@@ -1,0 +1,20 @@
+[project]
+name = "fex-agent"
+version = "0.1.0"
+description = "FEX: Fair Exchange's agent. Pydantic models here are the single schema source."
+requires-python = ">=3.12,<3.13"
+dependencies = ["pydantic>=2.8,<3"]
+
+[dependency-groups]
+dev = ["pytest>=8,<9"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/fex"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
