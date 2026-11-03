@@ -1,0 +1,29 @@
+name: Question
+description: Needs an answer from the team or FTUSA
+labels: ["type: question"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What prompted it, and what you already checked (vision doc, sample data, code).
+  - type: dropdown
+    id: who
+    attributes:
+      label: Who can answer
+      options:
+        - Team
+        - FTUSA
+    validations:
+      required: true
+  - type: textarea
+    id: blocks
+    attributes:
+      label: Blocks
+      description: Issues waiting on the answer, or "None". For FTUSA questions, also add a line to #38.
