@@ -71,9 +71,21 @@
     "CompletedRecord": {
       "additionalProperties": false,
       "description": "A conversation the producer agreed to save.",
+      "if": {
+        "properties": {
+          "language": {
+            "not": {
+              "const": "en"
+            }
+          }
+        },
+        "required": [
+          "language"
+        ]
+      },
       "properties": {
         "consent": {
-          "$ref": "#/$defs/Consent"
+          "$ref": "#/$defs/StoredConsent"
         },
         "created_at": {
           "format": "date-time",
@@ -192,6 +204,7 @@
         "summary_english": {
           "anyOf": [
             {
+              "minLength": 1,
               "type": "string"
             },
             {
@@ -199,7 +212,7 @@
             }
           ],
           "default": null,
-          "description": "English version, for non-English conversations",
+          "description": "English version; required for non-English conversations",
           "title": "Summary English"
         },
         "summary_original": {
@@ -235,19 +248,30 @@
         "record_id",
         "producer_id",
         "created_at",
-        "consent",
         "status",
+        "consent",
         "language",
         "entity_type",
         "summary_original",
         "tags"
       ],
+      "then": {
+        "properties": {
+          "summary_english": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "summary_english"
+        ]
+      },
       "title": "CompletedRecord",
       "type": "object"
     },
-    "Consent": {
+    "DeclinedConsent": {
       "additionalProperties": false,
-      "description": "What the producer agreed to, as a scope rather than a yes/no.\n\ndeclined: nothing narrative is stored\ninternal: stored for Fair Trade USA's own review and trends\ninternal_and_outward: may also be shared outward (e.g. aggregated for partners)",
+      "description": "The producer declined: nothing narrative is stored.",
       "properties": {
         "recorded_at": {
           "format": "date-time",
@@ -255,11 +279,7 @@
           "type": "string"
         },
         "scope": {
-          "enum": [
-            "declined",
-            "internal",
-            "internal_and_outward"
-          ],
+          "const": "declined",
           "title": "Scope",
           "type": "string"
         }
@@ -268,7 +288,7 @@
         "scope",
         "recorded_at"
       ],
-      "title": "Consent",
+      "title": "DeclinedConsent",
       "type": "object"
     },
     "DeclinedRecord": {
@@ -276,7 +296,7 @@
       "description": "The producer declined. Only identifiers, status and time are kept: no narrative content.",
       "properties": {
         "consent": {
-          "$ref": "#/$defs/Consent"
+          "$ref": "#/$defs/DeclinedConsent"
         },
         "created_at": {
           "format": "date-time",
@@ -311,10 +331,35 @@
         "record_id",
         "producer_id",
         "created_at",
-        "consent",
-        "status"
+        "status",
+        "consent"
       ],
       "title": "DeclinedRecord",
+      "type": "object"
+    },
+    "StoredConsent": {
+      "additionalProperties": false,
+      "description": "The producer agreed to store the conversation. Consent is a scope, not a yes/no:\n\ninternal: stored for Fair Trade USA's own review and trends\ninternal_and_outward: may also be shared outward (e.g. aggregated for partners)",
+      "properties": {
+        "recorded_at": {
+          "format": "date-time",
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "scope": {
+          "enum": [
+            "internal",
+            "internal_and_outward"
+          ],
+          "title": "Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scope",
+        "recorded_at"
+      ],
+      "title": "StoredConsent",
       "type": "object"
     }
   },

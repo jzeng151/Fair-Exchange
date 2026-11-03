@@ -9,7 +9,7 @@ dependencies = ["pydantic>=2.8,<3", "fx-data"]
 fx-data = { path = "../data" }  # regular install: macOS can hide editable .pth files, which Python skips
 
 [dependency-groups]
-dev = ["pytest>=8,<9"]
+dev = ["pytest>=8,<9", "jsonschema>=4.23,<5"]
 
 [build-system]
 requires = ["hatchling"]
