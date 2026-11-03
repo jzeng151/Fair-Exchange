@@ -28,3 +28,19 @@ To redeploy, follow [infra/README.md](../../infra/README.md). The sandbox checko
 is `/workshop/Fair-Exchange/Fair-Exchange-Scaffolding`; its deployment log is
 `/tmp/fair-exchange-deploy.log`. The bucket and encryption key are retained on
 stack deletion. Full cleanup requires handling those retained resources.
+
+## CI/CD setup status
+
+[PR #48](https://github.com/jzeng151/Fair-Exchange/pull/48) contains the CI/CD
+configuration. The [PR checks passed](https://github.com/jzeng151/Fair-Exchange/actions/runs/41733547889).
+`Scaffold checks` is required on `main`; the existing one-review approval rule
+is preserved. The workflow must be merged to apply to future branches.
+
+The sandbox IAM simulation allows `iam:CreateOpenIDConnectProvider`,
+`iam:CreateRole`, `iam:PutRolePolicy`, and `iam:PassRole`. GitHub's OIDC settings
+confirm immutable repository subjects. The scoped identity template is prepared,
+but role creation is awaiting action-time approval. No AWS credentials are stored
+in GitHub, no deployment role has been provisioned, and `AWS_DEPLOY_ROLE_ARN` is
+unset, so the publish job is currently skipped. After approval, create the identity,
+validate one setup-branch deployment, and remove temporary branch access before
+marking the PR ready for review.
