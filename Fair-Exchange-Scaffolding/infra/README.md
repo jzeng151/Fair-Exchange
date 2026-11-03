@@ -32,7 +32,7 @@ The `CI` workflow runs the existing Python tests, API and web type checks, web
 build, and CDK synthesis on every pull request. Actions are pinned by commit SHA.
 The `Scaffold checks` status is intended to be required before merging to `main`.
 
-After checks pass on `main`, `Publish sandbox` uses GitHub OIDC to assume
+After checks pass on a push or manual run on `main`, `Publish sandbox` uses GitHub OIDC to assume
 `FairExchangeGitHubDeploy`, builds the website, runs `publish-web.sh`, and verifies
 the served HTML and asset responses. Set the repository variable
 `AWS_DEPLOY_ROLE_ARN` to the role ARN. No AWS access keys are stored in GitHub.
@@ -51,10 +51,10 @@ EXPECTED_AWS_ACCOUNT=100300582834 bash configure-github-oidc.sh
 
 This creates the separate `FairExchangeGitHub` stack and requires IAM permissions.
 Its trust policy uses this repository's verified immutable OIDC subject IDs, not a
-wildcard repository name. `VALIDATION_BRANCH=chore/deploy-sandbox` temporarily
-allows the setup branch for an end-to-end test. Run the command again without
-that variable after testing to restore main-only trust. The temporary setup-branch
-deployment trigger must also be removed before merge.
+wildcard repository name. The role trusts only `main`. The setup script's optional
+`VALIDATION_BRANCH=chore/deploy-sandbox` parameter exists solely for initial
+validation; omit it during routine setup and updates. Pull-request runs have no
+AWS access, and deployment jobs are serialized to prevent overlapping uploads.
 
 CI and manual deployment instructions remain usable after the workshop ends;
 automated publishing needs a live sandbox account and its AWS resources.

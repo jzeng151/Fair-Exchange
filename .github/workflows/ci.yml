@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, chore/deploy-sandbox]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -55,7 +55,7 @@ jobs:
   deploy:
     name: Publish sandbox
     needs: checks
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/chore/deploy-sandbox') && vars.AWS_DEPLOY_ROLE_ARN != ''
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && vars.AWS_DEPLOY_ROLE_ARN != ''
     runs-on: ubuntu-latest
     timeout-minutes: 15
     concurrency:

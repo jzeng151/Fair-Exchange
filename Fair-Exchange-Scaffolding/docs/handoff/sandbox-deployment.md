@@ -32,15 +32,27 @@ stack deletion. Full cleanup requires handling those retained resources.
 ## CI/CD setup status
 
 [PR #48](https://github.com/jzeng151/Fair-Exchange/pull/48) contains the CI/CD
-configuration. The [PR checks passed](https://github.com/jzeng151/Fair-Exchange/actions/runs/41733547889).
-`Scaffold checks` is required on `main`; the existing one-review approval rule
-is preserved. The workflow must be merged to apply to future branches.
+configuration. `Scaffold checks` is required on `main`; the existing one-review
+approval rule is preserved. Merge the PR to enable the workflow for future
+branches and automatic website deployment after successful checks on `main`.
+Manual workflow runs on `main` can also publish. Pull-request runs have no AWS
+access, and deployment jobs are serialized.
 
-The sandbox IAM simulation allows `iam:CreateOpenIDConnectProvider`,
-`iam:CreateRole`, `iam:PutRolePolicy`, and `iam:PassRole`. GitHub's OIDC settings
-confirm immutable repository subjects. The scoped identity template is prepared,
-but role creation is awaiting action-time approval. No AWS credentials are stored
-in GitHub, no deployment role has been provisioned, and `AWS_DEPLOY_ROLE_ARN` is
-unset, so the publish job is currently skipped. After approval, create the identity,
-validate one setup-branch deployment, and remove temporary branch access before
-marking the PR ready for review.
+The approved `FairExchangeGitHub` CloudFormation stack provisions GitHub OIDC and
+`arn:aws:iam::100300582834:role/FairExchangeGitHubDeploy`. The repository variable
+`AWS_DEPLOY_ROLE_ARN` points to this role. No long-lived AWS credentials are stored
+in GitHub. The role can publish only the existing static website and refresh its
+CloudFront cache; infrastructure and IAM updates remain manual.
+
+The [end-to-end GitHub run](https://github.com/jzeng151/Fair-Exchange/actions/runs/41733955004)
+passed all checks, authenticated through OIDC, published the compiled files,
+waited for cache invalidation, compared the served HTML to the build, and fetched
+all built assets successfully. Validation used temporary access for
+`chore/deploy-sandbox`. That branch has been removed from the workflow's deploy
+triggers and from AWS trust. The role now trusts only the immutable subject
+`repo:jzeng151@87108282/Fair-Exchange@1444721780:ref:refs/heads/main`.
+
+The setup checkout in the browser workshop is `/tmp/fair-exchange-cicd`. Identity
+setup logs are `/tmp/fair-exchange-oidc.log` and
+`/tmp/fair-exchange-oidc-final.log`. These are temporary workshop files; the PR
+contains the reproducible setup instructions and configuration.
