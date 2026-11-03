@@ -6,7 +6,7 @@ import pytest
 from fx_data.standards import Standards
 from fx_data.standards_loader import export_text
 
-CLAUSES_JSON = Path(__file__).resolve().parents[1] / "standards" / "clauses.json"
+CLAUSES_JSON = Path(__file__).resolve().parents[1] / "src" / "fx_data" / "clauses.json"
 
 
 @pytest.fixture(scope="module")
@@ -50,7 +50,7 @@ def test_search_can_be_limited_to_one_standard(standards):
 
 def test_committed_clauses_json_matches_the_workbooks():
     assert CLAUSES_JSON.read_text(encoding="utf-8") == export_text(), \
-        "data/standards/clauses.json is stale; run: uv run python -m fx_data.standards_loader"
+        "fx_data/clauses.json is stale; run: PYTHONPATH=src uv run python -m fx_data.standards_loader"
 
 
 def test_search_matches_whole_words_not_fragments(standards):
