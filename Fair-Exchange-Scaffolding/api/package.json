@@ -1,0 +1,23 @@
+{
+  "name": "fair-exchange-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "build": "tsc -p .",
+    "typecheck": "tsc -p . --noEmit"
+  },
+  "dependencies": {
+    "@aws-lambda-powertools/idempotency": "^2.0.0",
+    "@aws-lambda-powertools/logger": "^2.0.0",
+    "@aws-sdk/client-bedrock-agentcore": "^3.700.0",
+    "@aws-sdk/client-comprehend": "^3.700.0",
+    "@aws-sdk/client-dynamodb": "^3.700.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.145",
+    "@types/node": "^20.16.0",
+    "typescript": "^5.6.0"
+  }
+}
