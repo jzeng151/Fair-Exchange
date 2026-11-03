@@ -1,0 +1,36 @@
+name: Bug
+description: Something isn't working
+labels: ["type: bug"]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include the synthetic producer ID and language if the bug is in a conversation.
+      value: |
+        1.
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: Stack name or local, branch or commit.
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or trace ID
+      description: AgentCore session ID, CloudWatch log link, or error output.
+      render: text

@@ -1,0 +1,37 @@
+name: Feature
+description: New capability for producers, reviewers or admins
+labels: ["type: feature"]
+body:
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Who needs this and why. Link the vision doc section, user journey or success metric it serves.
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance criteria
+      description: Checkable statements. Copy wording from the vision doc's success criteria or Definition of Done where one exists.
+      value: |
+        - [ ]
+    validations:
+      required: true
+  - type: textarea
+    id: technical
+    attributes:
+      label: Technical notes
+      description: Files, AWS services, schemas, tool contracts, decisions already made.
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Issues that must land first (#12), or "None".
+    validations:
+      required: true
+  - type: textarea
+    id: out-of-scope
+    attributes:
+      label: Out of scope
+      description: What this issue deliberately does not cover.

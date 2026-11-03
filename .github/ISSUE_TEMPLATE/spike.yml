@@ -1,0 +1,30 @@
+name: Spike
+description: Time-boxed research or prototype. The output is a finding, not a feature.
+labels: ["type: spike"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Question to answer
+      description: One question. The spike ends when it is answered or the time box runs out.
+    validations:
+      required: true
+  - type: input
+    id: timebox
+    attributes:
+      label: Time box
+      placeholder: e.g. 3 hours
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output
+      description: Where the finding goes (comment on this issue, ADR in docs/adr/, throwaway branch).
+    validations:
+      required: true
+  - type: textarea
+    id: unblocks
+    attributes:
+      label: Unblocks
+      description: Issues waiting on this answer.
