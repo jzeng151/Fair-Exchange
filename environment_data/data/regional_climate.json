@@ -1,0 +1,2583 @@
+{
+  "schema_version": 1,
+  "generated": "2026-11-03T21:45:59.411089Z",
+  "description": "Pre-extracted regional climate context (CHIRPS rainfall anomaly + Aqueduct water stress) for FTUSA producer regions. Static table read by the regional-context agent tool; no runtime API calls.",
+  "regions": [
+    {
+      "country": "brazil",
+      "region": "amazonas",
+      "centroid": {
+        "lat": -3.42,
+        "lon": -65.86
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in amazonas averaged 5.5% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -5.5,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in amazonas is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in amazonas is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "brazil",
+      "region": "minas gerais",
+      "centroid": {
+        "lat": -18.51,
+        "lon": -44.56
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in minas gerais averaged 3.4% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 3.4,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in minas gerais is rated 'Low - Medium (10-20%)'.",
+          "metric": "baseline_water_stress",
+          "value": 1.0287763193286548,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in minas gerais is projected to reach 'Medium-high (20-40%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 2.153794049,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "brazil",
+      "region": "piaui",
+      "centroid": {
+        "lat": -7.72,
+        "lon": -42.73
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in piaui averaged 4.3% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -4.3,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in piaui is rated 'Arid and Low Water Use'.",
+          "metric": "baseline_water_stress",
+          "value": 5,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in piaui is projected to reach 'Medium-high (20-40%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 2.988131876,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "brazil",
+      "region": "sao paulo",
+      "centroid": {
+        "lat": -22.3,
+        "lon": -48.6
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in sao paulo averaged 11.3% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -11.3,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in sao paulo is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in sao paulo is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "colombia",
+      "region": "antioquia",
+      "centroid": {
+        "lat": 6.55,
+        "lon": -75.83
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in antioquia averaged 7.7% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 7.7,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in antioquia is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in antioquia is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "colombia",
+      "region": "caldas",
+      "centroid": {
+        "lat": 5.3,
+        "lon": -75.27
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in caldas averaged 7.9% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 7.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in caldas is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in caldas is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "colombia",
+      "region": "cauca",
+      "centroid": {
+        "lat": 2.44,
+        "lon": -76.61
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in cauca averaged 10.4% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -10.4,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in cauca is rated 'Low - Medium (10-20%)'.",
+          "metric": "baseline_water_stress",
+          "value": 1.085506846511455,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in cauca is projected to reach 'Low-medium (10-20%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 1.363201626,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "colombia",
+      "region": "cesar",
+      "centroid": {
+        "lat": 9.34,
+        "lon": -73.65
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in cesar averaged 6.5% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 6.5,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in cesar is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in cesar is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0.298037761,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "colombia",
+      "region": "huila",
+      "centroid": {
+        "lat": 2.54,
+        "lon": -75.53
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in huila averaged 4.8% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 4.8,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in huila is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in huila is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0.111125444,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "colombia",
+      "region": "norte de santander",
+      "centroid": {
+        "lat": 7.95,
+        "lon": -72.9
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in norte de santander averaged 4.6% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -4.6,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in norte de santander is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in norte de santander is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "colombia",
+      "region": "risaralda",
+      "centroid": {
+        "lat": 5.31,
+        "lon": -75.99
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in risaralda averaged 7.2% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 7.2,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in risaralda is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in risaralda is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "colombia",
+      "region": "tolima",
+      "centroid": {
+        "lat": 4.09,
+        "lon": -75.15
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in tolima averaged 1.2% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -1.2,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in tolima is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in tolima is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "colombia",
+      "region": "valle del cauca",
+      "centroid": {
+        "lat": 3.8,
+        "lon": -76.52
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in valle del cauca averaged 2.6% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 2.6,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in valle del cauca is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in valle del cauca is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "costa rica",
+      "region": "alajuela",
+      "centroid": {
+        "lat": 10.39,
+        "lon": -84.42
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in alajuela averaged 30.6% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 30.6,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in alajuela is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in alajuela is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "costa rica",
+      "region": "san jose",
+      "centroid": {
+        "lat": 9.83,
+        "lon": -84.07
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in san jose averaged 13.7% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 13.7,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in san jose is rated 'Low - Medium (10-20%)'.",
+          "metric": "baseline_water_stress",
+          "value": 1.0815437123813136,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in san jose is projected to reach 'Low-medium (10-20%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 1.541027549,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "côte d’ivoire",
+      "region": "bas-sassandra",
+      "centroid": {
+        "lat": 5.47,
+        "lon": -6.62
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in bas-sassandra averaged 8.8% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -8.8,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in bas-sassandra is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in bas-sassandra is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "côte d’ivoire",
+      "region": "goh-djiboua",
+      "centroid": {
+        "lat": 5.88,
+        "lon": -5.57
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in goh-djiboua averaged 7.5% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -7.5,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in goh-djiboua is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in goh-djiboua is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "côte d’ivoire",
+      "region": "zanzan",
+      "centroid": {
+        "lat": 8.6,
+        "lon": -3.2
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in zanzan averaged 4.9% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -4.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in zanzan is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in zanzan is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "ecuador",
+      "region": "cotopaxi",
+      "centroid": {
+        "lat": -0.84,
+        "lon": -78.66
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in cotopaxi averaged 0.5% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 0.5,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in cotopaxi is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in cotopaxi is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "ecuador",
+      "region": "el oro",
+      "centroid": {
+        "lat": -3.42,
+        "lon": -79.8
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in el oro averaged 6.3% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -6.3,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in el oro is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0.9525144339049554,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in el oro is projected to reach 'Low-medium (10-20%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 1.448635661,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "ethiopia",
+      "region": "yedebub biheroch bihereseboch na hizboch",
+      "centroid": {
+        "lat": 6.5,
+        "lon": 37.0
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in yedebub biheroch bihereseboch na hizboch averaged 6.9% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 6.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in yedebub biheroch bihereseboch na hizboch is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in yedebub biheroch bihereseboch na hizboch is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "guatemala",
+      "region": "guatemala",
+      "centroid": {
+        "lat": 14.63,
+        "lon": -90.51
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in guatemala averaged 0.9% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -0.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in guatemala is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in guatemala is projected to reach 'Medium-high (20-40%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 2.16645552,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "guatemala",
+      "region": "huehuetenango",
+      "centroid": {
+        "lat": 15.32,
+        "lon": -91.47
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in huehuetenango averaged 0.9% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 0.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in huehuetenango is rated 'Low - Medium (10-20%)'.",
+          "metric": "baseline_water_stress",
+          "value": 1.8277138426496933,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in huehuetenango is projected to reach 'Medium-high (20-40%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 2.116573355,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "guatemala",
+      "region": "jalapa",
+      "centroid": {
+        "lat": 14.63,
+        "lon": -89.99
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in jalapa averaged 9.9% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 9.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in jalapa is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in jalapa is projected to reach 'Medium-high (20-40%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 2.16645552,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "guatemala",
+      "region": "quiche",
+      "centroid": {
+        "lat": 15.03,
+        "lon": -91.15
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in quiche averaged 0.3% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 0.3,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in quiche is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in quiche is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "guatemala",
+      "region": "solola",
+      "centroid": {
+        "lat": 14.77,
+        "lon": -91.18
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in solola averaged 8.6% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -8.6,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in solola is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in solola is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "honduras",
+      "region": "copan",
+      "centroid": {
+        "lat": 14.85,
+        "lon": -88.9
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in copan averaged 2.7% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -2.7,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in copan is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in copan is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0.21451072,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "honduras",
+      "region": "intibuca",
+      "centroid": {
+        "lat": 14.32,
+        "lon": -88.17
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in intibuca averaged 0.9% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -0.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in intibuca is rated 'Low - Medium (10-20%)'.",
+          "metric": "baseline_water_stress",
+          "value": 1.5870675902297675,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in intibuca is projected to reach 'Medium-high (20-40%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 2.629282176,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "honduras",
+      "region": "la paz",
+      "centroid": {
+        "lat": 14.32,
+        "lon": -87.68
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in la paz averaged 0.5% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -0.5,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in la paz is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in la paz is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0.21451072,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "honduras",
+      "region": "lempira",
+      "centroid": {
+        "lat": 14.59,
+        "lon": -88.57
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in lempira averaged 0.9% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 0.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in lempira is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in lempira is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0.21451072,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "honduras",
+      "region": "ocotepeque",
+      "centroid": {
+        "lat": 14.43,
+        "lon": -89.18
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in ocotepeque averaged 1.7% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -1.7,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in ocotepeque is rated 'Low - Medium (10-20%)'.",
+          "metric": "baseline_water_stress",
+          "value": 1.5870675902297675,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in ocotepeque is projected to reach 'Medium-high (20-40%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 2.629282176,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "india",
+      "region": "assam",
+      "centroid": {
+        "lat": 26.2,
+        "lon": 92.94
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in assam averaged 9.0% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 9.0,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in assam is rated 'Low - Medium (10-20%)'.",
+          "metric": "baseline_water_stress",
+          "value": 1.6810240019635176,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in assam is projected to reach 'Medium-high (20-40%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 2.395902807,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "india",
+      "region": "kerala",
+      "centroid": {
+        "lat": 10.85,
+        "lon": 76.27
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in kerala averaged 3.7% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -3.7,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in kerala is rated 'High (40-80%)'.",
+          "metric": "baseline_water_stress",
+          "value": 3.57334979305539,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in kerala is projected to reach 'High (40-80%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 3.577016574,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "india",
+      "region": "tamil nadu",
+      "centroid": {
+        "lat": 11.13,
+        "lon": 78.66
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in tamil nadu averaged 9.3% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 9.3,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in tamil nadu is rated 'Medium - High (20-40%)'.",
+          "metric": "baseline_water_stress",
+          "value": 2.387289319303638,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in tamil nadu is projected to reach 'High (40-80%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 3.08814436,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "indonesia",
+      "region": "aceh",
+      "centroid": {
+        "lat": 4.7,
+        "lon": 96.75
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in aceh averaged 3.2% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 3.2,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in aceh is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0.3224146964623894,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in aceh is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0.278070165,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "indonesia",
+      "region": "bali",
+      "centroid": {
+        "lat": -8.34,
+        "lon": 115.09
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in bali averaged 6.9% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 6.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in bali is rated 'Extremely High (>80%)'.",
+          "metric": "baseline_water_stress",
+          "value": 4.036138519540426,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in bali is projected to reach 'High (40-80%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 3.96639891,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "kenya",
+      "region": "kericho",
+      "centroid": {
+        "lat": -0.37,
+        "lon": 35.29
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in kericho averaged 0.9% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 0.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in kericho is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in kericho is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "mexico",
+      "region": "chiapas",
+      "centroid": {
+        "lat": 16.75,
+        "lon": -92.63
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in chiapas averaged 6.9% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 6.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in chiapas is rated 'Low - Medium (10-20%)'.",
+          "metric": "baseline_water_stress",
+          "value": 1.6995383206508503,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in chiapas is projected to reach 'Medium-high (20-40%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 2.726356151,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "mexico",
+      "region": "guanajuato",
+      "centroid": {
+        "lat": 21.02,
+        "lon": -101.26
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in guanajuato averaged 7.1% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -7.1,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in guanajuato is rated 'Extremely High (>80%)'.",
+          "metric": "baseline_water_stress",
+          "value": 5,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in guanajuato is projected to reach 'Extremely high (>80%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 5,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "mexico",
+      "region": "michoacan de ocampo",
+      "centroid": {
+        "lat": 19.57,
+        "lon": -101.71
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in michoacan de ocampo averaged 9.2% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 9.2,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in michoacan de ocampo is rated 'High (40-80%)'.",
+          "metric": "baseline_water_stress",
+          "value": 3.923892313939719,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in michoacan de ocampo is projected to reach 'Extremely high (>80%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 4.269689877,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "mexico",
+      "region": "sinaloa",
+      "centroid": {
+        "lat": 24.8,
+        "lon": -107.4
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in sinaloa averaged 15.2% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -15.2,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in sinaloa is rated 'Extremely High (>80%)'.",
+          "metric": "baseline_water_stress",
+          "value": 4.353049930030603,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in sinaloa is projected to reach 'Extremely high (>80%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 4.733887562,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "mexico",
+      "region": "sonora",
+      "centroid": {
+        "lat": 29.3,
+        "lon": -110.33
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in sonora averaged 19.1% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -19.1,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in sonora is rated 'Extremely High (>80%)'.",
+          "metric": "baseline_water_stress",
+          "value": 5,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in sonora is projected to reach 'Extremely high (>80%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 5,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "nicaragua",
+      "region": "boaco",
+      "centroid": {
+        "lat": 12.47,
+        "lon": -85.66
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in boaco averaged 13.1% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 13.1,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in boaco is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in boaco is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "nicaragua",
+      "region": "jinotega",
+      "centroid": {
+        "lat": 13.09,
+        "lon": -86.0
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in jinotega averaged 14.5% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 14.5,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in jinotega is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in jinotega is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "nicaragua",
+      "region": "madriz",
+      "centroid": {
+        "lat": 13.47,
+        "lon": -86.46
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in madriz averaged 15.9% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 15.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in madriz is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in madriz is projected to reach 'Low-medium (10-20%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 1.783609456,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "nicaragua",
+      "region": "masaya",
+      "centroid": {
+        "lat": 11.97,
+        "lon": -86.09
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in masaya averaged 16.1% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 16.1,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in masaya is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in masaya is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "peru",
+      "region": "amazonas",
+      "centroid": {
+        "lat": -5.08,
+        "lon": -78.0
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in amazonas averaged 13.6% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -13.6,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in amazonas is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in amazonas is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "peru",
+      "region": "ancash",
+      "centroid": {
+        "lat": -9.53,
+        "lon": -77.53
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in ancash averaged 5.0% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -5.0,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in ancash is rated 'Medium - High (20-40%)'.",
+          "metric": "baseline_water_stress",
+          "value": 2.21671865474843,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in ancash is projected to reach 'Medium-high (20-40%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 2.357621776,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "peru",
+      "region": "cajamarca",
+      "centroid": {
+        "lat": -7.16,
+        "lon": -78.51
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in cajamarca averaged 5.9% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -5.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in cajamarca is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in cajamarca is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "peru",
+      "region": "junin",
+      "centroid": {
+        "lat": -11.54,
+        "lon": -74.95
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in junin averaged 5.2% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 5.2,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in junin is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in junin is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "peru",
+      "region": "lambayeque",
+      "centroid": {
+        "lat": -6.37,
+        "lon": -79.84
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in lambayeque averaged 0.2% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -0.2,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in lambayeque is rated 'Extremely High (>80%)'.",
+          "metric": "baseline_water_stress",
+          "value": 4.982133946053635,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in lambayeque is projected to reach 'Extremely high (>80%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 5,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "peru",
+      "region": "pasco",
+      "centroid": {
+        "lat": -10.36,
+        "lon": -75.35
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in pasco averaged 3.9% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -3.9,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in pasco is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in pasco is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "peru",
+      "region": "san martin",
+      "centroid": {
+        "lat": -6.48,
+        "lon": -76.37
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in san martin averaged 11.0% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -11.0,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in san martin is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in san martin is projected to reach 'Low (<10%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "rwanda",
+      "region": "nord",
+      "centroid": {
+        "lat": -1.5,
+        "lon": 29.75
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in nord averaged 0.5% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -0.5,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in nord is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in nord is projected to reach 'Low-medium (10-20%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 1.021920422,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "rwanda",
+      "region": "ville de kigali",
+      "centroid": {
+        "lat": -1.95,
+        "lon": 30.06
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in ville de kigali averaged 6.3% below the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": -6.3,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in ville de kigali is rated 'Low (<10%)'.",
+          "metric": "baseline_water_stress",
+          "value": 0,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in ville de kigali is projected to reach 'Low-medium (10-20%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 1.021920422,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    },
+    {
+      "country": "sri lanka",
+      "region": "central province",
+      "centroid": {
+        "lat": 7.29,
+        "lon": 80.64
+      },
+      "claims": [
+        {
+          "statement": "Over the last 2 years, annual rainfall in central province averaged 0.5% above the 10-year average.",
+          "metric": "rainfall_anomaly_pct",
+          "value": 0.5,
+          "unit": "percent",
+          "citation": {
+            "source": "CHIRPS",
+            "detail": "Daily rainfall via ClimateSERV; recent 2-yr vs 10-yr annual mean",
+            "retrieved": "2026-11-03",
+            "url": "https://www.chc.ucsb.edu/data/chirps"
+          }
+        },
+        {
+          "statement": "Baseline water stress in central province is rated 'Medium - High (20-40%)'.",
+          "metric": "baseline_water_stress",
+          "value": 2.337081292646654,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Baseline annual water stress (WRI Aqueduct, HydroBASINS L6)",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        },
+        {
+          "statement": "Under a business-as-usual scenario, water stress in central province is projected to reach 'Medium-high (20-40%)' by 2050.",
+          "metric": "water_stress_bau_2050",
+          "value": 2.173773303,
+          "unit": "category",
+          "citation": {
+            "source": "Aqueduct 4.0",
+            "detail": "Projected water stress, business-as-usual scenario, 2050",
+            "retrieved": "2026-11-03",
+            "url": "https://www.wri.org/data/aqueduct-water-risk-atlas"
+          }
+        }
+      ]
+    }
+  ]
+}
