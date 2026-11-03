@@ -1,14 +1,14 @@
 // GENERATED FILE. Do not edit by hand.
 // Source: agent/src/fex/models.py  ->  agent/scripts/generate_types.py
-// schema-sha256: 9842e32e6446fb9723567cef0124223cdacb03ce4b718c8ed86a2fcd2a7a4007
-// body-sha256: dc93f9223bd0604cc899389990fd0175ff5180d6092344398b6c61125f48fb16
+// schema-sha256: 003e6d8f316aa6e8deb17623e3ceb07966d5604b7c8630763aaec455ca6531e9
+// body-sha256: f87710a425ab921de255c5df37a2a3e6ce8e239f558d78d33e3709b08d7c993a
 // end-of-banner
 /**
  * One record per Fair Exchange conversation. Generated from agent/src/fex/models.py; do not edit by hand.
  */
 export type ConversationRecord = CompletedRecord | DeclinedRecord;
 export type RecordedAt = string;
-export type Scope = "declined" | "internal" | "internal_and_outward";
+export type Scope = "internal" | "internal_and_outward";
 export type CreatedAt = string;
 /**
  * e.g. cooperative, smallholder, hired-labor farm, processor
@@ -65,7 +65,7 @@ export type ReviewedBy = string | null;
 export type Source1 = "agent conversation";
 export type Status = "completed";
 /**
- * English version, for non-English conversations
+ * English version; required for non-English conversations
  */
 export type SummaryEnglish = string | null;
 /**
@@ -105,6 +105,8 @@ export type Tags = [
     | "social and community"
   )[]
 ];
+export type RecordedAt1 = string;
+export type Scope1 = "declined";
 export type CreatedAt1 = string;
 /**
  * Set from the session, never from the conversation
@@ -121,7 +123,7 @@ export type Status1 = "declined";
  * A conversation the producer agreed to save.
  */
 export interface CompletedRecord {
-  consent: Consent;
+  consent: StoredConsent;
   created_at: CreatedAt;
   entity_type: EntityType;
   feedback?: Feedback;
@@ -141,13 +143,12 @@ export interface CompletedRecord {
   tags: Tags;
 }
 /**
- * What the producer agreed to, as a scope rather than a yes/no.
+ * The producer agreed to store the conversation. Consent is a scope, not a yes/no:
  *
- * declined: nothing narrative is stored
  * internal: stored for Fair Trade USA's own review and trends
  * internal_and_outward: may also be shared outward (e.g. aggregated for partners)
  */
-export interface Consent {
+export interface StoredConsent {
   recorded_at: RecordedAt;
   scope: Scope;
 }
@@ -171,10 +172,17 @@ export interface Citation {
  * The producer declined. Only identifiers, status and time are kept: no narrative content.
  */
 export interface DeclinedRecord {
-  consent: Consent;
+  consent: DeclinedConsent;
   created_at: CreatedAt1;
   producer_id: ProducerId1;
   record_id: RecordId1;
   source?: Source2;
   status: Status1;
+}
+/**
+ * The producer declined: nothing narrative is stored.
+ */
+export interface DeclinedConsent {
+  recorded_at: RecordedAt1;
+  scope: Scope1;
 }
