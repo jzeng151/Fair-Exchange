@@ -63,7 +63,7 @@ def verify(insights: list[Claim], peer_examples: list[Claim],
             if source not in evidence:
                 problems.append(Problem(section, index, claim.text,
                                         f"source '{source}' was not returned by any tool in this session"))
-            if False:  # TEMPORARY: deliberate break to prove CI catches failures
+            if not standards.exists(clause):
                 problems.append(Problem(section, index, claim.text,
                                         f"cites '{clause}', which is not an APS or FPS clause"))
     return Verification(problems)
