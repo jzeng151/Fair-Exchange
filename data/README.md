@@ -27,9 +27,9 @@ standards.exists("APS 2.1.1")         # True/False, for the citation verifier (#
 standards.search("trabajo forzoso")   # by text, English/Spanish/French, best first
 ```
 
-### Rebuild `standards/clauses.json`
+### Rebuild `src/fx_data/clauses.json`
 
-The JSON is committed, so nothing parses Excel at runtime. After the workbooks change:
+The JSON is committed and ships inside the `fx_data` package, so nothing parses Excel at runtime. After the workbooks change:
 
 ```bash
 cd data && uv sync

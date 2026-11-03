@@ -2,7 +2,8 @@
 
     cd data && uv run python -m fx_data.standards_loader
 
-Reads docs/olena_data/*.xlsm and writes data/standards/clauses.json (committed, so nothing
+Reads docs/olena_data/*.xlsm and writes data/src/fx_data/clauses.json (committed and shipped
+with the package, so nothing
 parses Excel at runtime). Clause IDs look like "APS 2.1.1" (objective), "APS 2.1.1.a" (criterion)
 and "FPS 1.1" (sub-module heading). They match the `standard_clause` citation format.
 
@@ -20,7 +21,7 @@ import openpyxl
 
 REPO = Path(__file__).resolve().parents[3]
 OLENA = REPO / "docs" / "olena_data"
-OUTPUT = REPO / "data" / "standards" / "clauses.json"
+OUTPUT = REPO / "data" / "src" / "fx_data" / "clauses.json"  # inside the package, so it ships with it
 
 # (standard, workbook, objectives sheet, criteria sheet, languages with official text)
 SOURCES = [

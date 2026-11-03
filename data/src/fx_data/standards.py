@@ -6,14 +6,15 @@
     standards.exists("APS 2.1.1")       # for the citation verifier (#17)
     standards.search("forced labor")    # by text, in English, Spanish or French
 
-Reads data/standards/clauses.json, built from the FTUSA workbooks by fx_data.standards_loader.
+Reads fx_data/clauses.json (shipped with the package), built from the FTUSA workbooks by fx_data.standards_loader.
 """
 import json
 import re
 import unicodedata
 from pathlib import Path
 
-CLAUSES_JSON = Path(__file__).resolve().parents[2] / "standards" / "clauses.json"
+# Shipped inside the package so it is found whether fx_data is installed or run from source
+CLAUSES_JSON = Path(__file__).with_name("clauses.json")
 _LEVEL_RANK = {"objective": 0, "criterion": 1, "sub-module": 2}
 
 
