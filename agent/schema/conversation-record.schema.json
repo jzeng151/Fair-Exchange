@@ -177,11 +177,61 @@
           "title": "Peer Examples",
           "type": "array"
         },
+        "pii_check": {
+          "default": "done",
+          "description": "Overall PII check status: failed if any text failed, unsupported_language for languages other than en and es, done only when every text is done (#20)",
+          "enum": [
+            "done",
+            "failed",
+            "unsupported_language"
+          ],
+          "title": "Pii Check",
+          "type": "string"
+        },
+        "pii_entity_types": {
+          "description": "PII types found in the producer's own text (#20)",
+          "items": {
+            "enum": [
+              "NAME",
+              "PHONE",
+              "EMAIL",
+              "ADDRESS"
+            ],
+            "type": "string"
+          },
+          "title": "Pii Entity Types",
+          "type": "array"
+        },
         "pii_flag": {
           "default": false,
           "description": "Personal information flagged for human review; never redacted",
           "title": "Pii Flag",
           "type": "boolean"
+        },
+        "pii_matches": {
+          "description": "What matched, for the reviewer; shown only through the review API (#20, #27)",
+          "items": {
+            "$ref": "#/$defs/PiiMatch"
+          },
+          "title": "Pii Matches",
+          "type": "array"
+        },
+        "pii_review": {
+          "anyOf": [
+            {
+              "enum": [
+                "confirmed",
+                "cleared"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reviewer decision on the PII flag (#27)",
+          "title": "Pii Review"
         },
         "producer_id": {
           "description": "Set from the session, never from the conversation",
@@ -564,6 +614,47 @@
         "reason"
       ],
       "title": "EarlierAnswer",
+      "type": "object"
+    },
+    "PiiMatch": {
+      "additionalProperties": false,
+      "description": "One PII hit in the producer's text, for a reviewer. Never redacted; shown only via the review API (#27).",
+      "properties": {
+        "context": {
+          "description": "About 10 words either side, from the producer's text",
+          "title": "Context",
+          "type": "string"
+        },
+        "entity_type": {
+          "enum": [
+            "NAME",
+            "PHONE",
+            "EMAIL",
+            "ADDRESS"
+          ],
+          "title": "Entity Type",
+          "type": "string"
+        },
+        "message_at": {
+          "description": "When the producer sent the message the match came from",
+          "format": "date-time",
+          "title": "Message At",
+          "type": "string"
+        },
+        "text": {
+          "description": "The matched words, exactly as the producer wrote them",
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entity_type",
+        "text",
+        "context",
+        "message_at"
+      ],
+      "title": "PiiMatch",
       "type": "object"
     },
     "StoredConsent": {

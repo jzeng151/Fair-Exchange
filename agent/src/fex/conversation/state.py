@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 from fex.conversation.contract import (
     Answer, ConsentScope, Evidence, FeedbackValue, HistoryEntry, Step,
 )
-from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer
+from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer, PiiMatch
 
 
 class Profile(BaseModel):
@@ -72,6 +72,13 @@ class ConversationState(BaseModel):
                                           "never given to a model, so they can't reach the playback or record")
     closed_reason: Literal["end", "inactivity", "max_lifetime"] | None = None
     closed_at: datetime | None = None
+    # PII flagging (#20): accumulated across saves and persisted, so a failed check never reads as clean.
+    pii_flag: bool = False
+    pii_entity_types: list[str] = Field(default_factory=list)
+    pii_matches: list[PiiMatch] = Field(default_factory=list)
+    pii_check: Literal["done", "failed", "unsupported_language"] = "done"
+    pii_statuses: dict[int, str] = Field(
+        default_factory=dict, description="History index -> scan status (pending/done/done_hit/failed/unsupported)")
     # Write-back (#26): what this conversation last saved, for conditional updates and no-op detection
     record_version: int | None = None
     record_created_at: datetime | None = None

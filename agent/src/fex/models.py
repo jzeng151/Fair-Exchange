@@ -36,6 +36,21 @@ class Claim(BaseModel):
     citation: Citation
 
 
+# PII flagging (#20): only these four types, above a confidence threshold, in the producer's own text.
+PiiEntityType = Literal["NAME", "PHONE", "EMAIL", "ADDRESS"]
+
+
+class PiiMatch(BaseModel):
+    """One PII hit in the producer's text, for a reviewer. Never redacted; shown only via the review API (#27)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    entity_type: PiiEntityType
+    text: str = Field(min_length=1, description="The matched words, exactly as the producer wrote them")
+    context: str = Field(description="About 10 words either side, from the producer's text")
+    message_at: datetime = Field(description="When the producer sent the message the match came from")
+
+
 class StoredConsent(BaseModel):
     """The producer agreed to store the conversation. Consent is a scope, not a yes/no:
 
@@ -132,6 +147,15 @@ class CompletedRecord(_RecordBase):
     peer_examples: list[Claim] = Field(default_factory=list, description="What others tried, as given to the producer")
     feedback: Literal["yes", "somewhat", "no"] | None = Field(default=None, description="Was the guidance helpful?")
     pii_flag: bool = Field(default=False, description="Personal information flagged for human review; never redacted")
+    pii_entity_types: list[PiiEntityType] = Field(
+        default_factory=list, description="PII types found in the producer's own text (#20)")
+    pii_matches: list[PiiMatch] = Field(
+        default_factory=list, description="What matched, for the reviewer; shown only through the review API (#20, #27)")
+    pii_check: Literal["done", "failed", "unsupported_language"] = Field(
+        default="done", description="Overall PII check status: failed if any text failed, unsupported_language "
+                                    "for languages other than en and es, done only when every text is done (#20)")
+    pii_review: Literal["confirmed", "cleared"] | None = Field(
+        default=None, description="Reviewer decision on the PII flag (#27)")
     review_status: Literal["pending", "reviewed"] = "pending"
     reviewed_by: str | None = None
     reviewed_at: datetime | None = None

@@ -87,6 +87,11 @@ def build_record(state: ConversationState, *, version: int, created_at: datetime
         "peer_examples": [c.model_dump() for c in answer.peer_examples],
         "earlier_answers": [a.model_dump() for a in state.earlier_answers],
         "feedback": state.feedback,
+        # PII flagging (#20): scanned into state before each save; declined records (above) keep none of it
+        "pii_flag": state.pii_flag,
+        "pii_entity_types": state.pii_entity_types,
+        "pii_matches": [m.model_dump() for m in state.pii_matches],
+        "pii_check": state.pii_check,
     })
 
 

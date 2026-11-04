@@ -12,7 +12,8 @@ from fex.models import parse_record
 from fex.records import DynamoRecordStore
 
 NARRATIVE = {"language", "entity_type", "summary_original", "summary_english", "tags", "evidence",
-             "earlier_answers", "insights", "peer_examples", "feedback"}
+             "earlier_answers", "insights", "peer_examples", "feedback",
+             "pii_flag", "pii_entity_types", "pii_matches", "pii_check", "pii_review"}
 
 
 @pytest.fixture

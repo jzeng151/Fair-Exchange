@@ -1,7 +1,7 @@
 // GENERATED FILE. Do not edit by hand.
 // Source: agent/src/fex/models.py  ->  agent/scripts/generate_types.py
-// schema-sha256: c284675744ec3db2711335ba461c075f321cdadbbdd000f31da1d6d2141990aa
-// body-sha256: 5ec5345a13493f0482edab75141e5c7a7e1a4eea7154f0009e057a4cb549ce65
+// schema-sha256: ddbacf88dbab677dda4216bc1bbf07d4f2d2695fdc2d7c7891ad4ee6ea888e37
+// body-sha256: 063ba8c2f850f77f95dd6c03810ea42e0f057b59cafc14c418f070649d21ea86
 // end-of-banner
 /**
  * One record per Fair Exchange conversation. Generated from agent/src/fex/models.py; do not edit by hand.
@@ -74,9 +74,38 @@ export type Language = string;
  */
 export type PeerExamples1 = Claim[];
 /**
+ * Overall PII check status: failed if any text failed, unsupported_language for languages other than en and es, done only when every text is done (#20)
+ */
+export type PiiCheck = "done" | "failed" | "unsupported_language";
+/**
+ * PII types found in the producer's own text (#20)
+ */
+export type PiiEntityTypes = ("NAME" | "PHONE" | "EMAIL" | "ADDRESS")[];
+/**
  * Personal information flagged for human review; never redacted
  */
 export type PiiFlag = boolean;
+/**
+ * About 10 words either side, from the producer's text
+ */
+export type Context = string;
+export type EntityType1 = "NAME" | "PHONE" | "EMAIL" | "ADDRESS";
+/**
+ * When the producer sent the message the match came from
+ */
+export type MessageAt = string;
+/**
+ * The matched words, exactly as the producer wrote them
+ */
+export type Text1 = string;
+/**
+ * What matched, for the reviewer; shown only through the review API (#20, #27)
+ */
+export type PiiMatches = PiiMatch[];
+/**
+ * Reviewer decision on the PII flag (#27)
+ */
+export type PiiReview = ("confirmed" | "cleared") | null;
 /**
  * Set from the session, never from the conversation
  */
@@ -210,7 +239,11 @@ export interface CompletedRecord {
   insights?: Insights1;
   language: Language;
   peer_examples?: PeerExamples1;
+  pii_check?: PiiCheck;
+  pii_entity_types?: PiiEntityTypes;
   pii_flag?: PiiFlag;
+  pii_matches?: PiiMatches;
+  pii_review?: PiiReview;
   producer_id: ProducerId;
   record_id: RecordId;
   review_status?: ReviewStatus;
@@ -272,6 +305,15 @@ export interface Citation {
   source: Source;
   standard_clause: StandardClause;
   strength?: Strength;
+}
+/**
+ * One PII hit in the producer's text, for a reviewer. Never redacted; shown only via the review API (#27).
+ */
+export interface PiiMatch {
+  context: Context;
+  entity_type: EntityType1;
+  message_at: MessageAt;
+  text: Text1;
 }
 /**
  * The producer declined. Only identifiers, status and time are kept: no narrative content.

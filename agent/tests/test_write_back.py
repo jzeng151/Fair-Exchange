@@ -15,7 +15,8 @@ from fex.records import DynamoRecordStore, RecordConflict, save_record
 TABLE = "fair-exchange-records-test"
 NARRATIVE = {"language", "entity_type", "summary_original", "summary_english", "tags", "evidence",
              "earlier_answers", "insights", "peer_examples", "feedback", "reviewer_tags",
-             "reviewer_summary_original", "reviewer_summary_english"}
+             "reviewer_summary_original", "reviewer_summary_english",
+             "pii_flag", "pii_entity_types", "pii_matches", "pii_check", "pii_review"}
 
 
 @pytest.fixture

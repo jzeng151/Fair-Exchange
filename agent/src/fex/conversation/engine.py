@@ -205,7 +205,8 @@ class ConversationEngine:
     def __init__(self, *, store: StateStore, small_model: Any, large_model: Any, standards: Standards | None = None,
                  profiles: Callable[[str], Profile | None] | None = None, tools: list | None = None,
                  clock: Callable[[], datetime] | None = None, max_retries: int = 2,
-                 records: Any = None, scope_check: ScopeCheck | None = None) -> None:
+                 records: Any = None, scope_check: ScopeCheck | None = None,
+                 pii_scanner: Any = None) -> None:
         self.store = store
         self.small_model, self.large_model = small_model, large_model
         self.standards = standards or Standards.load()
@@ -215,6 +216,7 @@ class ConversationEngine:
         self.max_retries = max_retries
         self.records = records  # a fex.records.RecordStore; None = records are not saved (#26)
         self.scope_check = scope_check or always_in_scope  # how it decides is "Not decided" (#21)
+        self.pii_scanner = pii_scanner  # a fex.pii.PiiScanner; None = producer text is not scanned (#20)
 
     # ------------------------------------------------------------------ entrypoint
 
@@ -335,6 +337,7 @@ class ConversationEngine:
         A conflict or invalid record is logged and surfaced as an error, never retried."""
         if self.records is None:
             return
+        self._scan_pii(state)
         from fex.records import RecordConflict, save_record  # local: records imports conversation state
 
         try:
@@ -346,6 +349,35 @@ class ConversationEngine:
         if result:
             turn.emit("record_saved", status=result.status, consent_scope=result.consent_scope,
                       version=result.version)
+
+    def _scan_pii(self, state: ConversationState) -> None:
+        """Scan the producer's own text for PII and fold the result into state (#20).
+
+        Runs on every save. Declined records keep no narrative, so there is nothing to flag. Out-of-scope
+        texts (#21) are excluded, so nothing from them is scanned or stored. Statuses persist, so a text is
+        scanned once and a flag, once set, stays set.
+        """
+        from fex.pii import PiiOutcome, ProducerText, flag_pii
+
+        if state.consent == "declined":
+            return
+        excluded = set(state.excluded_history)
+        texts: list = []
+        for i, entry in enumerate(state.history):
+            if i in excluded:
+                continue
+            if isinstance(entry, SpokenEntry) and entry.role == "producer":
+                texts.append(ProducerText(index=i, text=entry.text, at=entry.at))
+            elif isinstance(entry, ActionEntry) and entry.name == "correct_playback":
+                texts.append(ProducerText(index=i, text=entry.args["text"], at=entry.at))
+        prior = PiiOutcome(flag=state.pii_flag, entity_types=list(state.pii_entity_types),
+                           matches=list(state.pii_matches), check=state.pii_check, statuses=dict(state.pii_statuses))
+        outcome = flag_pii(texts, language=state.language, prior=prior, scanner=self.pii_scanner)
+        state.pii_flag = outcome.flag
+        state.pii_entity_types = outcome.entity_types
+        state.pii_matches = outcome.matches
+        state.pii_check = outcome.check
+        state.pii_statuses = outcome.statuses
 
     # ------------------------------------------------------------------ steps
 

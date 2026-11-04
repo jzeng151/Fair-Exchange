@@ -29,6 +29,18 @@ def model_ids() -> tuple[str, str]:
     return os.environ.get("FEX_SMALL_MODEL", DEFAULT_SMALL), os.environ.get("FEX_LARGE_MODEL", DEFAULT_LARGE)
 
 
+def pii_scanner():
+    """Comprehend-backed PII scanner, or None when records aren't saved (nothing to flag). Config: FEX_PII_THRESHOLD."""
+    if not os.environ.get("FEX_RECORDS_TABLE"):
+        return None
+    import boto3
+
+    from fex.pii import DEFAULT_PII_THRESHOLD, PiiScanner
+
+    threshold = float(os.environ.get("FEX_PII_THRESHOLD", DEFAULT_PII_THRESHOLD))
+    return PiiScanner(boto3.client("comprehend"), threshold=threshold)
+
+
 def record_store():
     """The records table from configuration, or None when FEX_RECORDS_TABLE is unset (local runs)."""
     name = os.environ.get("FEX_RECORDS_TABLE")
@@ -47,7 +59,8 @@ def default_engine() -> ConversationEngine:
 
     small, large = model_ids()
     return ConversationEngine(store=InMemoryStateStore(), small_model=BedrockModel(model_id=small),
-                              large_model=BedrockModel(model_id=large), records=record_store())
+                              large_model=BedrockModel(model_id=large), records=record_store(),
+                              pii_scanner=pii_scanner())
 
 
 def invoke(payload: dict[str, Any], engine: ConversationEngine | None = None) -> dict[str, Any]:
