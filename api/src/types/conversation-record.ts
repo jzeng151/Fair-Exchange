@@ -1,19 +1,12 @@
 // GENERATED FILE. Do not edit by hand.
 // Source: agent/src/fex/models.py  ->  agent/scripts/generate_types.py
-// schema-sha256: 996cdf9208b0689983db66aa6ed12340e1e8a01861a832aa45620f49ff19fa32
-// body-sha256: 745aa6595b2c4f0abfb26dcf467b13fccfaa390006bbf287dffd6cad1a46316d
+// schema-sha256: cca9aed75c59b7dba5fce1131f554e46c957f1a39a3d72491d17219c6bf3dddd
+// body-sha256: 9c1823be00ca2f205d03c692b3a6d03f1272b16998514bf1aa6b953d8e2d0430
 // end-of-banner
 /**
  * One record per Fair Exchange conversation. Generated from agent/src/fex/models.py; do not edit by hand.
  */
 export type ConversationRecord = CompletedRecord | DeclinedRecord;
-export type InputTokens = number;
-export type ModelId = string;
-export type OutputTokens = number;
-/**
- * Tokens per model for this conversation (AI footprint)
- */
-export type AiUsage = ModelUsage[];
 /**
  * Set when the conversation closes. Records are reviewable only when set.
  */
@@ -81,37 +74,13 @@ export type Language = string;
  */
 export type PeerExamples1 = Claim[];
 /**
- * Scan result: None until the first scan ran; unsupported_language covers languages other than en and es
- */
-export type PiiCheck = ("done" | "failed" | "unsupported_language") | null;
-/**
- * Types found across the conversation, in first-seen order
- */
-export type PiiEntityTypes = ("NAME" | "PHONE" | "EMAIL" | "ADDRESS")[];
-/**
  * Personal information flagged for human review; never redacted
  */
 export type PiiFlag = boolean;
 /**
- * Up to 10 words before and after the match
+ * Reviewer decision on the PII flag
  */
-export type Context = string;
-/**
- * Only these four types are looked for
- */
-export type EntityType1 = "NAME" | "PHONE" | "EMAIL" | "ADDRESS";
-/**
- * When the text containing the match was said
- */
-export type MessageAt = string;
-/**
- * The matched words; kept for review, never redacted or logged
- */
-export type Text1 = string;
-/**
- * Every match found across scanned texts; matches are removed if the record turns declined
- */
-export type PiiMatches = PiiMatch[];
+export type PiiReview = ("confirmed" | "cleared") | null;
 /**
  * Set from the session, never from the conversation
  */
@@ -201,10 +170,6 @@ export type UpdatedAt = string;
  */
 export type Version = number;
 /**
- * Tokens per model for this conversation (AI footprint)
- */
-export type AiUsage1 = ModelUsage[];
-/**
  * Set when the conversation closes. Records are reviewable only when set.
  */
 export type ClosedAt1 = string | null;
@@ -238,7 +203,6 @@ export type Version1 = number;
  * A conversation the producer agreed to save.
  */
 export interface CompletedRecord {
-  ai_usage?: AiUsage;
   closed_at?: ClosedAt;
   consent: StoredConsent;
   consent_history?: ConsentHistory;
@@ -250,10 +214,8 @@ export interface CompletedRecord {
   insights?: Insights1;
   language: Language;
   peer_examples?: PeerExamples1;
-  pii_check?: PiiCheck;
-  pii_entity_types?: PiiEntityTypes;
   pii_flag?: PiiFlag;
-  pii_matches?: PiiMatches;
+  pii_review?: PiiReview;
   producer_id: ProducerId;
   record_id: RecordId;
   review_status?: ReviewStatus;
@@ -269,14 +231,6 @@ export interface CompletedRecord {
   tags: Tags;
   updated_at: UpdatedAt;
   version: Version;
-}
-/**
- * Tokens one model used in this conversation, for the AI footprint (#26, #29). Non-narrative.
- */
-export interface ModelUsage {
-  input_tokens: InputTokens;
-  model_id: ModelId;
-  output_tokens: OutputTokens;
 }
 /**
  * The producer agreed to store the conversation. Consent is a scope, not a yes/no:
@@ -325,19 +279,9 @@ export interface Citation {
   strength?: Strength;
 }
 /**
- * One personal-information match a scan found, kept for human review (issue #20).
- */
-export interface PiiMatch {
-  context: Context;
-  entity_type: EntityType1;
-  message_at: MessageAt;
-  text: Text1;
-}
-/**
  * The producer declined. Only identifiers, status and time are kept: no narrative content.
  */
 export interface DeclinedRecord {
-  ai_usage?: AiUsage1;
   closed_at?: ClosedAt1;
   consent: DeclinedConsent;
   consent_history?: ConsentHistory1;
