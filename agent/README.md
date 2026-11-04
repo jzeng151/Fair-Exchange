@@ -75,6 +75,9 @@ intake → playback → respond → consent → feedback → closed
 - **Claim by claim:** each claim is checked by the citation verifier before it is sent as a `claim` event.
   Failures are rewritten up to the retry limit, then dropped and logged.
 - **Fixed text:** in `respond`, the opening line, limited-evidence notice and hand-back come from `conversation/copy.py`.
+- **Language (#22):** the opening uses the profile's language if it has one, otherwise English. Intake identifies
+  the language the producer writes in (ISO 639-1) and FEX switches to it; `step`, `actions` and resume carry it
+  so the client can label buttons. Tags always use the English values of the 11-tag set.
 - **State:** `ConversationState`, stored as JSON through a `StateStore` and rebuilt on every request.
   `InMemoryStateStore` is used until AgentCore Memory (`docs/specs/memory.md`) is built.
 - **Tests:** `tests/test_conversation_steps.py` (seam 1: scripted Strands models in `tests/conversation_harness.py`,

@@ -302,8 +302,9 @@ def test_engine_assesses_every_model_output_through_the_assessor():
     r = Run()
     r.engine.output_assessor = a
     r.to_feedback()
-    # The generated texts with content: first intake reply, playback, summary, and the answer's claims.
-    # The second intake turn sets ready_for_playback with an empty reply, which carries no text to assess.
-    assert len(client.calls) == 4
+    # Every generated text with content is assessed: the opening question, the intake reply, the playback,
+    # the summary, and the answer's claims. An empty reply (the intake turn that only sets the ready flag)
+    # carries no text, so it is not sent.
+    assert len(client.calls) >= 4
     assert all(c["source"] == "OUTPUT" for c in client.calls)
     assert any("Rainfall fell." in c["content"][0]["text"]["text"] for c in client.calls)

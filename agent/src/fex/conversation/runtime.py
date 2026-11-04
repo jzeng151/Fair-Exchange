@@ -47,9 +47,17 @@ def default_engine() -> ConversationEngine:
     from fex.guardrail import OutputAssessor, guarded_bedrock_model
 
     small, large = model_ids()
+    records = record_store()
+    # The Comprehend seam (#20): scans run only when records are configured — they are part of saving one.
+    pii_scanner = None
+    if records is not None:
+        from fex.pii import default_comprehend
+
+        pii_scanner = default_comprehend()
+    # Both models carry the detect-mode Guardrail (#12), and their structured output is assessed too.
     return ConversationEngine(store=InMemoryStateStore(), small_model=guarded_bedrock_model(small),
-                              large_model=guarded_bedrock_model(large), records=record_store(),
-                              output_assessor=OutputAssessor())
+                              large_model=guarded_bedrock_model(large), records=records,
+                              pii_scanner=pii_scanner, output_assessor=OutputAssessor())
 
 
 def invoke(payload: dict[str, Any], engine: ConversationEngine | None = None) -> dict[str, Any]:
