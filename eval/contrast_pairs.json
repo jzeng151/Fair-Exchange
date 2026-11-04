@@ -1,0 +1,11 @@
+{
+  "_comment": "Declared contrast pairs for the distinctness diagnostic (#36, per spec: 'the contrast pairs (S1 and S7, plus the producer pairs from [#7])'). The authoritative pair list lands with the #7 generator's producer definitions file; until then the pairs live here. Reviewer marks are filled after a human reviews a run's side-by-side pair answers.",
+  "pairs": [
+    {
+      "a": "colombia-drought-es",
+      "b": "cote-divoire-cocoa-pii-fr",
+      "basis": "S1 contrast partner per the #35 S7 rule: same challenge tag 'climate and weather', different crop (coffee vs cocoa) and region (Cauca, Colombia vs Goh-Djiboua, Cote d'Ivoire)"
+    }
+  ],
+  "reviewer_marks": {}
+}

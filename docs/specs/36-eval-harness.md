@@ -67,7 +67,10 @@ Amazon Bedrock AgentCore Evaluations (decided 2026-11-04) runs the scripted scen
   - mean tone score;
   - the distinctness pass rate;
   - the scope-leak count;
-  - per-scenario outcome checks.
+  - per-scenario outcome checks;
+  - run failures, so a missing record is visible in the report, not just dropped.
+
+The summary rates are on a 0 to 1 scale: a session's tone is its rubric score divided by 5 (the target of 4 or higher reads as 0.8), the directive-language count is the number of sessions that scored 0 (a directive phrase appeared), and the scope-leak count is the number of sessions that scored 1.0 (a leak scores 1.0, failing the 0 target). Each session's full result block still carries the raw values.
 
 ### Targets
 
