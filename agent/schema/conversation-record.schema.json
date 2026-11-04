@@ -1,0 +1,383 @@
+{
+  "$defs": {
+    "Citation": {
+      "additionalProperties": false,
+      "description": "Where a claim comes from. Every insight and peer example must carry one.",
+      "properties": {
+        "period": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Time period of the data, if any",
+          "title": "Period"
+        },
+        "source": {
+          "description": "Dataset, record or document the fact came from",
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "standard_clause": {
+          "description": "Related APS/FPS clause, e.g. 'APS 3.2.1'",
+          "minLength": 1,
+          "title": "Standard Clause",
+          "type": "string"
+        },
+        "strength": {
+          "default": "exact",
+          "description": "How well the evidence matches this producer's area",
+          "enum": [
+            "exact",
+            "nearest",
+            "limited"
+          ],
+          "title": "Strength",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "standard_clause"
+      ],
+      "title": "Citation",
+      "type": "object"
+    },
+    "Claim": {
+      "additionalProperties": false,
+      "description": "One insight or peer example given to the producer, with its citation.",
+      "properties": {
+        "citation": {
+          "$ref": "#/$defs/Citation"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "citation"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "CompletedRecord": {
+      "additionalProperties": false,
+      "description": "A conversation the producer agreed to save.",
+      "if": {
+        "properties": {
+          "language": {
+            "not": {
+              "const": "en"
+            }
+          }
+        },
+        "required": [
+          "language"
+        ]
+      },
+      "properties": {
+        "consent": {
+          "$ref": "#/$defs/StoredConsent"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "entity_type": {
+          "description": "e.g. cooperative, smallholder, hired-labor farm, processor",
+          "minLength": 1,
+          "title": "Entity Type",
+          "type": "string"
+        },
+        "feedback": {
+          "anyOf": [
+            {
+              "enum": [
+                "yes",
+                "somewhat",
+                "no"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Was the guidance helpful?",
+          "title": "Feedback"
+        },
+        "insights": {
+          "description": "What the data shows, as given to the producer",
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "title": "Insights",
+          "type": "array"
+        },
+        "language": {
+          "description": "ISO 639-1 code of the producer's language, e.g. 'es'",
+          "pattern": "^[a-z]{2}$",
+          "title": "Language",
+          "type": "string"
+        },
+        "peer_examples": {
+          "description": "What others tried, as given to the producer",
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "title": "Peer Examples",
+          "type": "array"
+        },
+        "pii_flag": {
+          "default": false,
+          "description": "Personal information flagged for human review; never redacted",
+          "title": "Pii Flag",
+          "type": "boolean"
+        },
+        "producer_id": {
+          "description": "Set from the session, never from the conversation",
+          "minLength": 1,
+          "title": "Producer Id",
+          "type": "string"
+        },
+        "record_id": {
+          "minLength": 1,
+          "title": "Record Id",
+          "type": "string"
+        },
+        "review_status": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "reviewed"
+          ],
+          "title": "Review Status",
+          "type": "string"
+        },
+        "reviewed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed At"
+        },
+        "reviewed_by": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reviewed By"
+        },
+        "source": {
+          "const": "agent conversation",
+          "default": "agent conversation",
+          "description": "Never confused with mandatory or compliance reporting data",
+          "title": "Source",
+          "type": "string"
+        },
+        "status": {
+          "const": "completed",
+          "title": "Status",
+          "type": "string"
+        },
+        "summary_english": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "English version; required for non-English conversations",
+          "title": "Summary English"
+        },
+        "summary_original": {
+          "description": "The challenge in the producer's own words and language",
+          "minLength": 1,
+          "title": "Summary Original",
+          "type": "string"
+        },
+        "tags": {
+          "description": "Challenge tags from the 11-tag set",
+          "items": {
+            "enum": [
+              "climate and weather",
+              "water",
+              "soil and land",
+              "market and price",
+              "labor and migration",
+              "financial and access to capital",
+              "education",
+              "health",
+              "infrastructure",
+              "biodiversity and conservation",
+              "social and community"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Tags",
+          "type": "array"
+        }
+      },
+      "required": [
+        "record_id",
+        "producer_id",
+        "created_at",
+        "status",
+        "consent",
+        "language",
+        "entity_type",
+        "summary_original",
+        "tags"
+      ],
+      "then": {
+        "properties": {
+          "summary_english": {
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "summary_english"
+        ]
+      },
+      "title": "CompletedRecord",
+      "type": "object"
+    },
+    "DeclinedConsent": {
+      "additionalProperties": false,
+      "description": "The producer declined: nothing narrative is stored.",
+      "properties": {
+        "recorded_at": {
+          "format": "date-time",
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "scope": {
+          "const": "declined",
+          "title": "Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scope",
+        "recorded_at"
+      ],
+      "title": "DeclinedConsent",
+      "type": "object"
+    },
+    "DeclinedRecord": {
+      "additionalProperties": false,
+      "description": "The producer declined. Only identifiers, status and time are kept: no narrative content.",
+      "properties": {
+        "consent": {
+          "$ref": "#/$defs/DeclinedConsent"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "producer_id": {
+          "description": "Set from the session, never from the conversation",
+          "minLength": 1,
+          "title": "Producer Id",
+          "type": "string"
+        },
+        "record_id": {
+          "minLength": 1,
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source": {
+          "const": "agent conversation",
+          "default": "agent conversation",
+          "description": "Never confused with mandatory or compliance reporting data",
+          "title": "Source",
+          "type": "string"
+        },
+        "status": {
+          "const": "declined",
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "producer_id",
+        "created_at",
+        "status",
+        "consent"
+      ],
+      "title": "DeclinedRecord",
+      "type": "object"
+    },
+    "StoredConsent": {
+      "additionalProperties": false,
+      "description": "The producer agreed to store the conversation. Consent is a scope, not a yes/no:\n\ninternal: stored for Fair Trade USA's own review and trends\ninternal_and_outward: may also be shared outward (e.g. aggregated for partners)",
+      "properties": {
+        "recorded_at": {
+          "format": "date-time",
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "scope": {
+          "enum": [
+            "internal",
+            "internal_and_outward"
+          ],
+          "title": "Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scope",
+        "recorded_at"
+      ],
+      "title": "StoredConsent",
+      "type": "object"
+    }
+  },
+  "description": "One record per Fair Exchange conversation. Generated from agent/src/fex/models.py; do not edit by hand.",
+  "discriminator": {
+    "mapping": {
+      "completed": "#/$defs/CompletedRecord",
+      "declined": "#/$defs/DeclinedRecord"
+    },
+    "propertyName": "status"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/CompletedRecord"
+    },
+    {
+      "$ref": "#/$defs/DeclinedRecord"
+    }
+  ],
+  "title": "ConversationRecord"
+}
