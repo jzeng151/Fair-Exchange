@@ -17,6 +17,7 @@ from fex.tools._contract import DataTool, EvidenceItem, run_data_tool
 from fex.tools._scope import session_entity_type, session_producer_id, session_tags
 
 MAX_EXAMPLES = 3
+_EVERY_MATCH = 10**9  # per-tag lookup limit: every candidate (the best project per organization), ranked later
 
 
 @lru_cache(maxsize=1)
@@ -47,14 +48,18 @@ def _fetch(state: dict[str, Any]) -> list[EvidenceItem]:
         return []
     if corrected := session_entity_type(state):
         profile = replace(profile, entity_type=corrected)
-    rows, seen = [], set()
-    for tag in session_tags(state):
-        for row in peers.find(tag, profile, limit=MAX_EXAMPLES):
-            if row["project_ref"] not in seen and row["org_ref"] not in seen:
-                seen |= {row["project_ref"], row["org_ref"]}
-                rows.append(row)
-    rows.sort(key=lambda r: -r["match_score"])  # stable: ties keep the confirmed tag order
-    return [_item(r, profile) for r in rows[:MAX_EXAMPLES]]
+    # Rank every candidate across all confirmed tags first, then keep one project per organization, so a
+    # better match under a later tag is never discarded for a weaker one under an earlier tag.
+    candidates = [row for tag in session_tags(state) for row in peers.find(tag, profile, limit=_EVERY_MATCH)]
+    candidates.sort(key=lambda r: -r["match_score"])  # stable: ties keep the confirmed tag order
+    rows, orgs = [], set()
+    for row in candidates:
+        if row["org_ref"] not in orgs:
+            orgs.add(row["org_ref"])
+            rows.append(row)
+            if len(rows) == MAX_EXAMPLES:
+                break
+    return [_item(r, profile) for r in rows]
 
 
 PEER_EXAMPLES = DataTool("find_peer_examples", "peer", _fetch)

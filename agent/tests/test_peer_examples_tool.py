@@ -62,6 +62,28 @@ def test_no_confirmed_tags_returns_an_empty_list():
     assert call_tool(find_peer_examples, {}, state(pid)) == ("success", [])
 
 
+def _best_per_org(pid: str, tags: list[str]) -> dict[str, float]:
+    """Highest match score each organization reaches across the tags (excluding the producer's own)."""
+    peers, profile = PeerProjects.load(), PROFILES.get(pid)
+    best: dict[str, float] = {}
+    for tag in tags:
+        for row in peers.find(tag, profile, limit=10**9):
+            best[row["org_ref"]] = max(best.get(row["org_ref"], 0.0), row["match_score"])
+    return best
+
+
+@pytest.mark.parametrize("tags", [["water", "soil and land"], ["soil and land", "water"],
+                                  ["climate and weather", "biodiversity and conservation"]])
+def test_ranking_across_tags_is_not_overridden_by_tag_order(tags):
+    for pid in PROFILES._profiles:
+        best = _best_per_org(pid, tags)
+        _, results = call_tool(find_peer_examples, {}, state(pid, *tags))
+        scores = [r["data"]["match_score"] for r in results]
+        # each organization shown with its best project, and the top organizations overall
+        assert all(r["data"]["match_score"] == best[r["data"]["org_ref"]] for r in results), pid
+        assert scores == sorted(best.values(), reverse=True)[:len(scores)], pid
+
+
 def test_items_follow_the_data_tool_contract():
     pid = _producer_with_projects("water", "coffee")
     _, results = call_tool(find_peer_examples, {}, state(pid, "water", "climate and weather"))
