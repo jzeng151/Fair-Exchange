@@ -39,7 +39,7 @@ deploy() {  # stack name, extra args
     --no-fail-on-empty-changeset "$@"
 }
 
-step "1/9 Checking CDK bootstrap and Transaction Search"
+step "1/10 Checking CDK bootstrap and Transaction Search"
 # The application stack uses CDK's standard synthesizer (docs/specs/05-cdk-stack.md), which needs a bootstrapped
 # account. The bootstrap version parameter is how the CDK CLI itself checks.
 if aws ssm get-parameter --name /cdk-bootstrap/hnb659fds/version >/dev/null 2>&1; then
@@ -57,29 +57,29 @@ if [[ "$destination" != CloudWatchLogs ]]; then
 fi
 echo "Transaction Search: on."
 
-step "2/9 Building the website"
+step "2/10 Building the website"
 (cd "$repo/web" && npm ci --silent && npm run build)
 
-step "3/9 Building one standards document per clause"
+step "3/10 Building one standards document per clause"
 hash="$(cd "$repo/data" && uv run --quiet python -m fx_data.standards_kb "$build/docs")"
 echo "Clause documents hash: $hash"
 
-step "4/9 Checking the infrastructure code"
+step "4/10 Checking the infrastructure code"
 (cd "$infra" && npm ci --silent && npx tsc --noEmit)
 
-step "5/9 Artifacts stack (artifacts key and bucket)"
+step "5/10 Artifacts stack (artifacts key and bucket)"
 synth
 deploy FairExchangeArtifacts
 bucket="$(output FairExchangeArtifacts ArtifactsBucketName)"
 key_arn="$(output FairExchangeArtifacts ArtifactsKeyArn)"
 [[ -n "$bucket" && "$bucket" != None && "$key_arn" == arn:aws:kms:* ]] || { echo "Artifacts stack outputs missing" >&2; exit 1; }
 
-step "6/9 Uploading clause documents to s3://$bucket/clauses/"
+step "6/10 Uploading clause documents to s3://$bucket/clauses/"
 # Freshly built files: sync re-uploads every document (resetting its expiry) and restores any that expired
 # before an ingestion can run. --delete removes clauses that no longer exist.
 aws s3 sync --only-show-errors --delete "$build/docs/clauses/" "s3://$bucket/clauses/"
 
-step "7/9 Packaging the agent (ARM64 Linux wheels, ADR 0002) and uploading it"
+step "7/10 Packaging the agent (ARM64 Linux wheels, ADR 0002) and uploading it"
 # The agent and data packages are built as wheels; their dependencies come from agent/uv.lock (minus the
 # OpenTelemetry pins, which aws-opentelemetry-distro sets for the traces).
 (cd "$repo/agent" && uv export --frozen --no-dev --no-hashes --no-emit-project --no-emit-package fx-data -q) \
@@ -96,7 +96,7 @@ agent_key="agent/fex-$(sha256 "$build/agent.zip" | cut -c1-12).zip"  # new key p
 aws s3 cp --only-show-errors "$build/agent.zip" "s3://$bucket/$agent_key"
 echo "Agent code: s3://$bucket/$agent_key ($(du -h "$build/agent.zip" | cut -f1))"
 
-step "8/9 Main stack (website hosting, standards Knowledge Base; ingestion runs when the clauses change)"
+step "8/10 Main stack (website hosting, standards Knowledge Base; ingestion runs when the clauses change)"
 # Migration for stacks deployed before the data source used RETAIN: switch the existing data source first.
 # A change that replaces the vector store also replaces the data source, and the old one is deleted after the
 # Knowledge Base role's vector permission has moved to the new index. With DELETE, that cleanup fails and leaves
@@ -125,7 +125,13 @@ fi
   -c artifactsBucket="$bucket" -c artifactsKeyArn="$key_arn" -c standardsDocsHash="$hash" \
   -c agentCodeKey="$agent_key" -c maxLifetimeMinutes="$FEX_MAX_LIFETIME_MINUTES" -c logRetentionDays="$LOG_RETENTION_DAYS")
 
-step "9/9 Publishing the website and running smoke tests"
+step "9/10 Uploading the producer data to the data bucket (#7, #14; Glue tables over it for Athena)"
+# Only allowlisted data: profiles, Premium projects, survey summary facts, certification scope, the peer catalog
+data_bucket="$(output FairExchange DataBucketName)"
+(cd "$repo/data" && uv run --quiet python -m fx_data.export "$build/data")
+aws s3 sync --only-show-errors --delete "$build/data/" "s3://$data_bucket/"
+
+step "10/10 Publishing the website and running smoke tests"
 bash "$infra/publish-web.sh"
 kb_id="$(output FairExchange StandardsKnowledgeBaseId)"
 (cd "$repo/agent" && FEX_STANDARDS_KB_ID="$kb_id" uv run --quiet pytest -q -p no:cacheprovider \
