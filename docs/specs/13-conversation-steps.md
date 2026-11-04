@@ -101,6 +101,7 @@ The AgentCore runtime role gets only these permissions. Other specs refer here.
 - `bedrock:Retrieve` on the standards Knowledge Base ([#17 spec](17-standards-grounding.md))
 - `comprehend:DetectPiiEntities` ([#20 spec](20-pii-flagging.md))
 - S3 read on the producer and peer data objects ([#14 spec](14-producer-record-tool.md))
+- Only in stacks deployed with `evalAccess=true`: `s3:PutObject` on the eval evidence bucket ([#34 spec](34-negative-scope-tests.md))
 
 ### Actions (shared contract owned here)
 

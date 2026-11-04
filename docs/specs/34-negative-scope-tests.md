@@ -54,7 +54,8 @@ The suite's result is the evidence for the scope metric.
 
 ### Eval evidence capture (shared contract owned here)
 
-- **When it's on.** Only in stacks deployed with `evalAccess=true` ([#5](05-cdk-stack.md)), which hold synthetic producers only. A template test ensures the main stack never has it.
+- **When it's on.** Only in stacks deployed with `evalAccess=true` ([#5](05-cdk-stack.md)). These load the same producer table as other stacks: FTUSA's anonymized sample plus synthetic producers, all already permitted in the sandbox. A template test ensures the main stack never has it.
+- **Permission.** The runtime role's evidence write is in the [#13](13-conversation-steps.md) permission list, conditional on `evalAccess`.
 - **What it holds.** At the end of each `respond` step and at close, the agent writes a JSON object to an eval evidence bucket under the conversation ID: every tool result item, every emitted claim, the dropped-claim reason codes and the final step.
 - **Access.** Read access is limited to the eval runner role. Objects expire after 7 days.
 

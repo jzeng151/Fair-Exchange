@@ -116,7 +116,7 @@ Template tests, using `aws-cdk-lib/assertions` on the synthesized stack:
 - every bucket, table and log group is KMS-encrypted;
 - every log group has a retention value set;
 - no resource has a hard-coded physical name;
-- the runtime role's actions equal the [#13 spec](13-conversation-steps.md) list exactly;
+- the runtime role's actions equal the [#13 spec](13-conversation-steps.md) list exactly for the stack's flags, including the eval evidence write only when `evalAccess=true`;
 - with `disposable=true`, nothing is retained, and the KMS key's deletion window is 7 days;
 - `evalAccess` and `trail` resources appear only when their flags are set, and the main stack name can't be synthesized with `evalAccess=true`;
 - the artifacts stack name is derived from `stackName`;

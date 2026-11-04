@@ -40,7 +40,7 @@ Scenarios are data files. Each file holds the producer, the language, the exact 
 | S7 | Contrast partner of S1 | en | Same tag as S1, different crop or region; used for distinctness |
 
 - **Demo set.** S1 to S5 make up the minimum demo run-through (README), with S6 added once its detection is decided. S2 and S4 cover Spanish.
-- **Runner behavior.** The scenario runner waits for each turn's `step` and `actions` events before sending the next turn. It answers extra intake questions from `intake_replies`. It fails a scenario if an expected step doesn't arrive within 60 seconds. The same runner is used by #34, #36 and #40.
+- **Runner behavior.** The scenario runner reads each turn's response stream to the end, through the `done` event, and checks the expected `step` and `actions` before sending the next turn. `step` and `actions` arrive before the turn finishes saving, and the turn lock rejects an early next request with 409 ([#25](25-chat-endpoint.md)). It answers extra intake questions from `intake_replies`. It fails a scenario if an expected step doesn't arrive within 60 seconds. The same runner is used by #34, #36 and #40.
 
 ### Labeled set
 
