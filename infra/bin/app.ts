@@ -2,6 +2,7 @@
 import { App, BootstraplessSynthesizer } from 'aws-cdk-lib';
 import { AgentArtifactsStack, AgentSpikeStack } from '../lib/agent-spike-stack';
 import { FairExchangeStack } from '../lib/fair-exchange-stack';
+import { GuardrailStack } from '../lib/guardrail-stack';
 
 const app = new App();
 const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION ?? 'us-west-2' };
@@ -15,3 +16,6 @@ new AgentSpikeStack(app, 'FairExchangeAgentSpike', {
   codeBucketName: app.node.tryGetContext('agentCodeBucket') ?? 'unset-agent-code-bucket',
   codeKey: app.node.tryGetContext('agentCodeKey') ?? 'hello/unset.zip',
 });
+
+// Issue #12: the FEX Guardrail in detect mode (synth-only until the agent stack, #5, deploys it)
+new GuardrailStack(app, 'FairExchangeGuardrail', { synthesizer: new BootstraplessSynthesizer(), env });

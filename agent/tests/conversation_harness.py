@@ -27,6 +27,7 @@ class ScriptedModel(Model):
         self.calls = []  # tool names offered on each call
         self.prompts = []  # the text the model was given on each call
         self.watch = None  # optional callable run at the start of every model call (e.g. to see what was delivered)
+        self.guardrail_traces = []  # Guardrail traces to attach, one per call, as Bedrock does in `metadata`
 
     def add(self, *steps):
         self.script.extend(steps)
@@ -52,6 +53,7 @@ class ScriptedModel(Model):
         kind, *rest = self.script.pop(0)
         if kind == "raise":
             raise rest[0]
+        trace = self.guardrail_traces.pop(0) if self.guardrail_traces else None
         yield {"messageStart": {"role": "assistant"}}
         if kind in ("tool", "out"):
             name, data = rest
@@ -59,6 +61,9 @@ class ScriptedModel(Model):
             yield {"contentBlockDelta": {"delta": {"toolUse": {"input": json.dumps(data)}}}}
             yield {"contentBlockStop": {}}
             yield {"messageStop": {"stopReason": "tool_use"}}
+            if trace:
+                yield {"metadata": {"usage": {"inputTokens": 10, "outputTokens": 5, "totalTokens": 15},
+                                    "metrics": {"latencyMs": 1}, "trace": {"guardrail": trace}}}
         else:
             yield {"contentBlockStart": {"start": {}}}
             yield {"contentBlockDelta": {"delta": {"text": rest[0]}}}

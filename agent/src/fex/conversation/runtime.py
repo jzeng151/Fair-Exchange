@@ -7,6 +7,7 @@ Deploy pattern: docs/adr/0002-agentcore-runtime-spike.md.
 
 State: in-memory per runtime session until AgentCore Memory (docs/specs/memory.md) replaces the store.
 Records (#26): saved to the DynamoDB table named by FEX_RECORDS_TABLE; not saved when it is unset.
+Guardrail (#12): FEX_GUARDRAIL_ID + FEX_GUARDRAIL_VERSION attach the Guardrail to every model call, in detect mode.
 """
 import os
 import queue
@@ -29,6 +30,21 @@ def model_ids() -> tuple[str, str]:
     return os.environ.get("FEX_SMALL_MODEL", DEFAULT_SMALL), os.environ.get("FEX_LARGE_MODEL", DEFAULT_LARGE)
 
 
+def guardrail_config() -> dict[str, Any]:
+    """Guardrail settings for every Bedrock model call (#12), or {} when no Guardrail is configured.
+
+    Trace is on so findings come back to be logged. Redaction is OFF explicitly: Strands redacts input by
+    default when a Guardrail intervenes, and FEX must never alter what the producer wrote.
+    """
+    gid, version = os.environ.get("FEX_GUARDRAIL_ID"), os.environ.get("FEX_GUARDRAIL_VERSION")
+    if not gid and not version:
+        return {}
+    if not (gid and version):
+        raise ValueError("Set both FEX_GUARDRAIL_ID and FEX_GUARDRAIL_VERSION, or neither")
+    return {"guardrail_id": gid, "guardrail_version": version, "guardrail_trace": "enabled",
+            "guardrail_redact_input": False, "guardrail_redact_output": False}
+
+
 def record_store():
     """The records table from configuration, or None when FEX_RECORDS_TABLE is unset (local runs)."""
     name = os.environ.get("FEX_RECORDS_TABLE")
@@ -46,8 +62,9 @@ def default_engine() -> ConversationEngine:
     from strands.models.bedrock import BedrockModel
 
     small, large = model_ids()
-    return ConversationEngine(store=InMemoryStateStore(), small_model=BedrockModel(model_id=small),
-                              large_model=BedrockModel(model_id=large), records=record_store())
+    guardrail = guardrail_config()  # the same Guardrail on every model call
+    return ConversationEngine(store=InMemoryStateStore(), small_model=BedrockModel(model_id=small, **guardrail),
+                              large_model=BedrockModel(model_id=large, **guardrail), records=record_store())
 
 
 def invoke(payload: dict[str, Any], engine: ConversationEngine | None = None) -> dict[str, Any]:

@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field, TypeAdapter
 from strands import Agent
 
 from fex.conversation import copy
+from fex.conversation.guardrail import GuardrailObserved
 from fex.conversation.scope import ScopeCheck, always_in_scope
 from fex.conversation.contract import (
     ActionEntry, ActionName, Answer, Event, Request, ResumeResponse, SpokenEntry,
@@ -267,7 +268,7 @@ class ConversationEngine:
         elif state.step == "playback":
             self._playback(state, turn, correction=text)
         else:  # respond, consent, feedback: a short reply that changes nothing
-            reply = self._structured(self.small_model, SHORT_REPLY_SYSTEM, self._transcript(state), ShortReply)
+            reply = self._structured(state, self.small_model, SHORT_REPLY_SYSTEM, self._transcript(state), ShortReply)
             turn.say(reply.reply)
         return self._finish(state, turn, step_changed=state.step != before)
 
@@ -345,7 +346,7 @@ class ConversationEngine:
     # ------------------------------------------------------------------ steps
 
     def _ask(self, state: ConversationState, turn: _Turn, system: str, prompt: str) -> IntakeTurn:
-        result = self._structured(self.small_model, system, prompt, IntakeTurn)
+        result = self._structured(state, self.small_model, system, prompt, IntakeTurn)
         state.language = result.language or state.language
         return result
 
@@ -358,7 +359,7 @@ class ConversationEngine:
 
     def _playback(self, state: ConversationState, turn: _Turn, correction: str | None = None) -> None:
         prompt = self._transcript(state) + (f"\n\nThe producer corrected the playback: {correction}" if correction else "")
-        draft = self._structured(self.small_model, PLAYBACK_SYSTEM, prompt, PlaybackDraft)
+        draft = self._structured(state, self.small_model, PLAYBACK_SYSTEM, prompt, PlaybackDraft)
         state.playback = Playback(text=draft.text, challenge=draft.challenge, timing=draft.timing,
                                   severity=draft.severity, tried=draft.tried)
         if draft.entity_type:  # every correction applies; back to the value on file clears the override
@@ -373,7 +374,7 @@ class ConversationEngine:
     def _confirm(self, state: ConversationState, turn: _Turn) -> None:
         assert state.playback is not None
         note = f"\nLocation note (keep it in both summaries): {state.location_note}" if state.location_note else ""
-        summary = self._structured(self.small_model, SUMMARY_SYSTEM,
+        summary = self._structured(state, self.small_model, SUMMARY_SYSTEM,
                                    f"Language: {state.language}\nConfirmed playback: {state.playback.model_dump_json()}"
                                    + note, RecordSummary)
         state.playback.summary_original = summary.summary_original
@@ -477,7 +478,8 @@ class ConversationEngine:
         invocation_state = {"producer_id": state.producer_id, "step": "respond",
                             "entity_type": state.effective_entity_type}
         try:
-            agent = Agent(model=self.large_model, system_prompt=ANSWER_SYSTEM, tools=list(self.tools),
+            agent = Agent(model=GuardrailObserved(self.large_model, state.conversation_id),
+                          system_prompt=ANSWER_SYSTEM, tools=list(self.tools),
                           callback_handler=None)
             result = agent(prompt, structured_output_model=AnswerDraft, invocation_state=invocation_state)
         except Exception as exc:  # model failure, or a tool failure Strands raised
@@ -501,9 +503,11 @@ class ConversationEngine:
 
     # ------------------------------------------------------------------ helpers
 
-    def _structured(self, model: Any, system: str, prompt: str, output: type[BaseModel]) -> Any:
-        """Small-model calls: no data tools are ever offered here."""
-        agent = Agent(model=model, system_prompt=system, tools=[], callback_handler=None)
+    def _structured(self, state: ConversationState, model: Any, system: str, prompt: str,
+                    output: type[BaseModel]) -> Any:
+        """Small-model calls: no data tools are ever offered here. Guardrail findings are logged (#12)."""
+        agent = Agent(model=GuardrailObserved(model, state.conversation_id), system_prompt=system, tools=[],
+                      callback_handler=None)
         return agent(prompt, structured_output_model=output).structured_output
 
     def _transcript(self, state: ConversationState) -> str:
