@@ -9,6 +9,13 @@ What each FEX tool takes, returns and guarantees. Code: `agent/src/fex/tools/`. 
 - No producer in the session: the tool returns an error (`PermissionError: No producer in session`).
 - Location, crop and entity type come from the producer's profile (`fx_data.peers.ProducerProfiles`). Today that is a stand-in built from the sample accounts. When the producer-record tool (#14) and the Athena tables (#28) exist, swap the profile lookup; the tool contracts do not change.
 
+## Step gating (all data tools, #13)
+
+- Data tools run only in the conversation's `respond` step, after the producer confirms the playback. The step comes from `tool_context.invocation_state["step"]`, which the conversation engine sets in code; the model never sets it.
+- Every data tool starts with `if refusal := retrieval_refusal(tool_context): return refusal` (from `fex.tools._scope`). Outside `respond`, including when no step is set, it returns `{"refused": true, "reason": "Data tools run only after the producer confirms the playback."}` instead of data.
+- `find_peer_examples` uses the entity type the producer corrected in playback (`invocation_state["entity_type"]`) for matching. Location is a scope field and always comes from the profile.
+- Tests that call a tool directly get `step: "respond"` from `tests/tool_harness.call_tool` unless they pass another step (or `step=None` for none).
+
 ## Citations
 
 Each fact and peer example has a `source` string. That is the value the citation verifier (#17) records from tool results and checks `Citation.source` against, so FEX must copy it unchanged into the claim's `Citation.source`. Tools do not choose a standard clause; that comes from `check_standards`. Copy `period` and `strength` into the `Citation` too.

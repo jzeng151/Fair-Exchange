@@ -1,0 +1,1034 @@
+{
+  "$defs": {
+    "ActionEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "args": {
+          "additionalProperties": true,
+          "title": "Args",
+          "type": "object"
+        },
+        "at": {
+          "format": "date-time",
+          "title": "At",
+          "type": "string"
+        },
+        "name": {
+          "enum": [
+            "confirm_playback",
+            "correct_playback",
+            "reopen_playback",
+            "retry_answer",
+            "set_consent",
+            "set_feedback",
+            "end"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "role": {
+          "const": "action",
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "name",
+        "args",
+        "at"
+      ],
+      "title": "ActionEntry",
+      "type": "object"
+    },
+    "ActionRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "discriminator": {
+            "mapping": {
+              "confirm_playback": "#/$defs/ConfirmPlayback",
+              "correct_playback": "#/$defs/CorrectPlayback",
+              "end": "#/$defs/End",
+              "reopen_playback": "#/$defs/ReopenPlayback",
+              "retry_answer": "#/$defs/RetryAnswer",
+              "set_consent": "#/$defs/SetConsent",
+              "set_feedback": "#/$defs/SetFeedback"
+            },
+            "propertyName": "name"
+          },
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ConfirmPlayback"
+            },
+            {
+              "$ref": "#/$defs/CorrectPlayback"
+            },
+            {
+              "$ref": "#/$defs/ReopenPlayback"
+            },
+            {
+              "$ref": "#/$defs/RetryAnswer"
+            },
+            {
+              "$ref": "#/$defs/SetConsent"
+            },
+            {
+              "$ref": "#/$defs/SetFeedback"
+            },
+            {
+              "$ref": "#/$defs/End"
+            }
+          ],
+          "title": "Action"
+        },
+        "conversationId": {
+          "description": "Set by the chat API",
+          "minLength": 1,
+          "title": "Conversationid",
+          "type": "string"
+        },
+        "kind": {
+          "const": "action",
+          "title": "Kind",
+          "type": "string"
+        },
+        "producerId": {
+          "description": "Set by the chat API from the identity",
+          "minLength": 1,
+          "title": "Producerid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "producerId",
+        "conversationId",
+        "kind",
+        "action"
+      ],
+      "title": "ActionRequest",
+      "type": "object"
+    },
+    "ActionsEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed": {
+          "items": {
+            "enum": [
+              "confirm_playback",
+              "correct_playback",
+              "reopen_playback",
+              "retry_answer",
+              "set_consent",
+              "set_feedback",
+              "end"
+            ],
+            "type": "string"
+          },
+          "title": "Allowed",
+          "type": "array"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "seq": {
+          "description": "Increasing within one turn",
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "actions",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "seq",
+        "type",
+        "allowed",
+        "language"
+      ],
+      "title": "ActionsEvent",
+      "type": "object"
+    },
+    "Answer": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "enum": [
+            "full",
+            "limited"
+          ],
+          "title": "Evidence",
+          "type": "string"
+        },
+        "insights": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "title": "Insights",
+          "type": "array"
+        },
+        "peer_examples": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "title": "Peer Examples",
+          "type": "array"
+        }
+      },
+      "required": [
+        "insights",
+        "peer_examples",
+        "evidence"
+      ],
+      "title": "Answer",
+      "type": "object"
+    },
+    "AnswerEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "enum": [
+            "full",
+            "limited"
+          ],
+          "title": "Evidence",
+          "type": "string"
+        },
+        "insights": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "title": "Insights",
+          "type": "array"
+        },
+        "peer_examples": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "title": "Peer Examples",
+          "type": "array"
+        },
+        "seq": {
+          "description": "Increasing within one turn",
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "answer",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "seq",
+        "type",
+        "insights",
+        "peer_examples",
+        "evidence"
+      ],
+      "title": "AnswerEvent",
+      "type": "object"
+    },
+    "AutoCloseRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "conversationId": {
+          "description": "Set by the chat API",
+          "minLength": 1,
+          "title": "Conversationid",
+          "type": "string"
+        },
+        "kind": {
+          "const": "auto_close",
+          "title": "Kind",
+          "type": "string"
+        },
+        "producerId": {
+          "description": "Set by the chat API from the identity",
+          "minLength": 1,
+          "title": "Producerid",
+          "type": "string"
+        },
+        "reason": {
+          "enum": [
+            "inactivity",
+            "max_lifetime"
+          ],
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "producerId",
+        "conversationId",
+        "kind",
+        "reason"
+      ],
+      "title": "AutoCloseRequest",
+      "type": "object"
+    },
+    "Citation": {
+      "additionalProperties": false,
+      "description": "Where a claim comes from. Every insight and peer example must carry one.",
+      "properties": {
+        "period": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Time period of the data, if any",
+          "title": "Period"
+        },
+        "source": {
+          "description": "Dataset, record or document the fact came from",
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        },
+        "standard_clause": {
+          "description": "Related APS/FPS clause, e.g. 'APS 3.2.1'",
+          "minLength": 1,
+          "title": "Standard Clause",
+          "type": "string"
+        },
+        "strength": {
+          "default": "exact",
+          "description": "How well the evidence matches this producer's area",
+          "enum": [
+            "exact",
+            "nearest",
+            "limited"
+          ],
+          "title": "Strength",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source",
+        "standard_clause"
+      ],
+      "title": "Citation",
+      "type": "object"
+    },
+    "Claim": {
+      "additionalProperties": false,
+      "description": "One insight or peer example given to the producer, with its citation.",
+      "properties": {
+        "citation": {
+          "$ref": "#/$defs/Citation"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "citation"
+      ],
+      "title": "Claim",
+      "type": "object"
+    },
+    "ClaimEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "claim": {
+          "$ref": "#/$defs/Claim"
+        },
+        "section": {
+          "enum": [
+            "insights",
+            "peer_examples"
+          ],
+          "title": "Section",
+          "type": "string"
+        },
+        "seq": {
+          "description": "Increasing within one turn",
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "claim",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "seq",
+        "type",
+        "section",
+        "claim"
+      ],
+      "title": "ClaimEvent",
+      "type": "object"
+    },
+    "ConfirmPlayback": {
+      "additionalProperties": false,
+      "properties": {
+        "args": {
+          "$ref": "#/$defs/NoArgs"
+        },
+        "name": {
+          "const": "confirm_playback",
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ConfirmPlayback",
+      "type": "object"
+    },
+    "CorrectPlayback": {
+      "additionalProperties": false,
+      "properties": {
+        "args": {
+          "$ref": "#/$defs/CorrectPlaybackArgs"
+        },
+        "name": {
+          "const": "correct_playback",
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "args"
+      ],
+      "title": "CorrectPlayback",
+      "type": "object"
+    },
+    "CorrectPlaybackArgs": {
+      "additionalProperties": false,
+      "properties": {
+        "text": {
+          "maxLength": 1000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "CorrectPlaybackArgs",
+      "type": "object"
+    },
+    "DoneEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "seq": {
+          "description": "Increasing within one turn",
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "done",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "seq",
+        "type"
+      ],
+      "title": "DoneEvent",
+      "type": "object"
+    },
+    "End": {
+      "additionalProperties": false,
+      "properties": {
+        "args": {
+          "$ref": "#/$defs/NoArgs"
+        },
+        "name": {
+          "const": "end",
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "End",
+      "type": "object"
+    },
+    "ErrorEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "enum": [
+            "agent_failed",
+            "invalid_action",
+            "closed"
+          ],
+          "title": "Code",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "seq": {
+          "description": "Increasing within one turn",
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "type": {
+          "const": "error",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "seq",
+        "type",
+        "code",
+        "message"
+      ],
+      "title": "ErrorEvent",
+      "type": "object"
+    },
+    "MessageRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "conversationId": {
+          "description": "Set by the chat API",
+          "minLength": 1,
+          "title": "Conversationid",
+          "type": "string"
+        },
+        "kind": {
+          "const": "message",
+          "title": "Kind",
+          "type": "string"
+        },
+        "producerId": {
+          "description": "Set by the chat API from the identity",
+          "minLength": 1,
+          "title": "Producerid",
+          "type": "string"
+        },
+        "text": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "producerId",
+        "conversationId",
+        "kind",
+        "text"
+      ],
+      "title": "MessageRequest",
+      "type": "object"
+    },
+    "NoArgs": {
+      "additionalProperties": false,
+      "properties": {},
+      "title": "NoArgs",
+      "type": "object"
+    },
+    "RecordSavedEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "consent_scope": {
+          "anyOf": [
+            {
+              "enum": [
+                "internal",
+                "internal_and_outward",
+                "declined"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Consent Scope"
+        },
+        "seq": {
+          "description": "Increasing within one turn",
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "status": {
+          "enum": [
+            "completed",
+            "declined"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "type": {
+          "const": "record_saved",
+          "title": "Type",
+          "type": "string"
+        },
+        "version": {
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "seq",
+        "type",
+        "status",
+        "consent_scope",
+        "version"
+      ],
+      "title": "RecordSavedEvent",
+      "type": "object"
+    },
+    "ReopenPlayback": {
+      "additionalProperties": false,
+      "properties": {
+        "args": {
+          "$ref": "#/$defs/NoArgs"
+        },
+        "name": {
+          "const": "reopen_playback",
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ReopenPlayback",
+      "type": "object"
+    },
+    "ResumeRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "conversationId": {
+          "description": "Set by the chat API",
+          "minLength": 1,
+          "title": "Conversationid",
+          "type": "string"
+        },
+        "kind": {
+          "const": "resume",
+          "title": "Kind",
+          "type": "string"
+        },
+        "producerId": {
+          "description": "Set by the chat API from the identity",
+          "minLength": 1,
+          "title": "Producerid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "producerId",
+        "conversationId",
+        "kind"
+      ],
+      "title": "ResumeRequest",
+      "type": "object"
+    },
+    "ResumeResponse": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed": {
+          "items": {
+            "enum": [
+              "confirm_playback",
+              "correct_playback",
+              "reopen_playback",
+              "retry_answer",
+              "set_consent",
+              "set_feedback",
+              "end"
+            ],
+            "type": "string"
+          },
+          "title": "Allowed",
+          "type": "array"
+        },
+        "answer": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Answer"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "history": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "action": "#/$defs/ActionEntry",
+                "fex": "#/$defs/SpokenEntry",
+                "producer": "#/$defs/SpokenEntry"
+              },
+              "propertyName": "role"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/SpokenEntry"
+              },
+              {
+                "$ref": "#/$defs/ActionEntry"
+              }
+            ]
+          },
+          "title": "History",
+          "type": "array"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "step": {
+          "enum": [
+            "intake",
+            "playback",
+            "respond",
+            "consent",
+            "feedback",
+            "closed"
+          ],
+          "title": "Step",
+          "type": "string"
+        }
+      },
+      "required": [
+        "step",
+        "language",
+        "allowed",
+        "answer",
+        "history"
+      ],
+      "title": "ResumeResponse",
+      "type": "object"
+    },
+    "RetryAnswer": {
+      "additionalProperties": false,
+      "properties": {
+        "args": {
+          "$ref": "#/$defs/NoArgs"
+        },
+        "name": {
+          "const": "retry_answer",
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "RetryAnswer",
+      "type": "object"
+    },
+    "SetConsent": {
+      "additionalProperties": false,
+      "properties": {
+        "args": {
+          "$ref": "#/$defs/SetConsentArgs"
+        },
+        "name": {
+          "const": "set_consent",
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "args"
+      ],
+      "title": "SetConsent",
+      "type": "object"
+    },
+    "SetConsentArgs": {
+      "additionalProperties": false,
+      "properties": {
+        "scope": {
+          "enum": [
+            "internal",
+            "internal_and_outward",
+            "declined"
+          ],
+          "title": "Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scope"
+      ],
+      "title": "SetConsentArgs",
+      "type": "object"
+    },
+    "SetFeedback": {
+      "additionalProperties": false,
+      "properties": {
+        "args": {
+          "$ref": "#/$defs/SetFeedbackArgs"
+        },
+        "name": {
+          "const": "set_feedback",
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "args"
+      ],
+      "title": "SetFeedback",
+      "type": "object"
+    },
+    "SetFeedbackArgs": {
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "enum": [
+            "yes",
+            "somewhat",
+            "no"
+          ],
+          "title": "Value",
+          "type": "string"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "SetFeedbackArgs",
+      "type": "object"
+    },
+    "SpokenEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "at": {
+          "format": "date-time",
+          "title": "At",
+          "type": "string"
+        },
+        "role": {
+          "enum": [
+            "producer",
+            "fex"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "text",
+        "at"
+      ],
+      "title": "SpokenEntry",
+      "type": "object"
+    },
+    "StartRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "conversationId": {
+          "description": "Set by the chat API",
+          "minLength": 1,
+          "title": "Conversationid",
+          "type": "string"
+        },
+        "kind": {
+          "const": "start",
+          "title": "Kind",
+          "type": "string"
+        },
+        "producerId": {
+          "description": "Set by the chat API from the identity",
+          "minLength": 1,
+          "title": "Producerid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "producerId",
+        "conversationId",
+        "kind"
+      ],
+      "title": "StartRequest",
+      "type": "object"
+    },
+    "StepEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "seq": {
+          "description": "Increasing within one turn",
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "step": {
+          "enum": [
+            "intake",
+            "playback",
+            "respond",
+            "consent",
+            "feedback",
+            "closed"
+          ],
+          "title": "Step",
+          "type": "string"
+        },
+        "type": {
+          "const": "step",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "seq",
+        "type",
+        "step",
+        "language"
+      ],
+      "title": "StepEvent",
+      "type": "object"
+    },
+    "TextEvent": {
+      "additionalProperties": false,
+      "properties": {
+        "seq": {
+          "description": "Increasing within one turn",
+          "minimum": 1,
+          "title": "Seq",
+          "type": "integer"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        },
+        "type": {
+          "const": "text",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "seq",
+        "type",
+        "text"
+      ],
+      "title": "TextEvent",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Requests, actions and events between the chat API and the agent. Generated from agent/src/fex/conversation/contract.py; do not edit by hand.",
+  "properties": {
+    "event": {
+      "discriminator": {
+        "mapping": {
+          "actions": "#/$defs/ActionsEvent",
+          "answer": "#/$defs/AnswerEvent",
+          "claim": "#/$defs/ClaimEvent",
+          "done": "#/$defs/DoneEvent",
+          "error": "#/$defs/ErrorEvent",
+          "record_saved": "#/$defs/RecordSavedEvent",
+          "step": "#/$defs/StepEvent",
+          "text": "#/$defs/TextEvent"
+        },
+        "propertyName": "type"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/TextEvent"
+        },
+        {
+          "$ref": "#/$defs/ClaimEvent"
+        },
+        {
+          "$ref": "#/$defs/AnswerEvent"
+        },
+        {
+          "$ref": "#/$defs/StepEvent"
+        },
+        {
+          "$ref": "#/$defs/ActionsEvent"
+        },
+        {
+          "$ref": "#/$defs/RecordSavedEvent"
+        },
+        {
+          "$ref": "#/$defs/ErrorEvent"
+        },
+        {
+          "$ref": "#/$defs/DoneEvent"
+        }
+      ],
+      "title": "Event"
+    },
+    "request": {
+      "discriminator": {
+        "mapping": {
+          "action": "#/$defs/ActionRequest",
+          "auto_close": "#/$defs/AutoCloseRequest",
+          "message": "#/$defs/MessageRequest",
+          "resume": "#/$defs/ResumeRequest",
+          "start": "#/$defs/StartRequest"
+        },
+        "propertyName": "kind"
+      },
+      "oneOf": [
+        {
+          "$ref": "#/$defs/StartRequest"
+        },
+        {
+          "$ref": "#/$defs/MessageRequest"
+        },
+        {
+          "$ref": "#/$defs/ActionRequest"
+        },
+        {
+          "$ref": "#/$defs/ResumeRequest"
+        },
+        {
+          "$ref": "#/$defs/AutoCloseRequest"
+        }
+      ],
+      "title": "Request"
+    },
+    "resume": {
+      "$ref": "#/$defs/ResumeResponse"
+    }
+  },
+  "required": [
+    "request",
+    "event",
+    "resume"
+  ],
+  "title": "ConversationContract",
+  "type": "object"
+}
