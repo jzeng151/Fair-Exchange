@@ -36,25 +36,20 @@ uv sync
 uv run pytest
 ```
 
-## Citation verifier (issue #17)
+## Citation verifier and data tool contract (issue #17)
 
-`src/fex/verifier.py` checks FEX's answer **after** it is written, deterministically (no model involved). Every insight and peer example must:
+Spec: [`docs/specs/17-standards-grounding.md`](../docs/specs/17-standards-grounding.md). Tool contract and reason codes: [`docs/handoff/tool-contracts.md`](../docs/handoff/tool-contracts.md).
 
-1. cite a **source a tool returned in this session**: tools add what they return to `SessionEvidence` (`record()` / `record_tool_result()`), so nothing can be invented;
-2. cite a **clause that exists** in APS or FPS (via `fx_data.standards`, issue #9).
+`src/fex/verifier.py` checks each claim deterministically (no model involved). `check_claim` checks one claim, so the engine can send claims one by one; `verify` checks a whole answer with it. A claim must cite a source a data tool returned this conversation, of the right kind for its section, and a clause the standards tool returned, and must use no directive language (`src/fex/tone.py`). Each problem carries a fixed `code` and a readable `reason`.
 
 ```python
-from fex.verifier import SessionEvidence, generate_verified
-
+from fex.verifier import SessionEvidence, check_claim
 evidence = SessionEvidence()
-evidence.record_tool_result(peer_examples_from_tool)      # each tool, as it runs
-result = generate_verified(write_answer, evidence, standards)
-result.answer      # GroundedAnswer with verified claims only
-result.attempts    # 1 = verified first time
-result.removed     # problems behind any claim that was dropped
+evidence.record_tool_result(items)   # data tools do this themselves through fex.tools._contract.run_data_tool
+problems = check_claim("insights", claim, evidence, standards)
 ```
 
-`write_answer(problems)` writes the answer; on a retry it receives the problems from the previous attempt so it can fix them. After `max_retries` (default 2), unverified claims are **removed and logged**, so they never reach the producer.
+`generate_verified(write_answer, evidence, standards)` is the whole-answer regenerate loop: after `max_retries` (default 2), unverified claims are removed and their codes logged.
 
 `agent/` depends on `data/` (`fx-data`) as a regular, non-editable install. After changing `data/`, run `uv sync --reinstall-package fx-data`.
 
@@ -70,8 +65,10 @@ intake → playback → respond → consent → feedback → closed
 - **Entrypoint:** `ConversationEngine.handle(request)`, with `start`, `message`, `action`, `resume` and `auto_close`
   requests (`conversation/contract.py`). The AgentCore wrapper is `conversation/runtime.py`.
 - **Models:** the small model (`FEX_SMALL_MODEL`) handles intake, playback, tagging and short replies, and is
-  never offered data tools. The large model (`FEX_LARGE_MODEL`) retrieves in `respond` and writes claims as
-  structured output.
+  never offered data tools. In `respond` the large model (`FEX_LARGE_MODEL`) first calls the data tools; code
+  calls any it skipped (`tool_backstopped`); then the large model writes claims as structured output from every item.
+- **Standards Knowledge Base:** set `FEX_STANDARDS_KB_ID` (the `StandardsKnowledgeBaseId` output of `infra/deploy.sh`). Without it,
+  `find_standards` fails and the answer fails with `agent_failed`.
 - **Claim by claim:** each claim is checked by the citation verifier before it is sent as a `claim` event.
   Failures are rewritten up to the retry limit, then dropped and logged.
 - **Fixed text:** in `respond`, the opening line, limited-evidence notice and hand-back come from `conversation/copy.py`.

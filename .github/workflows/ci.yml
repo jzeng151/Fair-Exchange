@@ -34,6 +34,12 @@ jobs:
         with:
           version: '0.13.7'
           python-version: '3.12'
+      # Repo-wide problems no package's tests can see: duplicate JSON keys, packages whose tests
+      # CI doesn't run, committed iCloud duplicates. See scripts/ci/check_repo.py.
+      - name: Repo guard
+        run: |
+          uv run --no-project --with pytest==8.4.2 python -m pytest -q -p no:cacheprovider scripts/ci
+          python3 scripts/ci/check_repo.py
       - name: Agent tests
         working-directory: agent
         run: |
@@ -45,6 +51,21 @@ jobs:
         run: |
           uv sync --locked
           uv run --no-sync pytest
+      - name: Sync tests
+        working-directory: sync
+        run: |
+          uv sync --locked
+          uv run --no-sync pytest
+      # Regenerate the record and contract schemas/types from the Pydantic models and fail on any
+      # difference, with a clear fix. Catches a PR that changed models.py without regenerating.
+      - name: Generated files are up to date
+        working-directory: agent
+        run: |
+          uv run --no-sync python scripts/generate_types.py
+          if ! git diff --exit-code -- schema ../api/src/types; then
+            echo "::error::Generated schema/types are stale. Merge main, then run: cd agent && uv run python scripts/generate_types.py"
+            exit 1
+          fi
       - name: Generated record types compile
         run: npx --yes -p typescript@5.6.3 tsc --noEmit --strict api/src/types/*.ts
       - name: API type check
@@ -53,12 +74,44 @@ jobs:
       - name: Web build and type check
         working-directory: web
         run: npm ci && npm run build
+      # The real chat API and the real agent run together over HTTP and hold one full conversation
+      # (demo model: no AWS). Catches mismatches each side's own tests can't see (#89, #101).
+      - name: Local end-to-end conversation
+        run: bash scripts/e2e/run_local.sh
       - name: Infrastructure type check and synthesis
         working-directory: infra
         run: |
           npm ci
           npx tsc --noEmit
           npx cdk synth --quiet
+
+  # If main itself fails CI (e.g. two PRs merged in an order that broke it), say so loudly:
+  # open an issue, or comment on the open one, with a link to the failing run.
+  report-main-failure:
+    name: Report a failing main
+    needs: checks
+    if: failure() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+      COMMIT: ${{ github.sha }}
+    steps:
+      - name: Open or update the "main is failing" issue
+        run: |
+          title="main is failing CI"
+          body="CI failed on main at ${COMMIT}: ${RUN_URL}. Fix forward before merging anything else; every PR's CI will fail until main is green."
+          existing=$(gh issue list --state open --search "in:title \"${title}\"" --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
 
   deploy:
     name: Publish sandbox

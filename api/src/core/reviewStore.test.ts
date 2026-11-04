@@ -32,6 +32,24 @@ describe('DynamoRecordStore', () => {
     expect(ddb.commandCalls(ScanCommand)[1]!.args[0].input.ExclusiveStartKey).toEqual({ record_id: { S: 'a' } });
   });
 
+  it('scans a producer’s closed records (completed and declined) across pages, filtered on producer_id', async () => {
+    ddb
+      .on(ScanCommand)
+      .resolvesOnce({
+        Items: [marshall(rec({ record_id: 'a', producer_id: 'producer-a' }))],
+        LastEvaluatedKey: { record_id: { S: 'a' } },
+      })
+      .resolvesOnce({ Items: [marshall(rec({ record_id: 'b', producer_id: 'producer-a', status: 'declined' }))] });
+    const records = await store.listClosedByProducer('producer-a');
+    expect(records.map((r) => r.record_id)).toEqual(['a', 'b']);
+    const first = ddb.commandCalls(ScanCommand)[0]!.args[0].input;
+    expect(first.FilterExpression).toContain('producer_id = :pid');
+    expect(first.FilterExpression).toContain('attribute_type(closed_at');
+    expect(first.FilterExpression).not.toContain('#status'); // both completed and declined are returned
+    expect(first.ExpressionAttributeValues![':pid']).toEqual({ S: 'producer-a' });
+    expect(ddb.commandCalls(ScanCommand)[1]!.args[0].input.ExclusiveStartKey).toEqual({ record_id: { S: 'a' } });
+  });
+
   it('reads one record with a strongly consistent read', async () => {
     ddb.on(GetItemCommand).resolves({ Item: marshall(rec()) });
     expect((await store.get('r1'))?.record_id).toBe('r1');

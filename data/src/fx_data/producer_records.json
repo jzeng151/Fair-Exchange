@@ -7,7 +7,6 @@
     "region": "Caldas",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -208,7 +207,6 @@
     "region": "Junin",
     "crop": "Ginger;Turmeric",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -240,7 +238,6 @@
     "region": "Antioquia",
     "crop": "Produce",
     "entity_type": "Estate",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -272,7 +269,6 @@
     "region": "Cajamarca",
     "crop": "Coffee",
     "entity_type": "2nd Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -304,7 +300,6 @@
     "region": "Jinotega",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -336,7 +331,6 @@
     "region": "Tolima",
     "crop": "Cocoa;Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -368,7 +362,6 @@
     "region": "San Jose",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -400,7 +393,6 @@
     "region": "Risaralda",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -445,7 +437,6 @@
     "region": "El Oro",
     "crop": "Bananas",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -490,7 +481,6 @@
     "region": "Sacatepequez",
     "crop": "Other;Peas",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -522,7 +512,6 @@
     "region": "Risaralda",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer;Trader;Premium Conveyor;Price Conveyor",
     "source": "FTUSA producer account (sample data)"
@@ -736,7 +725,6 @@
     "region": "YeDebub Biheroch Bihereseboch na Hizboch",
     "crop": "Coffee",
     "entity_type": "2nd Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -768,7 +756,6 @@
     "region": "Lambayeque",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -800,7 +787,6 @@
     "region": "El Oro",
     "crop": "Bananas",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -910,7 +896,6 @@
     "region": "Madriz",
     "crop": "Coffee",
     "entity_type": "2nd Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer;Trader",
     "source": "FTUSA producer account (sample data)"
@@ -942,7 +927,6 @@
     "region": "Ahafo",
     "crop": "Cocoa",
     "entity_type": null,
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -974,7 +958,6 @@
     "region": "Minas Gerais",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -1006,7 +989,6 @@
     "region": "Norte de Santander",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -1038,7 +1020,6 @@
     "region": "Caldas",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -1109,7 +1090,6 @@
     "region": "Caldas",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -1206,7 +1186,6 @@
     "region": "Sulawesi Utara",
     "crop": "Seafood",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Importer;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -1368,7 +1347,6 @@
     "region": "Cotopaxi",
     "crop": "Flowers and Plants",
     "entity_type": "Estate",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -1439,7 +1417,6 @@
     "region": "Central Province",
     "crop": "Tea;Other;Grains;Herbs and Spices;Produce",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -1536,7 +1513,6 @@
     "region": "Cajamarca",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer;Premium Conveyor;Price Conveyor",
     "source": "FTUSA producer account (sample data)"
@@ -1621,20 +1597,6 @@
       "strength": "exact"
      },
      {
-      "text": "14% of 682 survey responses say they have converted natural land to cropland.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2021-2026",
-      "responses": 682,
-      "strength": "exact"
-     },
-     {
-      "text": "96% of 494 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2023-2026",
-      "responses": 494,
-      "strength": "exact"
-     },
-     {
       "text": "How the harvest has changed, 680 survey responses: It has decreased (47%); It has not changed (29%); It has increased (24%).",
       "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
@@ -1646,13 +1608,6 @@
       "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
       "responses": 682,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 468 survey responses: It takes less than 30 minutes (58%); Always available in my house (21%); I don't have access to drinking water (16%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2021-2026",
-      "responses": 468,
       "strength": "exact"
      },
      {
@@ -1672,7 +1627,6 @@
     "region": "La Paz",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer;Trader;Premium Conveyor;Price Conveyor",
     "source": "FTUSA producer account (sample data)"
@@ -1731,20 +1685,6 @@
       "strength": "exact"
      },
      {
-      "text": "5% of 314 survey responses say they have converted natural land to cropland.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2023",
-      "responses": 314,
-      "strength": "exact"
-     },
-     {
-      "text": "98% of 314 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2023",
-      "responses": 314,
-      "strength": "exact"
-     },
-     {
       "text": "How the harvest has changed, 312 survey responses: It has decreased (45%); It has increased (29%); It has not changed (27%).",
       "source": "FTUSA survey responses (sample data)",
       "period": "2023",
@@ -1756,13 +1696,6 @@
       "source": "FTUSA survey responses (sample data)",
       "period": "2023",
       "responses": 314,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 87 survey responses: It takes less than 30 minutes (97%); It takes more than 30 minutes (3%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2023",
-      "responses": 87,
       "strength": "exact"
      },
      {
@@ -1782,7 +1715,6 @@
     "region": "Cauca",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer;Trader;Premium Conveyor;Price Conveyor",
     "source": "FTUSA producer account (sample data)"
@@ -1840,7 +1772,6 @@
     "region": "Quiche",
     "crop": "Coffee;Sweeteners",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -1885,7 +1816,6 @@
     "region": "Cesar",
     "crop": "Cocoa;Coffee;Sweeteners",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -1930,7 +1860,6 @@
     "region": "Cesar",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -1975,7 +1904,6 @@
     "region": "Cajamarca",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Suspended",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2007,7 +1935,6 @@
     "region": null,
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2039,7 +1966,6 @@
     "region": "Artibonite",
     "crop": "Produce",
     "entity_type": null,
-    "certification_status": "Decertified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2084,7 +2010,6 @@
     "region": "Cesar",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2116,7 +2041,6 @@
     "region": "Huila",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2148,7 +2072,6 @@
     "region": "Ho Chi Minh",
     "crop": "Apparel",
     "entity_type": "Factory",
-    "certification_status": "Certified",
     "certification_scope": "Factory",
     "supply_chain_role": "Factory",
     "source": "FTUSA producer account (sample data)"
@@ -2180,7 +2103,6 @@
     "region": "Marrakech-Safi",
     "crop": "Citrus",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2212,7 +2134,6 @@
     "region": "Zhejiang",
     "crop": "Cosmetics & Skincare",
     "entity_type": "Factory",
-    "certification_status": "Certified",
     "certification_scope": "Factory",
     "supply_chain_role": "Factory",
     "source": "FTUSA producer account (sample data)"
@@ -2244,7 +2165,6 @@
     "region": "Antioquia",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2328,7 +2248,6 @@
     "region": "Cajamarca",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2399,7 +2318,6 @@
     "region": "Huehuetenango",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2548,7 +2466,6 @@
     "region": "El Oro",
     "crop": "Bananas",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2580,7 +2497,6 @@
     "region": "Intibuca",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2625,7 +2541,6 @@
     "region": "Pasco",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2657,7 +2572,6 @@
     "region": "Sinaloa",
     "crop": "Shrimp",
     "entity_type": null,
-    "certification_status": "Decertified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2715,7 +2629,6 @@
     "region": "Sorsogon",
     "crop": "Nuts and Oilseeds",
     "entity_type": "Independent Smallholder",
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2773,7 +2686,6 @@
     "region": "Caldas",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2870,7 +2782,6 @@
     "region": "Minas Gerais",
     "crop": "Sweeteners",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer;Processor",
     "source": "FTUSA producer account (sample data)"
@@ -2915,7 +2826,6 @@
     "region": "Kerala",
     "crop": "Coffee;Herbs and Spices;Produce;Nuts and Oilseeds",
     "entity_type": "1st Grade",
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2947,7 +2857,6 @@
     "region": "Cajamarca",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -2992,7 +2901,6 @@
     "region": "Guaira",
     "crop": "Sugar",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -3024,7 +2932,6 @@
     "region": "Junin",
     "crop": "Cocoa;Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3056,7 +2963,6 @@
     "region": "San Martin",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3088,7 +2994,6 @@
     "region": null,
     "crop": "Camellia Sinensis Tea",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3120,7 +3025,6 @@
     "region": "Hung Yen",
     "crop": "Apparel and Home Goods",
     "entity_type": "Factory",
-    "certification_status": "Certified",
     "certification_scope": "Factory",
     "supply_chain_role": "Factory",
     "source": "FTUSA producer account (sample data)"
@@ -3152,7 +3056,6 @@
     "region": "San Martin",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3249,7 +3152,6 @@
     "region": "Tolima",
     "crop": null,
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": null,
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3307,7 +3209,6 @@
     "region": "Chiapas",
     "crop": "Coffee",
     "entity_type": "2nd Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -3339,7 +3240,6 @@
     "region": "Goh-Djiboua",
     "crop": "Cocoa",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3376,24 +3276,10 @@
     "responses": 102,
     "facts": [
      {
-      "text": "60% of 62 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2024",
-      "responses": 62,
-      "strength": "exact"
-     },
-     {
       "text": "How the harvest has changed, 101 survey responses: It has increased (53%); It has decreased (46%); It has not changed (1%).",
       "source": "FTUSA survey responses (sample data)",
       "period": "2021-2024",
       "responses": 101,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 39 survey responses: Always available in my house (49%); It takes less than 30 minutes (38%); It takes more than 30 minutes (13%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2021",
-      "responses": 39,
       "strength": "exact"
      },
      {
@@ -3413,7 +3299,6 @@
     "region": "El Oro",
     "crop": "Produce",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3458,7 +3343,6 @@
     "region": "Zanzan",
     "crop": "Cocoa",
     "entity_type": null,
-    "certification_status": "Suspended",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3521,24 +3405,10 @@
     "responses": 223,
     "facts": [
      {
-      "text": "58% of 180 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2024",
-      "responses": 180,
-      "strength": "exact"
-     },
-     {
       "text": "How the harvest has changed, 219 survey responses: It has decreased (56%); It has increased (43%); It has not changed (1%).",
       "source": "FTUSA survey responses (sample data)",
       "period": "2021-2024",
       "responses": 219,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 46 survey responses: It takes less than 30 minutes (52%); Always available in my house (39%); It takes more than 30 minutes (9%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2021-2024",
-      "responses": 46,
       "strength": "exact"
      },
      {
@@ -3558,7 +3428,6 @@
     "region": "Michoacan de Ocampo",
     "crop": "Produce",
     "entity_type": "Independent Smallholder - Worker Inclusion",
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3642,7 +3511,6 @@
     "region": "Cauca",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3674,7 +3542,6 @@
     "region": "Sinaloa",
     "crop": "Seafood",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer;Processor",
     "source": "FTUSA producer account (sample data)"
@@ -3755,13 +3622,6 @@
       "period": "2022",
       "responses": 209,
       "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 216 survey responses: Always available in my house (71%); It takes less than 30 minutes (20%); It takes more than 30 minutes (7%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2022",
-      "responses": 216,
-      "strength": "exact"
      }
     ],
     "note": null
@@ -3773,7 +3633,6 @@
     "region": "Tolima",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3818,7 +3677,6 @@
     "region": "Bali",
     "crop": "Produce",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3889,7 +3747,6 @@
     "region": "Minas Gerais",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -3934,7 +3791,6 @@
     "region": "Western Province",
     "crop": "Apparel;Knitwear",
     "entity_type": "Factory",
-    "certification_status": "Certified",
     "certification_scope": null,
     "supply_chain_role": "Factory",
     "source": "FTUSA producer account (sample data)"
@@ -3966,7 +3822,6 @@
     "region": "Davao del Sur",
     "crop": "Produce;Nuts and Oilseeds",
     "entity_type": "Independent Smallholder",
-    "certification_status": "Decertified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4076,7 +3931,6 @@
     "region": "Norte de Santander",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4108,7 +3962,6 @@
     "region": "Intibuca",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter",
     "source": "FTUSA producer account (sample data)"
@@ -4140,7 +3993,6 @@
     "region": "Alajuela",
     "crop": "Pineapples",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4172,7 +4024,6 @@
     "region": "Amazonas",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4269,7 +4120,6 @@
     "region": "Mindoro Occidental",
     "crop": "Seafood",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer;Processor",
     "source": "FTUSA producer account (sample data)"
@@ -4301,7 +4151,6 @@
     "region": "Ha Noi",
     "crop": "Apparel;Denim",
     "entity_type": "Factory",
-    "certification_status": "Certified",
     "certification_scope": "Factory",
     "supply_chain_role": "Factory",
     "source": "FTUSA producer account (sample data)"
@@ -4333,7 +4182,6 @@
     "region": "Bas-Sassandra",
     "crop": "Cocoa",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4370,24 +4218,10 @@
     "responses": 86,
     "facts": [
      {
-      "text": "40% of 86 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2024",
-      "responses": 86,
-      "strength": "exact"
-     },
-     {
       "text": "How the harvest has changed, 86 survey responses: It has decreased (78%); It has increased (21%); It has not changed (1%).",
       "source": "FTUSA survey responses (sample data)",
       "period": "2024",
       "responses": 86,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 13 survey responses: It takes less than 30 minutes (62%); It takes more than 30 minutes (38%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2024",
-      "responses": 13,
       "strength": "exact"
      },
      {
@@ -4407,7 +4241,6 @@
     "region": "Guanajuato",
     "crop": "Produce",
     "entity_type": "Estate",
-    "certification_status": "Decertified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4439,7 +4272,6 @@
     "region": "Yucatan",
     "crop": "Seafood",
     "entity_type": null,
-    "certification_status": "Decertified",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -4471,7 +4303,6 @@
     "region": "Minas Gerais",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4503,7 +4334,6 @@
     "region": "Antioquia",
     "crop": "Bananas",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4548,7 +4378,6 @@
     "region": "Sonora",
     "crop": "Produce",
     "entity_type": "Multi-Estate",
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4580,7 +4409,6 @@
     "region": "Junin",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4612,7 +4440,6 @@
     "region": "Junin",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -4644,7 +4471,6 @@
     "region": "Kericho",
     "crop": "Tea",
     "entity_type": "Estate",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4676,7 +4502,6 @@
     "region": "Ocotepeque",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -4734,7 +4559,6 @@
     "region": "Masaya",
     "crop": "Produce;Dried Fruits and Vegetables",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Manufacturer;Producer;Processor",
     "source": "FTUSA producer account (sample data)"
@@ -4766,7 +4590,6 @@
     "region": "Junin",
     "crop": "Cocoa;Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Suspended",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4811,7 +4634,6 @@
     "region": null,
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4843,7 +4665,6 @@
     "region": "Assam",
     "crop": "Camellia Sinensis Tea",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4875,7 +4696,6 @@
     "region": "Copan",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -4907,7 +4727,6 @@
     "region": "Tolima",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -4978,7 +4797,6 @@
     "region": "Sinaloa",
     "crop": "Seafood",
     "entity_type": null,
-    "certification_status": "Decertified",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -5184,24 +5002,10 @@
     "responses": 145,
     "facts": [
      {
-      "text": "96% of 145 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2022",
-      "responses": 145,
-      "strength": "exact"
-     },
-     {
       "text": "How the harvest has changed, 145 survey responses: It has not changed (39%); It has decreased (31%); It has increased (30%).",
       "source": "FTUSA survey responses (sample data)",
       "period": "2022",
       "responses": 145,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 135 survey responses: It takes less than 30 minutes (78%); It takes more than 30 minutes (22%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2022",
-      "responses": 135,
       "strength": "exact"
      }
     ],
@@ -5214,7 +5018,6 @@
     "region": "Sao Paulo",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5272,7 +5075,6 @@
     "region": "Antioquia",
     "crop": "Bananas",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5330,7 +5132,6 @@
     "region": "Valle del Cauca",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5375,7 +5176,6 @@
     "region": "Khanh Hoa",
     "crop": "Seafood",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5407,7 +5207,6 @@
     "region": "Copan",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5439,7 +5238,6 @@
     "region": null,
     "crop": "Tea",
     "entity_type": "Estate",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5471,7 +5269,6 @@
     "region": null,
     "crop": "Coffee",
     "entity_type": "2nd Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5503,7 +5300,6 @@
     "region": "Copan",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5535,7 +5331,6 @@
     "region": "Chiapas",
     "crop": "Coffee",
     "entity_type": "2nd Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5580,7 +5375,6 @@
     "region": "Cajamarca",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5612,7 +5406,6 @@
     "region": "Tamil Nadu",
     "crop": "Tea",
     "entity_type": "Estate",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5647,23 +5440,8 @@
    ],
    "survey": {
     "responses": 156,
-    "facts": [
-     {
-      "text": "88% of 156 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2023",
-      "responses": 156,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 59 survey responses: It takes less than 30 minutes (93%); It takes more than 30 minutes (7%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2023",
-      "responses": 59,
-      "strength": "exact"
-     }
-    ],
-    "note": null
+    "facts": [],
+    "note": "Fewer than 5 survey responses answered each question, so nothing is summarized."
    }
   },
   "C805DEE5262A0DC9E044FB3D1FAA5983": {
@@ -5672,7 +5450,6 @@
     "region": "Piaui",
     "crop": "Sweeteners",
     "entity_type": "2nd Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5717,7 +5494,6 @@
     "region": "Solola",
     "crop": "Produce",
     "entity_type": "1st Grade",
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5749,7 +5525,6 @@
     "region": "La Paz",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter",
     "source": "FTUSA producer account (sample data)"
@@ -5807,7 +5582,6 @@
     "region": "Tolima",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5839,7 +5613,6 @@
     "region": null,
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5871,7 +5644,6 @@
     "region": "Nord",
     "crop": "Tea",
     "entity_type": "Estate",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5942,7 +5714,6 @@
     "region": "Nord",
     "crop": "Coffee;Tea",
     "entity_type": "1st Grade",
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -5987,7 +5758,6 @@
     "region": "Cordillera",
     "crop": "Cane Sugar;Grains;Sweeteners",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6045,7 +5815,6 @@
     "region": null,
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6077,7 +5846,6 @@
     "region": "Guangdong",
     "crop": "Apparel;Denim",
     "entity_type": "Factory",
-    "certification_status": "Decertified",
     "certification_scope": "Factory",
     "supply_chain_role": "Factory",
     "source": "FTUSA producer account (sample data)"
@@ -6109,7 +5877,6 @@
     "region": "Antioquia",
     "crop": "Produce",
     "entity_type": "Multi-Estate",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6141,7 +5908,6 @@
     "region": "Amazonas",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -6173,7 +5939,6 @@
     "region": "Valle del Cauca",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Suspended",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6205,7 +5970,6 @@
     "region": "Antioquia",
     "crop": "Produce",
     "entity_type": "Estate",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6263,7 +6027,6 @@
     "region": "Jinotega",
     "crop": "Coffee",
     "entity_type": "2nd Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer;Trader;Premium Conveyor;Price Payer",
     "source": "FTUSA producer account (sample data)"
@@ -6322,20 +6085,6 @@
       "strength": "exact"
      },
      {
-      "text": "0% of 148 survey responses say they have converted natural land to cropland.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2024",
-      "responses": 148,
-      "strength": "exact"
-     },
-     {
-      "text": "93% of 150 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2024",
-      "responses": 150,
-      "strength": "exact"
-     },
-     {
       "text": "How the harvest has changed, 149 survey responses: It has increased (48%); It has not changed (41%); It has decreased (11%).",
       "source": "FTUSA survey responses (sample data)",
       "period": "2024",
@@ -6347,13 +6096,6 @@
       "source": "FTUSA survey responses (sample data)",
       "period": "2024",
       "responses": 149,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 31 survey responses: It takes less than 30 minutes (97%); It takes more than 30 minutes (3%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2024",
-      "responses": 31,
       "strength": "exact"
      },
      {
@@ -6373,7 +6115,6 @@
     "region": "Binh Duong",
     "crop": "Home Goods;Furniture",
     "entity_type": "Factory",
-    "certification_status": "Certified",
     "certification_scope": "Factory",
     "supply_chain_role": "Factory",
     "source": "FTUSA producer account (sample data)"
@@ -6405,7 +6146,6 @@
     "region": "Camarines Norte",
     "crop": "Nuts and Oilseeds",
     "entity_type": "Independent Smallholder",
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6429,24 +6169,10 @@
     "responses": 134,
     "facts": [
      {
-      "text": "87% of 134 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2023",
-      "responses": 134,
-      "strength": "exact"
-     },
-     {
       "text": "How the harvest has changed, 134 survey responses: It has decreased (38%); It has not changed (31%); It has increased (31%).",
       "source": "FTUSA survey responses (sample data)",
       "period": "2023",
       "responses": 134,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 92 survey responses: It takes less than 30 minutes (85%); It takes more than 30 minutes (15%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2023",
-      "responses": 92,
       "strength": "exact"
      },
      {
@@ -6466,7 +6192,6 @@
     "region": "Jalisco",
     "crop": "Sweeteners",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer;Processor",
     "source": "FTUSA producer account (sample data)"
@@ -6488,23 +6213,8 @@
    ],
    "survey": {
     "responses": 50,
-    "facts": [
-     {
-      "text": "96% of 49 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2022",
-      "responses": 49,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 29 survey responses: It takes less than 30 minutes (97%); It takes more than 30 minutes (3%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2022",
-      "responses": 29,
-      "strength": "exact"
-     }
-    ],
-    "note": null
+    "facts": [],
+    "note": "Fewer than 5 survey responses answered each question, so nothing is summarized."
    }
   },
   "18A0E3882F9585EE1864C55838BAEC2B": {
@@ -6513,7 +6223,6 @@
     "region": "Jalapa",
     "crop": "Produce",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6571,7 +6280,6 @@
     "region": "Aceh",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6642,7 +6350,6 @@
     "region": "Quezon",
     "crop": "Nuts and Oilseeds",
     "entity_type": "Independent Smallholder",
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6692,24 +6399,10 @@
     "responses": 227,
     "facts": [
      {
-      "text": "80% of 225 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2023",
-      "responses": 225,
-      "strength": "exact"
-     },
-     {
       "text": "How the harvest has changed, 225 survey responses: It has decreased (55%); It has increased (25%); It has not changed (20%).",
       "source": "FTUSA survey responses (sample data)",
       "period": "2023",
       "responses": 225,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 186 survey responses: It takes less than 30 minutes (86%); It takes more than 30 minutes (14%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2023",
-      "responses": 186,
       "strength": "exact"
      },
      {
@@ -6729,7 +6422,6 @@
     "region": "Oruro",
     "crop": "Beans and Grains",
     "entity_type": "Independent Smallholder",
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6761,7 +6453,6 @@
     "region": "Western",
     "crop": "Seafood",
     "entity_type": null,
-    "certification_status": "Decertified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer;Processor",
     "source": "FTUSA producer account (sample data)"
@@ -6806,7 +6497,6 @@
     "region": "Ancash",
     "crop": "Produce",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6838,7 +6528,6 @@
     "region": "Uttar Pradesh",
     "crop": "Rugs",
     "entity_type": "Factory",
-    "certification_status": "Certified",
     "certification_scope": "Factory",
     "supply_chain_role": "Factory",
     "source": "FTUSA producer account (sample data)"
@@ -6870,7 +6559,6 @@
     "region": "Huila",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -6981,20 +6669,6 @@
       "strength": "exact"
      },
      {
-      "text": "3% of 568 survey responses say they have converted natural land to cropland.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2021-2023",
-      "responses": 568,
-      "strength": "exact"
-     },
-     {
-      "text": "97% of 402 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2023",
-      "responses": 402,
-      "strength": "exact"
-     },
-     {
       "text": "How the harvest has changed, 566 survey responses: It has decreased (56%); It has not changed (23%); It has increased (20%).",
       "source": "FTUSA survey responses (sample data)",
       "period": "2021-2023",
@@ -7006,13 +6680,6 @@
       "source": "FTUSA survey responses (sample data)",
       "period": "2021-2023",
       "responses": 563,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 198 survey responses: Always available in my house (64%); It takes less than 30 minutes (19%); I don't have access to drinking water (10%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2021-2023",
-      "responses": 198,
       "strength": "exact"
      },
      {
@@ -7032,7 +6699,6 @@
     "region": "Antioquia",
     "crop": "Produce",
     "entity_type": "Estate",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -7090,7 +6756,6 @@
     "region": "Shanghai",
     "crop": "Home Goods;Bed Sheets & Covers",
     "entity_type": "Factory",
-    "certification_status": "Certified",
     "certification_scope": "Factory",
     "supply_chain_role": "Factory",
     "source": "FTUSA producer account (sample data)"
@@ -7122,7 +6787,6 @@
     "region": "Cauca",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -7154,7 +6818,6 @@
     "region": "Antioquia",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -7251,7 +6914,6 @@
     "region": "Cesar",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -7283,7 +6945,6 @@
     "region": "Lempira",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Manufacturer;Producer;Processor",
     "source": "FTUSA producer account (sample data)"
@@ -7315,7 +6976,6 @@
     "region": "Ocotepeque",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer;Premium Conveyor;Price Conveyor",
     "source": "FTUSA producer account (sample data)"
@@ -7360,7 +7020,6 @@
     "region": "Valle del Cauca",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -7392,7 +7051,6 @@
     "region": "Antioquia",
     "crop": "Coffee",
     "entity_type": "2nd Grade",
-    "certification_status": "Decertified",
     "certification_scope": "Producer",
     "supply_chain_role": "Manufacturer;Producer;Processor",
     "source": "FTUSA producer account (sample data)"
@@ -7424,7 +7082,6 @@
     "region": "Orange Walk",
     "crop": "Sugar",
     "entity_type": "1st Grade",
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": null,
     "source": "FTUSA producer account (sample data)"
@@ -7469,7 +7126,6 @@
     "region": "Guaira",
     "crop": "Sweeteners",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -7501,7 +7157,6 @@
     "region": "Aceh",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -7533,7 +7188,6 @@
     "region": "Boaco",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Exporter;Producer",
     "source": "FTUSA producer account (sample data)"
@@ -7565,7 +7219,6 @@
     "region": "Ocotepeque",
     "crop": "Coffee",
     "entity_type": "1st Grade",
-    "certification_status": "Not Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -7610,7 +7263,6 @@
     "region": "Huehuetenango",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer",
     "source": "FTUSA producer account (sample data)"
@@ -7694,7 +7346,6 @@
     "region": "Maluku",
     "crop": "Seafood",
     "entity_type": null,
-    "certification_status": "Certified",
     "certification_scope": "Producer",
     "supply_chain_role": "Producer;Processor",
     "source": "FTUSA producer account (sample data)"
@@ -7731,13 +7382,6 @@
     "responses": 523,
     "facts": [
      {
-      "text": "94% of 240 survey responses say they have running water at home.",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2025",
-      "responses": 240,
-      "strength": "exact"
-     },
-     {
       "text": "94% of 237 survey responses say they have noticed changes in fishing.",
       "source": "FTUSA survey responses (sample data)",
       "period": "2025",
@@ -7749,13 +7393,6 @@
       "source": "FTUSA survey responses (sample data)",
       "period": "2021-2025",
       "responses": 522,
-      "strength": "exact"
-     },
-     {
-      "text": "Access to drinking water, 410 survey responses: Always available in my house (58%); It takes less than 30 minutes (36%); It takes more than 30 minutes (3%).",
-      "source": "FTUSA survey responses (sample data)",
-      "period": "2021-2025",
-      "responses": 410,
       "strength": "exact"
      },
      {
@@ -7789,7 +7426,6 @@
     "region": "Krung Thep Maha Nakhon",
     "crop": "Apparel",
     "entity_type": "Factory",
-    "certification_status": "Certified",
     "certification_scope": null,
     "supply_chain_role": "Factory",
     "source": "FTUSA producer account (sample data)"
@@ -7821,7 +7457,6 @@
     "region": "Amazonas",
     "crop": "Coffee",
     "entity_type": null,
-    "certification_status": "Authorized",
     "certification_scope": null,
     "supply_chain_role": "Exporter",
     "source": "FTUSA producer account (sample data)"

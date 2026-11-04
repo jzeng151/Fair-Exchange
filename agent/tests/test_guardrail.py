@@ -14,6 +14,7 @@ from strands.models.bedrock import BedrockModel
 from tests.conversation_harness import Run, ScriptedModel
 
 from fex import guardrail
+from fex.tools import ALL_TOOLS
 from fex.conversation import runtime
 from fex.guardrail import GuardrailFindingsMixin, findings, guardrail_settings
 from fex.records import DynamoRecordStore
@@ -128,6 +129,9 @@ def test_both_deployed_models_carry_the_guardrail(monkeypatch):
         runtime.default_engine.cache_clear()
 
 
+DATA_TOOL_NAMES = {t.tool_name for t in ALL_TOOLS}
+
+
 def test_every_model_call_carries_the_conversation_id():
     r = guarded_run(trace=None)
     r.to_feedback()
@@ -136,8 +140,13 @@ def test_every_model_call_carries_the_conversation_id():
         assert state.get("conversation_id") == r.conversation_id
         # Small-model calls must not gain what the data tools need to run.
         assert "producer_id" not in state and "step" not in state
-    for state in r.large.invocation_states:
-        assert state["conversation_id"] == r.conversation_id and state["step"] == "respond"
+    assert len(r.large.invocation_states) == len(r.large.calls)
+    for state, offered in zip(r.large.invocation_states, r.large.calls):
+        assert state["conversation_id"] == r.conversation_id
+        if set(offered) & DATA_TOOL_NAMES:  # the retrieval call (#17): data tools need the producer and the step
+            assert state["step"] == "respond" and state["producer_id"] == r.producer_id
+        else:  # the claim-writing call offers no data tools, so it gets nothing they need
+            assert "producer_id" not in state and "step" not in state
 
 
 # ---------------------------------------------------------------- findings

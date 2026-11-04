@@ -47,5 +47,5 @@ FEX identifies the producer's language during intake and replies in it for the w
 
 ## Out of Scope
 
-- French (#24) and other languages
+- French, added by the [#24 spec](24-french-exchange.md) when built, and other languages
 - Translating the producer's own words inside `summary_original`

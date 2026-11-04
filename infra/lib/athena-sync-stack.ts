@@ -20,6 +20,9 @@ import type { Construct } from 'constructs';
 export const SYNC_DATABASE = 'fex';
 export const RECORDS_GLUE_TABLE = 'conversation_records';
 export const RECORDS_PREFIX = 'records/';
+/** Seeded demo records (spec 37): same columns, own prefix and table, never mixed with live records. */
+export const SEEDED_GLUE_TABLE = 'records_seeded';
+export const SEEDED_PREFIX = 'records-seeded/';
 
 export interface AthenaSyncStackProps extends StackProps {
   recordsTableName: string;
@@ -33,13 +36,22 @@ export interface AthenaSyncStackProps extends StackProps {
 const str = 'string';
 const citation = `struct<source:${str},standard_clause:${str},period:${str},strength:${str}>`;
 const claims = `array<struct<text:${str},citation:${citation}>>`;
+const evidence = str; // 'full' | 'limited'
 
-/** Columns mirror the record models (agent/src/fex/models.py). Timestamps stay strings: the JSON SerDe parses them poorly. */
+/**
+ * Columns mirror the record models (agent/src/fex/models.py); agent/tests/test_glue_columns.py fails if a record
+ * field has no column. Timestamps stay strings: the JSON SerDe parses them poorly. Deliberately NOT a column:
+ * `pii_matches` (the matched personal words stay in the record for reviewers, not in analytics).
+ */
 export const RECORD_COLUMNS: { name: string; type: string }[] = [
   { name: 'record_id', type: str },
   { name: 'producer_id', type: str },
   { name: 'version', type: 'int' },
   { name: 'created_at', type: str },
+  { name: 'updated_at', type: str },
+  { name: 'closed_at', type: str },
+  { name: 'consent_history', type: `array<struct<scope:${str},recorded_at:${str}>>` },
+  { name: 'ai_usage', type: `array<struct<model_id:${str},input_tokens:bigint,output_tokens:bigint>>` },
   { name: 'source', type: str },
   { name: 'status', type: str },
   { name: 'consent', type: `struct<scope:${str},recorded_at:${str}>` },
@@ -48,13 +60,22 @@ export const RECORD_COLUMNS: { name: string; type: string }[] = [
   { name: 'summary_original', type: str },
   { name: 'summary_english', type: str },
   { name: 'tags', type: `array<${str}>` },
+  { name: 'evidence', type: evidence },
+  { name: 'earlier_answers',
+    type: `array<struct<given_at:${str},reason:${str},insights:${claims},peer_examples:${claims},evidence:${evidence}>>` },
   { name: 'insights', type: claims },
   { name: 'peer_examples', type: claims },
   { name: 'feedback', type: str },
+  { name: 'pii_entity_types', type: `array<${str}>` },
+  { name: 'pii_check', type: str },
   { name: 'pii_flag', type: 'boolean' },
+  { name: 'pii_review', type: str },
   { name: 'review_status', type: str },
   { name: 'reviewed_by', type: str },
   { name: 'reviewed_at', type: str },
+  { name: 'reviewer_tags', type: `array<${str}>` },
+  { name: 'reviewer_summary_original', type: str },
+  { name: 'reviewer_summary_english', type: str },
 ];
 
 /**
@@ -184,6 +205,29 @@ export class AthenaSyncStack extends Stack {
       },
     });
     recordsTable.addDependency(database);
+
+    // Seeded demo records (spec 37): loaded by agent/scripts/load_seeded_records.py; read only by analytics (#29).
+    const seededTable = new glue.CfnTable(this, 'SeededRecordsGlueTable', {
+      catalogId: this.account,
+      databaseName: SYNC_DATABASE,
+      tableInput: {
+        name: SEEDED_GLUE_TABLE,
+        description: 'Seeded demo records (synthetic, spec 37). Never mixed with live records.',
+        tableType: 'EXTERNAL_TABLE',
+        parameters: { classification: 'json' },
+        storageDescriptor: {
+          location: `s3://${recordsBucket.bucketName}/${SEEDED_PREFIX}`,
+          columns: RECORD_COLUMNS,
+          inputFormat: 'org.apache.hadoop.mapred.TextInputFormat',
+          outputFormat: 'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat',
+          serdeInfo: {
+            serializationLibrary: 'org.openx.data.jsonserde.JsonSerDe',
+            parameters: { 'ignore.malformed.json': 'false' },
+          },
+        },
+      },
+    });
+    seededTable.addDependency(database);
 
     const workGroup = new athena.CfnWorkGroup(this, 'WorkGroup', {
       name: 'fex',

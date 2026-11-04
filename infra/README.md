@@ -1,7 +1,8 @@
 # infra/
 
 AWS CDK v2 (TypeScript). Issue #5 requires a single-command full-stack deployment;
-issue #40 records a timed clean redeploy. The current command deploys website hosting only.
+issue #40 records a timed clean redeploy. `infra/deploy.sh` is that command; today it deploys website
+hosting and the standards Knowledge Base (#17). Later features add their resources to the `FairExchange` stack.
 
 The `FairExchange` stack hosts the Vue website using a private KMS-encrypted S3 bucket
 and CloudFront with origin access control. It does not provision the stub API or
@@ -12,7 +13,7 @@ Run from the repository root:
 ```bash
 npm --prefix infra ci
 (cd infra && npx cdk synth FairExchange) # preview only; creates nothing
-EXPECTED_AWS_ACCOUNT=100300582834 AWS_REGION=us-west-2 bash infra/deploy-web.sh
+EXPECTED_AWS_ACCOUNT=100300582834 AWS_REGION=us-west-2 bash infra/deploy.sh
 ```
 
 `web/`, `api/`, `agent/`, `data/`, `eval/`, and `infra/` are root-level folders.
@@ -50,7 +51,7 @@ Remove that variable to disable automated publishing.
 The deployment role can publish only this website's files, use its encryption key
 through S3, read the hosting stack outputs, and create/read CloudFront invalidations.
 It cannot change infrastructure, IAM, the agent, or application records. Deploy
-infrastructure changes separately with `deploy-web.sh` using sandbox credentials.
+infrastructure changes separately with `deploy.sh` using sandbox credentials.
 
 Provision the OIDC identity once with:
 
@@ -67,3 +68,44 @@ AWS access, and deployment jobs are serialized to prevent overlapping uploads.
 
 CI and manual deployment instructions remain usable after the workshop ends;
 automated publishing needs a live sandbox account and its AWS resources.
+
+
+## Stacks and the deploy order (#5)
+
+The stacks use the bootstrapless synthesizer, so CDK cannot upload files for us. Anything the main stack
+reads while it is created must be uploaded first, by `deploy.sh`, into a small stack deployed before it:
+
+| Stack | Holds | Deleted with the stack? |
+|---|---|---|
+| `FairExchangeArtifacts` | The application data key (customer-managed KMS, rotated) and the artifacts bucket (encrypted with it): standards clause documents under `clauses/`, later the agent code zip | No. Both are kept. Clause documents expire after 30 days (`STANDARDS_DOCS_TTL_DAYS`), so a kept bucket empties itself. The key costs about $1 a month until it is scheduled for deletion. |
+| `FairExchange` | Website hosting (unchanged), the standards Knowledge Base and its ingestion, and later the API, agent runtime, records and analytics | The Knowledge Base, its vectors and ingestion resources are deleted. The website bucket and key are kept, as before. |
+
+`deploy.sh` runs, in order:
+
+1. Builds the website.
+2. Builds one document per APS/FPS clause (`python -m fx_data.standards_kb`), each with a `.metadata.json`
+   sidecar holding `clause_id` and `standard`, and computes their content hash.
+3. Type-checks the infrastructure code.
+4. Deploys `FairExchangeArtifacts`.
+5. Uploads the clause documents with `aws s3 sync --delete`. Every deploy re-uploads all of them, which
+   resets their expiry and restores any that expired.
+6. Deploys `FairExchange` with the bucket, key and hash as CDK context. The Knowledge Base uses an S3 Vectors
+   store encrypted with the data key, Titan Text Embeddings V2 and no chunking. A custom resource starts an
+   ingestion job and a Step Functions loop polls it: ingestion failure, any failed document, or more than
+   20 minutes fails the deploy, and CloudFormation rolls back only the new resources. The hash is a custom
+   resource property, so changed clauses re-ingest and unchanged ones do not.
+7. Publishes the website (`publish-web.sh`) and runs the Knowledge Base smoke test
+   (`eval/tests/test_standards_kb_smoke.py`). It prints `StandardsKnowledgeBaseId` for `FEX_STANDARDS_KB_ID`.
+
+`deploy-web.sh` now just runs `deploy.sh`. Do not deploy `cdk.out/FairExchange.template.json` by hand
+without the context `deploy.sh` passes: the Knowledge Base would point at a placeholder bucket.
+
+**Account prerequisites:** credentials that can create IAM roles, KMS keys, Bedrock Knowledge Bases and S3
+Vectors (the GitHub deploy role cannot), and access to Amazon Titan Text Embeddings V2 in the region.
+
+**Expiry caveat:** clause documents expire 30 days after the last deploy. Only ingest by deploying (the
+script uploads first). A sync started by hand in the console after they expired would empty the Knowledge
+Base; re-run `deploy.sh` to restore it.
+
+The ingestion handler is inline Lambda code (`lib/standards-kb/ingest_handler.py`, under 4 KB) because
+no CDK assets can be published.
