@@ -20,6 +20,11 @@ import { Construct } from 'constructs';
 
 /** Per-producer long-term namespace. Mirrors producer_namespace() in the agent (memory.py). */
 const ACTOR_NAMESPACE = '/actor/{actorId}/';
+/**
+ * Summaries are kept per session, so AgentCore requires `{sessionId}` in the summary strategy's namespace
+ * (CreateMemory rejects one without it). It stays under the producer's own namespace.
+ */
+const SESSION_NAMESPACE = `${ACTOR_NAMESPACE}session/{sessionId}/`;
 
 export interface FexMemoryProps {
   /**
@@ -61,7 +66,7 @@ export class FexMemory extends Construct {
         {
           summaryMemoryStrategy: {
             name: 'conversation_summary',
-            namespaces: [ACTOR_NAMESPACE],
+            namespaces: [SESSION_NAMESPACE],
           },
         },
         {
