@@ -33,13 +33,20 @@ The stack name is a parameter, and every resource name derives from it, so copie
 ### Shape
 
 - **Two stacks, one script.**
-  - An artifacts stack holds the bucket for agent code zips.
+  - An artifacts stack, named `<stackName>Artifacts`, holds the bucket for agent code zips.
   - The application stack holds everything else.
-  - The deploy script deploys both in order. This follows ADR 0002: code zip from S3, bootstrapless synthesizer, a new S3 key per build.
+  - The deploy script deploys both in order. The agent code is still a zip in S3 with a new key per build (ADR 0002).
+- **Synthesizer.** The application stack uses CDK's standard synthesizer, because its Lambdas and custom resources are CDK assets, which the bootstrapless synthesizer rejects. The account must be CDK-bootstrapped; the deploy script checks this and bootstraps if needed.
 - **Stack name is a parameter** (CDK context `stackName`, default `FairExchange`). No resource sets a physical name. Where a name is required, it is derived from the stack name.
 - **Removal policy is a parameter** (context `disposable`, default `false`).
   - When `false`, buckets, tables, the KMS key and the Knowledge Base are retained on stack deletion.
-  - When `true`, everything is destroyed, buckets are emptied, and nothing is left behind (#40).
+  - When `true`, buckets are emptied and everything is destroyed. The KMS key is scheduled for deletion with the minimum 7-day waiting period, which AWS requires; a key pending deletion counts as removed (#40).
+- **Eval access is a parameter** (context `evalAccess`, default `false`). When `true`:
+  - an eval runner role is created that may invoke this stack's runtime ([#25](25-chat-endpoint.md));
+  - eval evidence capture is switched on ([#34](34-negative-scope-tests.md)).
+
+  It is never set on the main `FairExchange` stack, and a template test enforces that.
+- **CloudTrail is a parameter** (context `trail`). The deploy script sets it only for the main `FairExchange` stack, so copies don't add billed trails.
 - **The spike stack and scripts are retired** once the runtime is in the application stack.
 
 ### Contents of the application stack
@@ -48,7 +55,7 @@ Each line names the spec that defines the resource.
 
 - **Security:**
   - one customer-managed KMS key with rotation, used by every bucket, table, log group and the memory resource;
-  - a CloudTrail trail (technical environment baseline).
+  - a CloudTrail trail when `trail` is set (technical environment baseline).
 - **Web:** the existing S3 and CloudFront hosting (#30).
 - **Data:**
   - the data bucket (producer table, peer catalog, [#14](14-producer-record-tool.md), [#16](16-peer-example-tool.md));
@@ -62,7 +69,8 @@ Each line names the spec that defines the resource.
   - the Guardrail ([#12](12-guardrail.md));
   - the standards Knowledge Base on S3 Vectors with its ingestion custom resource ([#17](17-standards-grounding.md)).
 - **API:**
-  - the REST API with chat (streaming), `GET /me`, review and analytics routes ([#25](25-chat-endpoint.md), [#11](11-identity.md), [#27](27-review-api.md), [#29](29-analytics-api.md));
+  - the REST API with chat (streaming), `GET /me`, `GET /me/records`, review and analytics routes ([#25](25-chat-endpoint.md), [#11](11-identity.md), [#32](32-your-record.md), [#27](27-review-api.md), [#29](29-analytics-api.md));
+  - `GET /health`, with no sign-in, returning the deployed version, for the smoke check;
   - the stream sync Lambda ([#28](28-athena-sync.md));
   - the inactivity sweep and its schedule ([#25](25-chat-endpoint.md)).
 - **Lambdas:** every function gets its own role with only the permissions its spec lists. TypeScript functions run on Node.js 24, and Python functions on Python 3.12.
@@ -74,12 +82,21 @@ One command, run from the infra package. In order, it:
 1. **Checks the account.** The target account must equal the expected account passed in.
 2. **Checks prerequisites:**
    - Bedrock model access for the configured models, failing with a message naming any missing model;
+   - CDK bootstrap, running it if missing;
    - CloudWatch Transaction Search. If it is off, the script adds the Logs resource policy and turns it on, then waits for `ACTIVE` (ADR 0002 measured 64 seconds).
-3. **Builds the agent zip** with ARM64 Linux wheels (ADR 0002) and uploads it under a new key.
-4. **Deploys** the artifacts stack, then the application stack, passing the code key, stack name and `disposable` flag.
-5. **Uploads data:** the producer table, peer catalog and seeded records ([#7](07-synthetic-data.md), [#37](37-seeded-records.md)).
-6. **Builds and publishes the web app** to the stack's bucket and invalidates CloudFront.
-7. **Runs a smoke check** of the API health and the Knowledge Base, and prints the outputs.
+3. **Deploys the artifacts stack** and reads its bucket name from the stack output.
+4. **Builds the agent zip** with ARM64 Linux wheels (ADR 0002) and uploads it to that bucket under a new key.
+5. **Deploys the application stack**, passing the code key and the `stackName`, `disposable`, `evalAccess` and `trail` values.
+6. **Uploads data:** the producer table, peer catalog and seeded records ([#7](07-synthetic-data.md), [#37](37-seeded-records.md)).
+7. **Builds and publishes the web app** to the stack's bucket and invalidates CloudFront.
+8. **Runs a smoke check** of `GET /health` and the Knowledge Base, and prints the outputs.
+
+### The destroy script
+
+It is for disposable stacks only, and refuses to run on a stack deployed with `disposable=false`.
+1. Empties the stack's buckets.
+2. Destroys the application stack, then the artifacts stack.
+3. Lists anything still tagged with the stack name. Only KMS keys pending deletion may remain, and their deletion dates are printed.
 
 It is safe to re-run. It writes a deployment log and prints the total elapsed time, which #40 uses.
 
@@ -100,7 +117,9 @@ Template tests, using `aws-cdk-lib/assertions` on the synthesized stack:
 - every log group has a retention value set;
 - no resource has a hard-coded physical name;
 - the runtime role's actions equal the [#13 spec](13-conversation-steps.md) list exactly;
-- with `disposable=true`, nothing is retained;
+- with `disposable=true`, nothing is retained, and the KMS key's deletion window is 7 days;
+- `evalAccess` and `trail` resources appear only when their flags are set, and the main stack name can't be synthesized with `evalAccess=true`;
+- the artifacts stack name is derived from `stackName`;
 - with `disposable=false`, the stateful resources are retained;
 - two stacks synthesized with different names share no resource names.
 
@@ -118,3 +137,7 @@ Script checks, run once in the sandbox: a re-run with no changes succeeds, and a
 - Retention period for each log group. It is a required deploy-time configuration value with no default, so every deployer chooses it explicitly.
 - Whether message content may appear in AgentCore logs at all (ADR 0002). Turning content capture off is a configuration value. ADR 0002 found the Strands tracer still logs content when the documented setting is off, so whoever turns it off must verify the result the same way the spike did.
 - The sign-in stand-in ([#11](11-identity.md)), which the stack will host once decided
+
+### Spike checks
+
+- Whether the AgentCore runtime's log group name is predictable before deploy, and whether the stack can create it with retention, or the runtime creates it itself

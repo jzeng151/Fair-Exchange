@@ -10,6 +10,20 @@ One spec per outline issue. The issue stays a short outline; the spec is the imp
 - The vision and technical environment documents in `docs/requirements/` still apply. Where a spec changes a requirement, it says so and gives the date of the decision.
 - Issues closed before their spec was written (#4, #30, and code merged ahead of #8, #15, #16, #31, #33) are reviewed against the specs in a retro review.
 
+## Minimum demo set (decided 2026-11-04)
+
+Build these first. Everything else is ranked behind them, and starts only when this set is on track. The list follows the vision document's Definition of Done.
+
+- Conversation flow, records and chat API: #13, #19, #20, #22, #25, #26
+- Retrieval and grounding: #14 to #18, #8, #12
+- Review and the Athena join: #27, #28, #31
+- Producer data: #7
+- Scope tests, with the standalone adversarial runner: #34
+- Scenarios S1 to S5 (drought, Spanish price drop, labor shortage, Spanish decline, PII) and the 15-account labeled set: #35
+- One-command deploy, handoff and the timed redeploy: #5, #39, #40
+
+Next if time allows: S6 and S7, the full eval harness (#36), memory (#59), analytics (#29, #33, #37), "your record" (#32). Then the stretch goals (#24, #41).
+
 ## Test seams (shared by all specs)
 
 Tests check what a caller sees, not internals. There are three seams:

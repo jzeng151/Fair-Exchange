@@ -48,6 +48,7 @@ The handoff lives in `docs/handoff/` as a small set of documents. Each links to 
      - AgentCore Gateway was deferred until after the MVP. Tools stay in-process because of the scope rule (#13).
      - Peer examples use a structured query. Moving them to the Knowledge Base is a planned expansion ([#16](16-peer-example-tool.md)).
      - The verifier proves provenance, not that a claim's wording matches its source ([#17](17-standards-grounding.md)).
+     - The scope metric shows zero leaks across the tested attacks; it is not proof that no leak is possible ([#34](34-negative-scope-tests.md)).
      - Code merged before its spec and not yet changed to match, listed from the retro review.
   7. **Open decisions:** every "Not decided" item across the specs, gathered into one list by topic, each linking to its spec.
 - **Keeping it current.** A PR that changes an interface updates the matching handoff document (CONTRIBUTING). The PR template already has this checkbox.

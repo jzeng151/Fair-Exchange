@@ -36,27 +36,33 @@ It combines FTUSA's sample producers, with their existing IDs, with synthetic `S
 
 - **Inputs:**
   - FTUSA's sample files in `docs/olena_data/` (producer accounts, Premium projects, surveys);
-  - a hand-written scenario file listing the synthetic producers;
+  - a hand-written **producer definitions file** listing the synthetic producers (not to be confused with the conversation scenario files in [#35](35-scenarios-and-labels.md));
   - a reviewed vocabulary mapping table.
 - **Synthetic producers:**
   - IDs are `SYN-` plus a stable number.
-  - Each is defined in the scenario file with country, region, crops, entity type, and a few Premium projects and survey rows using the allowlisted columns ([#14](14-producer-record-tool.md)).
+  - Each is defined in the producer definitions file with country, region, crops, entity type, and a few Premium projects (with their challenge tags) and survey rows using the allowlisted columns ([#14](14-producer-record-tool.md)).
   - They must cover:
     - a Colombian coffee smallholder in Cauca facing drought;
     - a Mexican coffee cooperative facing a price drop;
     - a Vietnamese processor facing a labor shortage;
     - at least two Côte d'Ivoire cocoa producers;
-    - a Honduran or Peruvian Spanish-language producer.
-- **Contrasts.** At least three pairs that share a challenge tag but differ in crop, region or entity type. They are listed in the scenario file so evals can find them.
+    - a Honduran or Peruvian Spanish-language producer;
+    - two scope-test producers, `SYN-SCOPE-A` and `SYN-SCOPE-B`, in different countries, regions and crops ([#34](34-negative-scope-tests.md)).
+- **Contrasts.** At least three pairs that share a challenge tag but differ in crop, region or entity type. They are listed in the producer definitions file. Each pair also needs a conversation scenario for both producers ([#35](35-scenarios-and-labels.md)) so evals can compare their answers.
 - **Mapping table.** A reviewed CSV maps sample values to the [#14](14-producer-record-tool.md) vocabulary (e.g., `1st Grade` to `cooperative`, `Independent Smallholder` to `smallholder`, `Estate` to `hired_labor_farm`, `Bananas` to `banana`). Unmapped values become `other`, and the generator lists them in its report.
 - **Scope of sample rows.** Only sample producers whose crops map to `coffee`, `banana` or `cocoa` go into the producer table. Factories and apparel accounts are excluded.
+- **Region for sample producers.** The producer accounts file has no region column. A producer's `admin1` is the most frequent `country_region_name` across its Premium projects, or empty if it has none. A producer with no region gets country-level regional facts only ([#15](15-regional-context-tool.md)).
+- **Challenge tags for projects.**
+  - Sample projects are all categorized `Environmental`, so a reviewed mapping table maps each `sub_category_taxonomy_term_txt` value to one or more of the 11 challenge tags.
+  - A project whose sub-category has no mapping is left out of the peer catalog and listed in the report.
+  - Synthetic projects declare their tags directly.
 - **Outputs:**
   - JSON lines files for the producer table, Premium projects, survey responses (allowlisted columns only) and certification scope;
   - the peer catalog;
   - a run report covering counts per country, crop and entity type, unmapped values and excluded rows.
 - **Peer catalog build:**
   - Every eligible project gets a fictional organization name from a fixed list and an opaque `catalog_id`.
-  - Only the publishable fields ([#16](16-peer-example-tool.md)) are copied.
+  - Only the publishable fields ([#16](16-peer-example-tool.md)) are copied, plus one private column, `owner_producer_id`. The peer tool uses it to exclude the producer's own projects and never returns it.
   - Each description is checked with Comprehend PII detection. A project with a hit is left out and listed in the report for hand-editing.
   - This step needs AWS credentials and runs as part of the generator, not at agent start.
 - **Determinism.** A fixed random seed; the same inputs give byte-identical outputs.
@@ -72,7 +78,9 @@ Generator tests (public function, data package), with the Comprehend step stubbe
 - the survey output contains only allowlisted columns, even when the input has every column filled;
 - excluded sample rows (factories, apparel) are absent;
 - unmapped values appear in the report;
-- the peer catalog holds only publishable fields and no sample IDs;
+- the peer catalog holds only publishable fields plus `owner_producer_id`, and no sample project or account IDs;
+- a sample producer's region is derived from its projects, and a producer without projects has an empty region;
+- a project with an unmapped sub-category is left out of the peer catalog and reported;
 - a stubbed PII hit leaves the project out.
 
 Prior art: the existing data package tests.

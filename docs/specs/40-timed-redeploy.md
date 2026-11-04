@@ -8,7 +8,7 @@ The vision document measures deployability with a timed redeploy into a second s
 
 ## Solution
 
-On day two, a team member deploys a full second copy under a different stack name in the same sandbox account (decided 2026-11-04). They use only the single command ([#5](05-cdk-stack.md)) and the handoff documents ([#39](39-handoff.md)). The copy is timed, S1 to S6 are run against it ([#35](35-scenarios-and-labels.md)), and it is torn down leaving nothing behind.
+On day two, a team member deploys a full second copy under a different stack name in the same sandbox account (decided 2026-11-04). They use only the single command ([#5](05-cdk-stack.md)) and the handoff documents ([#39](39-handoff.md)). The copy is timed, the minimum demo scenarios are run against it ([#35](35-scenarios-and-labels.md)), and it is torn down. Only KMS keys in their required deletion waiting period remain.
 
 ## User Stories
 
@@ -26,9 +26,9 @@ On day two, a team member deploys a full second copy under a different stack nam
   1. Start the timer.
   2. Run the single deploy command with the new stack name.
   3. Stop the timer when the script's smoke check passes; the script prints the elapsed time.
-  4. Run S1 to S6 against the new stack's API, using the scenario files.
+  4. Run S1 to S5 (plus S6 once decided) against the new stack's API with the scenario runner ([#35](35-scenarios-and-labels.md)).
   5. Check each scenario's expected outcome, the Athena join query for S1, and the reviewer view for S1.
-  6. Tear down with the destroy command and confirm no resources tagged with the stack name remain.
+  6. Tear down with the destroy script ([#5](05-cdk-stack.md)). Confirm that nothing tagged with the stack name remains except KMS keys pending deletion, and record their deletion dates.
 - **Account prerequisites.** Already met in the sandbox (Transaction Search is on). The handoff documents what a truly clean account needs instead, since this run can't prove it.
 - **Record.** The elapsed deploy time, the pass or fail result of each scenario, every handoff gap found, and teardown confirmation. These go in `docs/handoff/` and the #40 issue.
 - **Isolation.** The second stack derives every resource name from its own stack name and has its own KMS key, so it can't read or write the main stack's data.
