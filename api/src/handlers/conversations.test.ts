@@ -111,4 +111,27 @@ describe('streaming handlers', () => {
     const listed = await h.list(makeEvent({}));
     expect(JSON.parse(listed.body).conversations).toHaveLength(1);
   });
+
+  describe('GET /me', () => {
+    it('returns the caller user id and roles for any identified caller', async () => {
+      const { h } = setup();
+      const producer = await h.me(makeEvent({ userId: 'u-prod', roles: ['producer'], producerId: 'producer-a' }));
+      expect(producer.statusCode).toBe(200);
+      expect(JSON.parse(producer.body)).toEqual({ userId: 'u-prod', roles: ['producer'] });
+
+      const admin = await h.me(makeEvent({ producerId: null, userId: 'u-admin', roles: ['admin'] }));
+      expect(JSON.parse(admin.body)).toEqual({ userId: 'u-admin', roles: ['admin'] });
+    });
+
+    it('does not leak the producer id', async () => {
+      const { h } = setup();
+      const r = await h.me(makeEvent({ userId: 'u-prod', roles: ['producer'], producerId: 'producer-a' }));
+      expect(JSON.parse(r.body)).not.toHaveProperty('producerId');
+    });
+
+    it('returns 401 when the caller cannot be identified', async () => {
+      const { h } = setup();
+      expect((await h.me(makeEvent({ producerId: null }))).statusCode).toBe(401);
+    });
+  });
 });

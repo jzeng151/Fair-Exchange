@@ -1,5 +1,11 @@
 import type { APIGatewayProxyEvent } from 'aws-lambda';
-import { Forbidden, Unauthorized, type IdentityResolver } from './identity.js';
+import {
+  Forbidden,
+  Unauthorized,
+  type Identity,
+  type IdentityFullResolver,
+  type IdentityResolver,
+} from './identity.js';
 import { writeEvent, type Sink } from './stream.js';
 import { Conflict, NotFound, beginTurn, boundedResume, endTurn, loadOwned, streamTurn } from './turn.js';
 import type { Conversation, Deps, Log } from './types.js';
@@ -151,4 +157,18 @@ export async function listConversations(
       status: c.status,
     })),
   });
+}
+
+/**
+ * GET /me (#11 spec). Returns the caller's user id and roles, so the web app can pick the right
+ * views. Any identified caller may use it; it requires no particular role. The producer ID is not
+ * returned here, only what the web app needs to choose views.
+ */
+export async function getMe(
+  deps: Deps,
+  resolve: IdentityFullResolver,
+  event: APIGatewayProxyEvent,
+): Promise<JsonResult> {
+  const identity: Identity = await resolve(event);
+  return json(200, { userId: identity.userId, roles: identity.roles });
 }

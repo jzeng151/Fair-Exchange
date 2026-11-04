@@ -26,4 +26,4 @@ The first three are the vision doc's required scenarios. The Mexico and Vietnam 
 
 ## Labeled set
 
-`../labeled/challenge-tags.json`: 33 producer statements (English and Spanish) with challenge tags, at least two per tag, for tag-accuracy scoring (#36). The tags are drafts (`"labeled_by": "draft"`). A person needs to review each item, correct the tags if needed, and replace `draft` with their handle before the set counts as human-labeled.
+`../labeled/challenge-tags.json`: 33 producer statements (English and Spanish) with challenge tags, at least two per tag, for tag-accuracy scoring (#36). Labels were drafted, then reviewed and corrected by a person (`labeled_by`). 19 items carry more than one tag. Spanish items were reviewed from a Google Translate English version and are marked `(via Google Translate)`.
