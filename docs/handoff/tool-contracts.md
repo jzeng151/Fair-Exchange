@@ -94,6 +94,7 @@ It never substitutes a neighbouring region. Strength is `nearest` for climate an
 - Never the session producer's own projects. At most one project per organization.
 - Organizations are fictionalized; account ids never appear.
 - `intended_outcome` is what the project aimed for. The sample data has no recorded results, so FEX must not describe it as what happened. `status` says whether the project was completed.
+- `status` and dates are `null` for the few projects the sample cannot tell apart (same account and text, different statuses). FEX should not claim a status for those.
 - Empty list: no comparable project. FEX should say so rather than invent one. The sample covers environmental projects only, so market, labor, health and similar challenges return nothing today.
 
 **Feed the verifier:** `evidence.record_tool_result(result)`.
