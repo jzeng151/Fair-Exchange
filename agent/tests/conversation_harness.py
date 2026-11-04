@@ -114,7 +114,8 @@ RETRIEVE = (("tool", "get_regional_context", {}), ("tool", "find_peer_examples",
 class Run:
     """One conversation against a fresh engine."""
 
-    def __init__(self, producer_id: str | None = None, profiles=None, records=None, scope_check=None):
+    def __init__(self, producer_id: str | None = None, profiles=None, records=None, scope_check=None,
+                 pii_scanner=None):
         self.producer_id = producer_id or cauca_producer()
         self.conversation_id = "conv-1"
         self.small, self.large = ScriptedModel(), ScriptedModel()
@@ -125,6 +126,8 @@ class Run:
             kwargs["records"] = records
         if scope_check is not None:
             kwargs["scope_check"] = scope_check
+        if pii_scanner is not None:
+            kwargs["pii_scanner"] = pii_scanner
         self.engine = ConversationEngine(store=self.store, small_model=self.small, large_model=self.large,
                                          standards=STANDARDS, clock=self._clock, **kwargs)
         self.regional, self.peers = real_sources(self.producer_id)

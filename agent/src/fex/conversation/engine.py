@@ -205,12 +205,14 @@ class ConversationEngine:
     def __init__(self, *, store: StateStore, small_model: Any, large_model: Any, standards: Standards | None = None,
                  profiles: Callable[[str], Profile | None] | None = None, tools: list | None = None,
                  clock: Callable[[], datetime] | None = None, max_retries: int = 2,
-                 records: Any = None, scope_check: ScopeCheck | None = None) -> None:
+                 records: Any = None, scope_check: ScopeCheck | None = None,
+                 pii_scanner: Callable[[str, str], list[dict]] | None = None) -> None:
         self.store = store
         self.small_model, self.large_model = small_model, large_model
         self.standards = standards or Standards.load()
         self.profiles = profiles or _default_profiles()
         self.tools = tools if tools is not None else ALL_TOOLS
+        self.pii_scanner = pii_scanner  # the Comprehend seam (#20): None in tests, wired in runtime
         self.clock = clock or (lambda: datetime.now(UTC))
         self.max_retries = max_retries
         self.records = records  # a fex.records.RecordStore; None = records are not saved (#26)
@@ -232,8 +234,13 @@ class ConversationEngine:
         if request.kind == "start":
             state = state or self._new_state(request.producer_id, request.conversation_id)
             if not state.history:  # a repeated start just reports where the conversation is
-                opening = self._ask(state, turn, INTAKE_SYSTEM,
-                                    self._transcript(state) + "\n\nStart the conversation with an open question.")
+                # Opening language (#22): the profile's language if it has one, otherwise English. Nobody has
+                # written yet, so the model's guess doesn't set it; intake switches once the producer writes.
+                state.language = state.profile.language or "en"
+                opening = self._structured(
+                    self.small_model, INTAKE_SYSTEM,
+                    self._transcript(state) + f"\n\nStart the conversation with an open question, written in the "
+                    f"language with ISO 639-1 code '{state.language}'.", IntakeTurn)
                 turn.say(opening.reply)
             return self._finish(state, turn, step_changed=True)
 
@@ -333,7 +340,7 @@ class ConversationEngine:
         from fex.records import RecordConflict, save_record  # local: records imports conversation state
 
         try:
-            result = save_record(state, self.records, self.clock())
+            result = save_record(state, self.records, self.clock(), pii_scanner=self.pii_scanner)
         except (RecordConflict, ValueError) as exc:
             log.error("record not saved for conversation %s: %s", state.conversation_id, exc)
             turn.emit("error", code="agent_failed", message="Your answer could not be saved. Please try again.")

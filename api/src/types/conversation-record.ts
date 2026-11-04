@@ -1,7 +1,7 @@
 // GENERATED FILE. Do not edit by hand.
 // Source: agent/src/fex/models.py  ->  agent/scripts/generate_types.py
-// schema-sha256: be8f98dad8c03dad644969727195154b9cd044ceb72be9e5f805106d0ec8616c
-// body-sha256: 2cbe4f3667595644d0ad94af5a05cc6d3dd936053cc5836fa33998b0c7a2a529
+// schema-sha256: 996cdf9208b0689983db66aa6ed12340e1e8a01861a832aa45620f49ff19fa32
+// body-sha256: 745aa6595b2c4f0abfb26dcf467b13fccfaa390006bbf287dffd6cad1a46316d
 // end-of-banner
 /**
  * One record per Fair Exchange conversation. Generated from agent/src/fex/models.py; do not edit by hand.
@@ -81,9 +81,37 @@ export type Language = string;
  */
 export type PeerExamples1 = Claim[];
 /**
+ * Scan result: None until the first scan ran; unsupported_language covers languages other than en and es
+ */
+export type PiiCheck = ("done" | "failed" | "unsupported_language") | null;
+/**
+ * Types found across the conversation, in first-seen order
+ */
+export type PiiEntityTypes = ("NAME" | "PHONE" | "EMAIL" | "ADDRESS")[];
+/**
  * Personal information flagged for human review; never redacted
  */
 export type PiiFlag = boolean;
+/**
+ * Up to 10 words before and after the match
+ */
+export type Context = string;
+/**
+ * Only these four types are looked for
+ */
+export type EntityType1 = "NAME" | "PHONE" | "EMAIL" | "ADDRESS";
+/**
+ * When the text containing the match was said
+ */
+export type MessageAt = string;
+/**
+ * The matched words; kept for review, never redacted or logged
+ */
+export type Text1 = string;
+/**
+ * Every match found across scanned texts; matches are removed if the record turns declined
+ */
+export type PiiMatches = PiiMatch[];
 /**
  * Set from the session, never from the conversation
  */
@@ -222,7 +250,10 @@ export interface CompletedRecord {
   insights?: Insights1;
   language: Language;
   peer_examples?: PeerExamples1;
+  pii_check?: PiiCheck;
+  pii_entity_types?: PiiEntityTypes;
   pii_flag?: PiiFlag;
+  pii_matches?: PiiMatches;
   producer_id: ProducerId;
   record_id: RecordId;
   review_status?: ReviewStatus;
@@ -292,6 +323,15 @@ export interface Citation {
   source: Source;
   standard_clause: StandardClause;
   strength?: Strength;
+}
+/**
+ * One personal-information match a scan found, kept for human review (issue #20).
+ */
+export interface PiiMatch {
+  context: Context;
+  entity_type: EntityType1;
+  message_at: MessageAt;
+  text: Text1;
 }
 /**
  * The producer declined. Only identifiers, status and time are kept: no narrative content.
