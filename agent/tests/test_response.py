@@ -37,8 +37,9 @@ def standards():
 @pytest.fixture
 def evidence():
     ev = SessionEvidence()
-    ev.record(CHIRPS)
-    ev.record(PEER)
+    ev.record(CHIRPS, "regional")
+    ev.record(PEER, "peer")
+    ev.record_clause(GOOD_CLAUSE)  # the verifier now requires the cited clause to have been retrieved
     return ev
 
 
