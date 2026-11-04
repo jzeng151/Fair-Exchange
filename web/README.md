@@ -3,7 +3,8 @@
 Vue 3 + Vite (TypeScript). One app, two sides:
 
 - `#/`: **Producer**, the chat with FEX (issue #30)
-- `#/review`: **Fair Trade USA**, records to review (issue #31). The admin dashboard (#33) comes later.
+- `#/review`: **Fair Trade USA**, records to review (issue #31)
+- `#/admin`: **Admin**, aggregate dashboard (issue #33)
 
 ```bash
 npm ci
@@ -30,6 +31,16 @@ record is marked **reviewed** with who and when. Corrections that would break th
 an unknown tag, a non-English record without an English summary). Declined records have nothing to review.
 "Load demo records" adds synthetic records covering each state.
 
+## What an admin sees (`#/admin`)
+
+Counts only: records in view, declines (a count only), records waiting for review, and breakdowns by challenge,
+language, type of organization and feedback, as bars or as a table. The rules, in `src/lib/analytics.ts`, are the
+ones #29 must enforce: consented records only; any group under 5 hidden, plus one more where a hidden number could be
+worked out from the total; reviewed records by default ("Include pending" to widen). "Load sample data" adds
+60 synthetic `SEED-` records (`src/lib/dashboardSeed.ts`), because a few demo conversations can't clear the n < 5 rule.
+`AnalyticsSummary` is the response shape the dashboard expects from #29. Admin-only access needs #11 (sign-in) and #29;
+until then the route is open, and only aggregates are ever shown.
+
 ## Demo mode (until the chat API, #25)
 
 - Replies are **scripted** from `src/data/scenarios.ts` (synthetic producers and numbers, **real** APS/FPS clause IDs).
@@ -44,6 +55,8 @@ an unknown tag, a non-English record without an English summary). Declined recor
 - Every Spanish line has an English version; Spanish and English UI copy have the same keys.
 - Reviews (`src/lib/review.ts`): approve or correct, mark reviewed; never change producer, source or consent; refuse corrections that break the schema rules.
 - Demo records: every state is present, every one is reviewable, clauses are real, each completed record has a trace.
+- Analytics rules: groups under 5 hidden, complementary hiding, declines as a count only, reviewed by default, no record-level fields in the output.
+- Sample data: repeatable, unique `SEED-` IDs, valid records, meaningful breakdowns with a hidden group.
 - No directive wording ("you should", "debería", "recomendamos"…) anywhere in FEX's copy.
 
 Design tokens: `src/styles/tokens.css` (FTUSA UI/UX spec v1.1). Accessibility target: WCAG 2.2 AA.
