@@ -1,0 +1,24 @@
+{
+  "id": "colombia-drought-es",
+  "title": "Colombian coffee cooperative, two seasons of irregular rain (Spanish)",
+  "producer_id": "CFC19603C1B7B29C017954FD1DB2D620",
+  "profile_note": "Sample producer: coffee, 1st Grade cooperative, Cauca, Colombia. Regional data and peer examples exist.",
+  "language": "es",
+  "demonstrates": ["spanish exchange", "playback correction", "full evidence", "consent granted", "feedback"],
+  "turns": [
+    {"kind": "start"},
+    {"kind": "message", "text": "Este año casi no llovió como antes. Llevamos dos temporadas con lluvias muy irregulares y la última cosecha de café bajó bastante."},
+    {"kind": "message", "text": "Empezó a finales de 2024. Perdimos más o menos un tercio de la cosecha. Algunos socios sembraron más sombra en los cafetales, pero no alcanzó."},
+    {"kind": "action", "action": {"name": "correct_playback", "args": {"text": "No fue un tercio, fue casi la mitad de la cosecha."}}},
+    {"kind": "action", "action": {"name": "confirm_playback", "args": {}}},
+    {"kind": "action", "action": {"name": "set_consent", "args": {"scope": "internal"}}},
+    {"kind": "action", "action": {"name": "set_feedback", "args": {"value": "yes"}}},
+    {"kind": "action", "action": {"name": "end", "args": {}}}
+  ],
+  "expect": {
+    "tags": ["climate and weather", "water"],
+    "evidence": "full",
+    "record": {"status": "completed", "consent_scope": "internal", "feedback": "yes", "pii_flag": false},
+    "playback_after_correction_mentions": ["mitad"]
+  }
+}
