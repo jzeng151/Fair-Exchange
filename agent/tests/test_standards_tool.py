@@ -2,6 +2,7 @@
 Knowledge Base retriever behind the same ClauseRetriever interface. Spec: docs/specs/17-standards-grounding.md.
 """
 import pytest
+from fx_data.records import ProducerRecords
 from tests.conversation_harness import (
     RETRIEVE, FakeRetriever, Run, answer, claim, intake, of, playback, summary,
 )
@@ -9,6 +10,8 @@ from tests.tool_harness import call_tool
 
 from fex.tools.standards import BedrockKbRetriever, find_standards, standards_query
 from fex.verifier import SessionEvidence
+
+RECORDS = ProducerRecords.load()._records
 
 
 def respond_state(**extra) -> dict:
@@ -128,6 +131,31 @@ def test_a_tool_the_model_skipped_is_called_by_code_before_claims_are_written():
     # the claim-writing call saw the backstopped items
     assert r.peers[0]["source"] in r.large.prompts[-1] and "APS 3.6.1" in r.large.prompts[-1]
     assert of(events, "answer")[0].evidence == "full"
+
+
+def test_every_distinct_fact_reaches_the_claim_writer_even_when_facts_share_a_source():
+    # A producer whose survey facts all share one source label, as the sample data does
+    pid = next(p for p, rec in RECORDS.items() if len(rec["survey"]["facts"]) > 1)
+    r = Run(producer_id=pid)
+    confirmed(r)
+    r.large.add(*RETRIEVE, ("raise", RuntimeError("stop after the prompt is built")))
+    r.action("confirm_playback")
+    writer_prompt = r.large.prompts[-1]
+    survey = RECORDS[pid]["survey"]["facts"]
+    assert len({f["source"] for f in survey}) < len(survey)  # the case the old source-keyed dedupe lost
+    for fact in survey:
+        assert fact["text"] in writer_prompt
+    for fact in r.regional:
+        assert fact["text"] in writer_prompt
+
+
+def test_a_tool_called_twice_is_only_given_to_the_claim_writer_once():
+    r = Run()
+    confirmed(r)
+    regional = ("tool", "get_regional_context", {})
+    r.large.add(regional, regional, *RETRIEVE, ("raise", RuntimeError("stop after the prompt is built")))
+    r.action("confirm_playback")
+    assert r.large.prompts[-1].count(r.regional[0]["text"]) == 1
 
 
 def test_no_backstop_when_the_model_called_every_tool():

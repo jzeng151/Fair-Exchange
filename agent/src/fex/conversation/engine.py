@@ -537,7 +537,14 @@ class ConversationEngine:
                 f"Confirmed situation: {pb.model_dump_json(include={'challenge', 'timing', 'severity', 'tried', 'tags'})}")
 
     def _answer_prompt(self, state: ConversationState, items: list[dict]) -> str:
-        unique = list({item["source"]: item for item in items}.values())
+        # Drop only exact repeats (the model calling a tool twice). Distinct facts can share a source label
+        # (e.g. every survey fact), so the label alone is not an identity.
+        seen, unique = set(), []
+        for item in items:
+            key = json.dumps(item, sort_keys=True, ensure_ascii=False, default=str)
+            if key not in seen:
+                seen.add(key)
+                unique.append(item)
         return (self._situation(state) + "\n\nItems the data tools returned (cite only these):\n"
                 + "\n".join(json.dumps(item, ensure_ascii=False, default=str) for item in unique))
 
