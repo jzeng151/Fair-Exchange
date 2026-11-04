@@ -2,18 +2,25 @@
 # Run the real agent and the real chat API together on this machine and drive one full conversation (#101).
 #   bash scripts/e2e/run_local.sh            # deterministic demo model: no AWS, no cost
 #   FEX_DEMO_MODELS=0 bash scripts/e2e/run_local.sh   # real Claude via Bedrock (needs AWS credentials; costs cents)
-# Leaves both servers stopped. Records are written to $FEX_LOCAL_RECORDS_DIR (default: a temp folder).
+#   bash scripts/e2e/run_local.sh --web      # then keep the chain running and open the web app in live mode (#116)
+# Checks: the Python driver, then the web app's own live client against the same chain.
+# Leaves every server it started stopped. Records are written to $FEX_LOCAL_RECORDS_DIR (default: a temp folder).
 set -euo pipefail
+web=0
+[[ "${1:-}" == "--web" ]] && web=1
 root="$(cd "$(dirname "$0")/../.." && pwd)"
 export FEX_DEMO_MODELS="${FEX_DEMO_MODELS:-1}"
 export FEX_LOCAL_RECORDS_DIR="${FEX_LOCAL_RECORDS_DIR:-$(mktemp -d)}"
 export FEX_AGENT_PORT="${FEX_AGENT_PORT:-8080}" FEX_API_PORT="${FEX_API_PORT:-3000}"
 export FEX_AGENT_URL="http://127.0.0.1:${FEX_AGENT_PORT}"
+export FEX_WEB_PORT="${FEX_WEB_PORT:-5173}"
 [[ "$FEX_DEMO_MODELS" == "1" ]] || unset FEX_DEMO_MODELS
 logs="$(mktemp -d)"
 
 # Never talk to a server left over from an earlier run: it may be running old code.
-for port in "$FEX_AGENT_PORT" "$FEX_API_PORT"; do
+ports=("$FEX_AGENT_PORT" "$FEX_API_PORT")
+[[ $web == 1 ]] && ports+=("$FEX_WEB_PORT")
+for port in "${ports[@]}"; do
   if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
     echo "Port $port is already in use. Stop that process first (lsof -nP -iTCP:$port -sTCP:LISTEN)." >&2
     exit 1
@@ -21,7 +28,7 @@ for port in "$FEX_AGENT_PORT" "$FEX_API_PORT"; do
 done
 # uv and npx start the servers as child processes, so stop whatever listens on our ports.
 cleanup() {
-  for port in "$FEX_AGENT_PORT" "$FEX_API_PORT"; do
+  for port in "${ports[@]}"; do
     lsof -nP -t -iTCP:"$port" -sTCP:LISTEN 2>/dev/null | xargs kill 2>/dev/null || true
   done
 }
@@ -35,4 +42,14 @@ wait_for "http://127.0.0.1:${FEX_AGENT_PORT}/ping"
 wait_for "http://127.0.0.1:${FEX_API_PORT}/conversations"
 echo "agent :${FEX_AGENT_PORT} (demo model: ${FEX_DEMO_MODELS:-no, real Claude})  api :${FEX_API_PORT}  records: $FEX_LOCAL_RECORDS_DIR"
 
-python3 "$root/scripts/e2e/local_conversation.py" --api "http://127.0.0.1:${FEX_API_PORT}" --records "$FEX_LOCAL_RECORDS_DIR"
+api="http://127.0.0.1:${FEX_API_PORT}"
+python3 "$root/scripts/e2e/local_conversation.py" --api "$api" --records "$FEX_LOCAL_RECORDS_DIR"
+
+echo "web live client against the same chain:"
+(cd "$root/web" && npm ci --silent && FEX_E2E_API_URL="$api" npx vitest run src/lib/live.e2e.test.ts)
+
+if [[ $web == 1 ]]; then
+  echo
+  echo "Live FEX: http://localhost:${FEX_WEB_PORT}/#/live   (chat API $api; Ctrl-C stops everything)"
+  cd "$root/web" && VITE_FEX_API_URL="$api" npx vite --port "$FEX_WEB_PORT" --strictPort
+fi
