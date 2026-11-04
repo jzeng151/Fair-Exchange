@@ -1,4 +1,8 @@
-import { Stack, type StackProps } from 'aws-cdk-lib';
+import { CfnOutput, RemovalPolicy, Stack, type StackProps } from 'aws-cdk-lib';
+import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
+import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
+import * as kms from 'aws-cdk-lib/aws-kms';
+import * as s3 from 'aws-cdk-lib/aws-s3';
 import type { Construct } from 'constructs';
 
 /**
@@ -17,5 +21,36 @@ import type { Construct } from 'constructs';
 export class FairExchangeStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
+
+    // Hosting slice for #5 and #30. Upload only web/dist, never the source/data folders.
+    const key = new kms.Key(this, 'WebKey', {
+      enableKeyRotation: true,
+      removalPolicy: RemovalPolicy.RETAIN,
+    });
+    const bucket = new s3.Bucket(this, 'WebBucket', {
+      encryption: s3.BucketEncryption.KMS,
+      encryptionKey: key,
+      bucketKeyEnabled: true,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      enforceSSL: true,
+      objectOwnership: s3.ObjectOwnership.BUCKET_OWNER_ENFORCED,
+      removalPolicy: RemovalPolicy.RETAIN,
+    });
+    const distribution = new cloudfront.Distribution(this, 'WebDistribution', {
+      comment: 'Fair Exchange sandbox scaffold',
+      defaultRootObject: 'index.html',
+      priceClass: cloudfront.PriceClass.PRICE_CLASS_100,
+      defaultBehavior: {
+        origin: origins.S3BucketOrigin.withOriginAccessControl(bucket),
+        viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+        allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
+        cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+        responseHeadersPolicy: cloudfront.ResponseHeadersPolicy.SECURITY_HEADERS,
+        compress: true,
+      },
+    });
+    new CfnOutput(this, 'WebBucketName', { value: bucket.bucketName });
+    new CfnOutput(this, 'WebDistributionId', { value: distribution.distributionId });
+    new CfnOutput(this, 'WebUrl', { value: `https://${distribution.distributionDomainName}` });
   }
 }
