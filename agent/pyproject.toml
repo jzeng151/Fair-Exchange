@@ -3,7 +3,7 @@ name = "fex-agent"
 version = "0.1.0"
 description = "FEX: Fair Exchange's agent. Pydantic models here are the single schema source."
 requires-python = ">=3.12,<3.13"
-dependencies = ["pydantic>=2.8,<3", "fx-data"]
+dependencies = ["pydantic>=2.8,<3", "strands-agents>=1.60,<2", "fx-data"]
 
 [tool.uv.sources]
 fx-data = { path = "../data" }  # regular install: macOS can hide editable .pth files, which Python skips

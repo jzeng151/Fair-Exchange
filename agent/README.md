@@ -1,6 +1,6 @@
 # agent/
 
-FEX, Fair Exchange's agent (Python 3.12). For now this holds the **conversation record schema** (issue #6).
+FEX, Fair Exchange's agent (Python 3.12). This holds the **conversation record schema** (issue #6) and the agent **tools**.
 
 ## Record schema
 
@@ -56,3 +56,9 @@ result.removed     # problems behind any claim that was dropped
 `write_answer(problems)` writes the answer; on a retry it receives the problems from the previous attempt so it can fix them. After `max_retries` (default 2), unverified claims are **removed and logged**, so they never reach the producer.
 
 `agent/` depends on `data/` (`fx-data`) as a regular, non-editable install. After changing `data/`, run `uv sync --reinstall-package fx-data`.
+
+## Tools
+
+Every tool is `@tool(context=True)` and learns who the producer is only through `fex.tools._scope.session_producer_id`, which reads `tool_context.invocation_state["producer_id"]`. No tool takes a producer, location or crop parameter; `tests/test_scope_guard.py` checks this for every tool in `ALL_TOOLS`. Contracts are in [`docs/handoff/tool-contracts.md`](../docs/handoff/tool-contracts.md).
+
+Tool tests call each tool through Strands' own `stream()` (`tests/tool_harness.py`), so session-context injection is tested for real.
