@@ -79,10 +79,10 @@ def test_multiple_choice_ignores_other_and_non_answers():
 
 
 def test_each_fact_gets_the_period_of_its_own_responses():
-    rows = [_response_row(response_date="2025-02-01", running_water_code="Yes") for _ in range(5)] + \
+    rows = [_response_row(response_date="2025-02-01", has_water_conservation_practices_code="Yes") for _ in range(5)] + \
            [_response_row(response_date="2021-02-01", has_soil_conservation_practices_code="Yes") for _ in range(5)]
     facts = {f["text"].split(" say they ")[1]: f["period"] for f in _survey_facts(rows, [])}
-    assert facts["have running water at home."] == "2025"
+    assert facts["use water conservation practices."] == "2025"
     assert facts["use soil conservation practices."] == "2021"
 
 
@@ -110,3 +110,21 @@ def test_shipped_survey_facts_respect_the_minimum_and_never_say_households():
         for f in r["survey"]["facts"]:
             assert f["responses"] >= MIN_RESPONSES
             assert "household" not in f["text"].lower()
+
+
+# ---- #14 spec: certification status is never read; excluded survey columns stay excluded --------
+
+def test_certification_status_is_never_returned():
+    for r in build_records()["records"].values():
+        assert "certification_status" not in r["profile"]
+        assert "certification_status" not in json.dumps(r)
+    assert "certification_status" not in RECORDS_PATH.read_text(encoding="utf-8")
+
+
+def test_spec_excluded_columns_are_not_in_the_allowlist():
+    excluded = {"coverted_natural_land_to_cropland_code", "hectare_natural_land_converted_nbr",
+                "red_pesticide_code", "running_water_code", "water_access_distance_name",
+                "non_drinking_water_sources_name", "non_drinking_water_condition_name",
+                "drinking_water_treatment_method_name", "has_water_treatment_plant_code"}
+    assert not ALLOWED_FIELDS & excluded
+

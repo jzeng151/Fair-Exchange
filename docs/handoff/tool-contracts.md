@@ -30,7 +30,7 @@ Each fact and peer example has a `source` string. That is the value the citation
 {
   "found": true,
   "profile": {"country": "Peru", "region": "Cajamarca", "crop": "Coffee", "entity_type": "1st Grade",
-              "certification_status": "Authorized", "certification_scope": "Producer",
+              "certification_scope": "Producer",
               "supply_chain_role": "Producer", "source": "FTUSA producer account (sample data)"},
   "premium_projects": [{"project_ref": "PROJ-…", "source": "FTUSA Premium project (sample data, own record) PROJ-…",
                         "challenge_tag": "water", "name": "…", "challenge": "…", "action": "…",

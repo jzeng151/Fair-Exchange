@@ -18,7 +18,7 @@ def get_producer_record(tool_context: ToolContext) -> dict:
     """Return this producer's own profile, Premium projects and safe survey fields (farming, water, practices only).
 
     Returns `found`, then:
-      - profile: country, region, crop, entity_type, certification_status, certification_scope, source
+      - profile: country, region, crop, entity_type, certification_scope, supply_chain_role, source
       - premium_projects: their own projects (name, challenge, action, intended_outcome, status, dates, source)
       - survey: responses, facts (each with text, source, period, responses), and a note when
         there is nothing to summarize. No survey data is normal; say so rather than guess.
