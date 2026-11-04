@@ -26,6 +26,8 @@ export type QueryName = (typeof QUERY_NAMES)[keyof typeof QUERY_NAMES];
 
 /** All queries together, including loading the named queries, must finish within this. */
 export const ANALYTICS_TIMEOUT_MS = 20_000;
+/** Cleanup after a failure or timeout is best effort and bounded, so a stalled Athena can't hold the response. */
+export const CANCEL_GRACE_MS = 1_000;
 export const POLL_MS = 250;
 
 /** Any query failed or timed out. The route returns 503 and nothing partial. */
@@ -43,6 +45,8 @@ export interface AthenaDeps {
   namedQueryIds: string[];
   timeoutMs: number;
   pollMs: number;
+  /** How long to wait for Athena to accept the stop requests after a failure (default CANCEL_GRACE_MS). */
+  cancelGraceMs?: number;
   log: Log;
 }
 
@@ -147,9 +151,16 @@ export async function runAnalyticsQueries(
   } finally {
     clearTimeout(timer);
     controller.abort();
-    // Best effort: stop anything still running so no query outlives the request.
-    await Promise.allSettled(
+    // Best effort: stop anything still running so no query outlives the request, but never wait longer
+    // than the grace period for Athena to accept the stops (a stalled Athena must not hold the 503).
+    const stops = Promise.allSettled(
       [...running].map((id) => d.athena.send(new StopQueryExecutionCommand({ QueryExecutionId: id }))),
     );
+    let grace: ReturnType<typeof setTimeout> | undefined;
+    await Promise.race([
+      stops,
+      new Promise<void>((resolve) => { grace = setTimeout(resolve, d.cancelGraceMs ?? CANCEL_GRACE_MS); }),
+    ]);
+    clearTimeout(grace);
   }
 }

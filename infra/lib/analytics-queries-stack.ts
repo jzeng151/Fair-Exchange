@@ -1,7 +1,7 @@
 import { CfnOutput, Fn, Stack, type StackProps } from 'aws-cdk-lib';
 import * as athena from 'aws-cdk-lib/aws-athena';
 import type { Construct } from 'constructs';
-import { RECORDS_GLUE_TABLE, SYNC_DATABASE } from './athena-sync-stack';
+import { RECORDS_GLUE_TABLE, SEEDED_GLUE_TABLE, SYNC_DATABASE } from './athena-sync-stack';
 
 /**
  * Spec 29: the fixed Athena queries behind `GET /analytics`, as named queries.
@@ -18,12 +18,6 @@ import { RECORDS_GLUE_TABLE, SYNC_DATABASE } from './athena-sync-stack';
 
 /** Athena workgroup defined in AthenaSyncStack (spec 28). */
 export const ANALYTICS_WORKGROUP = 'fex';
-
-/**
- * Seeded demo records (spec 37) under `records-seeded/`. ASSUMPTION: the Glue table over that prefix is a
- * follow-up to #37 and not defined yet; it must use this name and the live table's columns.
- */
-export const SEEDED_GLUE_TABLE = 'records_seeded';
 
 export const ANALYTICS_QUERY_NAMES = {
   liveBreakdowns: 'analytics-live-breakdowns',

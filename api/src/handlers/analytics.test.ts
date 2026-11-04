@@ -399,6 +399,16 @@ describe('failures', () => {
     );
   });
 
+  it('still returns 503 promptly when Athena never confirms the cancellation', async () => {
+    given({ live: BASE, hang: QUERY_NAMES.seededFootprint });
+    athena.on(StopQueryExecutionCommand).callsFake(() => new Promise(() => {})); // stalled Athena
+    const started = Date.now();
+    const r = await call({ deps: { timeoutMs: 30, cancelGraceMs: 50 } });
+    expect(r.status).toBe(503);
+    expect(Date.now() - started).toBeLessThan(1000); // the deadline bounds the response, not the cleanup
+    expect(athena.commandCalls(StopQueryExecutionCommand).length).toBeGreaterThan(0); // the stop was still sent
+  });
+
   it('returns 503 and nothing partial when any query fails', async () => {
     given({ live: BASE, fail: QUERY_NAMES.liveFootprint });
     const r = await call();
