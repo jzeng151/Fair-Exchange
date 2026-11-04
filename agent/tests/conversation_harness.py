@@ -202,3 +202,32 @@ def last_step(events) -> str:
 
 def allowed(events) -> list[str]:
     return of(events, "actions")[-1].allowed
+
+
+class FakeMemoryClient:
+    """In-memory stand-in for bedrock_agentcore.memory.MemoryClient (memory spec testing decisions).
+
+    Implements only the data-plane methods the AgentCoreMemoryStateStore uses, with the real event
+    payload shape: {"eventId", "payload": [{"conversational": {"content": {"text": ...}, "role": ...}}]}.
+    Events are kept per (memory_id, actor_id, session_id) in insertion (chronological) order.
+    """
+
+    def __init__(self):
+        self._events: dict[tuple, list[dict]] = {}
+        self._seq = 0
+
+    def create_event(self, *, memory_id, actor_id, session_id, messages):
+        self._seq += 1
+        event = {
+            "eventId": f"e{self._seq}",
+            "payload": [{"conversational": {"content": {"text": text}, "role": role}} for text, role in messages],
+        }
+        self._events.setdefault((memory_id, actor_id, session_id), []).append(event)
+        return event
+
+    def list_events(self, *, memory_id, actor_id, session_id, max_results=100):
+        return list(self._events.get((memory_id, actor_id, session_id), []))[:max_results]
+
+    def delete_event(self, *, memory_id, actor_id, session_id, event_id):
+        key = (memory_id, actor_id, session_id)
+        self._events[key] = [e for e in self._events.get(key, []) if e["eventId"] != event_id]

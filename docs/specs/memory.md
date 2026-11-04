@@ -82,3 +82,14 @@ Evals run against real AgentCore Memory.
 ### Change to an existing requirement
 
 The vision document's Journey 2 says a decline stores no conversation content. With persistent memory (client request, 2026-11-04), conversation text is stored while the conversation runs. The declined record still has no narrative content (the record schema enforces this). What happens to the stored conversation text is listed above as not decided.
+
+### Build notes (as implemented, #59)
+
+These record the concrete choices the build made within the decisions above. They do not change any "Not decided" item.
+
+- **StateStore.** `AgentCoreMemoryStateStore` (agent `fex.conversation.memory`) implements the existing `StateStore` Protocol (#13). Each saved `ConversationState` is one short-term event under actor = producer ID, session = conversation ID; the newest event is the current state. The state's `revision` field carries optimistic concurrency, so a stale request raises `StateConflict` rather than overwriting newer state, exactly as `InMemoryStateStore` does. `resume` reads the latest event, so history, step and allowed actions all come from the stored state.
+- **Config.** `FEX_MEMORY_ID` selects the memory-backed store; with it unset the agent uses the in-process store (local runs). `FEX_EVENT_EXPIRY_DAYS` and `FEX_MAX_LIFETIME_MINUTES` are the retention values; both must be set when `FEX_MEMORY_ID` is. The startup check (`RetentionConfig`) refuses to start unless event expiry (3–365 days) is strictly longer than the maximum conversation lifetime.
+- **Namespaces.** Long-term namespaces template on the actor ID as `/actor/{actorId}/` (`producer_namespace` in the agent, mirrored by the CDK strategies). Retrieval reads only the calling producer's namespace, built in code from the request context.
+- **Recall.** `recall_eligibility(actor_id, query)` is the single eligibility seam and returns `[]`, so recall is built but switched off.
+- **Deletion.** `delete_conversation(producer_id, conversation_id)` deletes that conversation's short-term events only, and no other conversation's.
+- **CDK.** `FexMemory` (infra `lib/memory.ts`) defines one `AWS::BedrockAgentCore::Memory` with the summary and semantic strategies, event expiry 7 days, and `grantAgentAccess(role)` for the scoped runtime permissions. The L1 construct is new, so `aws-cdk-lib` (infra) and the memory client (agent) are pinned together.
