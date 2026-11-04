@@ -66,5 +66,5 @@ Amazon Comprehend `DetectPiiEntities` scans the producer's own messages, in Engl
 
 ## Out of Scope
 
-- French PII detection, which comes with #24 through the Guardrail
+- French PII detection. When built, the [#24 spec](24-french-exchange.md) scans `fr` text through the Guardrail and fills these same fields.
 - Detecting PII in FEX's own output

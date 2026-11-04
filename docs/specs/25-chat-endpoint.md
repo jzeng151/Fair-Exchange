@@ -55,6 +55,7 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 | `POST /conversations` | yes | Creates a conversation owned by the caller and streams the agent `start` turn |
 | `POST /conversations/{id}/messages` | yes | Body `{ "text": string }`, at most 4,000 characters (agent `message`) |
 | `POST /conversations/{id}/actions` | yes | Body `{ "action": string, "args": object }` (agent `action`); actions are defined in the [#13 spec](13-conversation-steps.md) |
+| Voice routes | no | Added by the [#41 spec](41-voice-notes.md) when built |
 | `GET /conversations/{id}` | no | History, current step and allowed actions (agent `resume`), for open or closed conversations |
 | `GET /conversations` | no | The caller's conversations, newest first: ID, created time, open or closed |
 
