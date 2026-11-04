@@ -5,12 +5,20 @@ import * as kms from 'aws-cdk-lib/aws-kms';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import type { Construct } from 'constructs';
 import { FexGuardrail } from './guardrail';
+import { FexMemory } from './memory';
 import { StandardsKnowledgeBase, type StandardsKnowledgeBaseProps } from './standards-kb';
 
 export interface FairExchangeStackProps extends StackProps {
   /** From FairExchangeArtifacts and the clause build; infra/deploy.sh passes them as CDK context. */
   standards: StandardsKnowledgeBaseProps;
 }
+
+/**
+ * Short-term event retention (days). Configuration, per the memory spec, and must be longer than the
+ * maximum conversation lifetime. The lifetime (#13) is still "Not decided"; 7 days comfortably exceeds
+ * any plausible lifetime. The agent re-checks this rule at startup from its own env configuration.
+ */
+const MEMORY_EVENT_EXPIRY_DAYS = 7;
 
 /**
  * The whole Fair Exchange stack, deployable with one command (issue #5).
@@ -21,6 +29,7 @@ export interface FairExchangeStackProps extends StackProps {
  *   - Knowledge Bases (S3 Vectors, NOT OpenSearch Serverless: it has an always-on cost)    (#16, #17: standards done)
  *   - API: API Gateway + Lambdas (chat, write-back, review, analytics), Powertools          (#25–#29)
  *   - Records: DynamoDB table (encrypted), Comprehend permissions                          (#26)
+ *   - Memory: AgentCore Memory for conversation resume + per-producer long-term memory      (#59)
  *   - Web: S3 + CloudFront for the Vue app                                                 (#30–#33)
  *   - Observability: AgentCore Observability / CloudWatch, log retention policy
  * Least-privilege IAM per Lambda and for the AgentCore role. No real producer PII.
@@ -68,5 +77,11 @@ export class FairExchangeStack extends Stack {
 
     // Standards grounding (#17): the agent runtime (#4) gets bedrock:Retrieve on it and FEX_STANDARDS_KB_ID
     new StandardsKnowledgeBase(this, 'StandardsKnowledgeBase', props.standards);
+
+    // Persistent conversation memory (#59). The agent reads FEX_MEMORY_ID from its runtime configuration.
+    // When the agent runtime lands in this stack (#5), grant its role access with memory.grantAgentAccess(role).
+    const memory = new FexMemory(this, 'Memory', { eventExpiryDays: MEMORY_EVENT_EXPIRY_DAYS });
+    new CfnOutput(this, 'MemoryId', { value: memory.memoryId });
+    new CfnOutput(this, 'MemoryArn', { value: memory.memoryArn });
   }
 }

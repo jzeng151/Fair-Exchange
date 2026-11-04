@@ -7,7 +7,7 @@ French conversation's PII goes through the FEX Guardrail (#12) instead.
 import boto3
 import pytest
 from moto import mock_aws
-from tests.conversation_harness import RETRIEVE, Run, intake, of, playback, summary
+from tests.conversation_harness import RETRIEVE, TAGS, Run, intake, of
 
 from fex.conversation.state import Profile
 from fex.guardrail import GuardrailPiiScanner
@@ -34,7 +34,7 @@ def fr_playback():
 def fr_summary():
     return ("out", "RecordSummary", {"summary_original": "La récolte de cacao a baissé.",
                                      "summary_english": "The cocoa harvest fell.",
-                                     "tags": ["climate and weather"]})
+                                     "tags": list(TAGS)})  # Match the evidence used by Run.good_answer().
 
 
 def langs(events) -> set[str]:
@@ -69,6 +69,8 @@ def test_fixed_answer_text_is_in_french():
     r.small.add(fr_summary())
     r.large.add(*RETRIEVE, r.good_answer())
     events = r.action("confirm_playback")
+    assert not of(events, "error")
+    assert {event.section for event in of(events, "claim")} == {"insights", "peer_examples"}
     text = "".join(e.text for e in of(events, "text"))
     assert "Voici ce que j'ai trouvé" in text
     assert "Vous et votre comité connaissez le mieux votre situation" in text
@@ -179,6 +181,8 @@ def test_the_french_record_has_both_summaries_and_is_pii_flagged(table):
     assert item["language"] == "fr"
     assert item["summary_original"] == "La récolte de cacao a baissé."
     assert item["summary_english"] == "The cocoa harvest fell."
+    assert item["tags"] == TAGS
+    assert item["evidence"] == "full"
     assert item["pii_flag"] is True
     assert item["pii_entity_types"] == ["NAME"]
     assert item["pii_check"] == "done"
