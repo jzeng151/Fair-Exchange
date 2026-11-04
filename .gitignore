@@ -168,8 +168,19 @@ notebooks/fisher-puns.tar.gz
 HCM_BACKUP.pg.dump
 
 
-# The generic rules above ("data", "lib/") also match this project's own folders, which silently
-# skips new files in them. Re-include the project packages.
+# --- Fair Exchange (merged from the old Fair-Exchange-Scaffolding/.gitignore) ---
+~$*
+.idea/
+node_modules/
+dist/
+cdk.out/
+cdk.context.json
+.env.*
+!.env.example
+
+# Source folders that the general "data" and "lib/" patterns above would hide.
+# Without these, NEW files in them are silently ignored.
 !/data/
-!/Fair-Exchange-Scaffolding/data/
-!/Fair-Exchange-Scaffolding/infra/lib/
+!/infra/lib/
+!/web/src/lib/
+!/web/src/data/
