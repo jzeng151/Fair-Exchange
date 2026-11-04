@@ -2,6 +2,44 @@
 
 One spec per outline issue. The issue stays a short outline; the spec is the implementation contract.
 
+## Index
+
+| Issue | Spec | Area |
+|---|---|---|
+| #5 | [CDK stack and single-command deploy](05-cdk-stack.md) | infra |
+| #7 | [Producer data and synthetic data generator](07-synthetic-data.md) | data |
+| #8 | [Regional fact table](08-regional-fact-table.md) | data |
+| #11 | [Identity contract](11-identity.md) | api |
+| #12 | [Bedrock Guardrail in detect mode](12-guardrail.md) | agent, infra |
+| #13 | [Conversation steps](13-conversation-steps.md) | agent |
+| #14 | [Producer-record tool](14-producer-record-tool.md) | agent |
+| #15 | [Regional-context tool](15-regional-context-tool.md) | agent |
+| #16 | [Peer-example tool](16-peer-example-tool.md) | agent |
+| #17 | [Standards grounding and citation verifier](17-standards-grounding.md) | agent |
+| #18 | [Grounded response with enablement tone](18-grounded-response.md) | agent |
+| #19 | [Consent and decline](19-consent-and-decline.md) | agent |
+| #20 | [PII flagging](20-pii-flagging.md) | agent |
+| #21 | [Out-of-scope handling](21-out-of-scope.md) | agent |
+| #22 | [Spanish exchange and bilingual record](22-spanish-exchange.md) | agent |
+| #23 | [Feedback capture](23-feedback-capture.md) | agent |
+| #24 | [French exchange](24-french-exchange.md) | agent |
+| #25 | [Chat endpoint](25-chat-endpoint.md) | api |
+| #26 | [Write-back](26-write-back.md) | agent, api |
+| #27 | [Review API](27-review-api.md) | api |
+| #28 | [Athena sync and record table](28-athena-sync.md) | data, infra |
+| #29 | [Analytics API](29-analytics-api.md) | api |
+| #31 | [Reviewer view](31-reviewer-view.md) | web |
+| #32 | ["Your record" view](32-your-record.md) | api, web |
+| #33 | [Admin analytics dashboard](33-admin-dashboard.md) | web |
+| #34 | [Negative scope tests](34-negative-scope-tests.md) | agent, eval |
+| #35 | [Scripted scenarios and labeled set](35-scenarios-and-labels.md) | eval |
+| #36 | [Evaluation with AgentCore Evaluations](36-eval-harness.md) | eval |
+| #37 | [Seeded conversation records for the dashboard](37-seeded-records.md) | data |
+| #39 | [Handoff package](39-handoff.md) | docs |
+| #40 | [Timed clean redeploy and demo run-through](40-timed-redeploy.md) | infra |
+| #41 | [Voice notes via Amazon Transcribe](41-voice-notes.md) | agent, web |
+| — | [Conversation memory (shared contract)](memory.md) | agent, infra |
+
 ## Rules
 
 - Build what the spec says. If a spec is wrong or missing something, open a PR that changes the spec first, and get it approved before building the change.
