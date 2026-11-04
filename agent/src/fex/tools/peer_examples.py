@@ -25,7 +25,7 @@ def find_peer_examples(challenge: ChallengeTag, tool_context: ToolContext) -> li
         challenge: The challenge tag for what the producer described.
 
     Each result has: source (cite it), challenge, action, intended_outcome, status (Completed,
-    In Progress or In Planning), crop, entity_type, country, region and match_score.
+    In Progress or In Planning; null when the sample cannot tell which of several similar projects it is), crop, entity_type, country, region and match_score.
     Organizations are fictionalized. An empty list means no comparable project exists: say so.
     """
     producer_id = session_producer_id(tool_context)
