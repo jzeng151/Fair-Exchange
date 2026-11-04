@@ -49,7 +49,7 @@ jobs:
         run: npx --yes -p typescript@5.6.3 tsc --noEmit --strict api/src/types/*.ts
       - name: API type check
         working-directory: api
-        run: npm ci && npm run typecheck
+        run: npm ci && npm run typecheck && npm test
       - name: Web build and type check
         working-directory: web
         run: npm ci && npm run build
