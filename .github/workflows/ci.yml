@@ -82,9 +82,11 @@ jobs:
       # (demo model: no AWS). Catches mismatches each side's own tests can't see (#89, #101).
       - name: Local end-to-end conversation
         run: bash scripts/e2e/run_local.sh
+      # The stack bundles the chat API's Lambdas from api/ (esbuild), so api/ needs its dependencies first.
       - name: Infrastructure type check and synthesis
         working-directory: infra
         run: |
+          (cd ../api && npm ci)
           npm ci
           npx tsc --noEmit
           npx cdk synth --quiet
@@ -141,9 +143,6 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: web/package-lock.json
-      - name: Build website
-        working-directory: web
-        run: npm ci && npm run build
       - name: Authenticate to sandbox
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
         with:
@@ -151,5 +150,13 @@ jobs:
           aws-region: us-west-2
           allowed-account-ids: '100300582834'
           role-session-name: GitHub-${{ github.run_id }}
+      # Live mode needs the deployed chat API's URL at build time; without the output the live tab is hidden.
+      - name: Build website
+        working-directory: web
+        run: |
+          api_url="$(aws cloudformation describe-stacks --stack-name FairExchange \
+            --query "Stacks[0].Outputs[?OutputKey=='ApiUrl'].OutputValue | [0]" --output text)"
+          [[ "$api_url" == https://* ]] || api_url=""
+          npm ci && VITE_FEX_API_URL="$api_url" npm run build
       - name: Publish and verify website
         run: bash infra/publish-web.sh

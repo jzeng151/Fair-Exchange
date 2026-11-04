@@ -141,6 +141,6 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 
 ## Further Notes
 
-### Not decided (do not build or assume)
+### Decided
 
-- The deployed sign-in stand-in ([#11 spec](11-identity.md))
+- The deployed sign-in stand-in (2026-11-04): a shared demo passcode plus a producer from the scenario allow-list, checked by a Lambda authorizer ([#11 spec](11-identity.md) "Deployed stand-in").

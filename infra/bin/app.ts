@@ -32,6 +32,7 @@ new FairExchangeStack(app, 'FairExchange', {
     maxLifetimeMinutes: Number(ctx('maxLifetimeMinutes', '60')),
     logRetention: Number(ctx('logRetentionDays', '1')),
   },
+  version: ctx('version', 'unset'),
 });
 
 // Issue #4 spike (deploy-agent-spike.sh passes the code location as context; placeholders keep `cdk synth` working)

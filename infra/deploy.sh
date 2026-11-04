@@ -57,8 +57,8 @@ if [[ "$destination" != CloudWatchLogs ]]; then
 fi
 echo "Transaction Search: on."
 
-step "2/9 Building the website"
-(cd "$repo/web" && npm ci --silent && npm run build)
+step "2/9 Installing the chat API's dependencies (bundled into its Lambdas by the stack)"
+(cd "$repo/api" && npm ci --silent)
 
 step "3/9 Building one standards document per clause"
 hash="$(cd "$repo/data" && uv run --quiet python -m fx_data.standards_kb "$build/docs")"
@@ -96,7 +96,7 @@ agent_key="agent/fex-$(sha256 "$build/agent.zip" | cut -c1-12).zip"  # new key p
 aws s3 cp --only-show-errors "$build/agent.zip" "s3://$bucket/$agent_key"
 echo "Agent code: s3://$bucket/$agent_key ($(du -h "$build/agent.zip" | cut -f1))"
 
-step "8/9 Main stack (website hosting, standards Knowledge Base; ingestion runs when the clauses change)"
+step "8/9 Main stack (website hosting, standards Knowledge Base, agent runtime, chat API)"
 # Migration for stacks deployed before the data source used RETAIN: switch the existing data source first.
 # A change that replaces the vector store also replaces the data source, and the old one is deleted after the
 # Knowledge Base role's vector permission has moved to the new index. With DELETE, that cleanup fails and leaves
@@ -123,10 +123,14 @@ fi
 (cd "$infra" && CDK_DEFAULT_ACCOUNT="$account" CDK_DEFAULT_REGION="$AWS_REGION" npx cdk deploy FairExchange \
   --require-approval never --progress events -c standardsDocsTtlDays="$ttl_days" \
   -c artifactsBucket="$bucket" -c artifactsKeyArn="$key_arn" -c standardsDocsHash="$hash" \
-  -c agentCodeKey="$agent_key" -c maxLifetimeMinutes="$FEX_MAX_LIFETIME_MINUTES" -c logRetentionDays="$LOG_RETENTION_DAYS")
+  -c agentCodeKey="$agent_key" -c maxLifetimeMinutes="$FEX_MAX_LIFETIME_MINUTES" -c logRetentionDays="$LOG_RETENTION_DAYS" \
+  -c version="$(git -C "$repo" rev-parse --short HEAD 2>/dev/null || echo unknown)")
 
-step "9/9 Publishing the website and running smoke tests"
+step "9/9 Building and publishing the website (live mode uses the chat API), then smoke tests"
+api_url="$(output FairExchange ApiUrl)"
+(cd "$repo/web" && npm ci --silent && VITE_FEX_API_URL="$api_url" npm run build)
 bash "$infra/publish-web.sh"
+curl --fail --silent --show-error --retry 5 --retry-all-errors "${api_url%/}/health"; echo
 kb_id="$(output FairExchange StandardsKnowledgeBaseId)"
 (cd "$repo/agent" && FEX_STANDARDS_KB_ID="$kb_id" uv run --quiet pytest -q -p no:cacheprovider \
   ../eval/tests/test_standards_kb_smoke.py)
@@ -134,4 +138,7 @@ kb_id="$(output FairExchange StandardsKnowledgeBaseId)"
 echo
 echo "Deployed in $((SECONDS - start))s."
 echo "Website: $(output FairExchange WebUrl)"
-echo "Standards Knowledge Base: $kb_id (set FEX_STANDARDS_KB_ID on the agent runtime)"
+echo "Standards Knowledge Base: $kb_id"
+echo "Chat API: $api_url"
+echo "Demo passcode (sign-in stand-in, docs/specs/11-identity.md):"
+echo "  aws secretsmanager get-secret-value --secret-id $(output FairExchange DemoPasscodeSecretArn) --query SecretString --output text"
