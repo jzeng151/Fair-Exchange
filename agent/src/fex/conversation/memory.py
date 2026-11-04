@@ -141,10 +141,8 @@ class AgentCoreMemoryStateStore:
         is a spike check (spec); until it passes, this makes no promise about long-term records.
         Returns the number of events deleted.
         """
-        events = self.client.list_events(
-            memory_id=self.memory_id, actor_id=producer_id, session_id=conversation_id, max_results=1000)
         deleted = 0
-        for event in events:
+        for event in self._all_events(producer_id, conversation_id):
             self.client.delete_event(
                 memory_id=self.memory_id, actor_id=producer_id, session_id=conversation_id,
                 event_id=event["eventId"])
@@ -153,9 +151,29 @@ class AgentCoreMemoryStateStore:
 
     # ------------------------------------------------------------------ internals
 
-    def _latest_event(self, producer_id: str, conversation_id: str) -> dict[str, Any] | None:
+    #: Short-term events are read in pages of this size; every page is walked, so the lookup never stops
+    #: at a fixed cap and miss newer events. A conversation accumulates one event per save (#13 lifetime
+    #: bounds how many), well within what paging handles.
+    _PAGE = 100
+
+    def _all_events(self, producer_id: str, conversation_id: str) -> list[dict[str, Any]]:
+        """Every short-term event for this conversation, in chronological order.
+
+        `list_events` returns at most `max_results` events and then stops, so a fixed cap would
+        silently read a stale event once a conversation has more saves than the cap. Raise the limit a
+        page at a time until the result stops growing, so the newest event is always included.
+        """
+        limit = self._PAGE
         events = self.client.list_events(
-            memory_id=self.memory_id, actor_id=producer_id, session_id=conversation_id, max_results=1000)
+            memory_id=self.memory_id, actor_id=producer_id, session_id=conversation_id, max_results=limit)
+        while len(events) == limit:  # hit the cap: there may be more
+            limit += self._PAGE
+            events = self.client.list_events(
+                memory_id=self.memory_id, actor_id=producer_id, session_id=conversation_id, max_results=limit)
+        return events
+
+    def _latest_event(self, producer_id: str, conversation_id: str) -> dict[str, Any] | None:
+        events = self._all_events(producer_id, conversation_id)
         if not events:
             return None
         # list_events returns chronological order; the newest event is the current state.

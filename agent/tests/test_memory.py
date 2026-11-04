@@ -59,6 +59,29 @@ def test_create_requires_no_existing_conversation():
         store.save(_state("P1", "c1"), expected_revision=None)
 
 
+def test_load_returns_the_newest_state_past_one_page_of_events():
+    # One event per save; more saves than a page must still read the latest state, not a stale one.
+    store = _store()
+    store.save(_state("P1", "c1"), expected_revision=None)  # revision 0
+    pages = AgentCoreMemoryStateStore._PAGE
+    for rev in range(pages + 5):  # well past a single page of events
+        store.save(_state("P1", "c1", step="playback"), expected_revision=rev)
+    loaded = store.load("P1", "c1")
+    assert loaded.revision == pages + 5  # the newest revision, not the event at the page boundary
+    assert loaded.step == "playback"
+
+
+def test_delete_removes_every_event_past_one_page():
+    store = _store()
+    store.save(_state("P1", "c1"), expected_revision=None)
+    pages = AgentCoreMemoryStateStore._PAGE
+    for rev in range(pages + 5):
+        store.save(_state("P1", "c1"), expected_revision=rev)
+    deleted = store.delete_conversation("P1", "c1")
+    assert deleted == pages + 6  # the create plus every update
+    assert store.load("P1", "c1") is None
+
+
 # ---------------------------------------------------------------- resume after the agent is discarded
 
 def test_resume_after_agent_discarded_returns_same_history_step_actions_and_state():
