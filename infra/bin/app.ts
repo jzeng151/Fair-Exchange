@@ -17,12 +17,12 @@ new ArtifactsStack(app, 'FairExchangeArtifacts', {
   env,
   docsTtlDays: Number(ctx('standardsDocsTtlDays', '30')),
 });
+// The application stack uses CDK's standard synthesizer (spec 05): deploy.sh bootstraps the account if needed.
 new FairExchangeStack(app, 'FairExchange', {
-  synthesizer: new BootstraplessSynthesizer(),
   env,
   standards: {
     artifactsBucketName: ctx('artifactsBucket', 'unset-artifacts-bucket'),
-    dataKeyArn: ctx('dataKeyArn', 'arn:aws:kms:us-west-2:000000000000:key/unset'),
+    artifactsKeyArn: ctx('artifactsKeyArn', 'arn:aws:kms:us-west-2:000000000000:key/unset'),
     contentHash: ctx('standardsDocsHash', 'unset'),
   },
 });

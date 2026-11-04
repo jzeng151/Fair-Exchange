@@ -1,8 +1,9 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { CfnOutput, CustomResource, Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
+import { CfnOutput, CustomResource, Duration, Fn, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import * as bedrock from 'aws-cdk-lib/aws-bedrock';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import type * as kms from 'aws-cdk-lib/aws-kms';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3vectors from 'aws-cdk-lib/aws-s3vectors';
@@ -18,8 +19,10 @@ const INGEST_LIMIT = Duration.minutes(20);
 export interface StandardsKnowledgeBaseProps {
   /** Artifacts bucket (FairExchangeArtifacts) holding the clause documents under `clauses/`. */
   artifactsBucketName: string;
-  /** Customer-managed data key (FairExchangeArtifacts): artifacts bucket and vector bucket encryption. */
-  dataKeyArn: string;
+  /** The artifacts bucket's key (FairExchangeArtifacts), to read the clause documents. */
+  artifactsKeyArn: string;
+  /** The application data key, for the vectors. */
+  dataKey: kms.IKey;
   /** SHA-256 of the clause documents (fx_data.standards_kb). A new hash re-ingests on deploy. */
   contentHash: string;
 }
@@ -45,9 +48,23 @@ export class StandardsKnowledgeBase extends Construct {
     const docsArn = `arn:aws:s3:::${props.artifactsBucketName}`;
 
     // ---------------------------------------------------------------- vector store
+    // S3 Vectors maintains indexes in the background with its own service principal (S3 Vectors docs,
+    // "Using SSE-KMS encryption"); limited to this account's vector buckets and S3 Vectors encryption contexts.
+    props.dataKey.addToResourcePolicy(new iam.PolicyStatement({
+      sid: 'AllowS3VectorsIndexing',
+      principals: [new iam.ServicePrincipal('indexing.s3vectors.amazonaws.com')],
+      actions: ['kms:Decrypt'],
+      resources: ['*'],
+      conditions: {
+        ArnLike: { 'aws:SourceArn': `arn:aws:s3vectors:${region}:${account}:bucket/*` },
+        StringEquals: { 'aws:SourceAccount': account },
+        'ForAnyValue:StringEquals': { 'kms:EncryptionContextKeys': ['aws:s3vectors:arn', 'aws:s3vectors:resource-id'] },
+      },
+    }));
     const vectorBucket = new s3vectors.CfnVectorBucket(this, 'VectorBucket', {
-      encryptionConfiguration: { sseType: 'aws:kms', kmsKeyArn: props.dataKeyArn },
+      encryptionConfiguration: { sseType: 'aws:kms', kmsKeyArn: props.dataKey.keyArn },
     });
+    vectorBucket.node.addDependency(props.dataKey);  // the key policy must allow indexing first
     const index = new s3vectors.CfnIndex(this, 'ClauseIndex', {
       vectorBucketArn: vectorBucket.attrVectorBucketArn,
       indexName: 'clauses',
@@ -82,10 +99,20 @@ export class StandardsKnowledgeBase extends Construct {
                 's3vectors:QueryVectors', 's3vectors:GetIndex'],
               resources: [index.attrIndexArn],
             }),
-            // The data key, only through S3 (reading documents) and S3 Vectors (writing and querying vectors)
+            // The artifacts key only through S3 (reading documents); the data key only through S3 Vectors
             new iam.PolicyStatement({
-              actions: ['kms:Decrypt', 'kms:GenerateDataKey'], resources: [props.dataKeyArn],
-              conditions: { StringEquals: { 'kms:ViaService': [`s3.${region}.amazonaws.com`, `s3vectors.${region}.amazonaws.com`] } },
+              actions: ['kms:Decrypt'], resources: [props.artifactsKeyArn],
+              conditions: { StringEquals: { 'kms:ViaService': `s3.${region}.amazonaws.com` } },
+            }),
+            // TEMPORARY (remove with the matching statement in artifacts-stack.ts): the vector store created
+            // before the data key moved used the artifacts key, and deleting it deletes its vectors as this role
+            new iam.PolicyStatement({
+              actions: ['kms:Decrypt', 'kms:GenerateDataKey'], resources: [props.artifactsKeyArn],
+              conditions: { StringEquals: { 'kms:ViaService': `s3vectors.${region}.amazonaws.com` } },
+            }),
+            new iam.PolicyStatement({
+              actions: ['kms:Decrypt', 'kms:GenerateDataKey'], resources: [props.dataKey.keyArn],
+              conditions: { StringEquals: { 'kms:ViaService': `s3vectors.${region}.amazonaws.com` } },
             }),
           ],
         }),
@@ -93,7 +120,9 @@ export class StandardsKnowledgeBase extends Construct {
     });
 
     const knowledgeBase = new bedrock.CfnKnowledgeBase(this, 'KnowledgeBase', {
-      name: `${stack.stackName}-standards`,
+      // Derived from the generated vector bucket name, not fixed: a change that replaces the store (and so the
+      // Knowledge Base) creates the new one before deleting the old, and two Knowledge Bases can't share a name.
+      name: Fn.join('-', [stack.stackName, 'standards', Fn.select(1, Fn.split('/', vectorBucket.attrVectorBucketArn))]),
       description: 'Fair Trade USA APS and FPS clauses, one document per clause (issue #17)',
       roleArn: kbRole.roleArn,
       knowledgeBaseConfiguration: {

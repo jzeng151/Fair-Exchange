@@ -9,7 +9,7 @@ import { StandardsKnowledgeBase, type StandardsKnowledgeBaseProps } from './stan
 
 export interface FairExchangeStackProps extends StackProps {
   /** From FairExchangeArtifacts and the clause build; infra/deploy.sh passes them as CDK context. */
-  standards: StandardsKnowledgeBaseProps;
+  standards: Omit<StandardsKnowledgeBaseProps, 'dataKey'>;
 }
 
 /**
@@ -25,6 +25,7 @@ export interface FairExchangeStackProps extends StackProps {
  *   - Observability: AgentCore Observability / CloudWatch, log retention policy
  * Least-privilege IAM per Lambda and for the AgentCore role. No real producer PII.
  * Files this stack reads at deploy time live in FairExchangeArtifacts (artifacts-stack.ts), deployed first.
+ * Uses CDK's standard synthesizer (spec 05), so Lambdas can be CDK assets; infra/deploy.sh bootstraps the account.
  */
 export class FairExchangeStack extends Stack {
   constructor(scope: Construct, id: string, props: FairExchangeStackProps) {
@@ -66,7 +67,17 @@ export class FairExchangeStack extends Stack {
     new CfnOutput(this, 'GuardrailId', { value: guardrail.guardrail.attrGuardrailId });
     new CfnOutput(this, 'GuardrailVersion', { value: guardrail.version.attrVersion });
 
+    // The application data key (docs/specs/05-cdk-stack.md "Security"): one customer-managed key with rotation
+    // for the stack's data. Today: the Knowledge Base vectors. Next: tables, log groups and memory.
+    // The website keeps its own WebKey: the GitHub publishing role is scoped to it.
+    const dataKey = new kms.Key(this, 'DataKey', {
+      description: 'Fair Exchange application data: Knowledge Base vectors, then tables, logs and memory',
+      enableKeyRotation: true,
+      removalPolicy: RemovalPolicy.RETAIN,
+    });
+    new CfnOutput(this, 'DataKeyArn', { value: dataKey.keyArn });
+
     // Standards grounding (#17): the agent runtime (#4) gets bedrock:Retrieve on it and FEX_STANDARDS_KB_ID
-    new StandardsKnowledgeBase(this, 'StandardsKnowledgeBase', props.standards);
+    new StandardsKnowledgeBase(this, 'StandardsKnowledgeBase', { ...props.standards, dataKey });
   }
 }
