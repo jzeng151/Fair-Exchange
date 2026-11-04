@@ -23,7 +23,7 @@ const bars = computed(() => {
   })
 })
 const baseY = H - BOTTOM
-function fmt(v: number) { return props.chart.unit === 'US$/lb' ? v.toFixed(2) : String(v) }
+function fmt(v: number) { return props.chart.unit.startsWith('US$') ? v.toFixed(2) : String(v) }
 // rounded top corners (4px), square at the baseline
 function barPath(b: { x: number; y: number; w: number; h: number }) {
   const r = Math.min(4, b.w / 2, b.h)
