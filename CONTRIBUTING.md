@@ -5,6 +5,7 @@ Read [`docs/requirements/vision.md`](docs/requirements/vision.md) and [`docs/req
 ## Issues
 
 - Every change starts from an issue. Use the Feature, Bug or Spike template. Use the Question template when you need an answer from the team or FTUSA.
+- Before you start an issue, check [`docs/specs/`](docs/specs/) for its spec. Each spec's title line names its issue, for example `# Spec: Chat endpoint (#25)`, so `grep -l '(#25)' docs/specs/*.md` finds it. If a spec exists, build what it says and follow the rules in [`docs/specs/README.md`](docs/specs/README.md).
 - Leave issues unassigned when you open them. The repo owner assigns owners.
 - Labels: one `type:`, one or more `area:`, one `priority:` (matches the vision doc's MoSCoW column), plus any `concern:` that applies.
 
@@ -39,7 +40,7 @@ A PR is done when:
 
 ## Repo conventions
 
-- **Folders:** `agent/` (Python), `data/` (Python), `eval/` (Python), `api/` (TypeScript Lambdas), `web/` (Vue 3 + Vite), `infra/` (CDK, TypeScript), `docs/{requirements,adr,handoff}`. Create a folder in the PR that adds its first real feature, not before.
+- **Folders:** `agent/` (Python), `data/` (Python), `eval/` (Python), `api/` (TypeScript Lambdas), `web/` (Vue 3 + Vite), `infra/` (CDK, TypeScript), `docs/{requirements,adr,handoff,specs}`. Create a folder in the PR that adds its first real feature, not before.
 - **One schema source:** the Pydantic models are the source of truth. JSON Schema and the TypeScript types are generated from them. Do not hand-edit generated files.
 - **Scope enforcement:** agent tools use `@tool(context=True)` and read `producer_id` from `tool_context.invocation_state`. Never expose `producer_id` or location as a parameter the model can set.
 - **PII:** flag it, never redact it.

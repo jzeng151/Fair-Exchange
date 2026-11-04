@@ -20,21 +20,30 @@ All handlers get the caller's identity from one identity-resolution function. No
 
 ### Identity-resolution function (shared contract owned here)
 
-- **Input and output.** It takes the incoming API request and returns the caller's producer ID, or rejects the request (the handler returns 401).
+- **Input and output.** It takes the incoming API request and returns the caller's identity, or rejects the request (the handler returns 401). The identity has:
+  - `user_id`;
+  - `roles`, any of `producer`, `reviewer` and `admin`;
+  - `producer_id`, present only with the `producer` role.
+- **Route access (added 2026-11-04 with the review and analytics specs):**
+  - chat routes require `producer` ([#25 spec](25-chat-endpoint.md));
+  - review routes require `reviewer` ([#27 spec](27-review-api.md));
+  - analytics requires `admin` ([#29 spec](29-analytics-api.md)).
+  - A missing role returns 403.
+- **`GET /me`.** Returns the caller's `user_id` and `roles`, so the web app can show the right views. Any identified caller may use it.
 - **Never from the request.** No handler reads a producer ID from the body, path, query string or a client-set header. Request bodies containing a producer ID are rejected with 400 ([#25 spec](25-chat-endpoint.md)).
 - **Agent side.** The producer ID it returns is the only producer ID passed to the agent. Tools, memory and records use it from the request context.
-- **Tests.** A fake resolver returns a fixed producer ID or rejects.
+- **Tests.** A fake resolver returns a fixed identity or rejects.
 
 ## Testing Decisions
 
 Seam 2 (Lambda handlers), per the [specs README](README.md). Cases:
 - a rejected identity returning 401 on every route;
+- a valid identity without the route's role returning 403;
 - a producer ID in the body rejected with 400;
 - the resolved ID, and not any ID in the request, reaching the agent call.
 
 ## Out of Scope
 
-- Reviewer and admin roles (later batch)
 - Production identity (Okta), which is FTUSA's
 
 ## Further Notes
