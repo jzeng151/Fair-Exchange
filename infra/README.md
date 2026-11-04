@@ -77,7 +77,7 @@ while it is created, like the clause documents, are uploaded by `deploy.sh` into
 | Stack | Holds | Deleted with the stack? |
 |---|---|---|
 | `FairExchangeArtifacts` | The artifacts key (customer-managed KMS, rotated) and the artifacts bucket (encrypted with it): standards clause documents under `clauses/`, later the agent code zip | No. Both are kept. Clause documents expire after 30 days (`STANDARDS_DOCS_TTL_DAYS`), so a kept bucket empties itself. The key costs about $1 a month until it is scheduled for deletion. |
-| `FairExchange` | Website hosting (with its own `WebKey`), the application data key, the Guardrail, the standards Knowledge Base (vectors encrypted with the data key) and its ingestion, and later the API, agent runtime, records and analytics | The Knowledge Base, its vectors and ingestion resources are deleted. The website bucket, `WebKey` and the data key are kept. |
+| `FairExchange` | Website hosting (with its own `WebKey`), the application data key, the Guardrail, the standards Knowledge Base (vectors encrypted with the data key) and its ingestion, AgentCore Memory (encrypted with the data key), and later the API, agent runtime, records and analytics | The Knowledge Base, its vectors and ingestion resources are deleted. The website bucket, `WebKey` and the data key are kept. |
 
 `deploy.sh` runs, in order:
 

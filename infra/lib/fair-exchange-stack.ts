@@ -77,10 +77,10 @@ export class FairExchangeStack extends Stack {
     new CfnOutput(this, 'GuardrailVersion', { value: guardrail.version.attrVersion });
 
     // The application data key (docs/specs/05-cdk-stack.md "Security"): one customer-managed key with rotation
-    // for the stack's data. Today: the Knowledge Base vectors. Next: tables, log groups and memory.
+    // for the stack's data. Today: the Knowledge Base vectors and memory. Next: tables and log groups.
     // The website keeps its own WebKey: the GitHub publishing role is scoped to it.
     const dataKey = new kms.Key(this, 'DataKey', {
-      description: 'Fair Exchange application data: Knowledge Base vectors, then tables, logs and memory',
+      description: 'Fair Exchange application data: Knowledge Base vectors and memory, then tables and logs',
       enableKeyRotation: true,
       removalPolicy: RemovalPolicy.RETAIN,
     });
@@ -91,7 +91,7 @@ export class FairExchangeStack extends Stack {
 
     // Persistent conversation memory (#59). The agent reads FEX_MEMORY_ID from its runtime configuration.
     // When the agent runtime lands in this stack (#5), grant its role access with memory.grantAgentAccess(role).
-    const memory = new FexMemory(this, 'Memory', { eventExpiryDays: MEMORY_EVENT_EXPIRY_DAYS });
+    const memory = new FexMemory(this, 'Memory', { eventExpiryDays: MEMORY_EVENT_EXPIRY_DAYS, encryptionKey: dataKey });
     new CfnOutput(this, 'MemoryId', { value: memory.memoryId });
     new CfnOutput(this, 'MemoryArn', { value: memory.memoryArn });
   }
