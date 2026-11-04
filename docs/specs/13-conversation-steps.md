@@ -67,8 +67,8 @@ The current step is kept in the conversation state (below), which is persisted i
 
 ### The answer: claim by claim (decided 2026-11-04)
 
-- **Streaming.** Intake and playback text stream word by word as `text` events. In `respond`, the large model produces claims as structured output. Code checks each completed claim with the citation verifier's per-claim rules (source returned by a tool this session; clause exists). A passing claim is sent at once as a `claim` event.
-- **Failing claims** are never shown. After the first pass, failed claims are rewritten and checked again, up to the verifier's retry limit, and passing rewrites are sent as `claim` events. Claims that still fail are dropped and logged.
+- **Streaming.** Intake and playback text stream word by word as `text` events. In `respond`, the large model writes claims as JSON lines ([#18 spec](18-grounded-response.md)). Code checks each completed claim with the per-claim check ([#17 spec](17-standards-grounding.md)). A passing claim is sent at once as a `claim` event.
+- **Failing claims** are never shown. Replacements and limits follow the [#18 spec](18-grounded-response.md). Claims that still fail are dropped and their reason codes logged.
 - **No unchecked model text.** In `respond`, the only model-written text shown is checked claims. The opening line, the limited-evidence notice and the closing hand-back ("you and your committee know your situation best") are fixed text in the producer's language, written in code.
 - **Limited evidence (decided 2026-11-04).** If the finished answer has no insights or no peer examples, FEX shows the fixed limited-evidence notice for what is missing (e.g., "I don't have rainfall or labor data for your region yet") and still moves to `consent`. The `answer` event and the record carry `evidence: "limited"` ([#26 spec](26-write-back.md)). Otherwise `evidence` is `"full"`.
 - **Failures.** If the model call or a tool fails in `respond`, FEX sends an `error` event and stays in `respond`. The `retry_answer` action re-runs retrieval and the answer. Any claims already shown in the failed attempt first move to earlier answers with reason `interrupted`, so the record keeps everything the producer saw.
@@ -85,9 +85,22 @@ This is what the agent keeps per conversation, persisted through memory and rebu
 - earlier answers
 - consent history and current consent
 - feedback
-- the session evidence (sources returned by tools)
+- the session evidence (sources and clause IDs returned by tools)
+- the decision log entries and token usage ([#26 spec](26-write-back.md))
+- PII check results ([#20 spec](20-pii-flagging.md))
 
 The record is built from this state ([#26 spec](26-write-back.md)), not from the raw transcript.
+
+### Agent runtime permissions (shared contract owned here)
+
+The AgentCore runtime role gets only these permissions. Other specs refer here.
+- DynamoDB read and write on the records table only ([#26 spec](26-write-back.md))
+- The AgentCore Memory resource for this agent ([memory spec](memory.md))
+- `bedrock:InvokeModel` and `bedrock:InvokeModelWithResponseStream` on the configured `us.` inference profiles
+- `bedrock:ApplyGuardrail` on the FEX Guardrail ([#12 spec](12-guardrail.md))
+- `bedrock:Retrieve` on the standards Knowledge Base ([#17 spec](17-standards-grounding.md))
+- `comprehend:DetectPiiEntities` ([#20 spec](20-pii-flagging.md))
+- S3 read on the producer and peer data objects ([#14 spec](14-producer-record-tool.md))
 
 ### Actions (shared contract owned here)
 
@@ -135,7 +148,7 @@ These are defined as Pydantic models in the agent package, the same way as the r
 | `type` | Fields |
 |---|---|
 | `text` | `text` (a chunk) |
-| `claim` | `section` (`insights` or `peer_examples`), `claim` (a `Claim` from the record schema) |
+| `claim` | `claim_id`, `section` (`insights` or `peer_examples`), `claim` (a `Claim` from the record schema) |
 | `answer` | `insights`, `peer_examples` (final verified lists), `evidence` (`full` or `limited`) |
 | `step` | `step`, `language` |
 | `actions` | `allowed` (list of action names), `language` |
@@ -171,9 +184,10 @@ Seam 3 covers one scripted conversation through all steps, plus one limited-evid
 
 ## Out of Scope
 
-- What the data tools return, nearest-match widening, and clause matching (later batch)
+- What the data tools return and clause matching ([#14](14-producer-record-tool.md), [#15](15-regional-context-tool.md), [#16](16-peer-example-tool.md), [#17](17-standards-grounding.md), [#18](18-grounded-response.md))
 - Memory storage details ([memory spec](memory.md))
 - Button labels and layout (web UI, later batch)
+- AgentCore Gateway (decided 2026-11-04: after the MVP). Tools stay in the agent process so the producer ID scope rule keeps working. The handoff notes list Gateway as the path for adding tools later, with that scope rule as the design constraint.
 
 ## Further Notes
 
