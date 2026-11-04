@@ -1,6 +1,6 @@
 # Spec: Producer-record tool (#14)
 
-Status: approved for build, 2026-11-04.
+Status: approved for build, 2026-11-04. Revised 2026-11-04: survey items are per-question summaries, not one item per response.
 
 ## Problem Statement
 
@@ -41,7 +41,10 @@ A data tool that returns this producer's Premium projects, an allowlisted set of
 
 - **Returned items:**
   - **Premium projects:** one item per project. `source` is `Your Premium project: <title> [<project_id>]`. `data` holds category, year, amount and description.
-  - **Survey:** one item per allowlisted column or question. `source` is `Your <year> survey: <column or question> [<survey_response_id>]`.
+  - **Survey (decided 2026-11-04):** one summary item per allowlisted column or question, across all of this producer's survey responses.
+    - An item is returned only when at least 5 distinct survey responses answered that column or question. A multiple-choice answer is named only when at least 5 responses chose it.
+    - `source` is `Your <years> survey: <column or question> [<summary_id>]`. `<years>` covers the responses behind the summary. `<summary_id>` is an opaque ID for this producer's summary of that column; it is not a survey response ID.
+    - Why: some producers have hundreds of responses (up to 3,951 for one producer in the sample), so one item per response would overflow a model call. And a cooperative's responses come from individual member households, so a single response can identify a member.
   - **Certification context:** certification scope (standards held) only, from `certification_scope_name`. `source` is `Your certification record [<producer_id>]`. Certification status (`certification_status_name`) and audit results are never read, because checking certification status is out of scope (#21).
 - **Survey allowlist (default deny).** The tool reads only these coded columns; free-text fields are never read.
   - **Single-choice survey:** response year, `farm_area_ha_nbr`, `has_hired_labor_code`, `harvest_changed_code`, `yield_produced_per_hectare_nbr`, `has_integrated_pest_management_practices_name`, `has_received_fertilizer_training_code`, `has_forest_protection_practices_code`, `has_water_conservation_practices_code`, `has_water_contamination_prevention_practices_code`, `has_soil_conservation_practices_code`, `water_access_sources_name`, `has_noticed_fishing_changes_code`, `adaption_strategies_name`, `future_concerns_name`.
@@ -57,6 +60,9 @@ A data tool that returns this producer's Premium projects, an allowlisted set of
   - producer A gets only A's projects and surveys, even when the model's messages mention producer B's ID or name (negative scope test, #34);
   - a producer without surveys gets projects only;
   - the complete returned payload contains only allowlisted columns, using a fixture row in which every column, including the sensitive ones, is filled;
+  - every allowlisted single-choice column (other than response year) and all three multiple-choice questions produce a summary item when 5 or more responses answered them;
+  - a column answered by 4 responses produces no item, and a multiple-choice answer chosen by 4 responses is not named;
+  - no survey response ID appears in any item;
   - no certification status or audit field appears;
   - every item's `source` reaches session evidence.
 - **Prior art:** the existing scope-guard test, and the session-scoped peer-example tool tests.

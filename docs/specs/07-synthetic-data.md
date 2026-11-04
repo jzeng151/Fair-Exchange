@@ -1,6 +1,6 @@
 # Spec: Producer data and synthetic data generator (#7)
 
-Status: approved for build, 2026-11-04.
+Status: approved for build, 2026-11-04. Revised 2026-11-04: PII check results file and hit rule, separate project and catalog IDs.
 
 ## Problem Statement
 
@@ -62,9 +62,16 @@ It combines FTUSA's sample producers, with their existing IDs, with synthetic `S
   - a run report covering counts per country, crop and entity type, unmapped values and excluded rows.
 - **Peer catalog build:**
   - Every eligible project gets a fictional organization name from a fixed list and an opaque `catalog_id`.
-  - Only the publishable fields ([#16](16-peer-example-tool.md)) are copied, plus one private column, `owner_producer_id`. The peer tool uses it to exclude the producer's own projects and never returns it.
+  - Only the publishable fields ([#16](16-peer-example-tool.md)) are copied, plus `catalog_id`, the challenge tags used for matching, and one private column, `owner_producer_id`. The peer tool uses it to exclude the producer's own projects and never returns it.
   - Each description is checked with Comprehend PII detection. A project with a hit is left out and listed in the report for hand-editing.
-  - This step needs AWS credentials and runs as part of the generator, not at agent start.
+  - **What counts as a hit:** the [#20](20-pii-flagging.md) rule. A `NAME`, `PHONE`, `EMAIL` or `ADDRESS` entity with a score of 0.8 or more. Other entity types, such as `DATE_TIME`, don't count.
+  - **PII check results file (decided 2026-11-04).**
+    - Comprehend's answers are kept in a committed input file, one row per description, keyed by the SHA-256 of the description text.
+    - The generator calls Comprehend only for descriptions not in the file and adds their rows. An edited description has a new key, so it is checked again.
+    - With the file complete, the generator runs offline. If it runs offline and a description is missing from the file, it fails instead of skipping the check.
+    - Why: Comprehend's answers can change between service versions, and CI has no AWS credentials. Keeping the answers as an input makes the build repeatable and lets CI check that the committed outputs are current.
+  - The Comprehend step needs AWS credentials only when the file is missing a description. It runs as part of the generator, not at agent start.
+- **Project and catalog IDs.** The sample has no project ID, so the generator makes one for the producer table. A project's `catalog_id` is derived separately, so a producer cannot link their own project ID to a catalog entry.
 - **Determinism.** A fixed random seed; the same inputs give byte-identical outputs.
 - **Loading.** The deploy script ([#5](05-cdk-stack.md)) uploads the outputs to the data bucket. Glue tables for producers, projects, surveys and certification are defined in CDK over those files for the Journey 3 join ([#28](28-athena-sync.md)).
 - **Synthetic text.** Synthetic project descriptions are written in English. They are reworded from sample "reason" text where useful, without copying names.
@@ -78,11 +85,13 @@ Generator tests (public function, data package), with the Comprehend step stubbe
 - the survey output contains only allowlisted columns, even when the input has every column filled;
 - excluded sample rows (factories, apparel) are absent;
 - unmapped values appear in the report;
-- the peer catalog holds only publishable fields plus the private `owner_producer_id`; sample account IDs may appear in that private field, but sample project IDs and account IDs do not appear in publishable fields;
+- the peer catalog holds only publishable fields plus `catalog_id`, the challenge tags and the private `owner_producer_id`; sample account IDs may appear in that private field, but sample project IDs and account IDs do not appear in any other field;
+- a project's `catalog_id` differs from its producer-table project ID;
 - for a sample producer, the peer tool excludes that producer's own projects and never returns `owner_producer_id` or sample IDs;
 - a sample producer's region is derived from its projects, and a producer without projects has an empty region;
 - a project with an unmapped sub-category is left out of the peer catalog and reported;
-- a stubbed PII hit leaves the project out.
+- a stubbed PII hit of one of the four types at 0.8 or more leaves the project out; a `DATE_TIME` hit or a score below 0.8 does not;
+- a description already in the PII check results file is not sent to Comprehend; an offline run with a description missing from the file fails.
 
 Prior art: the existing data package tests.
 

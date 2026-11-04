@@ -189,10 +189,15 @@ class _Turn:
             self.on_event(event)
 
     def say(self, text: str) -> None:
-        """Text streams word by word as `text` events."""
+        """Text streams word by word as `text` events. A message said right after another in the same turn
+        starts with a space, so clients joining the pieces don't run the two together (#126)."""
         if not text:
             return
-        for chunk in re.findall(r"\S+\s*", text):
+        chunks = re.findall(r"\S+\s*", text)
+        last = next((e for e in reversed(self.events) if e.type == "text"), None)
+        if chunks and last is not None and not last.text[-1:].isspace():
+            chunks[0] = " " + chunks[0]
+        for chunk in chunks:
             self.emit("text", text=chunk)
         self.spoken.append(text)
 

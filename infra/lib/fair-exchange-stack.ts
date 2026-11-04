@@ -6,11 +6,12 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import type { Construct } from 'constructs';
 import { FexGuardrail } from './guardrail';
 import { FexMemory } from './memory';
+import { FexTables } from './tables';
 import { StandardsKnowledgeBase, type StandardsKnowledgeBaseProps } from './standards-kb';
 
 export interface FairExchangeStackProps extends StackProps {
   /** From FairExchangeArtifacts and the clause build; infra/deploy.sh passes them as CDK context. */
-  standards: StandardsKnowledgeBaseProps;
+  standards: Omit<StandardsKnowledgeBaseProps, 'dataKey'>;
 }
 
 /**
@@ -34,6 +35,7 @@ const MEMORY_EVENT_EXPIRY_DAYS = 7;
  *   - Observability: AgentCore Observability / CloudWatch, log retention policy
  * Least-privilege IAM per Lambda and for the AgentCore role. No real producer PII.
  * Files this stack reads at deploy time live in FairExchangeArtifacts (artifacts-stack.ts), deployed first.
+ * Uses CDK's standard synthesizer (spec 05), so Lambdas can be CDK assets; infra/deploy.sh bootstraps the account.
  */
 export class FairExchangeStack extends Stack {
   constructor(scope: Construct, id: string, props: FairExchangeStackProps) {
@@ -75,13 +77,27 @@ export class FairExchangeStack extends Stack {
     new CfnOutput(this, 'GuardrailId', { value: guardrail.guardrail.attrGuardrailId });
     new CfnOutput(this, 'GuardrailVersion', { value: guardrail.version.attrVersion });
 
+    // The application data key (docs/specs/05-cdk-stack.md "Security"): one customer-managed key with rotation
+    // for the stack's data: the Knowledge Base vectors, memory and the tables. Next: log groups.
+    // The website keeps its own WebKey: the GitHub publishing role is scoped to it.
+    const dataKey = new kms.Key(this, 'DataKey', {
+      description: 'Fair Exchange application data: Knowledge Base vectors, memory and tables, then logs',
+      enableKeyRotation: true,
+      removalPolicy: RemovalPolicy.RETAIN,
+    });
+    new CfnOutput(this, 'DataKeyArn', { value: dataKey.keyArn });
+
     // Standards grounding (#17): the agent runtime (#4) gets bedrock:Retrieve on it and FEX_STANDARDS_KB_ID
-    new StandardsKnowledgeBase(this, 'StandardsKnowledgeBase', props.standards);
+    new StandardsKnowledgeBase(this, 'StandardsKnowledgeBase', { ...props.standards, dataKey });
 
     // Persistent conversation memory (#59). The agent reads FEX_MEMORY_ID from its runtime configuration.
     // When the agent runtime lands in this stack (#5), grant its role access with memory.grantAgentAccess(role).
-    const memory = new FexMemory(this, 'Memory', { eventExpiryDays: MEMORY_EVENT_EXPIRY_DAYS });
+    const memory = new FexMemory(this, 'Memory', { eventExpiryDays: MEMORY_EVENT_EXPIRY_DAYS, encryptionKey: dataKey });
     new CfnOutput(this, 'MemoryId', { value: memory.memoryId });
     new CfnOutput(this, 'MemoryArn', { value: memory.memoryArn });
+
+    // Records (#26) and conversations (#25) tables. The agent runtime (#5, next) gets read/write on the records
+    // table only (#13 "Agent runtime permissions"); the chat API Lambdas get the conversations table.
+    new FexTables(this, 'Tables', { encryptionKey: dataKey });
   }
 }

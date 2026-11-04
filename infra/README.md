@@ -22,11 +22,9 @@ called from another directory. Moving the source tree does not change the stack
 name, resource IDs, GitHub OIDC trust, or website URL. See the
 [remaining work for #5](../docs/handoff/sandbox-deployment.md#remaining-work-for-issue-5).
 
-The script builds and checks the app, deploys the synthesized CloudFormation
-template with the caller's existing credentials, uploads the site, invalidates
-CloudFront, and checks the HTTPS response. No CDK bootstrap or new IAM roles are
-needed for this static hosting stack. Commit both package lockfiles for repeatable
-builds. Revisit the synthesizer when Lambda or container assets are added.
+The script builds and checks the app, deploys the stacks with the caller's existing credentials, uploads the
+site, invalidates CloudFront, and checks the HTTPS response. See "Stacks and the deploy order" below for the
+CDK bootstrap and the stack layout. Commit both package lockfiles for repeatable builds.
 
 Stack outputs are `WebUrl`, `WebBucketName`, and `WebDistributionId`. The bucket
 policy grants object reads only to this distribution. CDK's KMS decrypt grant is
@@ -72,36 +70,40 @@ automated publishing needs a live sandbox account and its AWS resources.
 
 ## Stacks and the deploy order (#5)
 
-The stacks use the bootstrapless synthesizer, so CDK cannot upload files for us. Anything the main stack
-reads while it is created must be uploaded first, by `deploy.sh`, into a small stack deployed before it:
+`FairExchange` uses CDK's standard synthesizer (docs/specs/05-cdk-stack.md), so its Lambdas and custom resources
+can be CDK assets; `deploy.sh` bootstraps the account if needed (the `CDKToolkit` stack). Files the stack reads
+while it is created, like the clause documents, are uploaded by `deploy.sh` into a small stack deployed first:
 
 | Stack | Holds | Deleted with the stack? |
 |---|---|---|
-| `FairExchangeArtifacts` | The application data key (customer-managed KMS, rotated) and the artifacts bucket (encrypted with it): standards clause documents under `clauses/`, later the agent code zip | No. Both are kept. Clause documents expire after 30 days (`STANDARDS_DOCS_TTL_DAYS`), so a kept bucket empties itself. The key costs about $1 a month until it is scheduled for deletion. |
-| `FairExchange` | Website hosting (unchanged), the standards Knowledge Base and its ingestion, and later the API, agent runtime, records and analytics | The Knowledge Base, its vectors and ingestion resources are deleted. The website bucket and key are kept, as before. |
+| `FairExchangeArtifacts` | The artifacts key (customer-managed KMS, rotated) and the artifacts bucket (encrypted with it): standards clause documents under `clauses/`, later the agent code zip | No. Both are kept. Clause documents expire after 30 days (`STANDARDS_DOCS_TTL_DAYS`), so a kept bucket empties itself. The key costs about $1 a month until it is scheduled for deletion. |
+| `FairExchange` | Website hosting (with its own `WebKey`), the application data key, the Guardrail, the standards Knowledge Base (vectors encrypted with the data key) and its ingestion, AgentCore Memory (encrypted with the data key), the records and conversations tables (data key, point-in-time recovery), and later the API, agent runtime, records and analytics | The Knowledge Base, its vectors and ingestion resources are deleted. The website bucket, `WebKey`, the data key and both tables are kept. |
 
 `deploy.sh` runs, in order:
 
-1. Builds the website.
-2. Builds one document per APS/FPS clause (`python -m fx_data.standards_kb`), each with a `.metadata.json`
+1. Checks CDK bootstrap and runs `cdk bootstrap` if the account isn't bootstrapped.
+2. Builds the website.
+3. Builds one document per APS/FPS clause (`python -m fx_data.standards_kb`), each with a `.metadata.json`
    sidecar holding `clause_id` and `standard`, and computes their content hash.
-3. Type-checks the infrastructure code.
-4. Deploys `FairExchangeArtifacts`.
-5. Uploads the clause documents with `aws s3 sync --delete`. Every deploy re-uploads all of them, which
+4. Type-checks the infrastructure code.
+5. Deploys `FairExchangeArtifacts`.
+6. Uploads the clause documents with `aws s3 sync --delete`. Every deploy re-uploads all of them, which
    resets their expiry and restores any that expired.
-6. Deploys `FairExchange` with the bucket, key and hash as CDK context. The Knowledge Base uses an S3 Vectors
+7. Deploys `FairExchange` with `cdk deploy`, passing the artifacts bucket, its key and the hash as CDK context. The Knowledge Base uses an S3 Vectors
    store encrypted with the data key, Titan Text Embeddings V2 and no chunking. A custom resource starts an
    ingestion job and a Step Functions loop polls it: ingestion failure, any failed document, or more than
    20 minutes fails the deploy, and CloudFormation rolls back only the new resources. The hash is a custom
    resource property, so changed clauses re-ingest and unchanged ones do not.
-7. Publishes the website (`publish-web.sh`) and runs the Knowledge Base smoke test
+8. Publishes the website (`publish-web.sh`) and runs the Knowledge Base smoke test
    (`eval/tests/test_standards_kb_smoke.py`). It prints `StandardsKnowledgeBaseId` for `FEX_STANDARDS_KB_ID`.
 
 `deploy-web.sh` now just runs `deploy.sh`. Do not deploy `cdk.out/FairExchange.template.json` by hand
 without the context `deploy.sh` passes: the Knowledge Base would point at a placeholder bucket.
 
 **Account prerequisites:** credentials that can create IAM roles, KMS keys, Bedrock Knowledge Bases and S3
-Vectors (the GitHub deploy role cannot), and access to Amazon Titan Text Embeddings V2 in the region.
+Vectors (the GitHub deploy role cannot), and access to Amazon Titan Text Embeddings V2 in the region. The first run
+bootstraps CDK with its default settings: the `CDKToolkit` stack holds an asset bucket, an ECR repository and the
+roles `cdk deploy` uses; its CloudFormation execution role has `AdministratorAccess`, as is CDK's default.
 
 **Expiry caveat:** clause documents expire 30 days after the last deploy. Only ingest by deploying (the
 script uploads first). A sync started by hand in the console after they expired would empty the Knowledge
@@ -109,3 +111,16 @@ Base; re-run `deploy.sh` to restore it.
 
 The ingestion handler is inline Lambda code (`lib/standards-kb/ingest_handler.py`, under 4 KB) because
 no CDK assets can be published.
+
+## Tables (#25, #26)
+
+`FairExchange` outputs `RecordsTableName`, `RecordsTableArn`, `RecordsTableStreamArn`, `ConversationsTableName` and
+`ConversationsTableArn`. The records table has a keys-only stream for the Athena sync (#28). To deploy the sync stack
+against it until it is part of `deploy.sh`:
+
+```bash
+out() { aws cloudformation describe-stacks --stack-name FairExchange --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue | [0]" --output text; }
+EXPECTED_AWS_ACCOUNT=100300582834 RECORDS_TABLE_NAME="$(out RecordsTableName)" \
+  RECORDS_TABLE_STREAM_ARN="$(out RecordsTableStreamArn)" RECORDS_TABLE_KEY_ARN="$(out DataKeyArn)" \
+  bash infra/deploy-athena-sync.sh
+```

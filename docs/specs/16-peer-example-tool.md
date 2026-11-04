@@ -31,7 +31,7 @@ A data tool that runs a structured query over the Premium project data for proje
   - Built by the data work (#7) from the producer table's Premium projects (FTUSA sample plus synthetic, [#14 spec](14-producer-record-tool.md)). It is loaded from the data bucket.
   - Each project gets a fictional organization name. The vision document confirms that fictionalized names with realistic content are sufficient for organization-level projects.
   - Only the publishable fields below are copied into the catalog.
-  - Every description is checked with Comprehend PII detection when the catalog is built. Descriptions with a hit are hand-edited or the project is left out.
+  - Every description is checked with Comprehend PII detection when the catalog is built, using the hit rule and the committed check results file in the [#7 spec](07-synthetic-data.md). Descriptions with a hit are hand-edited or the project is left out.
   - Projects whose private `owner_producer_id` is the session's producer are excluded at query time. That column is never returned in any item ([#7](07-synthetic-data.md)).
 - **Ranking.** A candidate must share at least one confirmed tag. Then:
   - matches tag, a crop and entity type: strength `exact`;
