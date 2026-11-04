@@ -3,10 +3,28 @@ import { App, BootstraplessSynthesizer } from 'aws-cdk-lib';
 import { AgentArtifactsStack, AgentSpikeStack } from '../lib/agent-spike-stack';
 import { AthenaSyncStack } from '../lib/athena-sync-stack';
 import { FairExchangeStack } from '../lib/fair-exchange-stack';
+import { ArtifactsStack } from '../lib/artifacts-stack';
 
 const app = new App();
 const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION ?? 'us-west-2' };
-new FairExchangeStack(app, 'FairExchange', { synthesizer: new BootstraplessSynthesizer(), env });
+const ctx = (key: string, placeholder: string): string => app.node.tryGetContext(key) ?? placeholder;
+
+// Issue #5: infra/deploy.sh deploys FairExchangeArtifacts, uploads the files the main stack reads, then deploys
+// FairExchange with the artifact locations as context. Placeholders keep `cdk synth` working in CI.
+new ArtifactsStack(app, 'FairExchangeArtifacts', {
+  synthesizer: new BootstraplessSynthesizer(),
+  env,
+  docsTtlDays: Number(ctx('standardsDocsTtlDays', '30')),
+});
+new FairExchangeStack(app, 'FairExchange', {
+  synthesizer: new BootstraplessSynthesizer(),
+  env,
+  standards: {
+    artifactsBucketName: ctx('artifactsBucket', 'unset-artifacts-bucket'),
+    dataKeyArn: ctx('dataKeyArn', 'arn:aws:kms:us-west-2:000000000000:key/unset'),
+    contentHash: ctx('standardsDocsHash', 'unset'),
+  },
+});
 
 // Issue #4 spike (deploy-agent-spike.sh passes the code location as context; placeholders keep `cdk synth` working)
 new AgentArtifactsStack(app, 'FairExchangeAgentArtifacts', { synthesizer: new BootstraplessSynthesizer(), env });

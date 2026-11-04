@@ -3,8 +3,10 @@
 Code holds the step and decides when it changes; the model only writes words.
   - Each request is validated, the state is rebuilt from the store, one step function runs, the state is saved.
   - The small model handles intake, playback, tagging and short replies. It is never offered data tools.
-  - The large model retrieves (data tools, `respond` only) and writes claims as structured output.
-    Each claim is checked by the citation verifier before it is sent; failures are rewritten, then dropped.
+  - In `respond` the large model first calls the data tools. Code then calls any data tool the model
+    skipped (`tool_backstopped`, #17), and only then does the large model write claims, from every item
+    returned. Each claim is checked by the citation verifier before it is sent; failures are rewritten,
+    then dropped with their reason codes in the decision log.
 """
 import json
 import logging
@@ -25,11 +27,13 @@ from fex.conversation.contract import (
 )
 from fex.guardrail import CONVERSATION_KEY, OutputAssessor, narrative_texts
 from fex.conversation.state import (
-    ConversationState, Playback, Profile, ShownClaims, StateConflict, StateStore,
+    ConversationState, DecisionLogEntry, Playback, Profile, ShownClaims, StateConflict, StateStore,
 )
 from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer
-from fex.tools import ALL_TOOLS
-from fex.verifier import Problem, SessionEvidence, verify
+from fex.tools import ALL_TOOLS, DATA_TOOLS
+from fex.tools._contract import EVIDENCE_KEY, ITEMS_KEY, TOOLS_RUN_KEY, run_data_tool
+from fex.tools.standards import RETRIEVER_KEY, ClauseRetriever, default_retriever
+from fex.verifier import Problem, SessionEvidence, check_claim
 
 log = logging.getLogger(__name__)
 _REQUEST = TypeAdapter(Request)
@@ -105,10 +109,16 @@ SHORT_REPLY_SYSTEM = _RULES + (
     " Answer the producer's typed question in one or two sentences. You cannot change their consent, feedback or "
     "the conversation's step, and you cannot look anything up now."
 )
+RETRIEVE_SYSTEM = (
+    "You are FEX's retrieval step. Call every data tool once: this producer's record, regional data, peer "
+    "examples and the related Fair Trade standard clauses. The tools take no arguments; they already know the "
+    "producer and the confirmed challenge. When all have returned, reply with the single word: done."
+)
 ANSWER_SYSTEM = _RULES + (
-    " Use the tools to look up this producer's record, regional data and peer examples. Then write insights (what "
-    "the data shows) and peer_examples (what comparable producers tried, with trade-offs). Every claim must cite "
-    "a source exactly as a tool returned it and a related APS/FPS clause. Only state facts a tool returned."
+    " Write insights (what the data shows, citing the producer's record or regional data) and peer_examples "
+    "(what comparable producers tried, with trade-offs, citing a peer project) using only the items given. Every "
+    "claim must copy an item's `source` exactly into citation.source, and set citation.standard_clause to the "
+    "most related clause ID from the `standard` items. Only state facts the items contain."
 )
 
 # ------------------------------------------------------------------------------------------- engine
@@ -140,16 +150,6 @@ def _default_profiles() -> Callable[[str], Profile | None]:
     return lookup
 
 
-def _sources_in(value: Any) -> list[str]:
-    """Every `source` value anywhere in a tool result."""
-    if isinstance(value, dict):
-        found = [value["source"]] if isinstance(value.get("source"), str) else []
-        return found + [s for v in value.values() for s in _sources_in(v)]
-    if isinstance(value, list):
-        return [s for v in value for s in _sources_in(v)]
-    return []
-
-
 def _tool_errors(messages: list[dict]) -> list[str]:
     """Tool calls that failed. Strands returns a failure as a toolResult with status "error", not an exception."""
     return [" ".join(part.get("text", "") for part in block["toolResult"].get("content", []))[:200]
@@ -157,19 +157,18 @@ def _tool_errors(messages: list[dict]) -> list[str]:
             if block.get("toolResult", {}).get("status") == "error"]
 
 
-def _tool_sources(messages: list[dict]) -> list[str]:
-    sources = []
-    for message in messages:
-        for block in message["content"]:
-            for part in block.get("toolResult", {}).get("content", []):
-                data = part.get("json")
-                if data is None and part.get("text", "")[:1] in "[{":
-                    try:
-                        data = json.loads(part["text"])
-                    except ValueError:
-                        data = None
-                sources += _sources_in(data)
-    return sources
+_BRACKET_ID = re.compile(r"\[([^\[\]]+)\]\s*$")
+
+
+def _claim_refs(claim: Claim) -> list[str]:
+    """Opaque IDs for the decision log: the source's bracketed item ID and the clause ID. No free text."""
+    refs = []
+    if match := _BRACKET_ID.search(claim.citation.source):
+        refs.append(match.group(1))
+    clause = claim.citation.standard_clause.split()
+    if len(clause) == 2 and clause[0].upper() in ("APS", "FPS"):
+        refs.append(f"{clause[0].upper()} {clause[1]}")
+    return refs
 
 
 class _Turn:
@@ -205,6 +204,7 @@ class _AgentFailed(Exception):
 class ConversationEngine:
     def __init__(self, *, store: StateStore, small_model: Any, large_model: Any, standards: Standards | None = None,
                  profiles: Callable[[str], Profile | None] | None = None, tools: list | None = None,
+                 retriever: ClauseRetriever | None = None,
                  clock: Callable[[], datetime] | None = None, max_retries: int = 2,
                  records: Any = None, scope_check: ScopeCheck | None = None,
                  pii_scanner: Callable[[str, str], list[dict]] | None = None,
@@ -215,6 +215,7 @@ class ConversationEngine:
         self.profiles = profiles or _default_profiles()
         self.tools = tools if tools is not None else ALL_TOOLS
         self.pii_scanner = pii_scanner  # the Comprehend seam (#20): None in tests, wired in runtime
+        self.retriever = retriever if retriever is not None else default_retriever()
         self.clock = clock or (lambda: datetime.now(UTC))
         self.max_retries = max_retries
         self.records = records  # a fex.records.RecordStore; None = records are not saved (#26)
@@ -433,11 +434,9 @@ class ConversationEngine:
         lang = state.language
         try:
             turn.say(copy.text(lang, "respond_opening"))
-            draft, sources = self._retrieve_and_write(state, self._answer_prompt(state))
-            evidence = SessionEvidence()
-            for s in state.evidence_sources + sources:
-                evidence.record(s)
-            state.evidence_sources = sorted(evidence.sources)
+            evidence = state.session_evidence()
+            items = self._retrieve(state, evidence)  # every data tool has run before any claim is written
+            draft = self._write(state, self._answer_prompt(state, items))
             pending = [("insights", c) for c in draft.insights] + [("peer_examples", c) for c in draft.peer_examples]
             for attempt in range(self.max_retries + 1):
                 failed = []
@@ -452,12 +451,12 @@ class ConversationEngine:
                     break
                 if attempt == self.max_retries:
                     for section, claim, problems in failed:
-                        log.warning("dropped unverified claim (%s): %s", section, "; ".join(p.reason for p in problems))
+                        codes = sorted({p.code for p in problems})
+                        log.warning("dropped unverified claim (%s): %s", section, ", ".join(codes))
+                        for code in codes:
+                            self._log(state, "verifier", code, _claim_refs(claim))
                     break
-                draft, sources = self._retrieve_and_write(state, self._rewrite_prompt(state, failed))
-                for s in sources:
-                    evidence.record(s)
-                state.evidence_sources = sorted(evidence.sources)
+                draft = self._write(state, self._rewrite_prompt(state, items, failed))
                 pending = [("insights", c) for c in draft.insights] + [("peer_examples", c) for c in draft.peer_examples]
         except _AgentFailed as exc:
             log.warning("answer failed: %s", exc)
@@ -481,37 +480,75 @@ class ConversationEngine:
         state.step = "consent"
 
     def _check(self, section: str, claim: Claim, evidence: SessionEvidence) -> list[Problem]:
-        insights, peers = ([claim], []) if section == "insights" else ([], [claim])
-        return verify(insights, peers, evidence, self.standards).problems
+        return check_claim(section, claim, evidence, self.standards)
 
-    def _retrieve_and_write(self, state: ConversationState, prompt: str) -> tuple[AnswerDraft, list[str]]:
-        invocation_state = {"producer_id": state.producer_id, "step": "respond",
-                            "entity_type": state.effective_entity_type,
-                            CONVERSATION_KEY: state.conversation_id}  # for Guardrail findings (#12)
+    def _log(self, state: ConversationState, kind: str, code: str, refs: list[str]) -> None:
+        state.decision_log.append(DecisionLogEntry(at=self.clock(), kind=kind, code=code, refs=refs))
+
+    def _retrieve(self, state: ConversationState, evidence: SessionEvidence) -> list[dict]:
+        """The model calls the data tools; code then calls any it skipped (#17). Returns every item returned
+        in this respond step. Tools add their items to `evidence`, which is kept in the conversation state."""
+        pb = state.playback
+        tools_run: set[str] = set()
+        items: list[dict] = []
+        invocation_state = {
+            "producer_id": state.producer_id, "step": "respond", "entity_type": state.effective_entity_type,
+            "tags": list(pb.tags) if pb else [], "summary_english": pb.summary_english if pb else None,
+            "summary_original": pb.summary_original if pb else None,
+            CONVERSATION_KEY: state.conversation_id,  # for Guardrail findings (#12)
+            RETRIEVER_KEY: self.retriever, EVIDENCE_KEY: evidence, TOOLS_RUN_KEY: tools_run, ITEMS_KEY: items,
+        }
         try:
-            agent = Agent(model=self.large_model, system_prompt=ANSWER_SYSTEM, tools=list(self.tools),
-                          callback_handler=None)
-            result = agent(prompt, structured_output_model=AnswerDraft, invocation_state=invocation_state)
-        except Exception as exc:  # model failure, or a tool failure Strands raised
-            raise _AgentFailed(str(exc)) from exc
-        if errors := _tool_errors(agent.messages):  # a tool failure Strands returned as a result
-            raise _AgentFailed("data tool failed: " + "; ".join(errors))
-        draft = result.structured_output
-        self.output_assessor.assess(narrative_texts(draft), state.conversation_id)
-        return draft, _tool_sources(agent.messages)
+            try:
+                agent = Agent(model=self.large_model, system_prompt=RETRIEVE_SYSTEM, tools=list(self.tools),
+                              callback_handler=None)
+                agent(self._situation(state), invocation_state=invocation_state)
+            except Exception as exc:  # model failure, or a tool failure Strands raised
+                raise _AgentFailed(str(exc)) from exc
+            if errors := _tool_errors(agent.messages):  # a tool failure Strands returned as a result
+                raise _AgentFailed("data tool failed: " + "; ".join(errors))
+            for tool in self.tools:
+                data_tool = DATA_TOOLS.get(tool.tool_name)
+                if data_tool is None or data_tool.name in tools_run:
+                    continue
+                self._log(state, "tool", "tool_backstopped", [data_tool.name])
+                try:
+                    run_data_tool(data_tool, invocation_state)
+                except Exception as exc:
+                    raise _AgentFailed(f"data tool failed: {data_tool.name}: {exc}") from exc
+        finally:
+            state.keep_evidence(evidence)
+        return items
 
-    def _answer_prompt(self, state: ConversationState) -> str:
+    def _write(self, state: ConversationState, prompt: str) -> AnswerDraft:
+        """The large model writes claims from the items. No tools are offered here."""
+        try:
+            agent = Agent(model=self.large_model, system_prompt=ANSWER_SYSTEM, tools=[], callback_handler=None)
+            draft = agent(prompt, structured_output_model=AnswerDraft,
+                          invocation_state={CONVERSATION_KEY: state.conversation_id}).structured_output
+        except Exception as exc:
+            raise _AgentFailed(str(exc)) from exc
+        self.output_assessor.assess(narrative_texts(draft), state.conversation_id)
+        return draft
+
+    def _situation(self, state: ConversationState) -> str:
         pb = state.playback
         return (f"Language: {state.language}\nEntity type: {state.effective_entity_type}\n"
                 f"Confirmed situation: {pb.model_dump_json(include={'challenge', 'timing', 'severity', 'tried', 'tags'})}")
 
-    def _rewrite_prompt(self, state: ConversationState, failed: list) -> str:
+    def _answer_prompt(self, state: ConversationState, items: list[dict]) -> str:
+        unique = list({item["source"]: item for item in items}.values())
+        return (self._situation(state) + "\n\nItems the data tools returned (cite only these):\n"
+                + "\n".join(json.dumps(item, ensure_ascii=False, default=str) for item in unique))
+
+    def _rewrite_prompt(self, state: ConversationState, items: list[dict], failed: list) -> str:
         lines = [f"- [{section}] {claim.text} (source: {claim.citation.source}; clause: "
-                 f"{claim.citation.standard_clause}) -> {'; '.join(p.reason for p in problems)}"
+                 f"{claim.citation.standard_clause}) -> {', '.join(p.code for p in problems)}: "
+                 f"{'; '.join(p.reason for p in problems)}"
                  for section, claim, problems in failed]
-        return (self._answer_prompt(state) + "\n\nThese claims failed the citation check. Rewrite only these, "
-                "citing sources exactly as the tools returned them and real APS/FPS clauses, or leave them out:\n"
-                + "\n".join(lines))
+        return (self._answer_prompt(state, items) + "\n\nThese claims failed the citation check. Rewrite only "
+                "these, citing sources and clause IDs exactly as the items give them and without directive "
+                "language, or leave them out:\n" + "\n".join(lines))
 
     # ------------------------------------------------------------------ helpers
 
