@@ -3,7 +3,8 @@ import { ref, reactive, computed, nextTick } from 'vue'
 import { scenarios as producers } from '../data/scenarios'
 import { t as T, detect } from '../data/i18n'
 import { buildCompletedRecord, buildDeclinedRecord } from '../lib/record'
-import { saveRecord as storeRecord, setFeedback } from '../lib/demoStore'
+import { saveRecord as storeRecord, saveTrace, setFeedback } from '../lib/demoStore'
+import { toClaims } from '../lib/claims'
 import AnswerCards from './AnswerCards.vue'
 import FexMark from './FexMark.vue'
 import AboutAI from './AboutAI.vue'
@@ -245,20 +246,17 @@ async function saveRecord() {
   const p = producer.value
   addCall(usage, 'small', 600 + tokensFromText(messages.value.map((m) => m.text || '').join(' ')), 40) // challenge tagging
   const L = lang.value
-  const asClaim = (c: { text: { en: string; es?: string }; source: string; clause: string; strength: 'exact' | 'nearest' | 'limited'; period?: string }) => ({
-    text: c.text[L] ?? c.text.en,
-    citation: { source: c.source, standard_clause: c.clause, strength: c.strength, period: c.period ?? null },
-  })
+  const claims = toClaims(p, L)
   const rec = buildCompletedRecord({
     recordId: newRecordId(), producerId: p.id, now: new Date(), language: L, entityType: savedSummary.entity,
     summaryOriginal: savedSummary.challenge, summaryEnglish: englishSummary().challenge, tags: p.tags,
-    insights: p.insights.map(asClaim),
-    peerExamples: p.peers.map((x) => asClaim({ ...x, source: `${x.org} (${x.place})`, strength: 'nearest' })),
+    insights: claims.insights, peerExamples: claims.peerExamples,
     feedback: null, piiFlag: pii.flag,
   })
   storeRecord(rec)
   recordId.value = rec.record_id
   addLog('write_back_record', `Record ${rec.record_id} saved (demo mode): source="agent conversation", review_status=pending${pii.flag ? ', pii_flag=true' : ''}`)
+  saveTrace(rec.record_id, [...log.value]) // stand-in for AgentCore Observability traces
   await say({ role: 'agent', kind: 'text', text: t.value.saved, en: EN.saved, model: 'none' })
   stage.value = 'feedback'
   await say({ role: 'agent', kind: 'feedback', model: 'none' })
@@ -286,6 +284,7 @@ async function decline() {
   const rec = buildDeclinedRecord({ recordId: newRecordId(), producerId: producer.value.id, now: new Date() })
   storeRecord(rec)
   addLog('write_back_record', `Declined outcome ${rec.record_id}: producer ID + timestamp only. No narrative, no feedback.`)
+  saveTrace(rec.record_id, [...log.value])
   stage.value = 'declined'
   await say({ role: 'agent', kind: 'text', text: t.value.declined, en: EN.declined })
   await showEnergy()

@@ -1,6 +1,10 @@
 # web/
 
-Vue 3 + Vite (TypeScript). The producer chat with FEX (issue #30). The Fair Trade USA reviewer view (#31) and dashboard (#33) come later.
+Vue 3 + Vite (TypeScript). One app, two sides:
+
+- `#/`: **Producer**, the chat with FEX (issue #30)
+- `#/review`: **Fair Trade USA**, records to review (issue #31)
+- `#/admin`: **Admin**, aggregate dashboard (issue #33)
 
 ```bash
 npm ci
@@ -17,17 +21,42 @@ open question → follow-ups → editable playback → "looking things up" check
 Every insight and example shows its **source and APS/FPS clause** under "Where does this come from?". FEX never tells the
 producer what to do and hands the decision back. An **English subtitles** switch shows English under every Spanish line.
 
+## What a reviewer sees (`#/review`)
+
+A list of records (filter: all, pending, reviewed, flagged, declined) and the selected record:
+producer ID, saved time, source, consent, entity type, **language**, feedback, the **personal-information flag**,
+the **summary** (original and English), the **challenge tags**, what FEX told the producer (with sources and clauses),
+and the **agent's reasoning** (tool calls, in order). The reviewer approves, or corrects tags and summary, and the
+record is marked **reviewed** with who and when. Corrections that would break the #6 rules are refused (no tags,
+an unknown tag, a non-English record without an English summary). Declined records have nothing to review.
+"Load demo records" adds synthetic records covering each state.
+
+## What an admin sees (`#/admin`)
+
+Counts only: records in view, declines (a count only), records waiting for review, and breakdowns by challenge,
+language, type of organization and feedback, as bars or as a table. The rules, in `src/lib/analytics.ts`, are the
+ones #29 must enforce: consented records only; any group under 5 hidden, plus one more where a hidden number could be
+worked out from the total; reviewed records by default ("Include pending" to widen). "Load sample data" adds
+60 synthetic `SEED-` records (`src/lib/dashboardSeed.ts`), because a few demo conversations can't clear the n < 5 rule.
+`AnalyticsSummary` is the response shape the dashboard expects from #29. Admin-only access needs #11 (sign-in) and #29;
+until then the route is open, and only aggregates are ever shown.
+
 ## Demo mode (until the chat API, #25)
 
 - Replies are **scripted** from `src/data/scenarios.ts` (synthetic producers and numbers, **real** APS/FPS clause IDs).
 - Saved and declined records are built with the **generated #6 schema types** (`src/lib/record.ts`) and kept in this
-  browser only (`src/lib/demoStore.ts`). To connect the backend, replace `demoStore` with calls to #25/#26; the record shape doesn't change.
+  browser only (`src/lib/demoStore.ts`). To connect the backend, replace `demoStore` with calls to #25/#26/#27; the record shape doesn't change.
+- The reasoning trace is stored next to the record, keyed by record ID. In production it comes from AgentCore Observability.
 
 ## Tests (`npm test`)
 
 - Records match the #6 schema: completed vs. declined, consent scope, English summary rule; a decline carries no narrative.
 - Every clause the demo cites exists in `data/src/fx_data/clauses.json` (#9).
 - Every Spanish line has an English version; Spanish and English UI copy have the same keys.
+- Reviews (`src/lib/review.ts`): approve or correct, mark reviewed; never change producer, source or consent; refuse corrections that break the schema rules.
+- Demo records: every state is present, every one is reviewable, clauses are real, each completed record has a trace.
+- Analytics rules: groups under 5 hidden, complementary hiding, declines as a count only, reviewed by default, no record-level fields in the output.
+- Sample data: repeatable, unique `SEED-` IDs, valid records, meaningful breakdowns with a hidden group.
 - No directive wording ("you should", "debería", "recomendamos"…) anywhere in FEX's copy.
 
 Design tokens: `src/styles/tokens.css` (FTUSA UI/UX spec v1.1). Accessibility target: WCAG 2.2 AA.

@@ -231,3 +231,8 @@ pre.sub { background: none; border-left: 3px solid var(--ft-ui-border); padding:
 .chat-links .back-link { margin: 0; }
 .energy-note { align-self: center; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; padding: 6px 12px; border-radius: 20px; background: var(--ft-ui-success-bg); font-size: 14px; text-align: center; }
 .energy-note .btn-text { min-height: 32px; padding: 2px 4px; font-size: 13px; text-decoration: underline; }
+
+/* Side switch as links (each side has its own route: #/ and #/review) */
+.side-switch a { min-height: 44px; padding: 6px 16px; display: inline-flex; align-items: center; gap: 6px; background: var(--ft-ui-surface); color: var(--ft-ui-primary); font-weight: 500; text-decoration: none; }
+.side-switch a + a { border-left: 1px solid var(--ft-ui-primary); }
+.side-switch a.active { background: var(--ft-ui-primary); color: #fff; }

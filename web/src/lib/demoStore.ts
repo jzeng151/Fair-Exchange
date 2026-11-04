@@ -1,22 +1,47 @@
-// Demo mode (issue #30): records are kept in this browser only, until the chat API (#25) and
-// write-back (#26) exist. Records are built with the #6 schema types, so swapping this module
-// for real API calls doesn't change their shape.
+// Demo mode (issues #30, #31): records are kept in this browser only, until the chat API (#25),
+// write-back (#26) and review API (#27) exist. Records use the #6 schema types, so swapping this
+// module for real API calls doesn't change their shape.
+//
+// Traces (the agent's step-by-step reasoning) are kept NEXT TO records, keyed by record ID: in
+// production they come from AgentCore Observability, not from the record itself.
 import type { CompletedRecord, ConversationRecord } from '../../../api/src/types/conversation-record'
 
-const KEY = 'fair-exchange-demo-records'
+const RECORDS = 'fair-exchange-demo-records'
+const TRACES = 'fair-exchange-demo-traces'
 
-function load(): ConversationRecord[] {
-  try { return JSON.parse(localStorage.getItem(KEY) ?? '[]') as ConversationRecord[] } catch { return [] }
+export interface TraceStep { time: string; tool: string; detail: string }
+
+function read<T>(key: string, fallback: T): T {
+  try { return JSON.parse(localStorage.getItem(key) ?? 'null') ?? fallback } catch { return fallback }
+}
+function write(key: string, value: unknown) {
+  try { localStorage.setItem(key, JSON.stringify(value)) } catch { /* private mode etc. */ }
 }
 
-function persist(records: ConversationRecord[]) {
-  try { localStorage.setItem(KEY, JSON.stringify(records)) } catch { /* private mode etc. */ }
+export function loadRecords(): ConversationRecord[] {
+  return read<ConversationRecord[]>(RECORDS, [])
 }
 
 export function saveRecord(record: ConversationRecord) {
-  persist([record, ...load()])
+  write(RECORDS, [record, ...loadRecords().filter((r) => r.record_id !== record.record_id)])
+}
+
+export function updateRecord(record: ConversationRecord) {
+  write(RECORDS, loadRecords().map((r) => (r.record_id === record.record_id ? record : r)))
 }
 
 export function setFeedback(recordId: string, feedback: CompletedRecord['feedback']) {
-  persist(load().map((r) => (r.record_id === recordId && r.status === 'completed' ? { ...r, feedback } : r)))
+  write(RECORDS, loadRecords().map((r) => (r.record_id === recordId && r.status === 'completed' ? { ...r, feedback } : r)))
+}
+
+export function saveTrace(recordId: string, steps: TraceStep[]) {
+  write(TRACES, { ...read<Record<string, TraceStep[]>>(TRACES, {}), [recordId]: steps })
+}
+
+export function loadTrace(recordId: string): TraceStep[] {
+  return read<Record<string, TraceStep[]>>(TRACES, {})[recordId] ?? []
+}
+
+export function clearDemoData() {
+  try { localStorage.removeItem(RECORDS); localStorage.removeItem(TRACES) } catch { /* ignore */ }
 }
