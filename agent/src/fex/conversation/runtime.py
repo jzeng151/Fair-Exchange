@@ -44,11 +44,12 @@ def record_store():
 
 @lru_cache(maxsize=1)
 def default_engine() -> ConversationEngine:
-    from fex.guardrail import guarded_bedrock_model
+    from fex.guardrail import OutputAssessor, guarded_bedrock_model
 
     small, large = model_ids()
     return ConversationEngine(store=InMemoryStateStore(), small_model=guarded_bedrock_model(small),
-                              large_model=guarded_bedrock_model(large), records=record_store())
+                              large_model=guarded_bedrock_model(large), records=record_store(),
+                              output_assessor=OutputAssessor())
 
 
 def invoke(payload: dict[str, Any], engine: ConversationEngine | None = None) -> dict[str, Any]:

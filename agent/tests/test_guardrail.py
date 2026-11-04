@@ -205,3 +205,105 @@ def test_findings_change_nothing_in_the_conversation_or_the_record(table):
     record_text = json.dumps(guarded_record, default=str).lower()
     for marker in ("guardrail", "certification status and audit results", "insults", "worker grievances"):
         assert marker not in record_text
+
+
+# ---------------------------------------------------------------- output assessment (structured output)
+
+from fex.guardrail import OutputAssessor, narrative_texts  # noqa: E402
+
+# ApplyGuardrail returns a flat assessments list, not the Converse trace shape.
+OUTPUT_ASSESSMENT = {
+    "topicPolicy": {"topics": [{"name": "Worker grievances and complaints", "type": "DENY", "action": "NONE",
+                                "detected": True}]},
+    "contentPolicy": {"filters": [{"type": "INSULTS", "confidence": "HIGH", "action": "NONE", "detected": True}]},
+}
+
+
+class FakeBedrock:
+    """Records apply_guardrail calls and returns scripted assessments."""
+
+    def __init__(self, assessments=()):
+        self.assessments = list(assessments)
+        self.calls = []
+
+    def apply_guardrail(self, **kwargs):
+        self.calls.append(kwargs)
+        return {"action": "NONE", "assessments": self.assessments}
+
+
+def assessor(assessments=(), **kw) -> tuple[OutputAssessor, FakeBedrock]:
+    client = FakeBedrock(assessments)
+    return OutputAssessor(client=client, guardrail_id="gr-abc", version="3", **kw), client
+
+
+def test_output_assessment_checks_generated_text_as_output_source():
+    a, client = assessor()
+    a.assess(["The auditor said we failed."], "conv-1")
+    assert len(client.calls) == 1
+    call = client.calls[0]
+    assert call["source"] == "OUTPUT"
+    assert call["guardrailIdentifier"] == "gr-abc" and call["guardrailVersion"] == "3"
+    assert "The auditor said we failed." in call["content"][0]["text"]["text"]
+
+
+def test_output_findings_are_logged_with_conversation_id_and_no_text(caplog):
+    a, _ = assessor([OUTPUT_ASSESSMENT])
+    with caplog.at_level(logging.WARNING, logger="fex.guardrail"):
+        a.assess(["SECRET REPLY TEXT"], "conv-9")
+    logged = finding_logs(caplog)
+    assert {"source": "output", "policy": "topic", "category": "Worker grievances and complaints"} in [
+        {k: e[k] for k in ("source", "policy", "category")} for e in logged
+    ]
+    assert {e["conversation_id"] for e in logged} == {"conv-9"}
+    assert "SECRET REPLY TEXT" not in "\n".join(r.getMessage() for r in caplog.records)
+
+
+def test_output_assessment_is_skipped_when_unconfigured_or_empty():
+    client = FakeBedrock()
+    OutputAssessor(client=client, guardrail_id=None, version=None).assess(["text"], "c")
+    a, client2 = assessor()
+    a.assess(["", "   "], "c")
+    assert client.calls == [] and client2.calls == []
+
+
+def test_an_apply_guardrail_error_never_breaks_the_call(caplog):
+    class Boom(FakeBedrock):
+        def apply_guardrail(self, **kwargs):
+            raise RuntimeError("bedrock down")
+
+    a = OutputAssessor(client=Boom(), guardrail_id="gr-abc", version="3")
+    with caplog.at_level(logging.ERROR, logger="fex.guardrail"):
+        a.assess(["text"], "c")  # must not raise
+    assert "output guardrail assessment failed" in caplog.text
+
+
+def test_narrative_texts_are_only_producer_visible_free_text():
+    from tests.conversation_harness import claim as make_claim
+    from fex.conversation.engine import AnswerDraft, IntakeTurn, PlaybackDraft, RecordSummary, ShortReply
+    from fex.models import Claim
+
+    assert narrative_texts(IntakeTurn(reply="hola", ready_for_playback=False, language="es")) == ["hola"]
+    assert narrative_texts(ShortReply(reply="claro")) == ["claro"]
+    pb = PlaybackDraft(text="t", challenge="c", timing="ti", severity="s", tried="tr")
+    assert narrative_texts(pb) == ["t", "c", "ti", "s", "tr"]
+    summary = RecordSummary(summary_original="o", summary_english="e", tags=["water"])
+    assert narrative_texts(summary) == ["o", "e"]
+    answer_claim = Claim(**make_claim("Rain fell.", "SRC", "APS 1.1"))
+    texts = narrative_texts(AnswerDraft(insights=[answer_claim], peer_examples=[]))
+    assert texts == ["Rain fell."]
+    # Never the citation source or clause: those are not producer-written prose.
+    assert "SRC" not in texts and "APS 1.1" not in texts
+
+
+def test_engine_assesses_every_model_output_through_the_assessor():
+    """The end-to-end path: a full conversation runs each generated output through assess()."""
+    client = FakeBedrock()
+    a = OutputAssessor(client=client, guardrail_id="gr-abc", version="3")
+    r = Run()
+    r.engine.output_assessor = a
+    r.to_feedback()
+    # The generated texts with content: first intake reply, playback, summary, and the answer's claims.
+    # The second intake turn sets ready_for_playback with an empty reply, which carries no text to assess.
+    assert len(client.calls) == 4
+    assert all(c["source"] == "OUTPUT" for c in client.calls)
+    assert any("Rainfall fell." in c["content"][0]["text"]["text"] for c in client.calls)

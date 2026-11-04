@@ -23,7 +23,7 @@ from fex.conversation.scope import ScopeCheck, always_in_scope
 from fex.conversation.contract import (
     ActionEntry, ActionName, Answer, Event, Request, ResumeResponse, SpokenEntry,
 )
-from fex.guardrail import CONVERSATION_KEY
+from fex.guardrail import CONVERSATION_KEY, OutputAssessor, narrative_texts
 from fex.conversation.state import (
     ConversationState, Playback, Profile, ShownClaims, StateConflict, StateStore,
 )
@@ -206,7 +206,8 @@ class ConversationEngine:
     def __init__(self, *, store: StateStore, small_model: Any, large_model: Any, standards: Standards | None = None,
                  profiles: Callable[[str], Profile | None] | None = None, tools: list | None = None,
                  clock: Callable[[], datetime] | None = None, max_retries: int = 2,
-                 records: Any = None, scope_check: ScopeCheck | None = None) -> None:
+                 records: Any = None, scope_check: ScopeCheck | None = None,
+                 output_assessor: OutputAssessor | None = None) -> None:
         self.store = store
         self.small_model, self.large_model = small_model, large_model
         self.standards = standards or Standards.load()
@@ -216,6 +217,8 @@ class ConversationEngine:
         self.max_retries = max_retries
         self.records = records  # a fex.records.RecordStore; None = records are not saved (#26)
         self.scope_check = scope_check or always_in_scope  # how it decides is "Not decided" (#21)
+        # Assesses structured-output text, which the Converse guardrail skips (#12). No-op when unconfigured.
+        self.output_assessor = output_assessor or OutputAssessor()
 
     # ------------------------------------------------------------------ entrypoint
 
@@ -486,7 +489,9 @@ class ConversationEngine:
             raise _AgentFailed(str(exc)) from exc
         if errors := _tool_errors(agent.messages):  # a tool failure Strands returned as a result
             raise _AgentFailed("data tool failed: " + "; ".join(errors))
-        return result.structured_output, _tool_sources(agent.messages)
+        draft = result.structured_output
+        self.output_assessor.assess(narrative_texts(draft), state.conversation_id)
+        return draft, _tool_sources(agent.messages)
 
     def _answer_prompt(self, state: ConversationState) -> str:
         pb = state.playback
@@ -508,8 +513,10 @@ class ConversationEngine:
         """Small-model calls: no data tools are ever offered here."""
         agent = Agent(model=model, system_prompt=system, tools=[], callback_handler=None)
         # Only the conversation ID: no producer ID, step or entity type, so no data tool could ever run.
-        return agent(prompt, structured_output_model=output,
-                     invocation_state={CONVERSATION_KEY: state.conversation_id}).structured_output
+        result = agent(prompt, structured_output_model=output,
+                       invocation_state={CONVERSATION_KEY: state.conversation_id}).structured_output
+        self.output_assessor.assess(narrative_texts(result), state.conversation_id)
+        return result
 
     def _transcript(self, state: ConversationState) -> str:
         p = state.profile

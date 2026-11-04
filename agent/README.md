@@ -98,6 +98,9 @@ The Bedrock Guardrail is attached from `FEX_GUARDRAIL_ID` and `FEX_GUARDRAIL_VER
 input and output redaction explicitly off. Every policy is detect-only (CDK: `infra/lib/guardrail.ts`), so it
 never blocks or changes a conversation. Each detected policy is logged as one `guardrail_finding` JSON line
 (`conversation_id`, `source`, `policy`, `category`) at WARNING. It is never text, and never written to the record.
+FEX takes every model reply as structured output, which the Converse guardrail does not assess (it skips
+`toolUse.input`), so the generated text is checked separately with a detect-only `ApplyGuardrail` call
+(`OutputAssessor`, source `OUTPUT`). The reply is never changed; only policy and category are logged.
 If either variable is unset, the models run without the Guardrail and a warning is logged.
 Tests: `tests/test_guardrail.py`.
 ## Write-back (issue #26)

@@ -100,7 +100,12 @@ def log_findings(chunk: dict[str, Any], conversation_id: str | None) -> None:
 
 
 class GuardrailFindingsMixin:
-    """Mix into a Strands model to log Guardrail findings from its stream. Chunks pass through unchanged."""
+    """Mix into a Strands model to log Guardrail findings from its stream. Chunks pass through unchanged.
+
+    This covers the Converse *input* assessment. FEX takes every model output as structured output, which
+    Bedrock returns as tool-use arguments that the Converse guardrail does not assess, so generated text is
+    checked separately with `assess_output` after each call.
+    """
 
     async def stream(self, *args: Any, **kwargs: Any) -> AsyncIterator[Any]:
         conversation_id = (kwargs.get("invocation_state") or {}).get(CONVERSATION_KEY)
@@ -111,6 +116,67 @@ class GuardrailFindingsMixin:
                 except Exception:  # noqa: BLE001 - logging must never break a model call
                     log.exception("guardrail finding could not be logged for conversation %s", conversation_id)
             yield chunk
+
+
+class OutputAssessor:
+    """Runs a detect-only ApplyGuardrail pass over generated text and logs findings.
+
+    Converse guardrails skip the structured-output text (toolUse.input), so FEX assesses that text itself.
+    The call is OUTPUT-source and detect-only: the response is never changed, and only policy and category
+    are logged, never the text. A missing configuration or any error is swallowed, so a model call never
+    fails because of the assessment.
+    """
+
+    def __init__(self, client: Any | None = None, guardrail_id: str | None = None, version: str | None = None):
+        self._client = client
+        self._id = guardrail_id if guardrail_id is not None else os.environ.get(ENV_ID)
+        self._version = version if version is not None else os.environ.get(ENV_VERSION)
+
+    @property
+    def configured(self) -> bool:
+        return bool(self._id and self._version)
+
+    def _bedrock(self) -> Any:
+        if self._client is None:
+            import boto3
+
+            self._client = boto3.client("bedrock-runtime")
+        return self._client
+
+    def assess(self, texts: list[str], conversation_id: str | None) -> None:
+        joined = "\n\n".join(t for t in texts if t and t.strip())
+        if not joined or not self.configured:
+            return
+        try:
+            response = self._bedrock().apply_guardrail(
+                guardrailIdentifier=self._id, guardrailVersion=self._version,
+                source="OUTPUT", content=[{"text": {"text": joined}}],
+            )
+        except Exception:  # noqa: BLE001 - assessment must never break a model call
+            log.exception("output guardrail assessment failed for conversation %s", conversation_id)
+            return
+        # ApplyGuardrail returns a flat list of assessments, not the Converse trace shape.
+        for assessment in response.get("assessments") or []:
+            for finding in _from_assessment(assessment, "output"):
+                log.warning("guardrail_finding %s", json.dumps(
+                    {"event": "guardrail_finding", "conversation_id": conversation_id, **finding}))
+
+
+#: Narrative text to assess, per structured-output model. Only free text a producer could see; never tags,
+#: booleans, citations or source identifiers.
+def narrative_texts(output: Any) -> list[str]:
+    name = type(output).__name__
+    if name == "IntakeTurn":
+        return [output.reply]
+    if name == "PlaybackDraft":
+        return [output.text, output.challenge, output.timing, output.severity, output.tried]
+    if name == "RecordSummary":
+        return [output.summary_original, output.summary_english or ""]
+    if name == "ShortReply":
+        return [output.reply]
+    if name == "AnswerDraft":
+        return [c.text for c in [*output.insights, *output.peer_examples]]
+    return []
 
 
 class GuardedBedrockModel(GuardrailFindingsMixin, BedrockModel):

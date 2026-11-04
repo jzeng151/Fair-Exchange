@@ -55,6 +55,7 @@ Contract: `docs/specs/12-guardrail.md`. CDK: `infra/lib/guardrail.ts` (`FexGuard
   - Set the env vars from `guardrail.runtimeEnvironment` (`FEX_GUARDRAIL_ID`, `FEX_GUARDRAIL_VERSION`).
   - Call `guardrail.grantApply(executionRole)` for `bedrock:ApplyGuardrail`.
   - The hello-world spike runtime is not wired.
+- **Output text:** model replies are returned as structured output (tool-use input), which the Converse guardrail does not assess. FEX assesses that text with a detect-only `ApplyGuardrail` call (source `OUTPUT`) and logs findings the same way. This needs `bedrock:ApplyGuardrail` on the runtime role (`grantApply`), which is required regardless.
 - **CloudWatch:** each finding is one log line, `guardrail_finding {"event": "guardrail_finding", "conversation_id", "source", "policy", "category"}`, with no text.
   - Logs Insights: `filter @message like /guardrail_finding/`.
 - **Not yet verified on AWS:** the spec's spike check (detect-mode assessments appear in the trace when every action is `NONE`) and the seam 3 smoke test. Both need the FEX runtime deployed.
