@@ -232,8 +232,13 @@ class ConversationEngine:
         if request.kind == "start":
             state = state or self._new_state(request.producer_id, request.conversation_id)
             if not state.history:  # a repeated start just reports where the conversation is
-                opening = self._ask(state, turn, INTAKE_SYSTEM,
-                                    self._transcript(state) + "\n\nStart the conversation with an open question.")
+                # Opening language (#22): the profile's language if it has one, otherwise English. Nobody has
+                # written yet, so the model's guess doesn't set it; intake switches once the producer writes.
+                state.language = state.profile.language or "en"
+                opening = self._structured(
+                    self.small_model, INTAKE_SYSTEM,
+                    self._transcript(state) + f"\n\nStart the conversation with an open question, written in the "
+                    f"language with ISO 639-1 code '{state.language}'.", IntakeTurn)
                 turn.say(opening.reply)
             return self._finish(state, turn, step_changed=True)
 

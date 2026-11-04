@@ -23,6 +23,7 @@ class Profile(BaseModel):
     region: str | None = None
     crop: str | None = None
     entity_type: str | None = None
+    language: str | None = Field(default=None, description="ISO 639-1 code, if the profile has one (#22)")
 
 
 class Playback(BaseModel):
