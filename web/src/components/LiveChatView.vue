@@ -5,7 +5,7 @@
 import { computed, nextTick, reactive, ref } from 'vue'
 import FexMark from './FexMark.vue'
 import { copyFor } from '../data/liveCopy'
-import { liveProducers } from '../data/liveProducers'
+import { languageName, liveProducers } from '../data/liveProducers'
 import { createLiveClient, LiveError } from '../lib/liveClient'
 import { apply, beginTurn, fromResume, newView, said } from '../lib/liveView'
 import type { ActionName, LiveClient, StreamEvent } from '../lib/liveClient'
@@ -164,12 +164,14 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
           <p class="small">Chat API: <code>{{ apiUrl }}</code></p>
         </div>
       </section>
-      <h1>Choose a sample producer</h1>
+      <h1>Choose a demo scenario</h1>
+      <p class="small">Each card is an official demo scenario (<code>eval/scenarios/</code>): a sample producer and the messages to send.</p>
       <div class="picker-cards">
-        <button v-for="p in liveProducers" :key="p.id" class="picker-card" :data-producer="p.id" @click="pick(p.id)">
+        <button v-for="p in liveProducers" :key="p.scenarioId" class="picker-card" :data-producer="p.id" :data-scenario="p.scenarioId" @click="pick(p.id)">
           <span class="flag" aria-hidden="true">{{ p.flag }}</span>
-          <strong>{{ p.place }}</strong>
-          <span class="small">{{ p.crop }}</span>
+          <strong>{{ p.title }}</strong>
+          <span class="label neutral">{{ languageName[p.language] ?? p.language }}</span>
+          <span class="small">Scenario <code>{{ p.scenarioId }}</code></span>
         </button>
       </div>
     </div>
@@ -177,7 +179,7 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
     <div v-else class="layout phone">
       <div class="chat-links">
         <button class="btn-text back-link" @click="back">← Choose another producer</button>
-        <span class="small">{{ producer?.flag }} {{ producer?.place }}</span>
+        <span class="small">{{ producer?.flag }} {{ producer?.title }}</span>
       </div>
       <section class="chat-panel" aria-label="Conversation">
         <div class="transcript" ref="scroller" aria-live="polite">
@@ -210,11 +212,11 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
         </div>
         <div v-if="!view.busy && view.conversationId" class="live-actions">
           <div v-if="view.step === 'playback'" class="btn-row">
-            <button v-if="can('confirm_playback')" class="btn-primary" @click="act('confirm_playback')">{{ t.confirm }}</button>
-            <button v-if="can('correct_playback')" class="btn-default" @click="correcting = true">{{ t.correct }}</button>
+            <button v-if="can('confirm_playback')" class="btn-primary" data-action="confirm_playback" @click="act('confirm_playback')">{{ t.confirm }}</button>
+            <button v-if="can('correct_playback')" class="btn-default" data-action="correct_playback" @click="correcting = true">{{ t.correct }}</button>
           </div>
           <div v-if="can('retry_answer')" class="btn-row">
-            <button class="btn-primary" @click="act('retry_answer')">{{ t.retry }}</button>
+            <button class="btn-primary" data-action="retry_answer" @click="act('retry_answer')">{{ t.retry }}</button>
           </div>
           <div v-if="can('set_consent') && (view.step === 'consent' || changingConsent)" class="choice">
             <p>{{ t.consentAsk }}</p>
@@ -235,7 +237,7 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
             </div>
           </div>
           <div class="btn-row secondary">
-            <button v-if="can('reopen_playback')" class="btn-text" @click="act('reopen_playback')">{{ t.reopen }}</button>
+            <button v-if="can('reopen_playback')" class="btn-text" data-action="reopen_playback" @click="act('reopen_playback')">{{ t.reopen }}</button>
             <button v-if="can('end')" class="btn-text" data-action="end" @click="act('end')">
               {{ view.step === 'intake' || view.step === 'playback' || view.step === 'respond' ? t.stop : t.end }}
             </button>
