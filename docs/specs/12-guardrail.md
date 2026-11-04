@@ -35,7 +35,7 @@ One Guardrail, defined in CDK, attached to every Bedrock model call FEX makes, w
 ## Out of Scope
 
 - Blocking or masking anything
-- French PII (#24)
+- French PII (#24). When built, the [#24 spec](24-french-exchange.md) adds a detect-only sensitive-information filter to this Guardrail.
 
 ## Further Notes
 

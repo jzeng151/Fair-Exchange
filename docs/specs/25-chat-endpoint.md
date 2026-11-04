@@ -57,6 +57,7 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 | `POST /conversations/{id}/actions` | yes | Body `{ "action": string, "args": object }` (agent `action`); actions are defined in the [#13 spec](13-conversation-steps.md) |
 | `GET /conversations/{id}` | no | History, current step and allowed actions (agent `resume`), for open or closed conversations |
 | `GET /conversations` | no | The caller's conversations, newest first: ID, created time, open or closed |
+| Voice routes | no | Added by the [#41 spec](41-voice-notes.md) when built |
 
 - **Identity:** every route resolves the caller first through the identity-resolution function ([#11 spec](11-identity.md)).
 - **Unknown fields:** bodies with unknown fields, including any producer ID or conversation ID, get 400.
