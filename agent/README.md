@@ -80,6 +80,16 @@ intake → playback → respond → consent → feedback → closed
 - **Tests:** `tests/test_conversation_steps.py` (seam 1: scripted Strands models in `tests/conversation_harness.py`,
   real tools and data, real verifier).
 
+## Out-of-scope requests (issue #21)
+
+Every typed message first goes through one detection function, `scope_check(text, step) -> ScopeVerdict`
+(`fex/conversation/scope.py`), following [`docs/specs/21-out-of-scope.md`](../docs/specs/21-out-of-scope.md).
+An out-of-scope message (another producer's data, certification or audit results, grievances) gets fixed
+decline text in the producer's language plus an offer to return to the open question. No model is called, no
+data tool runs, and the step stays the same. The exchange stays in the resume history but is never given to a
+model, so it can't reach the playback, summaries or record. **How detection decides is "Not decided"**: the
+default, `always_in_scope`, treats everything as in scope. Pass `scope_check=` to `ConversationEngine` to plug one in.
+
 ## Write-back (issue #26)
 
 `fex.records` builds the record from the conversation state and saves it, following

@@ -66,6 +66,9 @@ class ConversationState(BaseModel):
     feedback: FeedbackValue | None = None
     evidence_sources: list[str] = Field(default_factory=list, description="Sources tools returned this session")
     history: list[HistoryEntry] = Field(default_factory=list)
+    excluded_history: list[int] = Field(
+        default_factory=list, description="History positions of out-of-scope exchanges (#21): shown on resume, "
+                                          "never given to a model, so they can't reach the playback or record")
     closed_reason: Literal["end", "inactivity", "max_lifetime"] | None = None
     closed_at: datetime | None = None
     # Write-back (#26): what this conversation last saved, for conditional updates and no-op detection
