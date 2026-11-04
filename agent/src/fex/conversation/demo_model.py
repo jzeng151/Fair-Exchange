@@ -1,9 +1,10 @@
 """A deterministic demo model (#101): runs the REAL engine end to end with no AWS and no cost.
 
 It is a Strands model, so the engine treats it exactly like Claude: it answers each structured-output request
-the engine makes (IntakeTurn, PlaybackDraft, RecordSummary, ShortReply, AnswerDraft) and, when writing an
-answer, calls the REAL data tools first and builds claims only from what they returned, citing their sources
-and a real APS clause, so the REAL citation verifier passes them. It doesn't understand language: it follows
+the engine makes (IntakeTurn, PlaybackDraft, RecordSummary, ShortReply, AnswerDraft). In the retrieval call
+it calls every REAL data tool once (#17); in the claim-writing call it builds claims only from the items the
+engine gives it, citing their sources and a clause the standards tool returned, so the REAL citation verifier
+passes them. It doesn't understand language: it follows
 the intake script, detects Spanish from simple markers, and tags from keywords. Not for producers: for local
 runs, demos without AWS and integration tests. Real Claude is one setting away (FEX_DEMO_MODELS unset).
 """
@@ -40,11 +41,7 @@ TAG_KEYWORDS = [
     ("financial and access to capital", ("crédito", "credit", "préstamo", "loan")),
     ("climate and weather", ("lluvia", "rain", "sequía", "drought", "clima", "weather", "calor", "heat")),
 ]
-# Related APS clause per tag (all exist in the standards; the demo mapping the web demo also uses).
-CLAUSES = {"climate and weather": "APS 4.1.1", "water": "APS 4.1.1", "soil and land": "APS 4.2.1",
-           "biodiversity and conservation": "APS 4.2.1", "market and price": "APS 5.2.3",
-           "labor and migration": "APS 3.3.1"}
-DEFAULT_CLAUSE = "APS 1.2.2"
+ITEMS_HEADER = "Items the data tools returned (cite only these):"
 
 
 def _text_of(messages: list[dict]) -> str:
@@ -70,18 +67,24 @@ def tags_for(text: str) -> list[str]:
     return tags[:2] or ["climate and weather"]
 
 
-def _tool_results(messages: list[dict]) -> dict[str, Any]:
-    """The JSON each tool returned so far, by tool name."""
-    names = {b["toolUse"]["toolUseId"]: b["toolUse"]["name"]
-             for m in messages for b in m["content"] if "toolUse" in b}
-    out = {}
-    for m in messages:
-        for b in m["content"]:
-            result = b.get("toolResult")
-            if result and result.get("content"):
-                part = result["content"][0]
-                out[names.get(result["toolUseId"], "?")] = part.get("json") or json.loads(part.get("text") or "null")
-    return out
+def _tools_called(messages: list[dict]) -> set[str]:
+    return {b["toolUse"]["name"] for m in messages for b in m["content"] if "toolUse" in b}
+
+
+def _items(prompt: str) -> list[dict]:
+    """The items the engine put in the claim-writing prompt, one JSON object per line."""
+    _, _, block = prompt.partition(ITEMS_HEADER)
+    items = []
+    for line in block.splitlines():
+        line = line.strip()
+        if line.startswith("{"):
+            try:
+                items.append(json.loads(line))
+            except ValueError:
+                break
+        elif items:
+            break
+    return items
 
 
 class DemoModel(Model):
@@ -101,18 +104,30 @@ class DemoModel(Model):
         names = [s["name"] for s in (tool_specs or [])]
         output = next((n for n in OUTPUTS if n in names), None)
         prompt = _text_of(messages)
-        if output == "AnswerDraft":
-            name, data = self._answer_step(prompt, messages)
-        else:
-            name, data = output, getattr(self, f"_{output}")(prompt)
-        call_id = f"demo-{len(messages)}"
         yield {"messageStart": {"role": "assistant"}}
-        yield {"contentBlockStart": {"start": {"toolUse": {"toolUseId": call_id, "name": name}}}}
+        if output is None:  # the retrieval call: every data tool once, then done
+            name = next((n for n in names if n not in _tools_called(messages)), None)
+            if name is None:
+                yield {"contentBlockStart": {"start": {}}}
+                yield {"contentBlockDelta": {"delta": {"text": "done"}}}
+                yield {"contentBlockStop": {}}
+                yield {"messageStop": {"stopReason": "end_turn"}}
+            else:
+                for event in self._tool_use(messages, name, {}):
+                    yield event
+        else:
+            data = self._answer(prompt) if output == "AnswerDraft" else getattr(self, f"_{output}")(prompt)
+            for event in self._tool_use(messages, output, data):
+                yield event
+        yield {"metadata": {"usage": {"inputTokens": len(prompt) // 4, "outputTokens": 50, "totalTokens": 0},
+                            "metrics": {"latencyMs": 0}}}
+
+    @staticmethod
+    def _tool_use(messages: list[dict], name: str, data: dict):
+        yield {"contentBlockStart": {"start": {"toolUse": {"toolUseId": f"demo-{len(messages)}", "name": name}}}}
         yield {"contentBlockDelta": {"delta": {"toolUse": {"input": json.dumps(data, ensure_ascii=False)}}}}
         yield {"contentBlockStop": {}}
         yield {"messageStop": {"stopReason": "tool_use"}}
-        yield {"metadata": {"usage": {"inputTokens": len(prompt) // 4, "outputTokens": 50, "totalTokens": 0},
-                            "metrics": {"latencyMs": 0}}}
 
     # ------------------------------------------------------------------ one method per structured output
 
@@ -143,22 +158,23 @@ class DemoModel(Model):
     def _ShortReply(self, prompt: str) -> dict:
         return {"reply": SHORT_REPLY[_language(prompt)]}
 
-    def _answer_step(self, prompt: str, messages: list[dict]) -> tuple[str, dict]:
-        """Like a model with tools: look up regional data, then peer examples, then write cited claims."""
-        situation = json.loads(re.search(r"Confirmed situation: (\{.*\})", prompt).group(1))
-        tag = (situation.get("tags") or ["climate and weather"])[0]
-        results = _tool_results(messages)
-        if "get_regional_context" not in results:
-            return "get_regional_context", {}
-        if "find_peer_examples" not in results:
-            return "find_peer_examples", {"challenge": tag}
-        clause = CLAUSES.get(tag, DEFAULT_CLAUSE)
-        regional, peers = results["get_regional_context"] or {}, results["find_peer_examples"] or []
-        facts = regional.get("facts", []) if isinstance(regional, dict) else []
-        insights = [{"text": f["text"], "citation": {"source": f["source"], "standard_clause": clause,
-                                                     "period": f.get("period"), "strength": f.get("strength", "exact")}}
-                    for f in facts[:2]]
-        examples = [{"text": f"{p['action']} Intended outcome: {p['intended_outcome']}",
-                     "citation": {"source": p["source"], "standard_clause": clause, "strength": "nearest"}}
-                    for p in (peers if isinstance(peers, list) else [])[:2]]
-        return "AnswerDraft", {"insights": insights, "peer_examples": examples}
+    def _answer(self, prompt: str) -> dict:
+        """Cited claims from the items given: regional facts (else the producer's record) and peer projects,
+        each citing the first clause the standards tool returned."""
+        items = _items(prompt)
+        clauses = [i["source"] for i in items if i["kind"] == "standard"]
+        if not clauses:
+            return {"insights": [], "peer_examples": []}
+        facts = [i for i in items if i["kind"] == "regional"] or [i for i in items if i["kind"] == "producer_record"]
+        peers = [i for i in items if i["kind"] == "peer"]
+
+        def claim(item: dict, text: str) -> dict:
+            return {"text": text, "citation": {"source": item["source"], "standard_clause": clauses[0],
+                                               "period": item.get("period"), "strength": item["strength"]}}
+
+        def peer_text(item: dict) -> str:
+            data = item["data"]
+            return f"{data['action']} Intended outcome: {data['intended_outcome']}" if data.get("action") else item["text"]
+
+        return {"insights": [claim(f, f["text"]) for f in facts[:2]],
+                "peer_examples": [claim(p, peer_text(p)) for p in peers[:2]]}

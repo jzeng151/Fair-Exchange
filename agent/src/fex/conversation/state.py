@@ -15,6 +15,17 @@ from fex.conversation.contract import (
     Answer, ConsentScope, Evidence, FeedbackValue, HistoryEntry, Step,
 )
 from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer
+from fex.verifier import SessionEvidence, SourceKind
+
+
+class DecisionLogEntry(BaseModel):
+    """One step of the agent's reasoning trail (#26). `refs` holds opaque IDs only: tool names, the
+    bracketed item IDs from sources, clause IDs. Never free text, model output or producer words."""
+
+    at: datetime
+    kind: Literal["step", "tool", "verifier", "pii"]
+    code: str
+    refs: list[str] = Field(default_factory=list)
 
 
 class Profile(BaseModel):
@@ -67,7 +78,10 @@ class ConversationState(BaseModel):
     consent: ConsentScope | None = None
     consent_history: list[ConsentChoice] = Field(default_factory=list)
     feedback: FeedbackValue | None = None
-    evidence_sources: list[str] = Field(default_factory=list, description="Sources tools returned this session")
+    evidence_sources: dict[str, SourceKind] = Field(
+        default_factory=dict, description="Source label -> kind, for every item the data tools returned (#17)")
+    evidence_clauses: list[str] = Field(default_factory=list, description="Clause IDs the standards tool returned")
+    decision_log: list[DecisionLogEntry] = Field(default_factory=list)
     history: list[HistoryEntry] = Field(default_factory=list)
     pii: PiiScanState | None = Field(
         default=None, description="PII scan tracking (#20): per-text status plus the accumulated flag, "
@@ -88,6 +102,13 @@ class ConversationState(BaseModel):
     @property
     def effective_entity_type(self) -> str | None:
         return self.entity_type or self.profile.entity_type
+
+    def session_evidence(self) -> SessionEvidence:
+        return SessionEvidence(sources=dict(self.evidence_sources), clauses=set(self.evidence_clauses))
+
+    def keep_evidence(self, evidence: SessionEvidence) -> None:
+        self.evidence_sources = dict(sorted(evidence.sources.items()))
+        self.evidence_clauses = sorted(evidence.clauses)
 
 
 class StateConflict(Exception):

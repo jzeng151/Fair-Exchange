@@ -24,17 +24,18 @@ def test_model_cannot_set_any_parameter():
 
 def test_returns_cited_facts_for_the_session_producers_own_region():
     pid = _producer("Colombia", "coffee")
-    status, answer = call_tool(get_regional_context, {}, {"producer_id": pid})
-    assert status == "success" and answer["matched"] and answer["match_level"] == "region"
+    status, items = call_tool(get_regional_context, {}, {"producer_id": pid})
+    assert status == "success" and items
     profile = PROFILES.get(pid)
-    assert answer["region"]["region"] == profile.region
-    sources = {f["source"] for f in answer["facts"]}
+    sources = {i["source"] for i in items}
     assert any(s.startswith("CHIRPS") for s in sources)
     assert any(s.startswith("WRI Aqueduct") for s in sources)
     assert any(s.startswith("World Bank") for s in sources)
-    for fact in answer["facts"]:
-        assert fact["text"] and fact["source"] and fact["period"]
-        assert fact["strength"] in {"exact", "nearest", "limited"}
+    for item in items:  # the data tool contract (#17)
+        assert set(item) == {"source", "kind", "text", "period", "strength", "data"}
+        assert item["kind"] == "regional" and item["text"] and item["source"] and item["period"]
+        assert item["strength"] in {"exact", "nearest", "limited"}
+        assert item["data"]["match_level"] == "region" and item["data"]["region"]["region"] == profile.region
 
 
 def test_a_location_supplied_by_the_model_is_ignored():
@@ -48,14 +49,13 @@ def test_a_location_supplied_by_the_model_is_ignored():
 def test_different_regions_get_different_facts():
     _, a = call_tool(get_regional_context, {}, {"producer_id": _producer("Colombia", "coffee")})
     _, b = call_tool(get_regional_context, {}, {"producer_id": _producer("Peru", "coffee")})
-    assert a["region"] != b["region"]
-    assert [f["text"] for f in a["facts"]] != [f["text"] for f in b["facts"]]
+    assert a[0]["data"]["region"] != b[0]["data"]["region"]
+    assert [i["text"] for i in a] != [i["text"] for i in b]
 
 
 def test_unknown_producer_gets_no_facts():
     status, answer = call_tool(get_regional_context, {}, {"producer_id": "NOT-A-PRODUCER"})
-    assert status == "success" and answer == {"matched": False, "match_level": "none", "facts": [],
-                                              "note": "This producer's location is not on record."}
+    assert status == "success" and answer == []  # empty, not an error: the limited-evidence path
 
 
 def test_no_producer_in_session_is_refused():

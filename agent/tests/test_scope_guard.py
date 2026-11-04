@@ -1,11 +1,19 @@
-"""Scope guard: no tool may let the model choose which producer's data it reads."""
-from fex.tools import ALL_TOOLS
+"""Scope guard (#17 data tool contract): the model can call a data tool but cannot steer what it reads.
 
-FORBIDDEN = {"producer_id", "producerid", "account_sk", "location", "country", "region", "crop",
-             "entity_type"}
+Every data tool reads the producer, profile, tags and summaries from the invocation state, so no tool
+may expose any input property at all (a deny-list of names let the old `challenge` parameter through).
+"""
+import pytest
+
+from fex.tools import ALL_TOOLS, DATA_TOOLS
 
 
-def test_no_tool_exposes_producer_or_location_parameters():
-    for t in ALL_TOOLS:
-        params = {p.lower() for p in t.tool_spec["inputSchema"]["json"]["properties"]}
-        assert not (params & FORBIDDEN), f"{t.tool_name} exposes {params & FORBIDDEN}"
+@pytest.mark.parametrize("tool", ALL_TOOLS, ids=lambda t: t.tool_name)
+def test_no_data_tool_exposes_any_input_property(tool):
+    schema = tool.tool_spec["inputSchema"]["json"]
+    assert schema.get("properties", {}) == {}, f"{tool.tool_name} exposes {list(schema['properties'])}"
+    assert not schema.get("required")
+
+
+def test_every_tool_offered_to_the_model_is_under_the_data_tool_contract():
+    assert {t.tool_name for t in ALL_TOOLS} == set(DATA_TOOLS)
