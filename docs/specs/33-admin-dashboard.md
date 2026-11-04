@@ -16,7 +16,7 @@ An admin route in the same Vue app that shows each breakdown from the Analytics 
 2. As an FTUSA admin, I want hidden cells to read "Hidden for privacy" rather than disappear, so that I know data exists but is protected.
 3. As an FTUSA admin, I want a toggle to include pending records, so that I can see recent activity (cells that would reveal small pending counts stay hidden).
 4. As an FTUSA admin, I want seeded demo data shown in its own clearly labeled section, so that I do not mistake it for real activity.
-5. As an FTUSA admin, I want the AI footprint shown, so that I can see model usage.
+5. As an FTUSA admin, I want the AI footprint (total tokens per model) shown, so that I can see model usage.
 
 ## Implementation Decisions
 
@@ -30,7 +30,7 @@ An admin route in the same Vue app that shows each breakdown from the Analytics 
 
 - **Component tests (Vitest with Vue Test Utils)** with a mocked API response:
   - suppressed cells show "Hidden for privacy" and no number or size hint;
-  - a hidden AI footprint shows "Hidden for privacy" for its totals and average;
+  - the AI footprint shows total tokens per model, with no count or average;
   - no client-side totals are computed;
   - seeded and live sections are shown separately and never summed;
   - a 503 shows the retry message;
