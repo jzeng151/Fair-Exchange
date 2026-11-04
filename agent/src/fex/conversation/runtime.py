@@ -61,8 +61,11 @@ def default_engine() -> ConversationEngine:
     if demo_models():  # local runs (#101): no Bedrock, no Comprehend, no AWS at all
         from fex.conversation.demo_model import DemoModel
 
+        from fex.tools.standards import LocalClauseRetriever
+
         demo = DemoModel()
-        return ConversationEngine(store=InMemoryStateStore(), small_model=demo, large_model=demo, records=records)
+        return ConversationEngine(store=InMemoryStateStore(), small_model=demo, large_model=demo, records=records,
+                                  retriever=LocalClauseRetriever())
     small, large = model_ids()
     # The Comprehend seam (#20): scans run only when records are configured — they are part of saving one.
     pii_scanner = None

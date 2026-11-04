@@ -12,6 +12,7 @@ from fex.conversation import ConversationEngine, InMemoryStateStore
 from fex.conversation.demo_model import DemoModel
 from fex.models import parse_record
 from fex.records.local import FileRecordStore
+from fex.tools.standards import LocalClauseRetriever
 
 SPANISH = ["La lluvia ha bajado mucho y la cosecha de café cayó este año.",
            "Empezó hace dos temporadas.", "Es grave, perdimos casi la mitad.",
@@ -27,7 +28,7 @@ def cauca() -> str:
 def engine(tmp_path, model=None):
     model = model or DemoModel()
     return ConversationEngine(store=InMemoryStateStore(), small_model=model, large_model=model,
-                              records=FileRecordStore(tmp_path))
+                              records=FileRecordStore(tmp_path), retriever=LocalClauseRetriever())
 
 
 def talk(eng, producer, conversation, messages):

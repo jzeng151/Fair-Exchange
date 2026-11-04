@@ -69,6 +69,19 @@ class BedrockKbRetriever:
         return clauses
 
 
+class LocalClauseRetriever:
+    """Keyword search over the shipped clause table (fx_data.standards), for demo and local runs with no AWS
+    (FEX_DEMO_MODELS=1). Not the spec's retrieval: deployed runs use the Knowledge Base."""
+
+    def __init__(self, standards: Any = None) -> None:
+        from fx_data.standards import Standards
+        self.standards = standards or Standards.load()
+
+    def retrieve(self, query: str, limit: int) -> list[RetrievedClause]:
+        return [RetrievedClause(clause_id=c["id"], standard=c["standard"], text=c["text"].get("en", ""))
+                for c in self.standards.search(query, limit=limit)]
+
+
 def default_retriever() -> ClauseRetriever | None:
     """The Bedrock retriever when the Knowledge Base ID is configured (set by the deploy), else None."""
     kb_id = os.environ.get(KB_ID_ENV)
