@@ -34,7 +34,8 @@ cleanup() {
 }
 trap cleanup EXIT
 
-(cd "$root/agent" && uv sync --locked -q && uv run --no-sync python scripts/serve_local.py) >"$logs/agent.log" 2>&1 &
+# --reinstall-package: fx-data is a local path dependency, and uv keeps an old installed copy after data/ changes
+(cd "$root/agent" && uv sync --locked -q --reinstall-package fx-data && uv run --no-sync python scripts/serve_local.py) >"$logs/agent.log" 2>&1 &
 (cd "$root/api" && npm ci --silent && npx --yes tsx@4.19.2 src/local/main.ts) >"$logs/api.log" 2>&1 &
 
 wait_for() { for _ in $(seq 1 120); do curl -s -o /dev/null "$1" && return 0; sleep 1; done; echo "not ready: $1 (logs in $logs)"; exit 1; }
