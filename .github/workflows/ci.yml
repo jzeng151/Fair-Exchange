@@ -1,115 +1,107 @@
-# CI for Fair Exchange (issue #10). Runs on every pull request and on pushes to main.
-# Each job skips with a notice when its folder doesn't exist yet, and starts running
-# automatically once that folder lands (e.g. infra/ with #5).
 name: CI
 
 on:
   pull_request:
   push:
     branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ci-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
-  pytest:
-    name: pytest (${{ matrix.package }})
+  checks:
+    name: Scaffold checks
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package: [agent, data, eval]
-    defaults:
-      run:
-        working-directory: ${{ matrix.package }}
+    timeout-minutes: 15
+    env:
+      AWS_EC2_METADATA_DISABLED: 'true'
+      AWS_DEFAULT_REGION: us-west-2
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Check the package exists
-        id: present
-        working-directory: .
-        run: |
-          if [ -f "${{ matrix.package }}/pyproject.toml" ]; then
-            echo "yes=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::${{ matrix.package }}/ has no pyproject.toml yet; skipping"
-          fi
-
-      - name: Set up uv
-        if: steps.present.outputs.yes == 'true'
-        uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          enable-cache: true
-
-      - name: Install (locked versions)
-        if: steps.present.outputs.yes == 'true'
-        run: uv sync --python 3.12 --locked
-
-      - name: Run tests
-        if: steps.present.outputs.yes == 'true'
-        run: uv run pytest -q
-
-  tsc:
-    name: tsc
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
-          node-version: 20
-
-      - name: Type-check TypeScript in api/, web/ and infra/
-        run: |
-          shopt -s globstar nullglob
-          checked=0
-          for dir in api web infra; do
-            [ -d "$dir" ] || continue
-            if [ -f "$dir/tsconfig.json" ]; then
-              echo "::group::tsc -p $dir"
-              if [ -f "$dir/package-lock.json" ]; then (cd "$dir" && npm ci); elif [ -f "$dir/package.json" ]; then (cd "$dir" && npm install); fi
-              (cd "$dir" && npx --yes -p typescript@5.6.3 tsc --noEmit -p .)
-              echo "::endgroup::"
-              checked=1
-            else
-              files=("$dir"/**/*.ts)
-              if [ ${#files[@]} -gt 0 ]; then
-                echo "::group::tsc --strict ${files[*]}"
-                npx --yes -p typescript@5.6.3 tsc --noEmit --strict "${files[@]}"
-                echo "::endgroup::"
-                checked=1
-              fi
-            fi
-          done
-          if [ "$checked" = 0 ]; then echo "::notice::no TypeScript in api/, web/ or infra/ yet; skipping"; fi
-
-  cdk-synth:
-    name: cdk synth
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Check infra/ exists
-        id: present
-        run: |
-          if [ -f infra/cdk.json ]; then
-            echo "yes=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "::notice::infra/ has no cdk.json yet (issue #5); skipping"
-          fi
-
-      - uses: actions/setup-node@v4
-        if: steps.present.outputs.yes == 'true'
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: Fair-Exchange-Scaffolding/*/package-lock.json
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
-          node-version: 20
-
-      - name: Synthesize the CDK app (no AWS credentials; nothing is deployed)
-        if: steps.present.outputs.yes == 'true'
-        working-directory: infra
+          version: '0.13.7'
+          python-version: '3.12'
+      - name: Python tests
+        working-directory: Fair-Exchange-Scaffolding/agent
         run: |
-          if [ -f package-lock.json ]; then npm ci; else npm install; fi
+          uv sync --locked
+          uv run --no-sync pytest tests ../eval/tests
+      # Root packages: the real code merged so far (record schema, standards, verifier).
+      # Each step skips until its folder exists on the branch being checked.
+      - name: Root agent tests
+        if: hashFiles('agent/pyproject.toml') != ''
+        working-directory: agent
+        run: |
+          uv sync --locked
+          uv run --no-sync pytest
+      - name: Root data tests
+        if: hashFiles('data/pyproject.toml') != ''
+        working-directory: data
+        run: |
+          uv sync --locked
+          uv run --no-sync pytest
+      - name: Generated record types compile
+        if: hashFiles('api/src/types/*.ts') != ''
+        run: npx --yes -p typescript@5.6.3 tsc --noEmit --strict api/src/types/*.ts
+      - name: API type check
+        working-directory: Fair-Exchange-Scaffolding/api
+        run: npm ci && npm run typecheck
+      - name: Web build and type check
+        working-directory: Fair-Exchange-Scaffolding/web
+        run: npm ci && npm run build
+      - name: Infrastructure type check and synthesis
+        working-directory: Fair-Exchange-Scaffolding/infra
+        run: |
+          npm ci
+          npx tsc --noEmit
           npx cdk synth --quiet
+
+  deploy:
+    name: Publish sandbox
+    needs: checks
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && vars.AWS_DEPLOY_ROLE_ARN != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: fair-exchange-sandbox-deploy
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      EXPECTED_AWS_ACCOUNT: '100300582834'
+      AWS_REGION: us-west-2
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: Fair-Exchange-Scaffolding/web/package-lock.json
+      - name: Build website
+        working-directory: Fair-Exchange-Scaffolding/web
+        run: npm ci && npm run build
+      - name: Authenticate to sandbox
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-west-2
+          allowed-account-ids: '100300582834'
+          role-session-name: GitHub-${{ github.run_id }}
+      - name: Publish and verify website
+        run: bash Fair-Exchange-Scaffolding/infra/publish-web.sh

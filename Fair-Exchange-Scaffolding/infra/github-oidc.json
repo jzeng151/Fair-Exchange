@@ -1,0 +1,177 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "GitHub OIDC identity for publishing the Fair Exchange sandbox website only.",
+  "Parameters": {
+    "WebBucket": {
+      "Type": "String"
+    },
+    "WebDistribution": {
+      "Type": "String"
+    },
+    "WebKey": {
+      "Type": "String"
+    },
+    "ValidationBranch": {
+      "Type": "String",
+      "Default": "",
+      "AllowedValues": [
+        "",
+        "chore/deploy-sandbox"
+      ]
+    }
+  },
+  "Conditions": {
+    "ValidateBranch": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "ValidationBranch"
+            },
+            ""
+          ]
+        }
+      ]
+    }
+  },
+  "Resources": {
+    "GitHubProvider": {
+      "Type": "AWS::IAM::OIDCProvider",
+      "Properties": {
+        "Url": "https://token.actions.githubusercontent.com",
+        "ClientIdList": [
+          "sts.amazonaws.com"
+        ]
+      }
+    },
+    "DeployRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "FairExchangeGitHubDeploy",
+        "MaxSessionDuration": 3600,
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": {
+                  "Ref": "GitHubProvider"
+                }
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+                  "token.actions.githubusercontent.com:sub": {
+                    "Fn::If": [
+                      "ValidateBranch",
+                      [
+                        "repo:jzeng151@87108282/Fair-Exchange@1444721780:ref:refs/heads/main",
+                        "repo:jzeng151@87108282/Fair-Exchange@1444721780:ref:refs/heads/chore/deploy-sandbox"
+                      ],
+                      [
+                        "repo:jzeng151@87108282/Fair-Exchange@1444721780:ref:refs/heads/main"
+                      ]
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "PublishFairExchangeWebsite",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": "cloudformation:DescribeStacks",
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:cloudformation:${AWS::Region}:${AWS::AccountId}:stack/FairExchange/*"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:ListBucket",
+                    "s3:GetBucketLocation"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:s3:::${WebBucket}"
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:s3:::${WebBucket}/assets/*"
+                    },
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:s3:::${WebBucket}/index.html"
+                    },
+                    {
+                      "Fn::Sub": "arn:${AWS::Partition}:s3:::${WebBucket}/favicon.svg"
+                    }
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "kms:GenerateDataKey",
+                    "kms:Decrypt"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:kms:${AWS::Region}:${AWS::AccountId}:key/${WebKey}"
+                  },
+                  "Condition": {
+                    "StringEquals": {
+                      "kms:ViaService": {
+                        "Fn::Sub": "s3.${AWS::Region}.amazonaws.com"
+                      }
+                    },
+                    "StringLike": {
+                      "kms:EncryptionContext:aws:s3:arn": [
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:s3:::${WebBucket}"
+                        },
+                        {
+                          "Fn::Sub": "arn:${AWS::Partition}:s3:::${WebBucket}/*"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "cloudfront:CreateInvalidation",
+                    "cloudfront:GetInvalidation"
+                  ],
+                  "Resource": {
+                    "Fn::Sub": "arn:${AWS::Partition}:cloudfront::${AWS::AccountId}:distribution/${WebDistribution}"
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "DeployRoleArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "DeployRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}
