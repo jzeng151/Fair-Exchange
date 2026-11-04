@@ -212,13 +212,119 @@ export const t = {
       contact: 'Para pedir a Fair Trade USA que cambie o elimine algo aquí, comuníquese con su representante de Fair Trade USA. Esta vista no puede cambiar su registro.',
     },
   },
+  fr: {
+    greet: 'Bonjour, je suis FEX, l’assistant informatique de Fair Trade USA. Je ne suis pas une personne et je ne décide pas à votre place. Je suis là pour écouter et partager des informations. Qu’est-ce qui a été difficile pour votre organisation récemment ?',
+    askTiming: 'Merci de l’avoir partagé. Quand cela a-t-il commencé ?',
+    askSeverity: 'À quel point cela a-t-il été grave — par exemple pour votre récolte, vos revenus ou vos travailleurs ?',
+    askTried: 'Qu’avez-vous déjà essayé, le cas échéant ?',
+    playbackIntro: 'Voici ce que j’ai compris. Corrigez ce qui ne va pas avant que je cherche des informations.',
+    confirm: 'C’est correct',
+    retrieving: ['Consultation du dossier de votre organisation…', 'Recherche d’informations régionales…', 'Recherche de ce que des organisations semblables ont essayé…', 'Vérification des normes pertinentes…'],
+    respondIntro: 'Voici ce que j’ai trouvé. Ce sont des informations pour appuyer votre propre décision — pas une recommandation.',
+    dataHeading: 'Ce que montrent les données',
+    peersHeading: 'Ce que d’autres ont essayé',
+    takeawayIntro: 'Voici un résumé que vous pouvez conserver ou partager avec votre Comité de Commerce Équitable :',
+    consentAsk: 'Voici ce que nous enregistrerions dans votre dossier. Vous pouvez le modifier. Pouvons-nous l’enregistrer ?',
+    save: 'Enregistrer',
+    dontSave: 'Ne pas enregistrer',
+    saved: 'Merci. Votre résumé a été enregistré et sera examiné par une personne de Fair Trade USA.',
+    feedbackAsk: 'Ces informations vous ont-elles été utiles ?',
+    fb: { yes: 'Oui', some: 'Un peu', no: 'Non' },
+    thanks: 'Merci pour votre retour. Vous pouvez fermer cette conversation quand vous le souhaitez.',
+    declined: 'Compris. Rien de cette conversation ne sera enregistré — seulement une note indiquant que vous avez choisi de ne pas continuer. Merci de votre temps.',
+    outOfScope: 'Je ne peux pas aider avec cela ici. Cet outil écoute seulement les difficultés que vous rencontrez et partage des données et des exemples. Pour les questions de certification ou les plaintes, contactez directement Fair Trade USA. Souhaitez-vous plutôt me parler d’une difficulté ?',
+    scope: (id: string) => `Je peux seulement accéder aux informations de votre propre organisation (${id}). Je ne peux pas consulter d’autres producteurs.`,
+    pii: 'Note : votre message peut contenir des informations personnelles (un nom ou des coordonnées). Elles seront signalées à une personne de Fair Trade USA pour examen. Rien n’a été supprimé.',
+    fields: { challenge: 'Difficulté', timing: 'Début', severity: 'Gravité', tried: 'Déjà essayé', entity: 'Type d’entité' },
+    entities: { cooperative: 'Coopérative', smallholder: 'Petit producteur', 'hired-labor farm': 'Ferme avec travailleurs salariés', processor: 'Unité de transformation' },
+    strength: { exact: 'Correspondance exacte de la région', nearest: 'Donnée disponible la plus proche', limited: 'Preuves limitées' },
+    matched: 'Correspond sur',
+    crop: 'culture', entityW: 'type d’entité', country: 'pays',
+    source: 'Source', clause: 'Norme associée',
+    takeaway: { challenge: 'Votre difficulté', data: 'Ce que montrent les données', others: 'Ce que d’autres ont essayé' },
+    placeholder: 'Écrivez un message…',
+    send: 'Envoyer',
+    restart: 'Recommencer',
+    inShort: 'En bref',
+    energy: {
+      veryLow: 'Cette conversation a utilisé très peu d’énergie d’IA.',
+      low: 'Cette conversation a utilisé peu d’énergie d’IA.',
+      moderate: 'Cette conversation a utilisé une quantité modérée d’énergie d’IA.',
+    },
+    howAI: 'Comment FEX utilise l’IA',
+    close: 'Fermer',
+    about: {
+      title: 'Comment FEX utilise l’IA',
+      intro: 'FEX est un assistant informatique (intelligence artificielle, ou IA). C’est un outil de Fair Trade USA, pas une personne.',
+      sections: [
+        ['🤝', 'Vous gardez le contrôle', 'Vous pouvez arrêter à tout moment. Rien n’est enregistré sans votre accord. FEX ne décide jamais à votre place ni à celle de votre comité.'],
+        ['👀', 'Des personnes restent impliquées', 'Une personne de Fair Trade USA examine tout ce qui est enregistré. FEX ne peut pas changer votre certification ni votre Premium.'],
+        ['📚', 'Des faits avec leurs sources', 'FEX ne partage que des informations provenant de dossiers et de données réels, et indique d’où vient chaque fait. Si les preuves sont faibles, il le dit.'],
+        ['🌱', 'Léger pour la planète', 'Comme l’irrigation au goutte-à-goutte, FEX n’utilise que l’énergie nécessaire à chaque question. Un petit modèle efficace fait les étapes simples, et un plus grand n’est utilisé qu’une seule fois, pour votre réponse. Rien ne tourne quand personne ne parle.'],
+        ['🌎', 'Aider à protéger la terre', 'FEX partage ce que d’autres producteurs ont fait pour préserver l’eau, le sol et les forêts, à partir de projets réels du Premium de Commerce Équitable, pour que vous puissiez en tirer des idées et décider ce qui convient à votre communauté.'],
+        ['🔒', 'Vos informations vous appartiennent', 'FEX ne peut voir que le dossier de votre propre organisation. Les autres producteurs ne peuvent pas voir ce que vous partagez.'],
+      ],
+    },
+    yourSummary: 'Votre résumé',
+    whereFrom: 'D’où cela vient-il ?',
+    hideDetails: 'Masquer les détails',
+    next: 'Suivant',
+    back: 'Retour',
+    continueBtn: 'Continuer',
+    cardOf: (i: number, n: number) => `${i} sur ${n}`,
+    othersIntro: 'Certains groupes dans des situations semblables ont choisi d’essayer cela. Chaque situation est différente.',
+    keepInMind: 'À garder à l’esprit',
+    handback: 'Vous et votre comité connaissez le mieux votre situation. Ce sont des informations pour vous aider à décider.',
+    editSummary: 'Modifier',
+    doneEditing: 'Terminé',
+    strengthWord: 'À quel point les données correspondent à votre zone',
+    chartNote: 'Barre grise = point de référence',
+    mapHeading: 'Où se trouvent ces organisations',
+    mapNote: 'Emplacements approximatifs · touchez un point',
+    you: 'Vous',
+    tapToSpeak: 'Touchez pour parler',
+    listening: 'Écoute…',
+    voiceNote: 'Note vocale',
+    voiceSim: 'Entrée vocale simulée : joue une réponse d’exemple',
+    steps: ['Le dossier de votre organisation', 'Données régionales', 'Organisations semblables', 'Normes du Commerce Équitable'],
+    checking: 'Recherche d’informations pour vous',
+    done: 'Terminé',
+    printCard: 'Imprimer ou enregistrer en PDF',
+    copy: 'Copier le texte',
+    copied: 'Copié',
+    cardTitle: 'Résumé Fair Exchange',
+    cardFooter: 'Préparé avec Fair Exchange de Fair Trade USA · démo avec des données synthétiques',
+    closing: 'Merci d’avoir partagé votre expérience. Cela aide Fair Trade USA à mieux comprendre et soutenir les producteurs comme vous.',
+    yourRecord: {
+      title: 'Votre dossier',
+      intro: 'Ce que Fair Trade USA a enregistré de vos conversations, et le consentement que vous avez donné. Cette vue est en lecture seule.',
+      empty: 'Vous n’avez pas encore de dossier enregistré.',
+      summary: 'Votre résumé',
+      tags: 'Étiquettes de difficulté',
+      consent: 'Consentement que vous avez donné',
+      insights: 'Ce que montraient les données',
+      peers: 'Ce que d’autres ont essayé',
+      feedback: 'Votre retour',
+      reviewStatus: 'État de l’examen',
+      reviewed: 'Examiné par Fair Trade USA',
+      pending: 'En attente d’examen',
+      changedByReviewer: 'Un examinateur de Fair Trade USA a corrigé ceci.',
+      scope: {
+        internal: 'Examen interne de Fair Trade USA uniquement',
+        internal_and_outward: 'Fair Trade USA, et peut être partagé à l’extérieur',
+        declined: 'Non enregistré : vous avez refusé',
+      },
+      feedbackValue: { yes: 'Utile', somewhat: 'Un peu utile', no: 'Pas utile' },
+      contact: 'Pour demander à Fair Trade USA de modifier ou de supprimer quelque chose ici, contactez votre représentant Fair Trade USA. Cette vue ne peut pas modifier votre dossier.',
+    },
+  },
 }
 
 /**
  * Translated challenge-tag names (#32). Keys are the canonical CHALLENGE_TAGS (scenarios.ts); a test
  * checks every tag has an entry in both languages. French arrives with #24.
  */
-export const tagNames: Record<'en' | 'es', Record<string, string>> = {
+export const tagNames: Record<'en' | 'es' | 'fr', Record<string, string>> = {
   en: {
     'climate and weather': 'Climate and weather',
     water: 'Water',
@@ -245,12 +351,25 @@ export const tagNames: Record<'en' | 'es', Record<string, string>> = {
     'biodiversity and conservation': 'Biodiversidad y conservación',
     'social and community': 'Social y comunidad',
   },
+  fr: {
+    'climate and weather': 'Climat et météo',
+    water: 'Eau',
+    'soil and land': 'Sol et terre',
+    'market and price': 'Marché et prix',
+    'labor and migration': 'Travail et migration',
+    'financial and access to capital': 'Finances et accès au capital',
+    education: 'Éducation',
+    health: 'Santé',
+    infrastructure: 'Infrastructure',
+    'biodiversity and conservation': 'Biodiversité et conservation',
+    'social and community': 'Social et communauté',
+  },
 }
 
 // Simple keyword detectors standing in for the real agent + Comprehend.
-const DECLINE = [/don'?t want/i, /do not want/i, /\bstop\b/i, /rather not/i, /don'?t (store|save)/i, /no thanks/i, /no quiero/i, /prefiero no/i, /no guard/i, /detener/i, /no gracias/i]
-const OUT_OF_SCOPE = [/certification status/i, /\baudit/i, /complaint/i, /grievance/i, /estado de (mi )?certificaci/i, /auditor/i, /\bqueja/i, /denuncia/i]
-const PII = [/\+?\d[\d\s-]{7,}\d/, /[\w.+-]+@[\w-]+\.[\w.]+/, /\b(Mr|Mrs|Ms|Sr|Sra)\.?\s+[A-ZÁÉÍÓÚ][a-záéíóúñ]+/, /\b(Don|Doña|señor|señora|my neighbor|mi vecino)\s+[A-ZÁÉÍÓÚ][a-záéíóúñ]+/]
+const DECLINE = [/don'?t want/i, /do not want/i, /\bstop\b/i, /rather not/i, /don'?t (store|save)/i, /no thanks/i, /no quiero/i, /prefiero no/i, /no guard/i, /detener/i, /no gracias/i, /je ne veux pas/i, /ne pas (enregistrer|garder)/i, /\barr[\u00eae]ter\b/i, /non merci/i]
+const OUT_OF_SCOPE = [/certification status/i, /\baudit/i, /complaint/i, /grievance/i, /estado de (mi )?certificaci/i, /auditor/i, /\bqueja/i, /denuncia/i, /statut de (ma )?certification/i, /\bplainte/i, /grief/i]
+const PII = [/\+?\d[\d\s-]{7,}\d/, /[\w.+-]+@[\w-]+\.[\w.]+/, /\b(Mr|Mrs|Ms|Sr|Sra|M|Mme)\.?\s+[A-ZÁÉÍÓÚÀÈÊ][a-záéíóúñàèêç]+/, /\b(Don|Doña|señor|señora|my neighbor|mi vecino|monsieur|madame|mon voisin|ma voisine)\s+[A-ZÁÉÍÓÚÀÈÊ][a-záéíóúñàèêç]+/]
 
 export const detect = {
   decline: (s: string) => DECLINE.some((r) => r.test(s)),
@@ -262,5 +381,5 @@ export const detect = {
   },
 }
 
-export type Lang = 'en' | 'es'
+export type Lang = 'en' | 'es' | 'fr'
 export type Copy = typeof t.en

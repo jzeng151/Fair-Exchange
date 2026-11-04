@@ -24,11 +24,11 @@ Amazon Comprehend `DetectPiiEntities` scans the producer's own messages, in Engl
 - **Input.** Every piece of text the producer typed: messages and `correct_playback` text. FEX's own summaries are not scanned.
 - **Out-of-scope messages.** A message the out-of-scope detection function classifies as `out_of_scope` ([#21 spec](21-out-of-scope.md)) adds nothing to the record: no flag, no entity type and no match or context. Nothing from it is quoted in the record, so there is nothing for a reviewer to check, and #21 keeps the misdirected request out of the record.
 - **Per-message status.** Each text has a scan status in the conversation state: `pending`, `done` or `failed`. At each save, every text that is `pending` or `failed` is scanned. A text marked `done` is never scanned again.
-- **Language.** `en` and `es` are scanned. Any other conversation language sets the check result to `unsupported_language`.
-- **Entity types.** `NAME`, `PHONE`, `EMAIL`, `ADDRESS` only, with a confidence threshold that is a configuration value, default 0.8.
+- **Language.** `en` and `es` are scanned by Comprehend; `fr` is scanned by the FEX Guardrail's sensitive-information filter, since Comprehend has no French PII detection ([#24](24-french-exchange.md)). Any other conversation language sets the check result to `unsupported_language`.
+- **Entity types.** `NAME`, `PHONE`, `EMAIL`, `ADDRESS` only. Comprehend hits count above a confidence threshold that is a configuration value, default 0.8; the threshold applies to Comprehend only. The Guardrail carries no score, so every French detection of one of the four types counts ([#24](24-french-exchange.md)).
 - **Flag rules:**
   - Any qualifying hit sets `pii_flag` to true, adds the entity type to `pii_entity_types`, and adds the match to `pii_matches`.
-  - `pii_check` is `failed` while any text is `failed`, `unsupported_language` for languages other than `en` and `es`, and `done` only when every text is `done`.
+  - `pii_check` is `failed` while any text is `failed`, `unsupported_language` for languages other than `en`, `es` and `fr`, and `done` only when every text is `done`.
   - A Comprehend error sets `pii_flag` to true.
   - The flag stays set for the life of the conversation.
 - **Record fields (completed records only; declined records have no narrative):**
@@ -51,7 +51,7 @@ Amazon Comprehend `DetectPiiEntities` scans the producer's own messages, in Engl
   - a name in a Spanish message flags the record with `NAME`;
   - a low-confidence `ADDRESS` below the threshold does not flag;
   - a Comprehend error flags with `failed`;
-  - a French conversation flags with `unsupported_language`;
+  - a conversation in a language other than `en`, `es` and `fr` flags with `unsupported_language` ([#24](24-french-exchange.md) added `fr`);
   - a failed text is rescanned at the next save, and `pii_check` stays `failed` until it succeeds;
   - `correct_playback` text is scanned;
   - mixed conversation: a grievance naming a worker (out of scope), then an in-scope challenge. The record's PII fields contain nothing from the grievance;
@@ -66,5 +66,5 @@ Amazon Comprehend `DetectPiiEntities` scans the producer's own messages, in Engl
 
 ## Out of Scope
 
-- French PII detection. When built, the [#24 spec](24-french-exchange.md) scans `fr` text through the Guardrail and fills these same fields.
+- (French PII detection is now in scope: it goes through the Guardrail, [#24](24-french-exchange.md))
 - Detecting PII in FEX's own output

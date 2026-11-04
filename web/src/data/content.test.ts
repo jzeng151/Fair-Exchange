@@ -5,7 +5,7 @@ import { t } from './i18n'
 import { scenarios } from './scenarios'
 
 const realClauses = new Set((clauses as { id: string }[]).map((c) => c.id))
-const DIRECTIVE = /\b(you should|we recommend|the best option|you must|debería|deberían|recomendamos|le recomiendo|la mejor opción|tiene que)\b/i
+const DIRECTIVE = /\b(you should|we recommend|the best option|you must|debería|deberían|recomendamos|le recomiendo|la mejor opción|tiene que|vous devriez|nous recommandons|la meilleure option|il faut que vous)\b/i
 
 function allStrings(value: unknown): string[] {
   if (typeof value === 'string') return [value]
@@ -39,8 +39,8 @@ describe('scenarios', () => {
     }
   })
 
-  it('cover English and at least one other language', () => {
-    expect(new Set(scenarios.map((s) => s.language))).toEqual(new Set(['en', 'es']))
+  it('cover English, Spanish and French', () => {
+    expect(new Set(scenarios.map((s) => s.language))).toEqual(new Set(['en', 'es', 'fr']))
   })
 })
 
@@ -52,5 +52,9 @@ describe('wording', () => {
 
   it('has the same Spanish and English copy keys', () => {
     expect(shape(t.es)).toEqual(shape(t.en))
+  })
+
+  it('has the same French and English copy keys', () => {
+    expect(shape(t.fr)).toEqual(shape(t.en))
   })
 })

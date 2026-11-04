@@ -22,7 +22,8 @@ One Guardrail, defined in CDK, attached to every Bedrock model call FEX makes, w
   - **Denied topics:** certification status and audit results; worker grievances and complaints.
   - **Content filters:** standard categories.
   - **Actions:** every policy action is `NONE` (detect) for both input and output.
-  - **Not configured:** sensitive information filters (PII is Comprehend's job, [#20 spec](20-pii-flagging.md); French PII comes with #24), and the contextual grounding check (the citation verifier covers grounding).
+  - **Sensitive information filter ([#24](24-french-exchange.md)):** `NAME`, `PHONE`, `EMAIL`, `ADDRESS`, action `NONE` (detect only) for input and output. On ordinary model calls its findings go to CloudWatch like any other. The French PII path ([#20 spec](20-pii-flagging.md)) calls the Guardrail directly on the producer's text to fill the record's PII fields, since Comprehend has no French.
+  - **Not configured:** the contextual grounding check (the citation verifier covers grounding).
 - **Attachment.** Every Bedrock model call goes through the Strands Bedrock model with the Guardrail ID and version and trace enabled. The IDs are configuration values. Input and output redaction are set to off explicitly (`guardrail_redact_input` and `guardrail_redact_output` false), so nothing is altered even if a policy action is changed later.
 - **Recording.** Each assessment with a detected policy is logged to CloudWatch with the conversation ID, policy type and topic or category only, never text. It is not written to the record, because #21 keeps anything derived from a misdirected request out of the record.
 - **Behavior.** No effect on steps, answers or records in the MVP. Whether the Guardrail feeds out-of-scope detection is part of the undecided detection function ([#21 spec](21-out-of-scope.md)).
@@ -35,7 +36,7 @@ One Guardrail, defined in CDK, attached to every Bedrock model call FEX makes, w
 ## Out of Scope
 
 - Blocking or masking anything
-- French PII (#24). When built, the [#24 spec](24-french-exchange.md) adds a detect-only sensitive-information filter to this Guardrail.
+- (French PII is now in scope via the sensitive-information filter above, [#24](24-french-exchange.md))
 
 ## Further Notes
 

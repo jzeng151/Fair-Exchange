@@ -43,7 +43,7 @@ def test_scenario_is_well_formed(path):
     s = _load(path)
     assert s["id"] == path.stem
     assert s["producer_id"] in PROFILES, "must be a sample producer, so the tools have data"
-    assert s["language"] in {"en", "es"}
+    assert s["language"] in {"en", "es", "fr"}  # fr added with the French exchange (#24)
     turns = s["turns"]
     assert turns[0] == {"kind": "start"} and turns[-1]["kind"] == "action"
     for t in turns:
