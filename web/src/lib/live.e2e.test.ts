@@ -67,7 +67,7 @@ describe.skipIf(!api)('live mode against the real local chain', () => {
     await expect(other.resume(view.conversationId!)).rejects.toMatchObject({ status: 404 })
   })
 
-  it.each(liveProducers.map((p) => [p.place, p.id]))('every producer in the live picker can start a conversation (%s)', async (_place, id) => {
+  it.each(liveProducers.map((p) => [p.scenarioId, p.id]))('every producer in the live picker can start a conversation (%s)', async (_place, id) => {
     const v = newView()
     await turn(v, createLiveClient({ baseUrl: api ?? '', producerId: id }).start())
     expect(v.step).toBe('intake')
