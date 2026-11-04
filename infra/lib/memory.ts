@@ -1,5 +1,7 @@
 import * as agentcore from 'aws-cdk-lib/aws-bedrockagentcore';
+import { Stack } from 'aws-cdk-lib';
 import * as iam from 'aws-cdk-lib/aws-iam';
+import type * as kms from 'aws-cdk-lib/aws-kms';
 import { Construct } from 'constructs';
 
 /**
@@ -26,10 +28,16 @@ export interface FexMemoryProps {
    * there is no safe default lifetime to compare against, so the caller must pass it.
    */
   readonly eventExpiryDays: number;
+  /**
+   * The application data key (docs/specs/05-cdk-stack.md "Security": one customer-managed key for every bucket,
+   * table, log group and the memory resource). Set at creation: changing it later replaces the memory.
+   */
+  readonly encryptionKey: kms.IKey;
 }
 
 export class FexMemory extends Construct {
   readonly memory: agentcore.CfnMemory;
+  private readonly encryptionKey: kms.IKey;
 
   constructor(scope: Construct, id: string, props: FexMemoryProps) {
     super(scope, id);
@@ -38,10 +46,14 @@ export class FexMemory extends Construct {
       throw new Error(`eventExpiryDays must be between 3 and 365 (AgentCore limit); got ${props.eventExpiryDays}`);
     }
 
+    this.encryptionKey = props.encryptionKey;
     this.memory = new agentcore.CfnMemory(this, 'Resource', {
       name: 'fair_exchange_conversation',
       description: 'Fair Exchange (#59): short-term conversation state for resume, long-term per-producer memory',
       eventExpiryDuration: props.eventExpiryDays,
+      // Customer-managed key. CloudFormation creates the memory as the bootstrap execution role, whose IAM access
+      // covers the key operations AgentCore needs at creation (CreateGrant, GenerateDataKey and so on).
+      encryptionKeyArn: props.encryptionKey.keyArn,
       // Long-term strategies, namespaced per producer. Extraction reads the short-term events the agent
       // writes. Recall into intake/playback stays switched off in the agent (recall_eligibility) until
       // the decline policy is decided, so declined text cannot resurface.
@@ -88,6 +100,13 @@ export class FexMemory extends Construct {
       ],
       // This memory resource only: the ARN plus its per-session/per-record children.
       resources: [this.memoryArn, `${this.memoryArn}/*`],
+    }));
+    // The memory's data key, only through AgentCore: events and records are encrypted with it.
+    role.addToPrincipalPolicy(new iam.PolicyStatement({
+      sid: 'FexConversationMemoryKey',
+      actions: ['kms:Decrypt', 'kms:GenerateDataKey'],
+      resources: [this.encryptionKey.keyArn],
+      conditions: { StringEquals: { 'kms:ViaService': `bedrock-agentcore.${Stack.of(this).region}.amazonaws.com` } },
     }));
   }
 }
