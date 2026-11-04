@@ -30,10 +30,21 @@ def model_ids() -> tuple[str, str]:
     return os.environ.get("FEX_SMALL_MODEL", DEFAULT_SMALL), os.environ.get("FEX_LARGE_MODEL", DEFAULT_LARGE)
 
 
+def demo_models() -> bool:
+    """FEX_DEMO_MODELS=1: the deterministic demo model instead of Bedrock (#101). No AWS, no cost."""
+    return os.environ.get("FEX_DEMO_MODELS") == "1"
+
+
 def record_store():
-    """The records table from configuration, or None when FEX_RECORDS_TABLE is unset (local runs)."""
+    """Where records are saved: the DynamoDB table named by FEX_RECORDS_TABLE, local JSON files in
+    FEX_LOCAL_RECORDS_DIR (local runs, #101), or None (not saved)."""
     name = os.environ.get("FEX_RECORDS_TABLE")
     if not name:
+        local = os.environ.get("FEX_LOCAL_RECORDS_DIR")
+        if local:
+            from fex.records.local import FileRecordStore
+
+            return FileRecordStore(local)
         return None
     import boto3
 
@@ -46,8 +57,13 @@ def record_store():
 def default_engine() -> ConversationEngine:
     from fex.guardrail import OutputAssessor, guarded_bedrock_model
 
-    small, large = model_ids()
     records = record_store()
+    if demo_models():  # local runs (#101): no Bedrock, no Comprehend, no AWS at all
+        from fex.conversation.demo_model import DemoModel
+
+        demo = DemoModel()
+        return ConversationEngine(store=InMemoryStateStore(), small_model=demo, large_model=demo, records=records)
+    small, large = model_ids()
     # The Comprehend seam (#20): scans run only when records are configured — they are part of saving one.
     pii_scanner = None
     if records is not None:

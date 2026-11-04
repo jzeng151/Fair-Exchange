@@ -74,6 +74,10 @@ jobs:
       - name: Web build and type check
         working-directory: web
         run: npm ci && npm run build
+      # The real chat API and the real agent run together over HTTP and hold one full conversation
+      # (demo model: no AWS). Catches mismatches each side's own tests can't see (#89, #101).
+      - name: Local end-to-end conversation
+        run: bash scripts/e2e/run_local.sh
       - name: Infrastructure type check and synthesis
         working-directory: infra
         run: |
