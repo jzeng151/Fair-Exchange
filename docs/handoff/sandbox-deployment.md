@@ -83,7 +83,7 @@ website publishing satisfies only the hosting portion. As of November 4, 2026:
   the separate hello-world spike. Include reproducible ARM64 dependency packaging,
   artifact upload, runtime configuration, and outputs consumed by the API.
 - [ ] Add the resources needed by the MVP features as they land: authenticated API
-  routes and Lambdas, records storage, data/query resources and loading, guardrails,
+  routes and Lambdas, records storage, data/query resources and loading, guardrails (defined: `FexGuardrail`, #12; wire it to the FEX runtime),
   and frontend configuration. Package the chosen retrieval implementation; managed
   Knowledge Bases are not required if the approved embedded approach is retained.
 - [ ] Provide one documented command that builds, provisions, loads required data,

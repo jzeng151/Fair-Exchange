@@ -7,6 +7,7 @@ Deploy pattern: docs/adr/0002-agentcore-runtime-spike.md.
 
 State: in-memory per runtime session until AgentCore Memory (docs/specs/memory.md) replaces the store.
 Records (#26): saved to the DynamoDB table named by FEX_RECORDS_TABLE; not saved when it is unset.
+Guardrail (#12): attached to both models from FEX_GUARDRAIL_ID and FEX_GUARDRAIL_VERSION, in detect mode.
 """
 import os
 import queue
@@ -43,7 +44,7 @@ def record_store():
 
 @lru_cache(maxsize=1)
 def default_engine() -> ConversationEngine:
-    from strands.models.bedrock import BedrockModel
+    from fex.guardrail import OutputAssessor, guarded_bedrock_model
 
     small, large = model_ids()
     records = record_store()
@@ -53,9 +54,10 @@ def default_engine() -> ConversationEngine:
         from fex.pii import default_comprehend
 
         pii_scanner = default_comprehend()
-    return ConversationEngine(store=InMemoryStateStore(), small_model=BedrockModel(model_id=small),
-                              large_model=BedrockModel(model_id=large), records=records,
-                              pii_scanner=pii_scanner)
+    # Both models carry the detect-mode Guardrail (#12), and their structured output is assessed too.
+    return ConversationEngine(store=InMemoryStateStore(), small_model=guarded_bedrock_model(small),
+                              large_model=guarded_bedrock_model(large), records=records,
+                              pii_scanner=pii_scanner, output_assessor=OutputAssessor())
 
 
 def invoke(payload: dict[str, Any], engine: ConversationEngine | None = None) -> dict[str, Any]:
