@@ -23,8 +23,22 @@ What Fair Trade USA engineering needs to redeploy and run Fair Exchange in their
 
 - [ ] Record schema (generated from `agent/src/fex/models.py`)
 - [ ] Tool interface contracts (inputs, outputs, scope rule)
-- [ ] API routes
+- [ ] API routes (chat routes are documented below; review and analytics come with #27 and #29)
 - [ ] CDK outputs and deploy steps (timed clean redeploy, #40)
 - [ ] Synthetic data generator and loading instructions
 - [ ] Stand-in → target mapping (Athena → Redshift "Atlas", DynamoDB → production store, test identities → Okta)
 - [ ] Known limitations
+
+## Chat API routes (#25)
+Contract: `docs/specs/25-chat-endpoint.md`. Code: `api/src/core/`, `api/src/handlers/conversations.ts`, `api/src/handlers/sweep.ts`.
+| Route | Streams | Notes |
+|---|---|---|
+| `POST /conversations` | yes | Server creates the conversation ID. First event is `{ "type": "conversation", "conversationId": ... }`. |
+| `POST /conversations/{id}/messages` | yes | Body `{ "text": string }`, 1 to 4,000 characters |
+| `POST /conversations/{id}/actions` | yes | Body `{ "action": string, "args": object }` |
+| `GET /conversations/{id}` | no | Agent `resume` output plus `conversationId` and `status` |
+| `GET /conversations` | no | `{ "conversations": [{ conversationId, createdAt, status }] }`, newest first |
+Streams are `application/x-ndjson`. Errors: 400 (unknown field, or any producer or conversation ID in the body), 401 (caller not identified), 404 (missing or someone else's conversation, same response), 409 (conversation closed, or a turn is in progress).
+Turn lock: each turn holds a lease (`lock_expires_at`, `lock_token`) taken before the response starts, so a 409 is a real HTTP 409. Agent calls are cut off at 290 s (Lambda timeout 300 s, lease 330 s), and only the holder's token can release the lock. `resume` calls (`GET /conversations/{id}` and the sweep) are cut off at 20 s, so a stalled agent is skipped rather than blocking the sweep.
+
+Deploy inputs the stack must provide: the conversations table and index, `AGENT_RUNTIME_ARN`, the REST API with response streaming and a 5 minute timeout on the three POST routes, the 15 minute schedule for the sweep, and `INACTIVITY_MINUTES`. Only the chat handlers and the sweep may write the table or invoke the runtime. Until the stack is wired, these handlers are not deployed.
