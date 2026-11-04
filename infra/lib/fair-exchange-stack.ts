@@ -6,6 +6,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import type { Construct } from 'constructs';
 import { FexGuardrail } from './guardrail';
 import { FexMemory } from './memory';
+import { FexTables } from './tables';
 import { StandardsKnowledgeBase, type StandardsKnowledgeBaseProps } from './standards-kb';
 
 export interface FairExchangeStackProps extends StackProps {
@@ -77,10 +78,10 @@ export class FairExchangeStack extends Stack {
     new CfnOutput(this, 'GuardrailVersion', { value: guardrail.version.attrVersion });
 
     // The application data key (docs/specs/05-cdk-stack.md "Security"): one customer-managed key with rotation
-    // for the stack's data. Today: the Knowledge Base vectors and memory. Next: tables and log groups.
+    // for the stack's data: the Knowledge Base vectors, memory and the tables. Next: log groups.
     // The website keeps its own WebKey: the GitHub publishing role is scoped to it.
     const dataKey = new kms.Key(this, 'DataKey', {
-      description: 'Fair Exchange application data: Knowledge Base vectors and memory, then tables and logs',
+      description: 'Fair Exchange application data: Knowledge Base vectors, memory and tables, then logs',
       enableKeyRotation: true,
       removalPolicy: RemovalPolicy.RETAIN,
     });
@@ -94,5 +95,9 @@ export class FairExchangeStack extends Stack {
     const memory = new FexMemory(this, 'Memory', { eventExpiryDays: MEMORY_EVENT_EXPIRY_DAYS, encryptionKey: dataKey });
     new CfnOutput(this, 'MemoryId', { value: memory.memoryId });
     new CfnOutput(this, 'MemoryArn', { value: memory.memoryArn });
+
+    // Records (#26) and conversations (#25) tables. The agent runtime (#5, next) gets read/write on the records
+    // table only (#13 "Agent runtime permissions"); the chat API Lambdas get the conversations table.
+    new FexTables(this, 'Tables', { encryptionKey: dataKey });
   }
 }
