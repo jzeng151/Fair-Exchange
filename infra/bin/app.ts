@@ -66,5 +66,5 @@ new FairExchangeEvalStack(app, 'FairExchangeEval', {
   codeBucketName: ctx('evalCodeBucket', 'unset-eval-code-bucket'),
   codeKey: ctx('evalCodeKey', 'eval/unset.zip'),
   codeKeyArn: app.node.tryGetContext('evalCodeKeyArn'),
-  judgeModelId: ctx('evalJudgeModelId', 'us.anthropic.claude-sonnet-5-5'),
+  judgeModelId: ctx('evalJudgeModelId', 'us.amazon.nova-pro-v1:0'),
 });

@@ -51,7 +51,7 @@ const EVALUATORS = [
   'scope_leak',
 ] as const;
 
-// The judge id is an inference profile in the US partition (us.anthropic.claude-sonnet-5-5);
+// The judge id defaults to AWS-native amazon.nova-pro (no marketplace agreement needed);
 // foundation-model ARNs take the bare id, across every US Bedrock region the profile may use.
 const US_REGIONS = ['us-east-1', 'us-east-2', 'us-west-1', 'us-west-2'];
 
@@ -127,7 +127,11 @@ export class FairExchangeEvalStack extends Stack {
         const stackAccount = Stack.of(this).account;
         role.addToPolicy(new PolicyStatement({
           sid: 'InvokeToneJudge',
-          actions: ['bedrock:InvokeModel', 'bedrock:InvokeModelWithResponseStream'],
+          actions: [
+            'bedrock:Converse',
+            'bedrock:InvokeModel',
+            'bedrock:InvokeModelWithResponseStream',
+          ],
           resources: [
             `arn:aws:bedrock:${stackRegion}:${stackAccount}:inference-profile/${props.judgeModelId}*`,
             ...US_REGIONS.map((region) => `arn:aws:bedrock:${region}::foundation-model/${foundationId}*`),
