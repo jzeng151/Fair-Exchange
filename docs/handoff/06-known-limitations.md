@@ -7,9 +7,11 @@ What to know before running Fair Exchange in production. Each links to its sourc
 - **Analytics over time** (decided 2026-11-04). Hidden counts can be recovered by comparing results as
   new records arrive; no sandbox rule prevents this. The production analytics should publish on a fixed
   schedule, round counts, or add noise ([#29](../specs/29-analytics-api.md)).
-- **Long-term memory recall is switched off.** Memory is built, but recall of earlier conversations
-  stays off behind one eligibility function until the decline policy is decided, so declined text
-  cannot resurface ([memory](../specs/memory.md)).
+- **Persistent memory is not in the deployed agent yet.** The shipped `default_engine()` still uses an
+  in-process `InMemoryStateStore`, so a conversation does not survive a runtime replacement until the
+  AgentCore Memory work lands ([memory spec](../specs/memory.md), in progress). When it does, long-term
+  recall of earlier conversations stays off behind one eligibility function until the decline policy is
+  decided, so declined text cannot resurface.
 - **AgentCore Gateway was deferred** until after the MVP. Tools stay in the agent process so the
   producer-ID scope rule keeps working; Gateway is the path for adding tools later, with that scope
   rule as the design constraint ([#13](../specs/13-conversation-steps.md)).
@@ -29,8 +31,22 @@ What to know before running Fair Exchange in production. Each links to its sourc
 ## Open decisions
 
 Every "Not decided" item across the specs, gathered by topic. These are not to be built or assumed
-until the owning spec decides them. (The CI open-decisions check fails if a spec gains a "Not decided"
-section not referenced here.)
+until the owning spec decides them. The CI open-decisions check fails if a spec gains or loses a
+"Not decided" item without this list and the manifest below being updated to match.
+
+<!-- open-decisions-manifest
+11-identity.md: 1
+13-conversation-steps.md: 2
+19-consent-and-decline.md: 3
+21-out-of-scope.md: 2
+25-chat-endpoint.md: 2
+26-write-back.md: 3
+28-athena-sync.md: 1
+memory.md: 3
+-->
+
+The count beside each spec in the manifest comment above is how many "Not decided" items that spec
+currently has; it is checked against the specs in CI.
 
 ### Conversation lifecycle
 - The inactivity period and the maximum conversation lifetime

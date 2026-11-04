@@ -10,7 +10,7 @@ to review and to aggregate into trends.
 
 The design principles that shaped every part of the system:
 
-- **The producer is in control.** Nothing is stored without consent. FEX hands the decision back.
+- **The producer is in control.** No *record* is stored without consent, and FEX hands the decision back. (Conversation text itself may be held while the conversation runs once persistent memory is on; what happens to it after a decline is still undecided — see the [memory spec](../specs/memory.md) and [open decisions](06-known-limitations.md#open-decisions).)
 - **Every fact is traceable.** Claims are shown only after a citation check; unverifiable text is dropped.
 - **Scope is enforced in code.** A producer can only ever reach their own data. No tool takes a producer,
   location or crop parameter, so a model mistake cannot cross producers.
