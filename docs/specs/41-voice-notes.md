@@ -42,11 +42,11 @@ These are on the same REST API, TypeScript on Node.js 24, `producer` role, with 
 - **Language.** The conversation's language if identified. Otherwise Transcribe's language identification is limited to `en-US`, `es-US` and `fr-FR` (only `en` and `es` until #24 is built).
 - **Job.** A batch job, with output written to the voice bucket.
 - **Completion worker.** An EventBridge rule on Transcribe job state changes (completed or failed) triggers a worker Lambda. It doesn't depend on the browser:
-  - on completion it deletes the audio and job output. It stores the transcript on the voice item only if the item isn't `cancelled`;
+  - on completion it deletes the audio and job output. It stores the transcript with a conditional write only if the item is still eligible for completion and has not expired or been cancelled;
   - on failure it marks the item `failed`, unless cancelled, and deletes the audio.
   - Cleanup is idempotent, so a repeat event is harmless.
 - **Voice items.** A small voice table (key `voice_id`) holds `conversation_id`, `status`, `expires_at` (one hour after creation) and, until it is delivered, the transcript.
-- **Transcript lifetime.** The first `GET` that returns the transcript also removes it from the item and sets `status` to `delivered`. A later `GET` returns `delivered` with no transcript. Any `GET` after `expires_at` returns 404. DynamoDB TTL on `expires_at` removes the item itself later; TTL deletion can take days, so it is not relied on to remove transcripts.
+- **Transcript lifetime.** The first `GET` that returns the transcript also removes it from the item and sets `status` to `delivered`. A later `GET` returns `delivered` with no transcript. Any `GET` after `expires_at` returns 404. If the transcript is never fetched, it remains in the item until DynamoDB TTL deletes it, typically within a few days after expiry. This is the physical retention period; one hour is the access limit, not a deletion deadline.
 - **Limits.** Recordings are at most 2 minutes. Failed jobs return `failed`, and the producer can type instead.
 
 ### Client
@@ -66,6 +66,7 @@ These are on the same REST API, TypeScript on Node.js 24, `producer` role, with 
 - **Roles:**
   - **Voice route handler:** read on the conversations table (ownership check), read and write on the voice table, write and delete on the voice bucket prefix (cancellation), `transcribe:StartTranscriptionJob`, and the KMS key.
   - **Completion worker:** `transcribe:GetTranscriptionJob`, read and delete on the voice bucket, write on the voice table, and the KMS key.
+- **Transcribe access:** Define the batch job's S3 access path explicitly. The principal used by Transcribe must be able to read the input object and write the output object, scoped to the voice prefixes, and use the KMS key as required. Configure the corresponding key policy. If the selected job configuration uses a data-access role, specify its trust policy and the handler's scoped `iam:PassRole` permission.
 - **PII and scope.**
   - The sent transcript is producer-typed text, so it gets the PII check ([#20](20-pii-flagging.md)) and the out-of-scope check ([#21](21-out-of-scope.md)) like any message.
 - **Logs.** IDs, status and durations only. Never transcript text.
@@ -81,9 +82,11 @@ These are on the same REST API, TypeScript on Node.js 24, `producer` role, with 
   - a failed job is marked `failed` and its audio deleted;
   - cancel before a job starts deletes the audio, and no job is started afterwards;
   - cancel while a job runs marks the item `cancelled`, and the worker then deletes the output without storing a transcript;
+  - if cancellation occurs between the worker reading the item and attempting its completion update, the conditional update cannot restore the transcript or change the cancelled status;
   - the first `GET` after completion returns the transcript and removes it; a second `GET` returns `delivered` with no transcript;
   - a `GET` after `expires_at` returns 404, even before TTL has removed the item;
   - no transcript text is logged.
+- **Deployed integration check:** transcribe an uploaded recording using the encrypted voice bucket, then verify completion and cleanup with the specified roles and key policy.
 - **Component tests:**
   - the transcript lands in the message box and is not sent automatically;
   - cancel discards the recording;
