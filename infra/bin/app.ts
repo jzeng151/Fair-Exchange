@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { App, BootstraplessSynthesizer } from 'aws-cdk-lib';
 import { AgentArtifactsStack, AgentSpikeStack } from '../lib/agent-spike-stack';
+import { AnalyticsQueriesStack } from '../lib/analytics-queries-stack';
 import { AthenaSyncStack } from '../lib/athena-sync-stack';
 import { FairExchangeStack } from '../lib/fair-exchange-stack';
 
@@ -19,7 +20,7 @@ new AgentSpikeStack(app, 'FairExchangeAgentSpike', {
 
 // Spec 28: records table -> S3 -> Glue/Athena. The records table and its stream come from the write-back work (spec 26);
 // pass them with -c recordsTableName=... -c recordsTableStreamArn=... (placeholders keep `cdk synth` working).
-new AthenaSyncStack(app, 'FairExchangeAthenaSync', {
+const athenaSync = new AthenaSyncStack(app, 'FairExchangeAthenaSync', {
   synthesizer: new BootstraplessSynthesizer(),
   env,
   recordsTableName: app.node.tryGetContext('recordsTableName') ?? 'unset-records-table',
@@ -29,3 +30,10 @@ new AthenaSyncStack(app, 'FairExchangeAthenaSync', {
   codeBucketName: app.node.tryGetContext('syncCodeBucket') ?? 'unset-sync-code-bucket',
   codeKey: app.node.tryGetContext('syncCodeKey') ?? 'sync/unset.zip',
 });
+
+// Spec 29: the analytics route's fixed queries, as Athena named queries in the workgroup above.
+const analyticsQueries = new AnalyticsQueriesStack(app, 'FairExchangeAnalyticsQueries', {
+  synthesizer: new BootstraplessSynthesizer(),
+  env,
+});
+analyticsQueries.addDependency(athenaSync);
