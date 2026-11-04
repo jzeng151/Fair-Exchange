@@ -23,6 +23,7 @@ from fex.conversation.scope import ScopeCheck, always_in_scope
 from fex.conversation.contract import (
     ActionEntry, ActionName, Answer, Event, Request, ResumeResponse, SpokenEntry,
 )
+from fex.guardrail import CONVERSATION_KEY
 from fex.conversation.state import (
     ConversationState, Playback, Profile, ShownClaims, StateConflict, StateStore,
 )
@@ -267,7 +268,7 @@ class ConversationEngine:
         elif state.step == "playback":
             self._playback(state, turn, correction=text)
         else:  # respond, consent, feedback: a short reply that changes nothing
-            reply = self._structured(self.small_model, SHORT_REPLY_SYSTEM, self._transcript(state), ShortReply)
+            reply = self._structured(state, self.small_model, SHORT_REPLY_SYSTEM, self._transcript(state), ShortReply)
             turn.say(reply.reply)
         return self._finish(state, turn, step_changed=state.step != before)
 
@@ -345,7 +346,7 @@ class ConversationEngine:
     # ------------------------------------------------------------------ steps
 
     def _ask(self, state: ConversationState, turn: _Turn, system: str, prompt: str) -> IntakeTurn:
-        result = self._structured(self.small_model, system, prompt, IntakeTurn)
+        result = self._structured(state, self.small_model, system, prompt, IntakeTurn)
         state.language = result.language or state.language
         return result
 
@@ -358,7 +359,7 @@ class ConversationEngine:
 
     def _playback(self, state: ConversationState, turn: _Turn, correction: str | None = None) -> None:
         prompt = self._transcript(state) + (f"\n\nThe producer corrected the playback: {correction}" if correction else "")
-        draft = self._structured(self.small_model, PLAYBACK_SYSTEM, prompt, PlaybackDraft)
+        draft = self._structured(state, self.small_model, PLAYBACK_SYSTEM, prompt, PlaybackDraft)
         state.playback = Playback(text=draft.text, challenge=draft.challenge, timing=draft.timing,
                                   severity=draft.severity, tried=draft.tried)
         if draft.entity_type:  # every correction applies; back to the value on file clears the override
@@ -373,7 +374,7 @@ class ConversationEngine:
     def _confirm(self, state: ConversationState, turn: _Turn) -> None:
         assert state.playback is not None
         note = f"\nLocation note (keep it in both summaries): {state.location_note}" if state.location_note else ""
-        summary = self._structured(self.small_model, SUMMARY_SYSTEM,
+        summary = self._structured(state, self.small_model, SUMMARY_SYSTEM,
                                    f"Language: {state.language}\nConfirmed playback: {state.playback.model_dump_json()}"
                                    + note, RecordSummary)
         state.playback.summary_original = summary.summary_original
@@ -475,7 +476,8 @@ class ConversationEngine:
 
     def _retrieve_and_write(self, state: ConversationState, prompt: str) -> tuple[AnswerDraft, list[str]]:
         invocation_state = {"producer_id": state.producer_id, "step": "respond",
-                            "entity_type": state.effective_entity_type}
+                            "entity_type": state.effective_entity_type,
+                            CONVERSATION_KEY: state.conversation_id}  # for Guardrail findings (#12)
         try:
             agent = Agent(model=self.large_model, system_prompt=ANSWER_SYSTEM, tools=list(self.tools),
                           callback_handler=None)
@@ -501,10 +503,13 @@ class ConversationEngine:
 
     # ------------------------------------------------------------------ helpers
 
-    def _structured(self, model: Any, system: str, prompt: str, output: type[BaseModel]) -> Any:
+    def _structured(self, state: ConversationState, model: Any, system: str, prompt: str,
+                    output: type[BaseModel]) -> Any:
         """Small-model calls: no data tools are ever offered here."""
         agent = Agent(model=model, system_prompt=system, tools=[], callback_handler=None)
-        return agent(prompt, structured_output_model=output).structured_output
+        # Only the conversation ID: no producer ID, step or entity type, so no data tool could ever run.
+        return agent(prompt, structured_output_model=output,
+                     invocation_state={CONVERSATION_KEY: state.conversation_id}).structured_output
 
     def _transcript(self, state: ConversationState) -> str:
         p = state.profile

@@ -92,6 +92,14 @@ default, `always_in_scope`, treats everything as in scope. Pass `scope_check=` t
 The check also covers text sent with `correct_playback`. A verdict can carry the message's `language`, so a
 producer whose first message is out of scope still gets the decline in their own language (no model is called).
 
+## Guardrail (issue #12)
+Both models are `GuardedBedrockModel`s (`fex/guardrail.py`), following [`docs/specs/12-guardrail.md`](../docs/specs/12-guardrail.md).
+The Bedrock Guardrail is attached from `FEX_GUARDRAIL_ID` and `FEX_GUARDRAIL_VERSION`, with the trace on and
+input and output redaction explicitly off. Every policy is detect-only (CDK: `infra/lib/guardrail.ts`), so it
+never blocks or changes a conversation. Each detected policy is logged as one `guardrail_finding` JSON line
+(`conversation_id`, `source`, `policy`, `category`) at WARNING. It is never text, and never written to the record.
+If either variable is unset, the models run without the Guardrail and a warning is logged.
+Tests: `tests/test_guardrail.py`.
 ## Write-back (issue #26)
 
 `fex.records` builds the record from the conversation state and saves it, following

@@ -42,3 +42,19 @@ Streams are `application/x-ndjson`. Errors: 400 (unknown field, or any producer 
 Turn lock: each turn holds a lease (`lock_expires_at`, `lock_token`) taken before the response starts, so a 409 is a real HTTP 409. Agent calls are cut off at 290 s (Lambda timeout 300 s, lease 330 s), and only the holder's token can release the lock. `resume` calls (`GET /conversations/{id}` and the sweep) are cut off at 20 s, so a stalled agent is skipped rather than blocking the sweep.
 
 Deploy inputs the stack must provide: the conversations table and index, `AGENT_RUNTIME_ARN`, the REST API with response streaming and a 5 minute timeout on the three POST routes, the 15 minute schedule for the sweep, and `INACTIVITY_MINUTES`. Only the chat handlers and the sweep may write the table or invoke the runtime. Until the stack is wired, these handlers are not deployed.
+
+## Guardrail (#12)
+Contract: `docs/specs/12-guardrail.md`. CDK: `infra/lib/guardrail.ts` (`FexGuardrail`, in the `FairExchange` stack). Agent: `agent/src/fex/guardrail.py`.
+- **Policies:**
+  - Denied topics: "Certification status and audit results" and "Worker grievances and complaints".
+  - Content filters: SEXUAL, VIOLENCE, HATE, INSULTS, MISCONDUCT and PROMPT_ATTACK (input only).
+  - Every action is `NONE` (detect).
+  - No sensitive-information or contextual grounding policy.
+- **Stack outputs:** `GuardrailId`, `GuardrailVersion`. A configuration change creates a new version on the next deploy.
+- **Runtime wiring** (for the FEX runtime, #4/#5):
+  - Set the env vars from `guardrail.runtimeEnvironment` (`FEX_GUARDRAIL_ID`, `FEX_GUARDRAIL_VERSION`).
+  - Call `guardrail.grantApply(executionRole)` for `bedrock:ApplyGuardrail`.
+  - The hello-world spike runtime is not wired.
+- **CloudWatch:** each finding is one log line, `guardrail_finding {"event": "guardrail_finding", "conversation_id", "source", "policy", "category"}`, with no text.
+  - Logs Insights: `filter @message like /guardrail_finding/`.
+- **Not yet verified on AWS:** the spec's spike check (detect-mode assessments appear in the trace when every action is `NONE`) and the seam 3 smoke test. Both need the FEX runtime deployed.
