@@ -26,7 +26,7 @@ data: {"seq": 13, "type": "claim", "section": "insights", "claim": {"text": "Rai
 
 data: {"seq": 14, "type": "claim", "section": "peer_examples", "claim": {"text": "A peer built tanks.", "citation": {"source": "Premium project, Higuera Producers' Group [PROJ-295DB6A0]", "standard_clause": "APS 1.1", "period": null, "strength": "exact"}}}
 
-data: {"seq": 15, "type": "text", "text": "Esta "}
+data: {"seq": 15, "type": "text", "text": " Esta "}
 
 data: {"seq": 16, "type": "text", "text": "información "}
 
