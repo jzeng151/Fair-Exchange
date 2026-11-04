@@ -13,3 +13,4 @@ Measures FEX against the Vision doc's success metrics.
 
 - `scenarios/`: labeled demo scenarios (3+, at least one in Spanish), issue #35
 - `tests/`: pytest harness; can also feed AgentCore Evaluations
+  - `test_negative_scope.py` (#34): every data tool in `ALL_TOOLS`, called as every sample producer, with another producer's identity and location slipped into the input. Checks the result is unchanged, holds no account id, and belongs to the session producer. A new tool fails until it gets a scope check in `TOOL_CHECKS`. Run with `cd agent && uv run pytest ../eval/tests`.
