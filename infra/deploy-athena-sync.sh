@@ -25,10 +25,14 @@ code_bucket="fair-exchange-sync-code-${account}-${AWS_REGION}"
 
 echo "1/4 Packaging the sync Lambda (x86_64 Linux wheels)"
 # The Lambda uses boto3, which the runtime already provides; package the source with its deps, Lambda arch.
+# Build fex-sync's own wheel first: --only-binary forbids building any source, including this package, so it
+# applies to the dependencies only.
+uv build -q --wheel --out-dir "$build/dist" "$sync_src"
 uv pip install -q --target "$build/pkg" --python-platform x86_64-manylinux2014 --python-version 3.12 \
-  --only-binary=:all: "$sync_src"
+  --only-binary=:all: "$build"/dist/fex_sync-*.whl
 (cd "$build/pkg" && zip -qr -X "$build/sync.zip" .)
-key="sync/sync-$(shasum -a 256 "$build/sync.zip" | cut -c1-12).zip"  # new key per build, so CloudFormation sees the change
+sha256() { if command -v sha256sum >/dev/null; then sha256sum "$1"; else shasum -a 256 "$1"; fi; }  # Linux / macOS
+key="sync/sync-$(sha256 "$build/sync.zip" | cut -c1-12).zip"  # new key per build, so CloudFormation sees the change
 
 echo "2/4 Code bucket ($code_bucket)"
 if ! aws s3api head-bucket --bucket "$code_bucket" 2>/dev/null; then
