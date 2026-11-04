@@ -1,7 +1,7 @@
 // Demo mode (issue #30): records are kept in this browser only, until the chat API (#25) and
 // write-back (#26) exist. Records are built with the #6 schema types, so swapping this module
 // for real API calls doesn't change their shape.
-import type { CompletedRecord, ConversationRecord } from '../../../../api/src/types/conversation-record'
+import type { CompletedRecord, ConversationRecord } from '../../../api/src/types/conversation-record'
 
 const KEY = 'fair-exchange-demo-records'
 

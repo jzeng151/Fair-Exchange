@@ -1,6 +1,6 @@
 // #30: what the chat hands to the backend must match the #6 record schema.
 import { describe, expect, it } from 'vitest'
-import type { CompletedRecord } from '../../../../api/src/types/conversation-record'
+import type { CompletedRecord } from '../../../api/src/types/conversation-record'
 import { buildCompletedRecord, buildDeclinedRecord } from './record'
 
 const NOW = new Date('2026-11-04T15:30:00Z')

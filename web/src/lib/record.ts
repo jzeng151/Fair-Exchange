@@ -1,6 +1,6 @@
 // Builds the record the chat hands to the backend, typed by the GENERATED #6 schema types.
 // (The Pydantic models in agent/ are the source of truth; never hand-edit the generated types.)
-import type { Claim, CompletedRecord, DeclinedRecord } from '../../../../api/src/types/conversation-record'
+import type { Claim, CompletedRecord, DeclinedRecord } from '../../../api/src/types/conversation-record'
 
 export interface CompletedInput {
   recordId: string

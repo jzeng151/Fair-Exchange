@@ -1,6 +1,6 @@
 // #30: the demo's scripted content must be honest and complete.
 import { describe, expect, it } from 'vitest'
-import clauses from '../../../../data/src/fx_data/clauses.json'
+import clauses from '../../../data/src/fx_data/clauses.json'
 import { t } from './i18n'
 import { scenarios } from './scenarios'
 
