@@ -26,9 +26,12 @@ PEER_ROWS = PeerProjects.load()._projects
 TAGS = list(ChallengeTag.__args__)
 
 
-def call(tool, tool_input: dict, producer_id: str | None) -> tuple[str, object]:
-    """Run a tool the way the agent does. Returns (status, parsed result or error text)."""
-    state = {"agent": None} | ({"producer_id": producer_id} if producer_id else {})
+def call(tool, tool_input: dict, producer_id: str | None, step: str | None = "respond") -> tuple[str, object]:
+    """Run a tool the way the agent does. Returns (status, parsed result or error text).
+
+    Data tools only run in the `respond` step (#13), so that is the default session step."""
+    state = {"agent": None} | ({"producer_id": producer_id} if producer_id else {}) \
+        | ({"step": step} if step else {})
 
     async def run():
         last = None
