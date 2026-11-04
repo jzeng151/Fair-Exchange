@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { App, BootstraplessSynthesizer } from 'aws-cdk-lib';
 import { AgentArtifactsStack, AgentSpikeStack } from '../lib/agent-spike-stack';
+import { AthenaSyncStack } from '../lib/athena-sync-stack';
 import { FairExchangeStack } from '../lib/fair-exchange-stack';
 
 const app = new App();
@@ -14,4 +15,17 @@ new AgentSpikeStack(app, 'FairExchangeAgentSpike', {
   env,
   codeBucketName: app.node.tryGetContext('agentCodeBucket') ?? 'unset-agent-code-bucket',
   codeKey: app.node.tryGetContext('agentCodeKey') ?? 'hello/unset.zip',
+});
+
+// Spec 28: records table -> S3 -> Glue/Athena. The records table and its stream come from the write-back work (spec 26);
+// pass them with -c recordsTableName=... -c recordsTableStreamArn=... (placeholders keep `cdk synth` working).
+new AthenaSyncStack(app, 'FairExchangeAthenaSync', {
+  synthesizer: new BootstraplessSynthesizer(),
+  env,
+  recordsTableName: app.node.tryGetContext('recordsTableName') ?? 'unset-records-table',
+  recordsTableStreamArn: app.node.tryGetContext('recordsTableStreamArn')
+    ?? `arn:aws:dynamodb:${env.region}:000000000000:table/unset-records-table/stream/2026-01-01T00:00:00.000`,
+  recordsTableKeyArn: app.node.tryGetContext('recordsTableKeyArn'),
+  codeBucketName: app.node.tryGetContext('syncCodeBucket') ?? 'unset-sync-code-bucket',
+  codeKey: app.node.tryGetContext('syncCodeKey') ?? 'sync/unset.zip',
 });

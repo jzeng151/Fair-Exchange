@@ -121,6 +121,74 @@ NAME_REPLACEMENTS = sorted([
     ("GMC-CFA", "The association"),
     ("SAINSBURYS", "THE BUYER"),
     ("SAINSBURY", "THE BUYER"),
+    # Added after code review (#54) found producer names the first list missed. Found by listing
+    # every capitalized word that never appears in lowercase, then reading each in context.
+    # Public bodies and standards (ICA, FLO, FLOCERT, CLAC, WWF, JAS, the World Bank) and places
+    # are left alone.
+    ("Seville cacaficulturers' cooperative - CAFISEVILLA", "the cacaficulturers' cooperative"),
+    ("KSU Rahmat Kinara", "a member farmers' group"),
+    ("Joan Fernie Charitable Trust (JFCT)", "a charitable trust"),
+    ("Joan Fernie Charitable Trust", "a charitable trust"),
+    ("JFCT", "the trust"),
+    ("FA Tunas Beringin", "a member farmers' association"),
+    ("Tunas Beringin", "a member farmers' association"),
+    ("Yaholu Village", "a village"),
+    ("Yaholu", "the village"),
+    ("Chemase Estate", "an estate"),
+    ("Marinyn Estate", "an estate"),
+    ("Kaproret Estate", "an estate"),
+    ("Kitumbe Factory", "a factory"),
+    ("Finteaflo office", "an office"),
+    ("Chepkembe head office", "the head office"),
+    ("Chemase", "the estate"),
+    ("Marinyn", "the estate"),
+    ("Kaproret", "the estate"),
+    ("Kitumbe", "the factory"),
+    ("Finteaflo", "the office"),
+    ("Chepkembe", "the head office"),
+    ("MUSASA Coffee School", "the coffee school"),
+    ("Musasa Coffee school", "the coffee school"),
+    ("MUSASA", "the school"),
+    ("FABICOOP Ltda.", "the cooperative"),
+    ("FABICOOP Ltda", "the cooperative"),
+    ("FABICOOP", "the cooperative"),
+    ("CAFESCOR", "the cooperative"),
+    ("Coopervitae", "the cooperative"),
+    ("MELCOOP", "the cooperative"),
+    ("FFSM", "the association"),
+    ("Asoprokia", "the association"),
+    ("Coratioquia", "the committee"),
+    ("CAFICAICEDONIA", "the cooperative"),
+    ("CAFISEVILLA", "the cooperative"),
+    ("COMIXCAEL", "the cooperative"),
+    ("COOCAFISA", "the cooperative"),
+    ("CORCI", "the cooperative"),
+    ("Cenfrocafe", "the cooperative"),
+    ("CECJ", "a partner group"),
+    ("GSC Community Service Group", "a community service group"),
+    ("GSC", "the group"),
+    ("Edulag and Pentágono Agrícola", "two farms"),
+    ("Edulag", "a farm"),
+    ("Pentágono Agrícola", "a farm"),
+    ("Montesol Group corporation", "a banana company"),
+    ("Montesol Group", "a banana company"),
+    ("Montesol", "the company"),
+    ("Campo Limpio corporation", "a collection corporation"),
+    ("Campo Limpio", "a collection corporation"),
+    ("RGC COFFEE", "a coffee importer"),
+    ("RGC", "the importer"),
+    ("Casa Común's", "the organization's"),
+    ("Casa Común", "the organization"),
+    ("PT. BMB", "a company"),
+    ("BMB", "a company"),
+    ("Nobland VN", "a company"),
+    ("Nobland", "a company"),
+    ("Popoyan", "a partner organization"),
+    ("Perpetani", "the village"),
+    ("SMTA", "the group's"),
+    # Villages where an individual certified producer's garden is, finer than the region.
+    ("La Zarzamora", "a village"),
+    ("Atapan", "a village"),
 ], key=lambda pair: -len(pair[0]))
 
 _PLACEHOLDER = re.compile(r"\b(lorem|phasellus|suspendisse|curabitur)\b", re.IGNORECASE)
@@ -134,9 +202,12 @@ def _ref(prefix: str, *parts: str) -> str:
     return f"{prefix}-{hashlib.sha1('|'.join(parts).encode()).hexdigest()[:8].upper()}"
 
 
+_NAME_PATTERNS = [(re.compile(r"(?<!\w)" + re.escape(n) + r"(?!\w)", re.IGNORECASE), r) for n, r in NAME_REPLACEMENTS]
+
+
 def fictionalize(text: str) -> str:
-    for name, replacement in NAME_REPLACEMENTS:
-        text = text.replace(name, replacement)
+    for pattern, replacement in _NAME_PATTERNS:
+        text = pattern.sub(replacement, text)
     return " ".join(text.split())
 
 
@@ -161,8 +232,50 @@ def _read(path: Path) -> list[dict]:
         return list(csv.DictReader(fh))
 
 
+def _outcome(rows: list[dict]) -> set[tuple]:
+    return {(r["project_status_name"], r["project_start_date"], r["project_end_date"]) for r in rows}
+
+
+def build_status_index() -> dict[tuple[str, str], list[dict]]:
+    """Status rows grouped by (account, description). Several projects can share a description."""
+    index: dict[tuple[str, str], list[dict]] = defaultdict(list)
+    for r in _read(STATUS_CSV):
+        index[(r["account_sk"], r["project_description_txt"].strip())].append(r)
+    return index
+
+
+def resolve_status(index: dict, row: dict) -> dict:
+    """The status row for one project, or {} when it cannot be told apart.
+
+    Same account and description can belong to several projects with different statuses and dates.
+    Narrow by region and subcategory, then by project name. If the candidates still disagree, return
+    {} so the project shows no status rather than another project's status.
+    """
+    candidates = index.get((row["account_sk"], row["translated_project_description_txt"].strip()), [])
+    steps = (lambda r: r["country_region_name"] == row["region"]
+             and r["sub_category_taxonomy_term_txt"] == row["subcategory"],
+             lambda r: normalize(r["project_name"]) == normalize(row["translated_project_name"]))
+    for keep in (None, *steps):
+        if keep:
+            narrowed = [r for r in candidates if keep(r)]
+            candidates = narrowed or candidates
+        if len(_outcome(candidates)) == 1:
+            return candidates[0]
+    return {}
+
+
+def unique_project_ref(seen: Counter, account: str, name: str, description: str) -> str:
+    """A ref that names exactly one project. The sample repeats some projects (same account, name and
+    description), so repeats get an occurrence number. Refs of projects that appear once are unchanged."""
+    key = (account, name, description)
+    n = seen[key]
+    seen[key] += 1
+    return _ref("PROJ", *key) if n == 0 else _ref("PROJ", *key, str(n))
+
+
 def build_peers() -> dict:
-    status_by_key = {(r["account_sk"], r["project_description_txt"].strip()): r for r in _read(STATUS_CSV)}
+    status_index = build_status_index()
+    seen_refs: Counter = Counter()
     projects, dropped = [], 0
     for row in _read(PROJECTS_CSV):
         texts = [row[f] for f in ("translated_project_name", "translated_project_description_txt",
@@ -171,9 +284,9 @@ def build_peers() -> dict:
             dropped += 1
             continue
         name, description, reason, goal = (fictionalize(t or "") for t in texts)
-        status = status_by_key.get((row["account_sk"], row["translated_project_description_txt"].strip()), {})
-        project_ref = _ref("PROJ", row["account_sk"], row["translated_project_name"],
-                           row["translated_project_description_txt"])
+        status = resolve_status(status_index, row)
+        project_ref = unique_project_ref(seen_refs, row["account_sk"], row["translated_project_name"],
+                                         row["translated_project_description_txt"])
         projects.append({
             "project_ref": project_ref,
             "org_ref": _ref("ORG", row["account_sk"]),
@@ -306,7 +419,7 @@ def main() -> None:
     profiles = build_profiles()
     PROFILES_PATH.write_text(json.dumps(profiles, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     tags = Counter(p["challenge_tag"] for p in peers["projects"])
-    print(f"wrote {PEERS_PATH}: {len(peers['projects'])} projects "
+    print(f"wrote {PEERS_PATH}: {len(peers['projects'])} projects ({sum(p['status'] is None for p in peers['projects'])} without a status) "
           f"({peers['dropped_placeholder_rows']} placeholder rows dropped); {dict(tags)}", file=sys.stderr)
     print(f"wrote {PROFILES_PATH}: {len(profiles['profiles'])} profiles", file=sys.stderr)
 
