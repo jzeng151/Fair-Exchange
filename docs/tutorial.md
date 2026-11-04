@@ -97,16 +97,40 @@ What to notice:
 - `pii_flag` / `pii_matches` — the write-back path flags PII, never redacts it.
 - `review_status: "pending"` — a human reviews every record after the conversation ends.
 
-## 4. Real Claude (optional)
+## 4. Real models (no demo)
 
 ```bash
 FEX_DEMO_MODELS=0 bash scripts/e2e/run_local.sh
 ```
 
-Same flow, real Claude via Bedrock. Needs AWS credentials for a sandbox, costs cents per run. For the
-full deployed stack (Gateway, AgentCore Runtime, knowledge bases, CDK), see
-[the handoff docs](handoff/sandbox-deployment.md) and the deploy command in the
-[README](../README.md#run-the-whole-chain-locally-no-aws).
+Same flow, real Claude via Bedrock — and two things demo mode shields you from, both verified on the
+2026-11-04 event account:
+
+**Model access.** The defaults are Claude Sonnet/Haiku. If your AWS account has no AWS Marketplace
+subscription for those models, the first turn fails with `AccessDeniedException … aws-marketplace:` — the
+IAM grants `bedrock` but not Marketplace. Point to a model your IAM covers instead:
+
+```bash
+FEX_SMALL_MODEL=us.amazon.nova-pro-v1:0 FEX_LARGE_MODEL=us.amazon.nova-pro-v1:0 \
+FEX_DEMO_MODELS=0 bash scripts/e2e/run_local.sh
+```
+
+**Knowledge Bases.** The grounded answer is not in the model — it comes from the standards Knowledge Base.
+The runtime needs its id:
+
+```bash
+export FEX_STANDARDS_KB_ID=<StandardsKnowledgeBaseId>   # output of the deployed stack
+```
+
+Without it the grounded-answer turn fails with `RuntimeError - The standards Knowledge Base is not
+configured (FEX_STANDARDS_KB_ID)`: intake, follow-ups and playback still work (all of those were verified
+on real models), but no claims stream until the stack is deployed. If you have no deployed stack, deploy
+one — [the handoff deploy guide](handoff/02-deploy.md) takes a fresh account end to end — or stay in demo
+mode, which runs the identical conversation over sample knowledge with zero AWS.
+
+The eval stack is the real-AWS path that works standalone: `infra/deploy-eval.sh` stands up its own CDK
+stack (Bedrock judge, six evaluators) and `eval_smoke.py` runs two records through it — no sandbox stack
+required.
 
 ## 5. Run the quality checks yourself
 
