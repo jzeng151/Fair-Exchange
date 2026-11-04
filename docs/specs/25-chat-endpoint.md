@@ -101,6 +101,8 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 ### Inactivity sweep (shared contract owned here)
 
 - **Schedule:** a scheduled Lambda runs every 15 minutes.
+- **Values (decided 2026-11-04, [#13 spec](13-conversation-steps.md)):** inactivity period 120 minutes
+  (`INACTIVITY_MINUTES`), maximum conversation lifetime 1,440 minutes.
 - **What it does:**
   - It finds open conversations whose `last_activity_at` is older than the inactivity period, or whose `created_at` is older than the maximum conversation lifetime.
   - For each one, it takes the turn lock and re-checks the condition.
@@ -141,5 +143,4 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 
 ### Not decided (do not build or assume)
 
-- The inactivity period and the maximum conversation lifetime
 - The deployed sign-in stand-in ([#11 spec](11-identity.md))
