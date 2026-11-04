@@ -13,6 +13,37 @@ What each FEX tool takes, returns and guarantees. Code: `agent/src/fex/tools/`. 
 
 Each fact and peer example has a `source` string. That is the value the citation verifier (#17) records from tool results and checks `Citation.source` against, so FEX must copy it unchanged into the claim's `Citation.source`. Tools do not choose a standard clause; that comes from `check_standards`. Copy `period` and `strength` into the `Citation` too.
 
+## `get_regional_context()` (#15, data from #8)
+
+**Parameters (model-visible):** none.
+
+**Returns:**
+
+```json
+{
+  "matched": true,
+  "match_level": "region",
+  "region": {"country": "Colombia", "region": "Cauca", "crop": "Coffee"},
+  "facts": [
+    {"text": "Rainfall near the centre of Cauca, Colombia averaged ...",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct", "value": -10.4, "unit": "%",
+     "period": "2014-2025", "strength": "nearest"}
+  ],
+  "note": null
+}
+```
+
+| `match_level` | Meaning | `facts` |
+|---|---|---|
+| `region` | The producer's region is in the table | rainfall, baseline water stress, projected water stress, plus crop prices |
+| `country` | Region not in the table, crop is priced | crop prices only; `note` says so |
+| `none` | Nothing known, or no profile | empty; `note` says so |
+
+It never substitutes a neighbouring region. Strength is `nearest` for climate and water (one point near the region's centre) and `limited` for prices (world benchmarks, not farm-gate prices).
+
+**Feed the verifier:** `evidence.record_tool_result(result["facts"])`.
+
 ## `find_peer_examples(challenge)` (#16)
 
 **Parameters (model-visible):** `challenge`, one of the 11 challenge tags (`fex.models.ChallengeTag`). Anything else is rejected by Strands before the tool runs.
@@ -41,6 +72,8 @@ Each fact and peer example has a `source` string. That is the value the citation
 
 | File | Built by | Rebuild |
 |---|---|---|
+| `regional_sources.json` | `fx_data.regional fetch` (network) | when adding regions or refreshing data |
+| `regional_facts.json` | `fx_data.regional build` (offline) | after `fetch` |
 | `peer_projects.json`, `producer_profiles.json` | `fx_data.peers` (offline) | when the sample data changes |
 
-The architecture in `Fair-Exchange-Scaffolding/README.md` puts peer search in a Knowledge Base. For the sandbox the tables ship as package data, like `clauses.json` (#9). Moving them to a Knowledge Base changes the loaders in `fx_data`, not the tool contracts.
+The architecture in `Fair-Exchange-Scaffolding/README.md` puts the regional table in S3 and peer search in a Knowledge Base. For the sandbox these ship as package data, like `clauses.json` (#9). Moving them to S3 or a Knowledge Base changes the loaders in `fx_data`, not the tool contracts.
