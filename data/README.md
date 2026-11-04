@@ -84,3 +84,13 @@ PYTHONPATH=src uv run python -m fx_data.peers   # offline -> peer_projects.json,
 - **`producer_profiles.json`**: producer id → country, region, crop, entity type. A stand-in until the producer-record tool (#14) and the Athena tables (#28) exist. Region is the region most of the producer's projects are in; 7 of the 146 sample producers have none.
 
 `tests/test_peers.py` fails if either file is stale, or if an account id or a listed name appears in `peer_projects.json`.
+
+## Producer records (issue #14)
+
+```bash
+PYTHONPATH=src uv run python -m fx_data.records   # offline -> producer_records.json
+```
+
+One record per sample producer: profile (with certification status), their own Premium projects, and a survey summary. Survey answers are reduced to shares of households from an allowlist of farming, water and practice questions (`YES_NO_FIELDS`, `CHOICE_FIELDS`, `MULTI_FIELDS` in `records.py`). Sensitive questions (harassment, borrowing, medical access, child schooling, committees, income) are never read. A share is only reported when at least 5 households answered. 22 of 146 producers have survey responses; 14 have enough to summarize.
+
+`tests/test_records.py` fails if `producer_records.json` is stale or a sensitive field is added to the allowlist.
