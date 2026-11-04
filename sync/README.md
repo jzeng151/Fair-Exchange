@@ -33,7 +33,16 @@ The bucket name is the `RecordsBucketName` output of the `FairExchangeAthenaSync
 
 ## Deploy
 
-The stack is `infra/lib/athena-sync-stack.ts`. It needs the records table name and stream ARN (spec 26) and a code zip in S3:
+`infra/deploy-athena-sync.sh` packages the Lambda, uploads the zip under a fresh key, and deploys `infra/lib/athena-sync-stack.ts`. It needs the records table name and stream ARN (spec 26):
+
+```
+EXPECTED_AWS_ACCOUNT=<account> \
+RECORDS_TABLE_NAME=<table> RECORDS_TABLE_STREAM_ARN=<stream arn> \
+[RECORDS_TABLE_KEY_ARN=<kms arn>] \
+bash infra/deploy-athena-sync.sh
+```
+
+It prints the stack outputs, including `RecordsBucketName` (used by the resync command above). Remove everything with `infra/destroy-athena-sync.sh`; the record and results buckets are retained on purpose. The manual steps below do the same by hand:
 
 ```
 cd sync && uv pip install -q --target build --python-platform x86_64-manylinux2014 --python-version 3.12 --only-binary=:all: .
