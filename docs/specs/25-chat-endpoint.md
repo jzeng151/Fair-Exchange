@@ -83,7 +83,7 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 ### Calling the agent
 
 - **Invocation:** handlers call AgentCore `InvokeAgentRuntime` with the runtime session ID set to the conversation ID. The payload carries the request kind, `producerId`, `conversationId`, and the text or action.
-- **Restricted access:** only the chat handlers' role and the sweep's role may invoke the runtime. In disposable eval stacks only, the eval runner's role may also invoke it ([#36 spec](36-eval-harness.md)).
+- **Restricted access:** only the chat handlers' role and the sweep's role may invoke the runtime.
 
 ### Turn lock (shared contract owned here)
 
@@ -131,7 +131,7 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 
 ## Out of Scope
 
-- Review, analytics and "your record" routes (later batch)
+- Review, analytics and "your record" routes ([#27](27-review-api.md), [#29](29-analytics-api.md), [#32](32-your-record.md))
 - The web UI beyond the routes and stream format
 - Production identity, WAF and rate limiting beyond API Gateway defaults
 

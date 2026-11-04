@@ -24,6 +24,7 @@ A producer-only route and a view in the existing Vue app. It lists the producer'
 ## Implementation Decisions
 
 - **API route.** `GET /me/records`, on the same REST API, TypeScript on Node.js 24, `producer` role required ([#11](11-identity.md)). It returns the caller's records with `closed_at` set, newest first.
+- **Records not listed until decided.** Conversations that closed without any consent choice, and records whose consent was cleared by a reopened playback, are not listed. Their outcome is not decided yet ([#13](13-conversation-steps.md), [#19](19-consent-and-decline.md)).
 - **What is returned, for each record:**
   - **Completed:**
     - record ID, closed time, language and consent scope with its time;
@@ -49,7 +50,8 @@ A producer-only route and a view in the existing Vue app. It lists the producer'
   - only the caller's records are returned, even when other producers' records exist;
   - non-producers get 403;
   - open records are excluded;
-  - declined records return only the four fields;
+  - declined records return only record ID, closed time and `declined`;
+  - records whose outcome is not decided are not listed;
   - `pii_*`, decision log, `ai_usage` and the reviewer identity are never present;
   - `changed_by_reviewer` is set when a reviewer value exists.
 - **Component tests (Vitest with Vue Test Utils):**
