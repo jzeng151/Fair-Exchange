@@ -2,14 +2,17 @@
 
     PYTHONPATH=src uv run python -m fx_data.peers   # offline: writes peer_projects.json, producer_profiles.json
 
-Peer projects:
+Peer catalog (#16 spec; interim build until the #7 generator replaces it):
   - one row per environmental Premium project (`pprojects-full-environmental-with-acct-detail.csv`),
-    joined to its status and dates (`Premium Projects Environmental.csv`) on account + description
-  - tagged with one challenge tag from the 11-tag set
-  - fictionalized: each organization gets a stable `ORG-xxxxxxxx` reference, and organization and
-    person names in the text are replaced with neutral words. The owning account is stored only as a
-    salted hash, used to leave a producer's own projects out of their results
+    with its start year from `Premium Projects Environmental.csv`
+  - only the publishable fields: fictional organization name, country, crop, entity type, category,
+    sub-category, start year and the description (organization and person names replaced), plus an
+    opaque `catalog_id` and the challenge tags
+  - one private column, `owner_producer_id` (the owning producer's ID), used only to leave a
+    producer's own projects out; never returned (#7, #16 specs)
   - placeholder rows (lorem ipsum) are dropped
+  - not yet done (owned by #7): Comprehend PII check of each description, and the reviewed
+    vocabulary and sub-category mapping tables
 
 Producer profiles are a stand-in for the producer-record tool (#14) and the Athena tables (#28):
 producer_id -> country, region, crop and entity type, so tools can resolve the session producer's
@@ -36,11 +39,6 @@ STATUS_CSV = LINKED_DIR / "Premium Projects Environmental.csv"
 ACCOUNTS_CSV = LINKED_DIR / "Producer Accounts.csv"
 PEERS_PATH = HERE / "peer_projects.json"
 PROFILES_PATH = HERE / "producer_profiles.json"
-
-# Fixed salt: the hash only has to be stable and not reveal the account id in the shipped file.
-_OWNER_SALT = "fair-exchange-peer-owner-v1"
-
-SOURCE_PREFIX = "FTUSA Premium project (sample data, fictionalized)"
 
 # Environmental subcategory -> challenge tag. Blank subcategories fall back to keywords.
 SUBCATEGORY_TAGS = {
@@ -194,10 +192,6 @@ NAME_REPLACEMENTS = sorted([
 _PLACEHOLDER = re.compile(r"\b(lorem|phasellus|suspendisse|curabitur)\b", re.IGNORECASE)
 
 
-def owner_key(producer_id: str) -> str:
-    return hashlib.sha256(f"{_OWNER_SALT}:{producer_id}".encode()).hexdigest()[:16]
-
-
 def _ref(prefix: str, *parts: str) -> str:
     return f"{prefix}-{hashlib.sha1('|'.join(parts).encode()).hexdigest()[:8].upper()}"
 
@@ -273,6 +267,24 @@ def unique_project_ref(seen: Counter, account: str, name: str, description: str)
     return _ref("PROJ", *key) if n == 0 else _ref("PROJ", *key, str(n))
 
 
+# Fictional organization names (#16: "peers shown only by fictionalized organization name").
+_NAME_WORDS = ("Ceiba", "Guayacán", "Nogal", "Cedro", "Laurel", "Roble", "Sauce", "Olivo", "Almendro",
+               "Ébano", "Caoba", "Pino", "Arrayán", "Encino", "Jacaranda", "Aliso", "Fresno", "Tilo",
+               "Acacia", "Bambú", "Mangle", "Palma", "Higuera", "Naranjo", "Limonero", "Cacao", "Vainilla",
+               "Canela", "Romero", "Salvia")
+_NAME_KINDS = ("Producers' Group", "Growers' Association", "Farmers' Cooperative", "Producer Union",
+               "Growers' Collective")
+FICTIONAL_NAMES = tuple(f"{w} {k}" for k in _NAME_KINDS for w in _NAME_WORDS)  # 150 names
+
+
+def fictional_names(org_keys: list[str]) -> dict[str, str]:
+    """A stable fictional name per organization: sorted keys take names in order."""
+    keys = sorted(set(org_keys))
+    if len(keys) > len(FICTIONAL_NAMES):
+        raise ValueError(f"{len(keys)} organizations but only {len(FICTIONAL_NAMES)} fictional names")
+    return dict(zip(keys, FICTIONAL_NAMES))
+
+
 def build_peers() -> dict:
     status_index = build_status_index()
     seen_refs: Counter = Counter()
@@ -287,27 +299,28 @@ def build_peers() -> dict:
         status = resolve_status(status_index, row)
         project_ref = unique_project_ref(seen_refs, row["account_sk"], row["translated_project_name"],
                                          row["translated_project_description_txt"])
+        start = status.get("project_start_date") or ""
+        if start.startswith("1970-01-01"):  # Unix-epoch placeholder in the sample, not a real date
+            start = ""
         projects.append({
-            "project_ref": project_ref,
-            "org_ref": _ref("ORG", row["account_sk"]),
-            "owner_key": owner_key(row["account_sk"]),
-            "source": f"{SOURCE_PREFIX} {project_ref}",
-            "challenge_tag": tag_for(row["subcategory"], *texts),
+            "catalog_id": project_ref,
+            "_org": _ref("ORG", row["account_sk"]),
+            "owner_producer_id": row["account_sk"],
+            "tags": [tag_for(row["subcategory"], *texts)],
+            "country": row["country"] or None,
             "crop": row["product_category_name"] or None,
             "entity_type": row["structure"] or None,
-            "country": row["country"] or None,
-            "region": row["region"] or None,
-            "subcategory": row["subcategory"] or None,
-            "name": _short(name, 160),
-            "challenge": _short(reason),
-            "action": _short(description or name),
-            "intended_outcome": _short(goal),
-            "status": status.get("project_status_name") or None,
-            "start_date": status.get("project_start_date") or None,
-            "end_date": status.get("project_end_date") or None,
+            "category": row["category"] or None,
+            "sub_category": row["subcategory"] or None,
+            "start_year": int(start[:4]) if start[:4].isdigit() else None,
+            "description": _short(description or name),
         })
-    return {"description": "Fictionalized, challenge-tagged peer Premium projects from the FTUSA sample. "
-                           "owner_key is a salted hash used only to exclude a producer's own projects.",
+    names = fictional_names([p["_org"] for p in projects])
+    for p in projects:
+        p["organization"] = names[p.pop("_org")]
+    return {"description": "Peer catalog: publishable fields only (#16), plus the private owner_producer_id, "
+                           "used only to exclude a producer's own projects and never returned. Organizations "
+                           "are fictional.",
             "dropped_placeholder_rows": dropped, "projects": projects}
 
 
@@ -362,12 +375,14 @@ class ProducerProfiles:
         return sorted(self._profiles)
 
 
-def _crops(crop: str | None) -> set[str]:
+def crop_set(crop: str | None) -> set[str]:
     return {normalize(p) for p in (crop or "").split(";") if p.strip()}
 
 
-# Match weights. The tag is required; crop matters most, then entity type, then same country.
-W_CROP, W_ENTITY, W_COUNTRY, W_COMPLETED = 0.4, 0.3, 0.2, 0.1
+PUBLISHABLE = ("organization", "country", "crop", "entity_type", "category", "sub_category", "start_year",
+               "description")
+MAX_EXAMPLES = 3
+_STRENGTH_RANK = {"exact": 0, "nearest": 1, "limited": 2}
 
 
 class PeerProjects:
@@ -379,38 +394,36 @@ class PeerProjects:
         return cls(json.loads(Path(path).read_text(encoding="utf-8")))
 
     @staticmethod
-    def score(project: dict, profile: ProducerProfile) -> float:
-        score = 0.0
-        if _crops(project["crop"]) & _crops(profile.crop):
-            score += W_CROP
-        if profile.entity_type and normalize(project["entity_type"]) == normalize(profile.entity_type):
-            score += W_ENTITY
-        if profile.country and normalize(project["country"]) == normalize(profile.country):
-            score += W_COUNTRY
-        if project["status"] == "Completed":
-            score += W_COMPLETED
-        return round(score, 2)
+    def strength(project: dict, crops: set[str], entity_type: str | None) -> str:
+        """#16: tag + a crop + entity type is exact; tag + one of them is nearest; tag only is limited."""
+        crop = bool(crop_set(project["crop"]) & crops)
+        entity = bool(entity_type) and normalize(project["entity_type"]) == normalize(entity_type)
+        return "exact" if crop and entity else "nearest" if crop or entity else "limited"
 
-    def find(self, challenge_tag: str, profile: ProducerProfile, limit: int = 3) -> list[dict]:
-        """Projects OTHER producers funded for the same challenge, closest profile first.
+    def find(self, producer_id: str, tags: set[str], crops: set[str], entity_type: str | None,
+             limit: int = MAX_EXAMPLES) -> list[dict]:
+        """Projects OTHER producers funded that share a confirmed tag, strongest first, then most recent.
 
         At most one project per organization, so one group cannot fill every slot.
         """
-        own = owner_key(profile.producer_id)
-        candidates = [p for p in self._projects
-                      if p["challenge_tag"] == challenge_tag and p["owner_key"] != own]
-        ranked = sorted(candidates, key=lambda p: (-self.score(p, profile), p["project_ref"]))
-        results, seen_orgs = [], set()
+        candidates = [p for p in self._projects if set(p["tags"]) & tags and p["owner_producer_id"] != producer_id]
+        ranked = sorted(candidates, key=lambda p: (_STRENGTH_RANK[self.strength(p, crops, entity_type)],
+                                                   -(p["start_year"] or 0), p["catalog_id"]))
+        items, seen = [], set()
         for p in ranked:
-            if p["org_ref"] in seen_orgs:
+            if p["organization"] in seen:
                 continue
-            seen_orgs.add(p["org_ref"])
-            item = {k: v for k, v in p.items() if k != "owner_key"}
-            item["match_score"] = self.score(p, profile)
-            results.append(item)
-            if len(results) >= limit:
+            seen.add(p["organization"])
+            data = {k: p[k] for k in PUBLISHABLE}
+            where = ", ".join(x for x in (p["entity_type"], p["crop"], p["country"]) if x)
+            year = f" starting in {p['start_year']}" if p["start_year"] else ""
+            items.append({"source": f"Premium project, {p['organization']} [{p['catalog_id']}]", "kind": "peer",
+                          "text": f"{p['organization']} ({where}) funded a Premium project{year}: {p['description']}",
+                          "period": str(p["start_year"]) if p["start_year"] else None,
+                          "strength": self.strength(p, crops, entity_type), "data": data})
+            if len(items) >= limit:
                 break
-        return results
+        return items
 
 
 def main() -> None:
@@ -418,8 +431,8 @@ def main() -> None:
     PEERS_PATH.write_text(json.dumps(peers, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
     profiles = build_profiles()
     PROFILES_PATH.write_text(json.dumps(profiles, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-    tags = Counter(p["challenge_tag"] for p in peers["projects"])
-    print(f"wrote {PEERS_PATH}: {len(peers['projects'])} projects ({sum(p['status'] is None for p in peers['projects'])} without a status) "
+    tags = Counter(t for p in peers["projects"] for t in p["tags"])
+    print(f"wrote {PEERS_PATH}: {len(peers['projects'])} projects "
           f"({peers['dropped_placeholder_rows']} placeholder rows dropped); {dict(tags)}", file=sys.stderr)
     print(f"wrote {PROFILES_PATH}: {len(profiles['profiles'])} profiles", file=sys.stderr)
 

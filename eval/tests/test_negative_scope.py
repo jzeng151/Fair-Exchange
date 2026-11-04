@@ -15,7 +15,7 @@ import asyncio
 import json
 
 import pytest
-from fx_data.peers import PeerProjects, ProducerProfiles, owner_key
+from fx_data.peers import PUBLISHABLE, PeerProjects, ProducerProfiles
 from fx_data.records import ProducerRecords
 from fx_data.regional import RegionalFacts
 
@@ -136,13 +136,13 @@ def _check_regional(result, pid, _session):
 
 
 def _check_peers(result, pid, session):
-    own = owner_key(pid)
-    by_ref = {p["project_ref"]: p for p in PEER_ROWS}
+    by_id = {p["catalog_id"]: p for p in PEER_ROWS}
     for item in result:
+        row = by_id[item["source"].rsplit("[", 1)[1].rstrip("]")]
         assert item["kind"] == "peer"
-        assert by_ref[item["data"]["project_ref"]]["owner_key"] != own, "returned the producer's own project"
-        assert item["data"]["challenge_tag"] in session["tags"]
-        assert "owner_key" not in item["data"]
+        assert row["owner_producer_id"] != pid, "returned the producer's own project"
+        assert set(row["tags"]) & set(session["tags"])
+        assert set(item["data"]) == set(PUBLISHABLE), "a field outside the publishable list"
 
 
 def _check_standards(result, _pid, _session):

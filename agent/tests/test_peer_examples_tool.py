@@ -1,35 +1,50 @@
-"""Peer-example tool (#16), called through Strands so the session context is injected for real.
-
-The confirmed tags come from the conversation state (data tool contract, #17), never from the model."""
+"""Peer-example tool (#16), called through Strands so the session context is injected for real."""
 import json
 
 import pytest
-from fx_data.peers import PEERS_PATH, PeerProjects, ProducerProfiles, owner_key
+from fx_data.peers import PEERS_PATH, PUBLISHABLE, PeerProjects, ProducerProfiles
+
+from fex.tools import peer_examples
+from fex.tools.peer_examples import find_peer_examples
 from tests.tool_harness import call_tool
 
-from fex.tools.peer_examples import find_peer_examples
 
-PROFILES = ProducerProfiles.load()
-PEER_ROWS = json.loads(PEERS_PATH.read_text(encoding="utf-8"))["projects"]
-
-
-def _producer_with_projects(tag: str, crop_word: str) -> str:
-    """A real sample producer who has their own project for `tag` and grows `crop_word`."""
-    for row in PEER_ROWS:
-        if row["challenge_tag"] != tag:
-            continue
-        for pid, profile in PROFILES._profiles.items():
-            if owner_key(pid) == row["owner_key"] and crop_word in (profile["crop"] or "").lower():
-                return pid
-    raise AssertionError(f"no sample producer with a {tag} project growing {crop_word}")
+def _project(catalog_id, org, owner, tags=("water",), crop="Coffee", entity="Cooperative", year=2022):
+    return {"catalog_id": catalog_id, "organization": org, "owner_producer_id": owner, "tags": list(tags),
+            "country": "Peru", "crop": crop, "entity_type": entity, "category": "Environmental",
+            "sub_category": "Clean Water", "start_year": year, "description": f"Project {catalog_id}."}
 
 
-def _own_refs(pid: str) -> set[str]:
-    return {r["project_ref"] for r in PEER_ROWS if r["owner_key"] == owner_key(pid)}
+FIXTURE_PROJECTS = [
+    _project("P-OWN", "Ceiba Producers' Group", "COFFEE-COOP"),
+    _project("P-COFFEE-COOP", "Nogal Producers' Group", "A"),
+    _project("P-COFFEE-ESTATE", "Cedro Producers' Group", "B", entity="Estate", year=2024),
+    _project("P-BANANA-COOP", "Laurel Producers' Group", "C", crop="Bananas", year=2020),
+    _project("P-BANANA-ESTATE", "Roble Producers' Group", "D", crop="Bananas", entity="Estate"),
+    _project("P-COCOA-SMALL", "Sauce Producers' Group", "E", crop="Cocoa", entity="Independent Smallholder", year=2025),
+    _project("P-SOIL", "Olivo Producers' Group", "F", tags=("soil and land",)),
+]
+FIXTURE_PROFILES = {
+    "COFFEE-COOP": {"country": "Peru", "region": "Junin", "crop": "Coffee", "entity_type": "Cooperative"},
+    "BANANA-ESTATE": {"country": "Ecuador", "region": "El Oro", "crop": "Bananas", "entity_type": "Estate"},
+}
 
 
-def state(pid: str, *tags: str, **extra) -> dict:
-    return {"producer_id": pid, "tags": list(tags), **extra}
+@pytest.fixture(autouse=True)
+def fixture_tables(monkeypatch):
+    tables = (PeerProjects({"projects": FIXTURE_PROJECTS}), ProducerProfiles({"profiles": FIXTURE_PROFILES}))
+    monkeypatch.setattr(peer_examples, "_tables", lambda: tables)
+
+
+def _call(pid, tags=("water",), entity_type=None, tool_input=None):
+    state = {"producer_id": pid, "tags": list(tags)} | ({"entity_type": entity_type} if entity_type else {})
+    status, items = call_tool(find_peer_examples, tool_input or {}, state)
+    assert status == "success"
+    return items
+
+
+def _ids(items):
+    return [i["source"].rsplit("[", 1)[1].rstrip("]") for i in items]
 
 
 def test_model_cannot_set_any_parameter():
@@ -37,19 +52,52 @@ def test_model_cannot_set_any_parameter():
 
 
 def test_never_returns_the_session_producers_own_projects():
-    pid = _producer_with_projects("water", "coffee")
-    assert _own_refs(pid), "test needs a producer with their own water project"
-    status, results = call_tool(find_peer_examples, {}, state(pid, "water"))
-    assert status == "success" and results
-    assert not {r["data"]["project_ref"] for r in results} & _own_refs(pid)
+    assert "P-OWN" not in _ids(_call("COFFEE-COOP"))
 
 
-def test_a_producer_id_or_challenge_supplied_by_the_model_is_ignored():
-    pid = _producer_with_projects("water", "coffee")
-    other = next(p for p in PROFILES._profiles if p != pid)
-    _, honest = call_tool(find_peer_examples, {}, state(pid, "water"))
-    _, spoofed = call_tool(find_peer_examples, {"challenge": "health", "producer_id": other}, state(pid, "water"))
-    assert spoofed == honest
+def test_ranking_strength_labels_and_limit():
+    # Same crop and entity type, then one of them (most recent first), and at most 3: the two
+    # tag-only projects, including the newest one, are cut.
+    items = _call("COFFEE-COOP")
+    assert _ids(items) == ["P-COFFEE-COOP", "P-COFFEE-ESTATE", "P-BANANA-COOP"]
+    assert [i["strength"] for i in items] == ["exact", "nearest", "nearest"]
+
+
+def test_tag_only_matches_are_limited():
+    items = _call("BANANA-ESTATE")
+    assert [i["strength"] for i in items] == ["exact", "nearest", "nearest"]
+    # As a processor, no project shares the entity type: crop-only matches, then the newest tag-only one.
+    items = _call("COFFEE-COOP", entity_type="Processor")
+    assert [(i, item["strength"]) for i, item in zip(_ids(items), items)] == [
+        ("P-COFFEE-ESTATE", "nearest"), ("P-COFFEE-COOP", "nearest"), ("P-COCOA-SMALL", "limited")]
+
+
+def test_producers_differing_in_crop_and_entity_type_get_different_examples():
+    coffee, banana = _call("COFFEE-COOP"), _call("BANANA-ESTATE")
+    assert _ids(coffee)[0] == "P-COFFEE-COOP" and _ids(banana)[0] == "P-BANANA-ESTATE"
+
+
+def test_a_corrected_entity_type_is_used_for_matching():
+    items = _call("COFFEE-COOP", entity_type="Estate")
+    assert _ids(items)[0] == "P-COFFEE-ESTATE" and items[0]["strength"] == "exact"
+
+
+def test_only_confirmed_tags_match_and_no_match_is_an_empty_list():
+    assert _ids(_call("COFFEE-COOP", tags=["soil and land"])) == ["P-SOIL"]
+    assert _call("COFFEE-COOP", tags=["labor and migration"]) == []
+
+
+def test_items_hold_only_publishable_fields():
+    for item in _call("COFFEE-COOP"):
+        assert set(item) == {"source", "kind", "text", "period", "strength", "data"}
+        assert item["kind"] == "peer" and set(item["data"]) == set(PUBLISHABLE)
+        assert item["source"] == f"Premium project, {item['data']['organization']} [{_ids([item])[0]}]"
+        assert "owner_producer_id" not in json.dumps(item)
+
+
+def test_tags_or_a_producer_id_supplied_by_the_model_are_ignored():
+    honest = _call("COFFEE-COOP")
+    assert _call("COFFEE-COOP", tool_input={"challenge": "soil and land", "producer_id": "BANANA-ESTATE"}) == honest
 
 
 def test_no_producer_in_session_is_refused():
@@ -57,82 +105,13 @@ def test_no_producer_in_session_is_refused():
     assert status == "error" and "No producer in session" in text
 
 
-def test_no_confirmed_tags_returns_an_empty_list():
-    pid = next(iter(PROFILES._profiles))
-    assert call_tool(find_peer_examples, {}, state(pid)) == ("success", [])
-
-
-def _best_per_org(pid: str, tags: list[str]) -> dict[str, float]:
-    """Highest match score each organization reaches across the tags (excluding the producer's own)."""
-    peers, profile = PeerProjects.load(), PROFILES.get(pid)
-    best: dict[str, float] = {}
-    for tag in tags:
-        for row in peers.find(tag, profile, limit=10**9):
-            best[row["org_ref"]] = max(best.get(row["org_ref"], 0.0), row["match_score"])
-    return best
-
-
-@pytest.mark.parametrize("tags", [["water", "soil and land"], ["soil and land", "water"],
-                                  ["climate and weather", "biodiversity and conservation"]])
-def test_ranking_across_tags_is_not_overridden_by_tag_order(tags):
-    for pid in PROFILES._profiles:
-        best = _best_per_org(pid, tags)
-        _, results = call_tool(find_peer_examples, {}, state(pid, *tags))
-        scores = [r["data"]["match_score"] for r in results]
-        # each organization shown with its best project, and the top organizations overall
-        assert all(r["data"]["match_score"] == best[r["data"]["org_ref"]] for r in results), pid
-        assert scores == sorted(best.values(), reverse=True)[:len(scores)], pid
-
-
-def test_items_follow_the_data_tool_contract():
-    pid = _producer_with_projects("water", "coffee")
-    _, results = call_tool(find_peer_examples, {}, state(pid, "water", "climate and weather"))
-    assert 0 < len(results) <= 3
-    for r in results:
-        assert set(r) == {"source", "kind", "text", "period", "strength", "data"}
-        assert r["kind"] == "peer" and r["text"] and r["strength"] in {"exact", "nearest", "limited"}
-    assert len({r["data"]["org_ref"] for r in results}) == len(results)
-
-
-def test_producers_with_different_profiles_get_different_examples():
-    coffee = _producer_with_projects("climate and weather", "coffee")
-    bananas = next(pid for pid, p in PROFILES._profiles.items()
-                   if "banana" in (p["crop"] or "").lower())
-    _, a = call_tool(find_peer_examples, {}, state(coffee, "climate and weather"))
-    _, b = call_tool(find_peer_examples, {}, state(bananas, "climate and weather"))
-    assert [r["data"]["project_ref"] for r in a] != [r["data"]["project_ref"] for r in b]
-    assert any("coffee" in (r["data"]["crop"] or "").lower() for r in a)
-    assert any("banana" in (r["data"]["crop"] or "").lower() for r in b)
-
-
-def test_results_carry_a_citable_source_and_no_private_identifiers():
-    pid = _producer_with_projects("water", "coffee")
-    _, results = call_tool(find_peer_examples, {}, state(pid, "water"))
-    text = json.dumps(results)
-    for r in results:
-        assert r["source"].startswith("FTUSA Premium project (sample data, fictionalized) PROJ-")
-        assert "owner_key" not in r["data"]
-    assert not any(account in text for account in PROFILES._profiles)
-
-
-def test_at_most_one_example_per_organization():
-    pid = next(iter(PROFILES._profiles))
-    for tag in ("water", "climate and weather", "biodiversity and conservation"):
-        _, results = call_tool(find_peer_examples, {}, state(pid, tag))
-        orgs = [r["data"]["org_ref"] for r in results]
-        assert len(orgs) == len(set(orgs))
-
-
-def test_challenge_with_no_peer_projects_returns_an_empty_list():
-    # The sample has environmental projects only, so a labor challenge has no precedent.
-    pid = next(iter(PROFILES._profiles))
-    status, results = call_tool(find_peer_examples, {}, state(pid, "labor and migration"))
-    assert status == "success" and results == []
-
-
-@pytest.mark.parametrize("tag", ["water", "climate and weather"])
-def test_ranking_prefers_same_crop(tag):
-    pid = _producer_with_projects(tag, "coffee")
-    profile = PROFILES.get(pid)
-    top = PeerProjects.load().find(tag, profile, limit=1)[0]
-    assert "coffee" in (top["crop"] or "").lower()
+def test_the_real_catalog_returns_no_sample_account_or_project_id(monkeypatch):
+    monkeypatch.undo()
+    profiles = ProducerProfiles.load()
+    raw_ids = set(profiles.ids())
+    for pid in profiles.ids()[:20]:
+        text = json.dumps(_call(pid, tags=["water", "climate and weather", "biodiversity and conservation"]))
+        assert not any(account in text for account in raw_ids)
+    assert "account_sk" not in PEERS_PATH.read_text(encoding="utf-8")
+    assert all("owner_producer_id" not in json.dumps(i) for pid in profiles.ids()[:20]
+               for i in _call(pid, tags=["water"]))
