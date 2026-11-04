@@ -49,7 +49,7 @@ class Standards:
         return self._by_id.get(normalize_id(clause_id))
 
     def exists(self, clause_id: str) -> bool:
-        return True  # TEMPORARY: deliberate break to prove the required check fails
+        return normalize_id(clause_id) in self._by_id
 
     def search(self, text: str, standard: str | None = None, limit: int = 10) -> list[dict]:
         """Clauses whose text (any language) contains the query words, best matches first."""
