@@ -7,9 +7,10 @@ What to know before running Fair Exchange in production. Each links to its sourc
 - **Analytics over time** (decided 2026-11-04). Hidden counts can be recovered by comparing results as
   new records arrive; no sandbox rule prevents this. The production analytics should publish on a fixed
   schedule, round counts, or add noise ([#29](../specs/29-analytics-api.md)).
-- **Persistent memory is not in the deployed agent yet.** The shipped `default_engine()` still uses an
-  in-process `InMemoryStateStore`, so a conversation does not survive a runtime replacement until the
-  AgentCore Memory work lands ([memory spec](../specs/memory.md), in progress). When it does, long-term
+- **Persistent memory is configured, not on by default.** `default_engine()` uses AgentCore Memory when
+  `FEX_MEMORY_ID` is set, so a conversation survives a runtime replacement; without it the agent falls back
+  to an in-process `InMemoryStateStore` and state is lost on replacement ([memory spec](../specs/memory.md)).
+  The deploy must set `FEX_MEMORY_ID` (and the retention values) for persistence to take effect. Long-term
   recall of earlier conversations stays off behind one eligibility function until the decline policy is
   decided, so declined text cannot resurface.
 - **AgentCore Gateway was deferred** until after the MVP. Tools stay in the agent process so the
@@ -35,6 +36,7 @@ until the owning spec decides them. The CI open-decisions check fails if a spec 
 "Not decided" item without this list and the manifest below being updated to match.
 
 <!-- open-decisions-manifest
+05-cdk-stack.md: 3
 11-identity.md: 1
 13-conversation-steps.md: 2
 19-consent-and-decline.md: 3
@@ -42,6 +44,7 @@ until the owning spec decides them. The CI open-decisions check fails if a spec 
 25-chat-endpoint.md: 2
 26-write-back.md: 3
 28-athena-sync.md: 1
+40-timed-redeploy.md: 1
 memory.md: 3
 -->
 
@@ -74,10 +77,20 @@ currently has; it is checked against the specs in CI.
 ### Identity and scope
 - How callers sign in, and the deployed stand-in for it, which the deployed smoke test and the demo need
   before the chat endpoint runs end to end ([#11](../specs/11-identity.md),
-  [#25](../specs/25-chat-endpoint.md)).
+  [#25](../specs/25-chat-endpoint.md)). The stack will host the stand-in once it is decided
+  ([#5](../specs/05-cdk-stack.md)).
 
 ### Out of scope
 - How the out-of-scope detection function decides ([#21](../specs/21-out-of-scope.md)).
+### Deployment and logging
+- The log-group retention period: a required deploy-time value with no default, chosen per deploy
+  ([#5](../specs/05-cdk-stack.md)).
+- Whether message content may appear in AgentCore logs at all: content capture is a configuration value,
+  and ADR 0002 found the Strands tracer still logs content when the documented setting is off, so whoever
+  turns it off must verify the result ([#5](../specs/05-cdk-stack.md)).
+- How the timed-redeploy scenarios sign in as their producers, which depends on the sign-in stand-in and
+  blocks the scenario step until it is decided ([#40](../specs/40-timed-redeploy.md),
+  [#11](../specs/11-identity.md)).
 
 ### This handoff
 - Any item the specs list as "Not decided" that is added after this package was assembled
