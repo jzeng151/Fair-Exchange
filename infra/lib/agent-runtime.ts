@@ -86,6 +86,8 @@ export class FexRuntime extends Construct {
       { StringEquals: { 'kms:ViaService': `dynamodb.${region}.amazonaws.com` } });
     props.memory.grantAgentAccess(this.role);
     allow('DetectPii', ['comprehend:DetectPiiEntities'], ['*']); // Comprehend has no resource-level permissions
+    // Reviewer-facing English summary (#22, changed 2026-11-04): Translate has no resource-level permissions
+    allow('TranslateSummary', ['translate:TranslateText'], ['*']);
     allow('ReadAgentCode', ['s3:GetObject'], [`arn:aws:s3:::${props.codeBucketName}/${props.codeKey}`]);
     allow('ArtifactsKeyViaS3', ['kms:Decrypt'], [props.artifactsKeyArn],
       { StringEquals: { 'kms:ViaService': `s3.${region}.amazonaws.com` } });

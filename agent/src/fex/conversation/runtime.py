@@ -99,9 +99,13 @@ def default_engine() -> ConversationEngine:
         pii_scanner = default_pii_scanner()
     # State: AgentCore Memory when FEX_MEMORY_ID is set (resume across a recycled runtime), else in-process.
     # Both models carry the detect-mode Guardrail (#12), and their structured output is assessed too.
+    from fex.translate import AmazonTranslator
+
+    # Reviewer-facing English comes from Amazon Translate (#22); the model's English is the fallback.
     return ConversationEngine(store=state_store(), small_model=guarded_bedrock_model(small),
                               large_model=guarded_bedrock_model(large), records=records,
-                              pii_scanner=pii_scanner, output_assessor=OutputAssessor())
+                              pii_scanner=pii_scanner, output_assessor=OutputAssessor(),
+                              translator=AmazonTranslator())
 
 
 def invoke(payload: dict[str, Any], engine: ConversationEngine | None = None) -> dict[str, Any]:

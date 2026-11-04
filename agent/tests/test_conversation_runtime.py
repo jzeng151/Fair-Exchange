@@ -90,6 +90,19 @@ def test_demo_models_are_used_when_asked(monkeypatch):
     try:
         eng = runtime.default_engine()
         assert isinstance(eng.small_model, DemoModel) and isinstance(eng.large_model, DemoModel)
+        assert eng.translator is None  # demo mode: no AWS, the model's English summary (#22)
+    finally:
+        runtime.default_engine.cache_clear()
+
+
+def test_the_deployed_engine_translates_reviewer_summaries_with_amazon_translate(monkeypatch):
+    from fex.translate import AmazonTranslator
+    monkeypatch.setenv("AWS_DEFAULT_REGION", "us-west-2")
+    monkeypatch.delenv("FEX_DEMO_MODELS", raising=False)
+    monkeypatch.delenv("FEX_RECORDS_TABLE", raising=False)
+    runtime.default_engine.cache_clear()
+    try:
+        assert isinstance(runtime.default_engine().translator, AmazonTranslator)  # #22, changed 2026-11-04
     finally:
         runtime.default_engine.cache_clear()
 
