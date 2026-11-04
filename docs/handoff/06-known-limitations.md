@@ -10,9 +10,10 @@ What to know before running Fair Exchange in production. Each links to its sourc
 - **Persistent memory is configured, not on by default.** `default_engine()` uses AgentCore Memory when
   `FEX_MEMORY_ID` is set, so a conversation survives a runtime replacement; without it the agent falls back
   to an in-process `InMemoryStateStore` and state is lost on replacement ([memory spec](../specs/memory.md)).
-  The deploy must set `FEX_MEMORY_ID` (and the retention values) for persistence to take effect. Long-term
-  recall of earlier conversations stays off behind one eligibility function until the decline policy is
-  decided, so declined text cannot resurface.
+  The sandbox deploy sets `FEX_MEMORY_ID`. Memory keeps conversation events and the long-term strategies
+  on, and does not delete anything when a producer declines; that policy is FTUSA's to decide (see
+  "Decisions for FTUSA" below). Long-term recall of earlier conversations stays off behind one eligibility
+  function until it is decided, so declined text cannot resurface.
 - **AgentCore Gateway was deferred** until after the MVP. Tools stay in the agent process so the
   producer-ID scope rule keeps working; Gateway is the path for adding tools later, with that scope
   rule as the design constraint ([#13](../specs/13-conversation-steps.md)).
@@ -24,10 +25,46 @@ What to know before running Fair Exchange in production. Each links to its sourc
 - **The scope metric is evidence, not proof.** It shows zero leaks across the tested attacks; it is not
   proof that no leak is possible (spec #34, `docs/specs/34-negative-scope-tests.md`, pending).
 - **Observability content capture.** The AgentCore spike found full prompts, responses and tool results
-  in runtime logs with no expiry; the content-capture policy and log retention are resolved in the
-  full-stack deploy ([ADR 0002](../adr/0002-agentcore-runtime-spike.md), spec #5 pending).
+  in runtime logs with no expiry ([ADR 0002](../adr/0002-agentcore-runtime-spike.md)). The sandbox runtime
+  turns content capture off and keeps logs 30 days; a CloudWatch Logs Insights search of a real
+  conversation found no message content. Whether content may ever appear in logs, and the retention
+  period, remain FTUSA's decisions ([#5](../specs/05-cdk-stack.md)).
 - **Code merged before its spec.** Any code that landed ahead of its spec and has not yet been changed
   to match is listed from the retro review; keep this current as those are reconciled.
+
+## Decided
+
+- **Inactivity period and maximum conversation lifetime** (decided 2026-11-04 for the sandbox and pilot):
+  a conversation closes after 120 minutes without a message, and the runtime session ends after
+  1440 minutes (24 hours) ([#13](../specs/13-conversation-steps.md),
+  [#25](../specs/25-chat-endpoint.md), [deploy](02-deploy.md)).
+
+## Decisions for FTUSA
+
+Privacy and administration choices are FTUSA's to make after handoff. Until then the sandbox runs with
+the current behavior below; each row stays in the open list that follows until FTUSA decides it.
+
+### Privacy
+
+| Decision | Current sandbox behavior |
+|---|---|
+| What happens to stored text and derived memories on decline ([#19](../specs/19-consent-and-decline.md), [memory](../specs/memory.md)) | Nothing is deleted; the record shows the decline |
+| Memory retention for events and long-term records ([memory](../specs/memory.md)) | Short-term events expire after 7 days (the stack's sandbox value); long-term records have no expiry; no deletion call is made |
+| Which long-term memories may be recalled ([memory](../specs/memory.md)) | Recall is off |
+| Whether message content may appear in logs ([#5](../specs/05-cdk-stack.md)) | Content capture is off and verified |
+| Log retention ([#5](../specs/05-cdk-stack.md)) | 30 days, passed as `LOG_RETENTION_DAYS` |
+| How long records are kept ([#26](../specs/26-write-back.md)) | No expiry on the DynamoDB records or their Athena copy; only Athena query results expire (30 days) |
+| Outcome of a conversation that closes without a consent choice ([#13](../specs/13-conversation-steps.md), [#19](../specs/19-consent-and-decline.md)) | Not built; see the open list |
+| How the record shows consent while a reopened playback waits ([#19](../specs/19-consent-and-decline.md)) | Not built; see the open list |
+| Whether open conversations appear in Athena ([#28](../specs/28-athena-sync.md)) | Every record is copied |
+
+### Administration
+
+| Decision | Current sandbox behavior |
+|---|---|
+| Production sign-in, expected to be FTUSA's Okta ([#11](../specs/11-identity.md)) | A sandbox stand-in only |
+| Who may invoke the runtime | The deploying account's principals with invoke permission |
+| CDK bootstrap permissions | The default bootstrap, which grants CloudFormation `AdministratorAccess`; FTUSA may scope it down |
 
 ## Open decisions
 
@@ -38,10 +75,10 @@ until the owning spec decides them. The CI open-decisions check fails if a spec 
 <!-- open-decisions-manifest
 05-cdk-stack.md: 3
 11-identity.md: 1
-13-conversation-steps.md: 2
+13-conversation-steps.md: 1
 19-consent-and-decline.md: 3
 21-out-of-scope.md: 2
-25-chat-endpoint.md: 2
+25-chat-endpoint.md: 1
 26-write-back.md: 3
 28-athena-sync.md: 1
 40-timed-redeploy.md: 1
@@ -52,8 +89,6 @@ The count beside each spec in the manifest comment above is how many "Not decide
 currently has; it is checked against the specs in CI.
 
 ### Conversation lifecycle
-- The inactivity period and the maximum conversation lifetime
-  ([#13](../specs/13-conversation-steps.md), [#25](../specs/25-chat-endpoint.md)).
 - What outcome and record a conversation gets when it closes without any consent choice — leaving before
   the consent question, or after only an out-of-scope request
   ([#13](../specs/13-conversation-steps.md), [#19](../specs/19-consent-and-decline.md),

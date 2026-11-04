@@ -59,18 +59,26 @@ Items with `kind: "producer_record"`, built by `fx_data.records.ProducerRecords.
 
 ## `get_regional_context()` (#15, data from #8)
 
-Items with `kind: "regional"`, one per fact for the producer's region and crop:
+Rows of `regional_facts.csv` (#8) whose tags overlap the confirmed tags and whose crop, if any, is one of the profile crops (`fx_data.regional.normalize_crops`):
+
+| Row scope | Qualifies when | `strength` |
+|---|---|---|
+| `region` | `country` and `admin1` match the profile | `exact` |
+| `country` | `country` matches (the average of that country's regions in the table) | `nearest` |
+| `global` | always (world benchmark prices) | `limited` |
+
+At most 8 items: region rows, then country, then global. It never substitutes a neighbouring region. `data` is the CSV row.
 
 ```json
-[{"source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)", "kind": "regional",
-  "text": "Rainfall near the centre of Cauca, Colombia averaged ...", "period": "2014-2025", "strength": "nearest",
-  "data": {"metric": "rainfall_change_pct", "value": -10.4, "unit": "%", "match_level": "region",
-           "region": {"country": "Colombia", "region": "Cauca", "crop": "Coffee"}}}]
+[{"source": "CHIRPS v2.0 rainfall anomaly, Cauca, Colombia, 2024-2025 [RF-F8C4E1]", "kind": "regional",
+  "text": "Rainfall near the centre of Cauca, Colombia in 2024-2025 was 11.5% below the 2014-2023 mean (1,861 mm vs 2,103 mm a year).",
+  "period": "2024-2025", "strength": "exact",
+  "data": {"fact_id": "RF-F8C4E1", "scope": "region", "country": "CO", "admin1": "Cauca", "crop": "",
+           "tags": "climate and weather;water", "indicator": "rainfall_anomaly_pct", "value": "-11.5", "unit": "%", "…": "…"}}]
 ```
 
-- `data.match_level` is `region` (rainfall, water stress, crop prices) or `country` (crop prices only). No data for the region, or no profile: an empty list. It never substitutes a neighbouring region.
-- Strength is `nearest` for climate and water (one point near the region's centre) and `limited` for prices (world benchmarks).
-- Tag filtering, unique `[fact_id]` source labels and the 8-item limit are the #15 and #08 retro work.
+- Prices are world benchmarks, not farm-gate prices; their text says so.
+- Uncovered country, no matching tag, or unknown producer: an empty list.
 
 ## `find_peer_examples()` (#16)
 
@@ -115,7 +123,7 @@ Items with `kind: "standard"`: the top 5 distinct APS/FPS clauses the standards 
 | File | Built by | Rebuild |
 |---|---|---|
 | `regional_sources.json` | `fx_data.regional fetch` (network) | when adding regions or refreshing data |
-| `regional_facts.json` | `fx_data.regional build` (offline) | after `fetch` |
+| `regional_facts.csv` | `fx_data.regional build` (offline; validated, #8 columns) | after `fetch` |
 | `peer_projects.json`, `producer_profiles.json` | `fx_data.peers` (offline) | when the sample data changes |
 | `producer_records.json` | `fx_data.records` (offline) | when the sample data changes |
 

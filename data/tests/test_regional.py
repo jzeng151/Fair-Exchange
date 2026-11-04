@@ -1,88 +1,129 @@
-"""Regional fact table (#8): CHIRPS, Aqueduct and World Bank prices, pre-extracted."""
+"""Regional fact table (#8): CHIRPS, Aqueduct and World Bank prices, pre-extracted, as a validated CSV."""
+import csv
 import json
 
 import pytest
-from fx_data.regional import (FACTS_PATH, REGIONS, SOURCES_PATH, RegionalFacts, _band, build,
-                              normalize)
+from fx_data.regional import (COLUMNS, COUNTRY_CODES, FACTS_PATH, REGIONS, SOURCES_PATH, RegionalFacts,
+                              _band, build, country_code, normalize_crops, source_label, validate_rows)
 
-PRIORITY_COUNTRIES = {"peru", "cote d'ivoire", "colombia", "honduras", "mexico"}
-PRIORITY_CROPS = ("coffee", "cocoa", "bananas")
-NAMED_SOURCES = ("CHIRPS", "WRI Aqueduct", "World Bank Commodity Price Data")
+PRIORITY_COUNTRIES = {"PE", "CI", "CO", "HN", "MX"}
+PRIORITY_CROPS = ("coffee", "banana", "cocoa")
 
 
 @pytest.fixture(scope="module")
-def table():
-    return json.loads(FACTS_PATH.read_text(encoding="utf-8"))
+def rows():
+    with open(FACTS_PATH, encoding="utf-8", newline="") as fh:
+        return list(csv.DictReader(fh))
 
 
-def test_committed_facts_match_the_committed_sources(table):
-    assert table == build(json.loads(SOURCES_PATH.read_text(encoding="utf-8")))
+def _good(**overrides) -> dict:
+    row = {"fact_id": "RF-TEST01", "scope": "region", "country": "CO", "admin1": "Cauca", "crop": "",
+           "tags": "water", "indicator": "water_stress_score", "value": "1.0", "unit": "score 0-5",
+           "comparison": "test", "period": "1979-2019", "source_name": "WRI Aqueduct 4.0",
+           "source_url": "https://example.org", "extracted_at": "2026-11-04", "curated": "false"}
+    return row | overrides
 
 
-def test_every_region_in_the_list_was_fetched(table):
-    assert {(r["country"], r["region"]) for r in table["regions"]} == set(REGIONS)
+# ---- the committed table ----------------------------------------------------------------------
+
+def test_committed_csv_matches_the_committed_sources(rows):
+    built = build(json.loads(SOURCES_PATH.read_text(encoding="utf-8")))
+    as_text = [{k: str(v) for k, v in r.items()} for r in built]
+    assert rows == as_text
 
 
-def test_covers_the_priority_countries_and_crops(table):
-    countries = {normalize(r["country"]) for r in table["regions"] if r["facts"]}
-    assert PRIORITY_COUNTRIES <= countries
+def test_columns_are_exactly_the_spec_columns():
+    with open(FACTS_PATH, encoding="utf-8", newline="") as fh:
+        assert tuple(next(csv.reader(fh))) == COLUMNS
+
+
+def test_committed_rows_load_and_validate(rows):
+    RegionalFacts(rows)  # raises on any invalid row
+
+
+def test_every_region_in_the_list_has_rows(rows):
+    have = {(r["country"], r["admin1"]) for r in rows if r["scope"] == "region"}
+    assert have == {(COUNTRY_CODES[c], region) for c, region in REGIONS}
+
+
+def test_every_priority_country_has_region_or_country_rows(rows):
+    assert PRIORITY_COUNTRIES <= {r["country"] for r in rows if r["scope"] in ("region", "country")}
+
+
+def test_every_priority_crop_has_a_price_row(rows):
     for crop in PRIORITY_CROPS:
-        assert table["prices"][crop], crop
+        assert any(r["crop"] == crop and r["indicator"].startswith("price") for r in rows), crop
 
 
-def test_every_region_has_rainfall_and_water_facts(table):
-    for r in table["regions"]:
-        metrics = {f["metric"] for f in r["facts"]}
-        assert {"rainfall_change_pct", "baseline_water_stress", "projected_water_stress_2050"} <= metrics, \
-            (r["country"], r["region"])
+def test_source_labels_are_unique_and_end_in_the_fact_id(rows):
+    labels = [source_label(r) for r in rows]
+    assert len(labels) == len(set(labels))
+    assert all(label.endswith(f"[{r['fact_id']}]") for label, r in zip(labels, rows))
 
 
-def test_every_fact_cites_a_named_dataset_and_period(table):
-    facts = [f for r in table["regions"] for f in r["facts"]] + \
-            [f for crop in table["prices"].values() for f in crop]
-    for f in facts:
-        assert f["source"].startswith(NAMED_SOURCES), f["source"]
-        assert f["text"] and f["period"]
-        assert f["strength"] in {"nearest", "limited"}
+def test_prices_are_global_rows_labelled_as_world_benchmarks(rows):
+    prices = [r for r in rows if r["indicator"].startswith("price")]
+    assert prices and all(r["scope"] == "global" and not r["country"] for r in prices)
+    assert all("world benchmark" in r["comparison"] for r in prices)
 
 
-def test_prices_are_labelled_as_world_benchmarks(table):
-    for crop in PRIORITY_CROPS:
-        assert all(f["strength"] == "limited" for f in table["prices"][crop])
-    assert "not a farm-gate price" in table["prices"]["coffee"][0]["text"]
+# ---- the loader rejects bad rows --------------------------------------------------------------
+
+@pytest.mark.parametrize("bad", [
+    {"tags": "drought"},                                    # unknown tag
+    {"tags": ""},                                           # no tag
+    {"source_name": ""},                                    # missing source
+    {"source_url": " "},
+    {"country": "XX"},                                      # bad country code
+    {"country": "Colombia"},                                # a name, not ISO alpha-2
+    {"crop": "bananas"},                                    # not the crop vocabulary
+    {"scope": "district"},                                  # unknown scope
+    {"scope": "country"},                                   # country row with an admin1
+    {"admin1": ""},                                         # region row without an admin1
+    {"scope": "global"},                                    # global row with a country
+    {"curated": "yes"},
+])
+def test_invalid_rows_are_rejected(bad):
+    with pytest.raises(ValueError):
+        validate_rows([_good(**bad)])
 
 
-def test_lookup_matches_names_despite_accents_case_and_apostrophes(table):
-    facts = RegionalFacts(table)
-    assert facts.lookup("Cote d'Ivoire", "Bas-Sassandra", "Cocoa").matched
-    assert facts.lookup("CÔTE D’IVOIRE", "bas-sassandra", "Cocoa").match_level == "region"
+def test_duplicate_fact_ids_are_rejected():
+    with pytest.raises(ValueError):
+        validate_rows([_good(), _good()])
 
 
-def test_lookup_adds_prices_for_multi_crop_producers(table):
-    facts = RegionalFacts(table)
-    sources = {f["source"] for f in facts.lookup("Colombia", "Tolima", "Cocoa;Coffee").facts}
-    assert any("Cocoa" in s for s in sources) and any("Arabica" in s for s in sources)
+def test_a_valid_row_loads():
+    validate_rows([_good(), _good(fact_id="RF-TEST02", scope="global", country="", admin1="", crop="coffee",
+                                  tags="market and price")])
 
 
-def test_lookup_never_substitutes_another_region(table):
-    facts = RegionalFacts(table)
-    unknown = facts.lookup("Colombia", "Narino", "Coffee")
-    assert unknown.match_level == "country"
-    assert all(f["metric"].startswith("benchmark_price") for f in unknown.facts)
-    nothing = facts.lookup("Vietnam", "Khanh Hoa", "Seafood")
-    assert not nothing.matched and nothing.facts == []
+def test_curated_rows_say_so_in_their_source_label():
+    assert source_label(_good(curated="true")).endswith(" (curated stand-in) [RF-TEST01]")
+
+
+# ---- helpers ----------------------------------------------------------------------------------
+
+def test_country_names_match_despite_accents_and_apostrophes():
+    assert country_code("Cote d'Ivoire") == country_code("CÔTE D’IVOIRE") == "CI"
+    assert country_code("Vietnam") is None
+
+
+def test_crops_are_normalized_to_the_vocabulary():
+    assert normalize_crops("Cocoa;Coffee") == {"cocoa", "coffee"}
+    assert normalize_crops("Bananas") == {"banana"}
+    assert normalize_crops("Apparel") == set()
 
 
 def test_band_tidies_aqueduct_labels():
     assert _band("Low - Medium (10-20%)") == "low to medium (10-20%)"
-    assert _band("Low-medium (10-20%)") == "low to medium (10-20%)"
     assert _band("Medium-high (20-40%)") == "medium to high (20-40%)"
     assert _band(None) is None
 
 
-def test_incomplete_rainfall_years_produce_no_rainfall_fact():
-    record = {"country": "X", "region": "Y", "lat": 0, "lon": 0,
+def test_incomplete_rainfall_years_produce_no_rainfall_row():
+    sources = json.loads(SOURCES_PATH.read_text(encoding="utf-8"))
+    record = {"country": "Colombia", "region": "Cauca", "lat": 0, "lon": 0,
               "chirps": {"2024": {"total_mm": 900.0, "days": 200}}, "aqueduct": None}
-    built = build({"fetched_at": "x", "regions": [record],
-                   "prices": {"updated": "x", "series": json.loads(SOURCES_PATH.read_text())["prices"]["series"]}})
-    assert built["regions"][0]["facts"] == []
+    built = build({"fetched_at": "x", "regions": [record], "prices": sources["prices"]})
+    assert not [r for r in built if r["indicator"] == "rainfall_anomaly_pct"]
