@@ -67,6 +67,28 @@ step "6/8 Uploading clause documents to s3://$bucket/clauses/"
 aws s3 sync --only-show-errors --delete "$build/docs/clauses/" "s3://$bucket/clauses/"
 
 step "7/8 Main stack (website hosting, standards Knowledge Base; ingestion runs when the clauses change)"
+# Migration for stacks deployed before the data source used RETAIN: switch the existing data source first.
+# A change that replaces the vector store also replaces the data source, and the old one is deleted after the
+# Knowledge Base role's vector permission has moved to the new index. With DELETE, that cleanup fails and leaves
+# the old data source and Knowledge Base behind. Deleting the old index removes the vectors anyway.
+old_kb="$(output FairExchange StandardsKnowledgeBaseId 2>/dev/null || true)"
+if [[ -n "$old_kb" && "$old_kb" != None ]]; then
+  for ds in $(aws bedrock-agent list-data-sources --knowledge-base-id "$old_kb" --query 'dataSourceSummaries[].dataSourceId' --output text); do
+    aws bedrock-agent get-data-source --knowledge-base-id "$old_kb" --data-source-id "$ds" --query dataSource > "$build/ds.json"
+    if [[ "$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("dataDeletionPolicy"))' "$build/ds.json")" == DELETE ]]; then
+      echo "Setting data source $ds of $old_kb to RETAIN before the stack update"
+      python3 - "$build/ds.json" > "$build/ds-update.json" <<'PY'
+import json, sys
+ds = json.load(open(sys.argv[1]))
+update = {k: ds[k] for k in ("knowledgeBaseId", "dataSourceId", "name", "dataSourceConfiguration") if k in ds}
+update.update({k: ds[k] for k in ("description", "vectorIngestionConfiguration", "serverSideEncryptionConfiguration") if ds.get(k)})
+update["dataDeletionPolicy"] = "RETAIN"
+print(json.dumps(update))
+PY
+      aws bedrock-agent update-data-source --cli-input-json "file://$build/ds-update.json" --query dataSource.dataDeletionPolicy --output text
+    fi
+  done
+fi
 # cdk deploy (not aws cloudformation deploy): it publishes the stack's CDK assets through the bootstrap roles
 (cd "$infra" && CDK_DEFAULT_ACCOUNT="$account" CDK_DEFAULT_REGION="$AWS_REGION" npx cdk deploy FairExchange \
   --require-approval never --progress events -c standardsDocsTtlDays="$ttl_days" \
