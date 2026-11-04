@@ -8,7 +8,7 @@ One spec per outline issue. The issue stays a short outline; the spec is the imp
 - Each shared contract is defined in exactly one spec, under a heading marked "shared contract owned here". Other specs link to it rather than restate it. Change a contract only in the spec that owns it.
 - Items under "Not decided" are not to be built or assumed. Leave them to the configuration value or function the spec names.
 - The vision and technical environment documents in `docs/requirements/` still apply. Where a spec changes a requirement, it says so and gives the date of the decision.
-- Specs for the chat UI and consent receipt (#30, #32), the synthetic data generator (#7), evaluation (#34 to #36), and infrastructure and deployment (#4, #5, #39, #40) come in a later batch.
+- Issues closed before their spec was written (#4, #30, and code merged ahead of #8, #15, #16, #31, #33) are reviewed against the specs in a retro review.
 
 ## Test seams (shared by all specs)
 
