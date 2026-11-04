@@ -104,12 +104,6 @@ export class StandardsKnowledgeBase extends Construct {
               actions: ['kms:Decrypt'], resources: [props.artifactsKeyArn],
               conditions: { StringEquals: { 'kms:ViaService': `s3.${region}.amazonaws.com` } },
             }),
-            // TEMPORARY (remove with the matching statement in artifacts-stack.ts): the vector store created
-            // before the data key moved used the artifacts key, and deleting it deletes its vectors as this role
-            new iam.PolicyStatement({
-              actions: ['kms:Decrypt', 'kms:GenerateDataKey'], resources: [props.artifactsKeyArn],
-              conditions: { StringEquals: { 'kms:ViaService': `s3vectors.${region}.amazonaws.com` } },
-            }),
             new iam.PolicyStatement({
               actions: ['kms:Decrypt', 'kms:GenerateDataKey'], resources: [props.dataKey.keyArn],
               conditions: { StringEquals: { 'kms:ViaService': `s3vectors.${region}.amazonaws.com` } },
@@ -145,7 +139,10 @@ export class StandardsKnowledgeBase extends Construct {
     const dataSource = new bedrock.CfnDataSource(this, 'ClauseDocuments', {
       knowledgeBaseId: this.knowledgeBaseId,
       name: 'clauses',
-      dataDeletionPolicy: 'DELETE',
+      // RETAIN: deleting the index (with the stack, or when the store is replaced) removes the vectors. With
+      // DELETE, a replacement fails: this role's vector permission has already moved to the new index, so the
+      // old data source cannot delete from the old one and CloudFormation leaves it and the old KB behind.
+      dataDeletionPolicy: 'RETAIN',
       dataSourceConfiguration: {
         type: 'S3',
         s3Configuration: { bucketArn: docsArn, inclusionPrefixes: [CLAUSE_DOCS_PREFIX] },

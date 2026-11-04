@@ -1,5 +1,4 @@
 import { CfnOutput, Duration, RemovalPolicy, Stack, type StackProps } from 'aws-cdk-lib';
-import * as iam from 'aws-cdk-lib/aws-iam';
 import * as kms from 'aws-cdk-lib/aws-kms';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import type { Construct } from 'constructs';
@@ -30,20 +29,6 @@ export class ArtifactsStack extends Stack {
       enableKeyRotation: true,
       removalPolicy: RemovalPolicy.RETAIN,
     });
-    // TEMPORARY (remove once the vector store has moved to the application data key): deploy.sh updates this
-    // stack before the application stack, so the vector store still on this key keeps S3 Vectors' background
-    // indexing access until it is replaced, including if that application stack update rolls back.
-    key.addToResourcePolicy(new iam.PolicyStatement({
-      sid: 'AllowS3VectorsIndexing',
-      principals: [new iam.ServicePrincipal('indexing.s3vectors.amazonaws.com')],
-      actions: ['kms:Decrypt'],
-      resources: ['*'],
-      conditions: {
-        ArnLike: { 'aws:SourceArn': `arn:aws:s3vectors:${this.region}:${this.account}:bucket/*` },
-        StringEquals: { 'aws:SourceAccount': this.account },
-        'ForAnyValue:StringEquals': { 'kms:EncryptionContextKeys': ['aws:s3vectors:arn', 'aws:s3vectors:resource-id'] },
-      },
-    }));
 
     const bucket = new s3.Bucket(this, 'Artifacts', {
       encryption: s3.BucketEncryption.KMS,
