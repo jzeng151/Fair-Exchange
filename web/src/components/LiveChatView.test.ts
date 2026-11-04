@@ -148,6 +148,53 @@ describe('LiveChatView', () => {
     expect(w.findAll('[data-consent]').length).toBe(3)
   })
 
+  it('keeps the saved conversation and offers a retry when resuming fails for a temporary reason', async () => {
+    sessionStorage.setItem('fex.live.CFC19603C1B7B29C017954FD1DB2D620', 'c-old')
+    const fake = fakeClient({ resume: new LiveError(0, 'unreachable') })
+    const w = await open(fake)
+    expect(fake.calls).toEqual([['resume', 'c-old']]) // no new conversation started
+    expect(sessionStorage.getItem('fex.live.CFC19603C1B7B29C017954FD1DB2D620')).toBe('c-old')
+    // Nothing from the conversation has loaded yet, so its language is unknown: the notice is in English
+    expect(w.get('.alert').text()).toContain('Can’t reach FEX')
+    fake.client.resume = async (id) => { fake.calls.push(['resume', id]); return { step: 'intake', language: 'es', allowed: ['end'], answer: null, history: [{ role: 'fex', text: 'Hola otra vez', at: '2026-11-04T10:00:00Z' }] } }
+    await w.get('[data-action="retry-resume"]').trigger('click')
+    await flushPromises()
+    expect(fake.calls.at(-1)).toEqual(['resume', 'c-old'])
+    expect(bubbles(w)).toEqual(['Hola otra vez'])
+  })
+
+  it("a reply still streaming for one producer never reaches another producer's chat", async () => {
+    let release!: () => void, releaseB!: () => void
+    const gate = new Promise<void>((r) => { release = r })
+    const gateB = new Promise<void>((r) => { releaseB = r })
+    const clients: Record<string, LiveClient> = {
+      CFC19603C1B7B29C017954FD1DB2D620: { ...fakeClient().client, start: async function* () {
+        yield { type: 'conversation', conversationId: 'c-A' } as StreamEvent
+        await gate
+        yield { type: 'text', seq: 1, text: 'late reply for A' } as StreamEvent
+        yield { type: 'done', seq: 2 } as StreamEvent
+      } },
+      A7F700B04BCE55512CB026A71121426C: { ...fakeClient().client, start: async function* () {
+        await gateB
+        for (const e of [{ type: 'conversation', conversationId: 'c-B' }, { type: 'text', seq: 1, text: 'hello B' }, ...step('intake', ['end'])]) yield e as StreamEvent
+      } },
+    }
+    const w = mount(LiveChatView, { props: { apiUrl: 'http://api.test', makeClient: (id: string) => clients[id]! } })
+    await w.get('[data-producer="CFC19603C1B7B29C017954FD1DB2D620"]').trigger('click')
+    await flushPromises()
+    await w.get('.back-link').trigger('click')
+    await w.get('[data-producer="A7F700B04BCE55512CB026A71121426C"]').trigger('click')
+    await flushPromises()
+    release() // A's late reply finishes while B's first reply is still loading
+    await flushPromises()
+    expect(w.find('.typing').exists()).toBe(true) // B is still busy: A's cleanup must not touch B's view
+    expect((w.get('#live-msg').element as HTMLInputElement).disabled).toBe(true)
+    releaseB()
+    await flushPromises()
+    expect(bubbles(w)).toEqual(['hello B'])
+    expect(sessionStorage.getItem('fex.live.A7F700B04BCE55512CB026A71121426C')).toBe('c-B')
+  })
+
   it('starts fresh when the saved conversation is gone (404)', async () => {
     sessionStorage.setItem('fex.live.CFC19603C1B7B29C017954FD1DB2D620', 'c-gone')
     const fake = fakeClient({ resume: new LiveError(404, 'Not found') })

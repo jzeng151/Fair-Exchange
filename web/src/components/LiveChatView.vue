@@ -20,6 +20,10 @@ const correcting = ref(false)
 const changingConsent = ref(false) // feedback step: the consent choice collapses to one line until 'Change'
 const scroller = ref<HTMLElement | null>(null)
 let client: LiveClient | null = null
+// Bumped whenever the producer changes: a turn started for an earlier producer stops applying events
+// and never saves its conversation ID under the new producer.
+let session = 0
+const resumeFailed = ref<string | null>(null) // saved conversation we could not reopen for a temporary reason
 
 const t = computed(() => copyFor(view.language))
 const can = (a: ActionName) => view.allowed.includes(a)
@@ -53,37 +57,58 @@ function errorText(err: unknown): string {
 
 /** One turn: send, then render each event as it arrives. Errors become a notice in the transcript. */
 async function turn(events: () => AsyncGenerator<StreamEvent>) {
+  const mine = session
+  const owner = producerId.value
   beginTurn(view)
   try {
     for await (const e of events()) {
+      if (mine !== session) return // the producer changed: stop reading this stream
       apply(view, e)
       await scrollDown()
     }
   } catch (err) {
+    if (mine !== session) return
     view.items.push({ kind: 'notice', tone: 'error', text: errorText(err) })
-    if (err instanceof LiveError && err.status === 404 && producerId.value) remember(producerId.value, null)
+    if (err instanceof LiveError && err.status === 404 && owner) remember(owner, null)
   } finally {
-    view.busy = false
-    if (producerId.value) remember(producerId.value, view.conversationId)
-    await scrollDown()
+    if (mine === session) {
+      view.busy = false
+      if (owner) remember(owner, view.conversationId)
+      await scrollDown()
+    }
   }
 }
 
 async function pick(id: string) {
+  const mine = ++session
   producerId.value = id
+  resumeFailed.value = null
   client = props.makeClient ? props.makeClient(id) : createLiveClient({ baseUrl: props.apiUrl, producerId: id })
   const saved = recall(id)
   if (saved) {
     try {
-      reset(fromResume(saved, await client.resume(saved)))
+      const resumed = await client.resume(saved)
+      if (mine !== session) return
+      reset(fromResume(saved, resumed))
       if (!closed.value) return void scrollDown()
-    } catch { remember(id, null) }
+    } catch (err) {
+      if (mine !== session) return
+      if (!(err instanceof LiveError && err.status === 404)) {
+        // Temporary failure: keep the saved conversation and let the producer try again.
+        reset()
+        resumeFailed.value = saved
+        view.items.push({ kind: 'notice', tone: 'error', text: errorText(err) })
+        return
+      }
+      remember(id, null) // the server says it is gone
+    }
   }
   await startNew()
 }
 
 async function startNew() {
   if (!client) return
+  resumeFailed.value = null
   reset()
   correcting.value = false
   await turn(() => client!.start())
@@ -106,9 +131,11 @@ async function act(action: ActionName, args: Record<string, unknown> = {}) {
   if (action === 'set_consent') changingConsent.value = false
   await turn(() => client!.action(id, action, args))
 }
-const currentConsent = computed(() => view.record?.status === 'declined' ? 'declined' : view.record?.consent_scope ?? null)
+const currentConsent = computed(() => view.consent)
 
 function back() {
+  session++
+  resumeFailed.value = null
   producerId.value = null
   client = null
   reset()
@@ -175,6 +202,12 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
           <div v-if="closed" class="alert" role="status">{{ t.closed }}</div>
         </div>
 
+        <div v-if="resumeFailed" class="live-actions">
+          <div class="btn-row">
+            <button class="btn-primary" data-action="retry-resume" @click="pick(producerId!)">{{ t.retry }}</button>
+            <button class="btn-text" @click="startNew">{{ t.start }}</button>
+          </div>
+        </div>
         <div v-if="!view.busy && view.conversationId" class="live-actions">
           <div v-if="view.step === 'playback'" class="btn-row">
             <button v-if="can('confirm_playback')" class="btn-primary" @click="act('confirm_playback')">{{ t.confirm }}</button>

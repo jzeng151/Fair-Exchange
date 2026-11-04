@@ -74,6 +74,16 @@ describe('live view', () => {
     expect(v.items.at(-1)).toEqual({ kind: 'record', status: 'completed', consent_scope: 'internal', version: 1 })
   })
 
+  it('tracks the current consent choice, and clears it when the description is reopened (agent clears it too)', () => {
+    const v = run(newView(), [{ type: 'record_saved', seq: 1, status: 'completed', consent_scope: 'internal', version: 1 }])
+    expect(v.consent).toBe('internal')
+    run(v, [{ type: 'record_saved', seq: 1, status: 'declined', consent_scope: 'declined', version: 2 }])
+    expect(v.consent).toBe('declined')
+    run(v, [{ type: 'step', seq: 2, step: 'playback', language: 'es' }])
+    expect(v.consent).toBeNull()
+    expect(v.record?.version).toBe(2) // the saved-record history is kept
+  })
+
   it('rebuilds the view from a resume response: history, then the answer, step and allowed actions', () => {
     const v = fromResume('c-1', {
       step: 'consent', language: 'es', allowed: ['reopen_playback', 'set_consent', 'end'],
