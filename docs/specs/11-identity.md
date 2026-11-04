@@ -25,7 +25,7 @@ All handlers get the caller's identity from one identity-resolution function. No
   - `roles`, any of `producer`, `reviewer` and `admin`;
   - `producer_id`, present only with the `producer` role.
 - **Route access (added 2026-11-04 with the review and analytics specs):**
-  - chat routes require `producer` ([#25 spec](25-chat-endpoint.md));
+  - chat routes and `GET /me/records` require `producer` ([#25 spec](25-chat-endpoint.md), [#32 spec](32-your-record.md));
   - review routes require `reviewer` ([#27 spec](27-review-api.md));
   - analytics requires `admin` ([#29 spec](29-analytics-api.md)).
   - A missing role returns 403.
