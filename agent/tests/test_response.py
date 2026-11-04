@@ -182,6 +182,51 @@ def test_failure_partway_keeps_the_emitted_claims(evidence, standards):
     assert len(seen) == 1  # what the producer saw is kept
 
 
+def test_failed_emission_is_neither_shown_nor_tracked(evidence, standards):
+    """A raising emission callback must leave the claim unshown and untracked.
+
+    The interrupted result then has stored == shown, and the same identity fed
+    again later is a fresh claim, not a dropped duplicate.
+    """
+    calls = []
+    emissions = {"count": 0}
+
+    def emit_once_fails(claim_id, section, claim):
+        emissions["count"] += 1
+        if emissions["count"] == 1:
+            raise RuntimeError("event queue unavailable")
+        calls.append((claim_id, section, claim.text))
+
+    w = GroundedResponseWriter(evidence, standards, emit_once_fails)
+    with pytest.raises(RuntimeError):
+        w.feed(line("insights", "Undelivered.", CHIRPS, GOOD_CLAUSE))
+    assert w.emitted_claims("insights") == []
+
+    out = w.feed(line(*GOOD_INSIGHT))
+    assert out.status == "emitted" and out.claim_id == 1
+
+    retry = w.feed(line("insights", "Undelivered.", CHIRPS, GOOD_CLAUSE))
+    assert retry.status == "emitted" and retry.claim_id == 2
+    assert [t for _, _, t in calls] == [GOOD_INSIGHT[1], "Undelivered."]
+
+
+def test_run_respond_keeps_stored_equal_to_shown_when_emission_fails(evidence, standards):
+    seen = []
+
+    def flaky(claim_id, section, claim):
+        if claim.text != GOOD_INSIGHT[1]:
+            raise RuntimeError("event queue unavailable")
+        seen.append((claim_id, section, claim.text))
+
+    def writer(followup):
+        return [line(*GOOD_INSIGHT), line("insights", "Undelivered.", CHIRPS, GOOD_CLAUSE)]
+
+    result = run_respond(writer, evidence, standards, flaky)
+    assert result.interrupted is True
+    assert [c.text for c in result.insights] == [GOOD_INSIGHT[1]]  # stored == shown
+    assert len(seen) == 1
+
+
 # --- Fixed text and prompt ------------------------------------------------------
 
 def test_fixed_text_in_both_languages():

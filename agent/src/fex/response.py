@@ -137,10 +137,13 @@ class GroundedResponseWriter:
             self.failed.append({"line": line, "reasons": reasons})
             return LineOutcome("failed", reasons=reasons)
         claim_id = self._next_id
+        self.emit(claim_id, section, claim)
+        # Record the claim only after the emission callback succeeded: a failed
+        # emission left nothing shown, so it must count as neither emitted nor a
+        # seen duplicate (a retry feed goes through as a fresh claim).
         self._next_id += 1
         self._ids[identity] = claim_id
         self.emitted[section].append((claim_id, claim))
-        self.emit(claim_id, section, claim)
         return LineOutcome("emitted", claim_id=claim_id)
 
     def open_slots(self, section: str) -> int:
