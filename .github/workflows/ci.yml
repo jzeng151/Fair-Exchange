@@ -39,6 +39,23 @@ jobs:
         run: |
           uv sync --locked
           uv run --no-sync pytest tests ../eval/tests
+      # Root packages: the real code merged so far (record schema, standards, verifier).
+      # Each step skips until its folder exists on the branch being checked.
+      - name: Root agent tests
+        if: hashFiles('agent/pyproject.toml') != ''
+        working-directory: agent
+        run: |
+          uv sync --locked
+          uv run --no-sync pytest
+      - name: Root data tests
+        if: hashFiles('data/pyproject.toml') != ''
+        working-directory: data
+        run: |
+          uv sync --locked
+          uv run --no-sync pytest
+      - name: Generated record types compile
+        if: hashFiles('api/src/types/*.ts') != ''
+        run: npx --yes -p typescript@5.6.3 tsc --noEmit --strict api/src/types/*.ts
       - name: API type check
         working-directory: Fair-Exchange-Scaffolding/api
         run: npm ci && npm run typecheck
