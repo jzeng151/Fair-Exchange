@@ -19,6 +19,7 @@ from pydantic import BaseModel, Field, TypeAdapter
 from strands import Agent
 
 from fex.conversation import copy
+from fex.conversation.scope import ScopeCheck, always_in_scope
 from fex.conversation.contract import (
     ActionEntry, ActionName, Answer, Event, Request, ResumeResponse, SpokenEntry,
 )
@@ -178,6 +179,7 @@ class _Turn:
         self.events: list = []
         self.on_event = on_event
         self.spoken: list[str] = []
+        self.excluded = False  # an out-of-scope exchange (#21): kept in history, hidden from models
         self.loaded_revision: int | None = None  # the state revision this request started from
 
     def emit(self, type_: str, **fields) -> None:
@@ -203,7 +205,7 @@ class ConversationEngine:
     def __init__(self, *, store: StateStore, small_model: Any, large_model: Any, standards: Standards | None = None,
                  profiles: Callable[[str], Profile | None] | None = None, tools: list | None = None,
                  clock: Callable[[], datetime] | None = None, max_retries: int = 2,
-                 records: Any = None) -> None:
+                 records: Any = None, scope_check: ScopeCheck | None = None) -> None:
         self.store = store
         self.small_model, self.large_model = small_model, large_model
         self.standards = standards or Standards.load()
@@ -212,6 +214,7 @@ class ConversationEngine:
         self.clock = clock or (lambda: datetime.now(UTC))
         self.max_retries = max_retries
         self.records = records  # a fex.records.RecordStore; None = records are not saved (#26)
+        self.scope_check = scope_check or always_in_scope  # how it decides is "Not decided" (#21)
 
     # ------------------------------------------------------------------ entrypoint
 
@@ -257,6 +260,13 @@ class ConversationEngine:
     def _message(self, state: ConversationState, turn: _Turn, text: str):
         before = state.step
         state.history.append(SpokenEntry(role="producer", text=text, at=self.clock()))
+        verdict = self.scope_check(text, state.step)
+        if not verdict.in_scope:  # decline in fixed text; no model, no data tool, step unchanged (#21)
+            state.excluded_history.append(len(state.history) - 1)
+            turn.excluded = True
+            turn.say(copy.text(state.language, f"out_of_scope_{verdict.reason or 'other_producer_data'}"))
+            turn.say(copy.text(state.language, "back_to_open"))
+            return self._finish(state, turn, step_changed=False)
         if state.step == "intake":
             self._intake(state, turn)
         elif state.step == "playback":
@@ -490,8 +500,9 @@ class ConversationEngine:
         p = state.profile
         lines = [f"Profile on file: location {p.region}, {p.country}; crop {p.crop}; "
                  f"entity type {state.effective_entity_type}. Language so far: {state.language}."]
-        for h in state.history:
-            if h.role in ("producer", "fex"):
+        hidden = set(state.excluded_history)
+        for i, h in enumerate(state.history):
+            if h.role in ("producer", "fex") and i not in hidden:
                 lines.append(f"{h.role}: {h.text}")
         choices = [f"{name}: {value}" for name, value in (("consent", state.consent), ("feedback", state.feedback))
                    if value]
@@ -515,6 +526,8 @@ class ConversationEngine:
     def _finish(self, state: ConversationState, turn: _Turn, *, step_changed: bool, save: bool = True):
         if turn.spoken:
             state.history.append(SpokenEntry(role="fex", text=" ".join(turn.spoken), at=self.clock()))
+            if turn.excluded:
+                state.excluded_history.append(len(state.history) - 1)
         steps = [e.step for e in turn.events if e.type == "step"]
         if not steps or steps[-1] != state.step:
             self._emit_step(state, turn)
