@@ -199,3 +199,16 @@ def test_runtime_state_store_rejects_memory_id_without_retention_config(monkeypa
     monkeypatch.delenv("FEX_MAX_LIFETIME_MINUTES", raising=False)
     with pytest.raises(RuntimeError, match="both are required"):
         runtime.state_store()
+
+
+def test_load_returns_the_newest_state_whatever_order_events_come_back_in():
+    # The live ListEvents returns newest first (sandbox, 2026-11-04); the client's docstring says chronological.
+    # Taking the last event read the oldest state, so every turn restarted the conversation in intake.
+    store = _store()
+    store.save(_state("P1", "c1"), expected_revision=None)  # revision 0, intake
+    store.save(_state("P1", "c1", step="playback"), expected_revision=0)
+    store.save(_state("P1", "c1", step="respond"), expected_revision=1)
+    loaded = store.load("P1", "c1")
+    assert loaded.revision == 2 and loaded.step == "respond"
+    with pytest.raises(StateConflict):  # a save that read the stale state is rejected
+        store.save(_state("P1", "c1", step="consent"), expected_revision=0)
