@@ -3,7 +3,7 @@
 #   EXPECTED_AWS_ACCOUNT=100300582834 AWS_REGION=us-west-2 bash infra/deploy.sh
 # Optional: STANDARDS_DOCS_TTL_DAYS (default 30) - days before uploaded clause documents expire.
 # Needs: AWS credentials that can create IAM roles, KMS keys, Bedrock Knowledge Bases and S3 Vectors;
-# access to Amazon Titan Text Embeddings V2 in the region; uv; Node 22.
+# access to Amazon Titan Text Embeddings V2 in the region; uv; Node 22. Bootstraps CDK in the account if needed.
 set -euo pipefail
 export AWS_PAGER=""
 export AWS_REGION="${AWS_REGION:-us-west-2}"
@@ -34,33 +34,67 @@ deploy() {  # stack name, extra args
     --no-fail-on-empty-changeset "$@"
 }
 
-step "1/7 Building the website"
+step "1/8 Checking CDK bootstrap"
+# The application stack uses CDK's standard synthesizer (docs/specs/05-cdk-stack.md), which needs a bootstrapped
+# account. The bootstrap version parameter is how the CDK CLI itself checks.
+if aws ssm get-parameter --name /cdk-bootstrap/hnb659fds/version >/dev/null 2>&1; then
+  echo "Bootstrapped."
+else
+  echo "Not bootstrapped: running cdk bootstrap (creates the CDKToolkit stack)."
+  (cd "$infra" && npm ci --silent && npx cdk bootstrap "aws://$account/$AWS_REGION")
+fi
+
+step "2/8 Building the website"
 (cd "$repo/web" && npm ci --silent && npm run build)
 
-step "2/7 Building one standards document per clause"
+step "3/8 Building one standards document per clause"
 hash="$(cd "$repo/data" && uv run --quiet python -m fx_data.standards_kb "$build/docs")"
 echo "Clause documents hash: $hash"
 
-step "3/7 Checking the infrastructure code"
+step "4/8 Checking the infrastructure code"
 (cd "$infra" && npm ci --silent && npx tsc --noEmit)
 
-step "4/7 Artifacts stack (data key and artifacts bucket)"
+step "5/8 Artifacts stack (artifacts key and bucket)"
 synth
 deploy FairExchangeArtifacts
 bucket="$(output FairExchangeArtifacts ArtifactsBucketName)"
-key_arn="$(output FairExchangeArtifacts DataKeyArn)"
+key_arn="$(output FairExchangeArtifacts ArtifactsKeyArn)"
 [[ -n "$bucket" && "$bucket" != None && "$key_arn" == arn:aws:kms:* ]] || { echo "Artifacts stack outputs missing" >&2; exit 1; }
 
-step "5/7 Uploading clause documents to s3://$bucket/clauses/"
+step "6/8 Uploading clause documents to s3://$bucket/clauses/"
 # Freshly built files: sync re-uploads every document (resetting its expiry) and restores any that expired
 # before an ingestion can run. --delete removes clauses that no longer exist.
 aws s3 sync --only-show-errors --delete "$build/docs/clauses/" "s3://$bucket/clauses/"
 
-step "6/7 Main stack (website hosting, standards Knowledge Base; ingestion runs when the clauses change)"
-synth -c artifactsBucket="$bucket" -c dataKeyArn="$key_arn" -c standardsDocsHash="$hash"
-deploy FairExchange --capabilities CAPABILITY_IAM
+step "7/8 Main stack (website hosting, standards Knowledge Base; ingestion runs when the clauses change)"
+# Migration for stacks deployed before the data source used RETAIN: switch the existing data source first.
+# A change that replaces the vector store also replaces the data source, and the old one is deleted after the
+# Knowledge Base role's vector permission has moved to the new index. With DELETE, that cleanup fails and leaves
+# the old data source and Knowledge Base behind. Deleting the old index removes the vectors anyway.
+old_kb="$(output FairExchange StandardsKnowledgeBaseId 2>/dev/null || true)"
+if [[ -n "$old_kb" && "$old_kb" != None ]]; then
+  for ds in $(aws bedrock-agent list-data-sources --knowledge-base-id "$old_kb" --query 'dataSourceSummaries[].dataSourceId' --output text); do
+    aws bedrock-agent get-data-source --knowledge-base-id "$old_kb" --data-source-id "$ds" --query dataSource > "$build/ds.json"
+    if [[ "$(python3 -c 'import json,sys;print(json.load(open(sys.argv[1])).get("dataDeletionPolicy"))' "$build/ds.json")" == DELETE ]]; then
+      echo "Setting data source $ds of $old_kb to RETAIN before the stack update"
+      python3 - "$build/ds.json" > "$build/ds-update.json" <<'PY'
+import json, sys
+ds = json.load(open(sys.argv[1]))
+update = {k: ds[k] for k in ("knowledgeBaseId", "dataSourceId", "name", "dataSourceConfiguration") if k in ds}
+update.update({k: ds[k] for k in ("description", "vectorIngestionConfiguration", "serverSideEncryptionConfiguration") if ds.get(k)})
+update["dataDeletionPolicy"] = "RETAIN"
+print(json.dumps(update))
+PY
+      aws bedrock-agent update-data-source --cli-input-json "file://$build/ds-update.json" --query dataSource.dataDeletionPolicy --output text
+    fi
+  done
+fi
+# cdk deploy (not aws cloudformation deploy): it publishes the stack's CDK assets through the bootstrap roles
+(cd "$infra" && CDK_DEFAULT_ACCOUNT="$account" CDK_DEFAULT_REGION="$AWS_REGION" npx cdk deploy FairExchange \
+  --require-approval never --progress events -c standardsDocsTtlDays="$ttl_days" \
+  -c artifactsBucket="$bucket" -c artifactsKeyArn="$key_arn" -c standardsDocsHash="$hash")
 
-step "7/7 Publishing the website and running smoke tests"
+step "8/8 Publishing the website and running smoke tests"
 bash "$infra/publish-web.sh"
 kb_id="$(output FairExchange StandardsKnowledgeBaseId)"
 (cd "$repo/agent" && FEX_STANDARDS_KB_ID="$kb_id" uv run --quiet pytest -q -p no:cacheprovider \

@@ -7,6 +7,8 @@ and GET /conversations/{id}.
 Behind it run the real chat API route logic and the real agent engine (see scripts/e2e/run_local.sh).
 Exits non-zero, with the failing step, if anything is wrong. Standard library only.
 """
+from __future__ import annotations  # run under the system python3, which may be 3.9 (PEP 604 unions in annotations)
+
 import argparse
 import json
 import sys
