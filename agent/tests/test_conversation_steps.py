@@ -423,3 +423,40 @@ def test_conversations_are_scoped_to_the_requesting_producer():
                              "conversationId": r.conversation_id})
     assert of(other, "error")[0].code == "invalid_action"
     assert r.store.load("SOMEONE-ELSE", r.conversation_id) is None
+
+
+# ---------------------------------------------------------------- review fixes (Codex on #67)
+
+def test_entity_type_can_be_corrected_back_to_the_value_on_file():
+    r = Run()
+    r.small.add(intake("Hola"), intake("", ready=True), playback(entity_type="estate"))
+    r.send("start")
+    r.send("message", text="Somos una finca.")
+    on_file = r.state().profile.entity_type
+    assert r.state().effective_entity_type == "estate"
+    r.small.add(playback(entity_type=on_file))
+    r.action("correct_playback", text=f"Perdón, sí somos {on_file}.")
+    assert r.state().effective_entity_type == on_file
+    assert r.state().entity_type is None  # back to the profile value: no override left
+
+
+def test_a_failing_data_tool_is_an_answer_failure_with_retry():
+    r = Run()
+    r.to_playback()
+    r.small.add(summary())
+    # an invalid tool input makes Strands return a toolResult with status "error" (no exception raised)
+    # The answer needs no rewrite, so only the tool error can make this fail
+    r.large.add(("tool", "find_peer_examples", {"challenge": "not-a-tag"}), answer([], []))
+    events = r.action("confirm_playback")
+    assert of(events, "error")[0].code == "agent_failed"
+    assert of(events, "claim") == [] and of(events, "answer") == []
+    assert r.state().step == "respond" and "retry_answer" in allowed(events)
+
+
+def test_follow_up_questions_see_the_answer_that_was_shown():
+    r = Run()
+    r.to_consent()
+    r.small.add(short_reply("Es un ejemplo de otra cooperativa."))
+    r.send("message", text="¿Qué significa el ejemplo que mostró?")
+    prompt = r.small.prompts[-1]
+    assert "Rainfall fell." in prompt and "A peer built tanks." in prompt

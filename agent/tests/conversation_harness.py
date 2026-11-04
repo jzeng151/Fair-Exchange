@@ -25,6 +25,7 @@ class ScriptedModel(Model):
     def __init__(self, script=()):
         self.script = list(script)
         self.calls = []  # tool names offered on each call
+        self.prompts = []  # the text the model was given on each call
 
     def add(self, *steps):
         self.script.extend(steps)
@@ -42,6 +43,7 @@ class ScriptedModel(Model):
 
     async def stream(self, messages, tool_specs=None, system_prompt=None, **kwargs):
         self.calls.append([s["name"] for s in (tool_specs or [])])
+        self.prompts.append(" ".join(b.get("text", "") for m in messages if m["role"] == "user" for b in m["content"]))
         if not self.script:
             raise AssertionError("ScriptedModel ran out of script")
         kind, *rest = self.script.pop(0)

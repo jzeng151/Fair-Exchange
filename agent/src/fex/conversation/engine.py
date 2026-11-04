@@ -146,6 +146,13 @@ def _sources_in(value: Any) -> list[str]:
     return []
 
 
+def _tool_errors(messages: list[dict]) -> list[str]:
+    """Tool calls that failed. Strands returns a failure as a toolResult with status "error", not an exception."""
+    return [" ".join(part.get("text", "") for part in block["toolResult"].get("content", []))[:200]
+            for message in messages for block in message["content"]
+            if block.get("toolResult", {}).get("status") == "error"]
+
+
 def _tool_sources(messages: list[dict]) -> list[str]:
     sources = []
     for message in messages:
@@ -321,8 +328,8 @@ class ConversationEngine:
         draft = self._structured(self.small_model, PLAYBACK_SYSTEM, prompt, PlaybackDraft)
         state.playback = Playback(text=draft.text, challenge=draft.challenge, timing=draft.timing,
                                   severity=draft.severity, tried=draft.tried)
-        if draft.entity_type and draft.entity_type != state.profile.entity_type:
-            state.entity_type = draft.entity_type
+        if draft.entity_type:  # every correction applies; back to the value on file clears the override
+            state.entity_type = None if draft.entity_type == state.profile.entity_type else draft.entity_type
         state.step = "playback"
         turn.say(draft.text)
         if draft.location_disputed:
@@ -439,8 +446,10 @@ class ConversationEngine:
             agent = Agent(model=self.large_model, system_prompt=ANSWER_SYSTEM, tools=list(self.tools),
                           callback_handler=None)
             result = agent(prompt, structured_output_model=AnswerDraft, invocation_state=invocation_state)
-        except Exception as exc:  # model or tool failure
+        except Exception as exc:  # model failure, or a tool failure Strands raised
             raise _AgentFailed(str(exc)) from exc
+        if errors := _tool_errors(agent.messages):  # a tool failure Strands returned as a result
+            raise _AgentFailed("data tool failed: " + "; ".join(errors))
         return result.structured_output, _tool_sources(agent.messages)
 
     def _answer_prompt(self, state: ConversationState) -> str:
@@ -470,6 +479,10 @@ class ConversationEngine:
         for h in state.history:
             if h.role in ("producer", "fex"):
                 lines.append(f"{h.role}: {h.text}")
+        shown = state.answer or state.partial
+        if shown and (shown.insights or shown.peer_examples):  # claims are events, not spoken history
+            lines.append("FEX showed these checked points (insights, then peer examples):")
+            lines += [f"- {c.text} (source: {c.citation.source})" for c in shown.insights + shown.peer_examples]
         return "\n".join(lines)
 
     def _new_state(self, producer_id: str, conversation_id: str) -> ConversationState:
