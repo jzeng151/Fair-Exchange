@@ -37,7 +37,12 @@ An admin-only route that runs fixed Athena queries over the records table and th
   - **Live counts only.** Suppression is applied to live counts. Seeded demo counts are never mixed in; they are returned as a separate `seeded` series ([#37 spec](37-seeded-records.md)).
   - **Small cells.** Any live cell with a count from 1 to 4 is returned as `{"suppressed": true}`, never as a number.
   - **Second cell.** If a breakdown has exactly one suppressed cell, the next-smallest cell in that breakdown is also suppressed, so the hidden one can't be worked out from a total or from another breakdown.
-  - **Totals.** No breakdown returns a total. The single overall count of completed records is returned once and is itself suppressed if it is 1 to 4.
+  - **Totals.** No breakdown returns a total.
+  - **Standalone counts are cells too.** These are each treated as a cell under every rule here, including the both-views rule:
+    - the overall count of completed records;
+    - the declined count;
+    - the number of conversations the AI footprint covers.
+  - **AI footprint.** When the AI footprint's conversation count is hidden, its totals and average are hidden too. Otherwise total divided by average would reveal the count.
   - **Pending toggle.** With `include_pending=true`, a cell is also suppressed if its pending-only count (all minus reviewed) is 1 to 4.
   - **Both views together.** Suppression is always computed for the reviewed-only and the include-pending view together, whichever one is requested:
     1. Apply the small-cell and pending rules.
@@ -58,6 +63,8 @@ An admin-only route that runs fixed Athena queries over the records table and th
   - no breakdown returns a total;
   - seeded counts are returned separately and never added to live cells;
   - with `include_pending`, a cell whose pending-only count is 1 to 4 is suppressed;
+  - one conversation with 1,000 tokens: the AI footprint's totals, average and conversation count are all hidden;
+  - a pending-only difference of 1 to 4 in the overall or declined count hides that count in both views;
   - reconstruction case: reviewed A=1, B=5 with five pending records added to A. Both A and B stay hidden in both views, so the reviewed counts can't be recovered by comparing the responses;
   - a query timeout returns 503;
   - declined records appear only as a count;
