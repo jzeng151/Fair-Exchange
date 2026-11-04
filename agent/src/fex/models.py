@@ -160,6 +160,27 @@ ConversationRecord = Annotated[CompletedRecord | DeclinedRecord, Field(discrimin
 _record_adapter = TypeAdapter(ConversationRecord)
 
 
+class VoiceTurn(BaseModel):
+    """One producer voice note, transcribed by Amazon Transcribe (issue #41).
+
+    The transcript is the producer's own words; audio rests in the voice store
+    (local for now); `audio_key` is opaque to the model."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    turn_id: str = Field(min_length=1)
+    conversation_id: str = Field(min_length=1)
+    producer_id: str = Field(min_length=1, description="Set from the session, never from the conversation")
+    created_at: datetime
+    transcript: str = Field(min_length=1, description="Raw transcript; PII is flagged (#20), never redacted")
+    language_code: str = Field(
+        pattern=r"^[a-z]{2}$", description="ISO 639-1 detected language, e.g. 'es'; required for ingestion")
+    confidence: float | None = Field(
+        default=None, ge=0, le=1, description="Mean item confidence reported by Transcribe, if any")
+    audio_key: str = Field(min_length=1, description="Store key of the source audio, opaque to the model")
+    pii_flag: bool = Field(default=False, description="Personal information flagged for human review; never redacted")
+
+
 def parse_record(data: dict) -> CompletedRecord | DeclinedRecord:
     """Validate a stored or incoming record, choosing the type from its `status`."""
     return _record_adapter.validate_python(data)
