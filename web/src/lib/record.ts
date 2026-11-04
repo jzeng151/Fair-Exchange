@@ -24,7 +24,10 @@ export function buildCompletedRecord(input: CompletedInput): CompletedRecord {
     producer_id: input.producerId,
     status: 'completed',
     created_at: at,
+    updated_at: at,
+    version: 1,
     consent: { scope: 'internal', recorded_at: at },
+    consent_history: [{ scope: 'internal', recorded_at: at }],
     source: 'agent conversation',
     language: input.language,
     entity_type: input.entityType,
@@ -32,6 +35,8 @@ export function buildCompletedRecord(input: CompletedInput): CompletedRecord {
     // The schema requires an English version only for non-English conversations
     summary_english: input.language === 'en' ? null : input.summaryEnglish,
     tags: input.tags,
+    // limited when the producer was shown no insights or no peer examples (#26)
+    evidence: input.insights.length && input.peerExamples.length ? 'full' : 'limited',
     insights: input.insights,
     peer_examples: input.peerExamples,
     feedback: input.feedback,
@@ -50,7 +55,10 @@ export function buildDeclinedRecord(input: { recordId: string; producerId: strin
     producer_id: input.producerId,
     status: 'declined',
     created_at: at,
+    updated_at: at,
+    version: 1,
     consent: { scope: 'declined', recorded_at: at },
+    consent_history: [{ scope: 'declined', recorded_at: at }],
     source: 'agent conversation',
   }
 }

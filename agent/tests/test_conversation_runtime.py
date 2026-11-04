@@ -37,3 +37,12 @@ def test_invoke_rejects_a_malformed_request_without_raising():
     out = runtime.invoke({"kind": "action", "producerId": "P", "conversationId": "c",
                           "action": {"name": "set_consent", "args": {"scope": "everyone"}}}, engine=Run().engine)
     assert out["error"]["code"] == "invalid_request"
+
+
+def test_records_are_saved_only_when_a_table_is_configured(monkeypatch):
+    monkeypatch.delenv("FEX_RECORDS_TABLE", raising=False)
+    assert runtime.record_store() is None
+    monkeypatch.setenv("FEX_RECORDS_TABLE", "fair-exchange-records")
+    monkeypatch.setenv("AWS_DEFAULT_REGION", "us-west-2")
+    store = runtime.record_store()
+    assert store is not None and store.table.name == "fair-exchange-records"

@@ -23,9 +23,9 @@ from fex.conversation.contract import (
     ActionEntry, ActionName, Answer, Request, ResumeResponse, SpokenEntry,
 )
 from fex.conversation.state import (
-    ConsentChoice, ConversationState, EarlierAnswer, Playback, Profile, ShownClaims, StateStore,
+    ConversationState, Playback, Profile, ShownClaims, StateStore,
 )
-from fex.models import ChallengeTag, Claim
+from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer
 from fex.tools import ALL_TOOLS
 from fex.verifier import Problem, SessionEvidence, verify
 
@@ -187,7 +187,8 @@ class _AgentFailed(Exception):
 class ConversationEngine:
     def __init__(self, *, store: StateStore, small_model: Any, large_model: Any, standards: Standards | None = None,
                  profiles: Callable[[str], Profile | None] | None = None, tools: list | None = None,
-                 clock: Callable[[], datetime] | None = None, max_retries: int = 2) -> None:
+                 clock: Callable[[], datetime] | None = None, max_retries: int = 2,
+                 records: Any = None) -> None:
         self.store = store
         self.small_model, self.large_model = small_model, large_model
         self.standards = standards or Standards.load()
@@ -195,6 +196,7 @@ class ConversationEngine:
         self.tools = tools if tools is not None else ALL_TOOLS
         self.clock = clock or (lambda: datetime.now(UTC))
         self.max_retries = max_retries
+        self.records = records  # a fex.records.RecordStore; None = records are not saved (#26)
 
     # ------------------------------------------------------------------ entrypoint
 
@@ -264,8 +266,10 @@ class ConversationEngine:
             self._respond(state, turn)
         elif name == "set_consent":
             self._set_consent(state, args["scope"])
+            self._save_record(state, turn)
         elif name == "set_feedback":
             state.feedback = args["value"]
+            self._save_record(state, turn)
         elif name == "end":
             return self._close(state, turn, "end")
         return self._finish(state, turn, step_changed=state.step != before)
@@ -277,8 +281,26 @@ class ConversationEngine:
                (name == "set_feedback" and args["value"] == state.feedback)
 
     def _close(self, state: ConversationState, turn: _Turn, reason: str):
-        state.step, state.closed_reason = "closed", reason
+        state.step, state.closed_reason, state.closed_at = "closed", reason, self.clock()
+        self._save_record(state, turn)
         return self._finish(state, turn, step_changed=True)
+
+    def _save_record(self, state: ConversationState, turn: _Turn) -> None:
+        """Save point (#26): code saves the record; each save emits `record_saved`.
+        A conflict or invalid record is logged and surfaced as an error, never retried."""
+        if self.records is None:
+            return
+        from fex.records import RecordConflict, save_record  # local: records imports conversation state
+
+        try:
+            result = save_record(state, self.records, self.clock())
+        except (RecordConflict, ValueError) as exc:
+            log.error("record not saved for conversation %s: %s", state.conversation_id, exc)
+            turn.emit("error", code="agent_failed", message="Your answer could not be saved. Please try again.")
+            return
+        if result:
+            turn.emit("record_saved", status=result.status, consent_scope=result.consent_scope,
+                      version=result.version)
 
     # ------------------------------------------------------------------ steps
 
@@ -323,7 +345,8 @@ class ConversationEngine:
 
     def _reopen(self, state: ConversationState, turn: _Turn) -> None:
         if state.answer:
-            state.earlier_answers.append(EarlierAnswer(**state.answer.model_dump(), reason="reopened"))
+            state.earlier_answers.append(EarlierAnswer(**state.answer.model_dump(), reason="reopened",
+                                                       given_at=state.answer_given_at or self.clock()))
         self._retire_partial(state)
         state.answer, state.answer_failed = None, False
         state.consent, state.feedback = None, None
@@ -337,12 +360,13 @@ class ConversationEngine:
         if state.partial and (state.partial.insights or state.partial.peer_examples):
             state.earlier_answers.append(EarlierAnswer(insights=state.partial.insights,
                                                        peer_examples=state.partial.peer_examples,
-                                                       reason="interrupted"))
-        state.partial = None
+                                                       reason="interrupted",
+                                                       given_at=state.partial_started_at or self.clock()))
+        state.partial, state.partial_started_at = None, None
 
     def _set_consent(self, state: ConversationState, scope: str) -> None:
         state.consent = scope
-        state.consent_history.append(ConsentChoice(scope=scope, at=self.clock()))
+        state.consent_history.append(ConsentChoice(scope=scope, recorded_at=self.clock()))
         if scope == "declined":
             state.feedback = None
             state.step = "consent"
@@ -353,7 +377,7 @@ class ConversationEngine:
 
     def _respond(self, state: ConversationState, turn: _Turn) -> None:
         state.step, state.answer, state.answer_failed = "respond", None, False
-        state.partial = ShownClaims()
+        state.partial, state.partial_started_at = ShownClaims(), self.clock()
         lang = state.language
         try:
             turn.say(copy.text(lang, "respond_opening"))
@@ -398,7 +422,8 @@ class ConversationEngine:
             turn.say(copy.text(lang, "no_peers"))
         turn.say(copy.text(lang, "hand_back"))
         state.answer = Answer(insights=shown.insights, peer_examples=shown.peer_examples, evidence=evidence_level)
-        state.partial = None
+        state.answer_given_at = state.partial_started_at
+        state.partial, state.partial_started_at = None, None
         turn.emit("answer", insights=[c.model_dump() for c in shown.insights],
                   peer_examples=[c.model_dump() for c in shown.peer_examples], evidence=evidence_level)
         state.step = "consent"

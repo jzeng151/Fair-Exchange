@@ -16,6 +16,9 @@ def completed(**overrides):
         "producer_id": "258CC6A1",
         "status": "completed",
         "created_at": NOW,
+        "updated_at": NOW,
+        "version": 1,
+        "evidence": "full",
         "consent": {"scope": "internal", "recorded_at": NOW},
         "language": "es",
         "entity_type": "cooperative",
@@ -85,6 +88,8 @@ def declined(**overrides):
         "producer_id": "258CC6A1",
         "status": "declined",
         "created_at": NOW,
+        "updated_at": NOW,
+        "version": 1,
         "consent": {"scope": "declined", "recorded_at": NOW},
     }
     data.update(overrides)
@@ -135,3 +140,67 @@ def test_english_record_does_not_need_a_second_summary():
     record = CompletedRecord.model_validate(completed(
         language="en", summary_original="Rainfall has been irregular.", summary_english=None))
     assert record.summary_english is None
+
+
+# ---------------------------------------------------------------- #26 write-back fields
+
+def test_save_fields_are_required_and_versions_start_at_1():
+    for field in ("updated_at", "version"):
+        data = completed()
+        del data[field]
+        with pytest.raises(ValidationError):
+            CompletedRecord.model_validate(data)
+    with pytest.raises(ValidationError):
+        CompletedRecord.model_validate(completed(version=0))
+
+
+def test_completed_record_carries_evidence_full_or_limited():
+    assert CompletedRecord.model_validate(completed(evidence="limited")).evidence == "limited"
+    with pytest.raises(ValidationError):
+        CompletedRecord.model_validate(completed(evidence="partial"))
+    data = completed()
+    del data["evidence"]
+    with pytest.raises(ValidationError):
+        CompletedRecord.model_validate(data)
+
+
+def test_new_fields_default_to_empty_and_unset():
+    r = CompletedRecord.model_validate(completed())
+    assert r.closed_at is None and r.consent_history == [] and r.earlier_answers == []
+    assert r.reviewer_tags is None and r.reviewer_summary_original is None and r.reviewer_summary_english is None
+
+
+def test_consent_history_holds_each_choice_on_both_record_types():
+    history = [{"scope": "declined", "recorded_at": NOW}, {"scope": "internal", "recorded_at": NOW}]
+    assert [c.scope for c in CompletedRecord.model_validate(completed(consent_history=history)).consent_history] \
+        == ["declined", "internal"]
+    assert len(DeclinedRecord.model_validate(declined(consent_history=history, closed_at=NOW)).consent_history) == 2
+    with pytest.raises(ValidationError):
+        CompletedRecord.model_validate(completed(consent_history=[{"scope": "yes", "recorded_at": NOW}]))
+
+
+def test_earlier_answers_keep_what_was_shown_and_why():
+    claim = completed()["insights"][0]
+    earlier = [{"given_at": NOW, "reason": "reopened", "insights": [claim], "peer_examples": [], "evidence": "limited"},
+               {"given_at": NOW, "reason": "interrupted", "insights": [], "peer_examples": [claim], "evidence": None}]
+    r = CompletedRecord.model_validate(completed(earlier_answers=earlier))
+    assert [a.reason for a in r.earlier_answers] == ["reopened", "interrupted"]
+    with pytest.raises(ValidationError):
+        CompletedRecord.model_validate(completed(earlier_answers=[{**earlier[0], "reason": "replaced"}]))
+
+
+def test_reviewer_corrections_sit_next_to_the_agent_values():
+    r = CompletedRecord.model_validate(completed(reviewer_tags=["water"], reviewer_summary_original="Falta agua.",
+                                                 reviewer_summary_english="Water is short."))
+    assert r.tags == ["climate and weather", "water"] and r.reviewer_tags == ["water"]
+    with pytest.raises(ValidationError):
+        CompletedRecord.model_validate(completed(reviewer_tags=["drought"]))
+
+
+@pytest.mark.parametrize("narrative_field, value", [
+    ("evidence", "full"), ("earlier_answers", []), ("reviewer_tags", ["water"]),
+    ("reviewer_summary_original", "x"), ("reviewer_summary_english", "x"),
+])
+def test_declined_record_rejects_the_new_narrative_fields(narrative_field, value):
+    with pytest.raises(ValidationError):
+        DeclinedRecord.model_validate(declined(**{narrative_field: value}))

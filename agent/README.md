@@ -80,6 +80,22 @@ intake → playback → respond → consent → feedback → closed
 - **Tests:** `tests/test_conversation_steps.py` (seam 1: scripted Strands models in `tests/conversation_harness.py`,
   real tools and data, real verifier).
 
+## Write-back (issue #26)
+
+`fex.records` builds the record from the conversation state and saves it, following
+[`docs/specs/26-write-back.md`](../docs/specs/26-write-back.md). Code saves; the model has no save tool.
+
+- **Save points:** `set_consent`, `set_feedback`, `end` and `auto_close`. Each save emits `record_saved`. A save
+  that would change nothing writes nothing. No record exists before the first consent choice.
+- **One record per conversation:** `record_id` is the conversation ID. Completed and declined records switch as
+  consent changes; earlier answers (`reopened`, `interrupted`) and the consent history are kept.
+- **Write rules:** validated with the record models before writing. A create requires that the record doesn't
+  exist. An update requires that the stored `version` is the one this conversation last saved and that the stored
+  `producer_id` matches. A failed condition raises `RecordConflict` and becomes an `error` event, never retried.
+- **Where:** `DynamoRecordStore` on the table named by `FEX_RECORDS_TABLE` (unset: records aren't saved).
+  The table itself (KMS, Streams) and the runtime role's permissions are CDK work (#5, #28).
+- **Tests:** `tests/test_write_back.py` runs the entrypoint against moto DynamoDB, so conditional writes behave as in AWS.
+
 ## Tools
 
 Every tool is `@tool(context=True)` and learns who the producer is only through `fex.tools._scope.session_producer_id`, which reads `tool_context.invocation_state["producer_id"]`. No tool takes a producer, location or crop parameter; `tests/test_scope_guard.py` checks this for every tool in `ALL_TOOLS`. Contracts are in [`docs/handoff/tool-contracts.md`](../docs/handoff/tool-contracts.md).

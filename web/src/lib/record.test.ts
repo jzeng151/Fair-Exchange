@@ -42,10 +42,22 @@ describe('buildCompletedRecord', () => {
   })
 })
 
+describe('evidence (#26)', () => {
+  it('is limited when no insights or no peer examples were shown, full when both were', () => {
+    const base = { recordId: 'R-9', producerId: 'P-001', now: NOW, language: 'en', entityType: 'cooperative',
+      summaryOriginal: 'Prices fell.', summaryEnglish: '', tags: ['market and price'] as CompletedRecord['tags'],
+      feedback: null, piiFlag: false }
+    const c = claim('Prices fell 18%.', 'APS 5.2.3')
+    expect(buildCompletedRecord({ ...base, insights: [c], peerExamples: [c] }).evidence).toBe('full')
+    expect(buildCompletedRecord({ ...base, insights: [c], peerExamples: [] }).evidence).toBe('limited')
+    expect(buildCompletedRecord({ ...base, insights: [], peerExamples: [c] }).evidence).toBe('limited')
+  })
+})
+
 describe('buildDeclinedRecord', () => {
   it('holds only identifiers, status, time and declined consent: no narrative', () => {
     const r = buildDeclinedRecord({ recordId: 'R-2', producerId: 'P-001', now: NOW })
-    expect(Object.keys(r).sort()).toEqual(['consent', 'created_at', 'producer_id', 'record_id', 'source', 'status'])
+    expect(Object.keys(r).sort()).toEqual(['consent', 'consent_history', 'created_at', 'producer_id', 'record_id', 'source', 'status', 'updated_at', 'version'])
     expect(r.consent.scope).toBe('declined')
     expect(r.status).toBe('declined')
   })
