@@ -1,16 +1,25 @@
 # infra/
 
-AWS CDK v2 (TypeScript). One stack, one command. The Vision doc requires a timed clean redeploy into a fresh account (issue #40).
+AWS CDK v2 (TypeScript). Issue #5 requires a single-command full-stack deployment;
+issue #40 records a timed clean redeploy. The current command deploys website hosting only.
 
-The current stack hosts the Vue scaffold using a private KMS-encrypted S3 bucket
+The `FairExchange` stack hosts the Vue website using a private KMS-encrypted S3 bucket
 and CloudFront with origin access control. It does not provision the stub API or
 agent. Only compiled files from `web/dist` are published.
 
+Run from the repository root:
+
 ```bash
-npm ci
-npx cdk synth            # preview only; creates nothing
-EXPECTED_AWS_ACCOUNT=100300582834 AWS_REGION=us-west-2 bash deploy-web.sh
+npm --prefix infra ci
+(cd infra && npx cdk synth FairExchange) # preview only; creates nothing
+EXPECTED_AWS_ACCOUNT=100300582834 AWS_REGION=us-west-2 bash infra/deploy-web.sh
 ```
+
+`web/`, `api/`, `agent/`, `data/`, `eval/`, and `infra/` are root-level folders.
+The scripts resolve their paths from their own location, so they also work when
+called from another directory. Moving the source tree does not change the stack
+name, resource IDs, GitHub OIDC trust, or website URL. See the
+[remaining work for #5](../docs/handoff/sandbox-deployment.md#remaining-work-for-issue-5).
 
 The script builds and checks the app, deploys the synthesized CloudFormation
 template with the caller's existing credentials, uploads the site, invalidates
@@ -46,7 +55,7 @@ infrastructure changes separately with `deploy-web.sh` using sandbox credentials
 Provision the OIDC identity once with:
 
 ```bash
-EXPECTED_AWS_ACCOUNT=100300582834 bash configure-github-oidc.sh
+EXPECTED_AWS_ACCOUNT=100300582834 bash infra/configure-github-oidc.sh
 ```
 
 This creates the separate `FairExchangeGitHub` stack and requires IAM permissions.

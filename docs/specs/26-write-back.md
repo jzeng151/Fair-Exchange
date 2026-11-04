@@ -58,7 +58,8 @@ The record carries its own history:
   - Earlier answers go to `earlier_answers`.
 - **Declined record:** identifiers, status, times, consent and consent history only ([#19 spec](19-consent-and-decline.md)).
 - **Switching type:** while the conversation is open, a record switches between completed and declined as consent changes. Switching back to completed rebuilds the narrative from the conversation state, including earlier answers.
-- **PII flag:** `pii_flag` keeps its schema default until the PII spec (later batch) defines how it is set.
+- **PII:** `pii_flag` and the PII fields are set as defined in the [#20 spec](20-pii-flagging.md).
+- **Decision log and AI usage:** built from the conversation state ([#13 spec](13-conversation-steps.md)), which records step changes, tool calls, verifier reason codes, PII checks and token usage as they happen. Guardrail findings go to CloudWatch only, not the record ([#12 spec](12-guardrail.md)).
 
 ### Record schema changes (shared contract owned here)
 
@@ -75,6 +76,9 @@ Changes go in the Pydantic record models. JSON Schema and TypeScript types are r
 | `reviewer_tags` | completed | list of challenge tags, or null | Reviewer's corrected tags |
 | `reviewer_summary_original` | completed | string or null | Reviewer's corrected summary in the producer's language |
 | `reviewer_summary_english` | completed | string or null | Reviewer's corrected English summary |
+| `decision_log` | completed | list of `{at, kind, code, refs}` | The agent's reasoning trail for reviewers (Journey 3). `kind` is `step`, `tool`, `verifier` or `pii`. `code` is a fixed code (e.g., `step_changed`, `tool_called`, `tool_backstopped`, a verifier reason code, `pii_found`). `refs` lists opaque IDs only: step names, tool names, the bracketed item IDs from sources, clause IDs, PII entity types. No free text, titles, model output or producer words. |
+| `ai_usage` | both | list of `{model_id, input_tokens, output_tokens}` | Tokens per model for this conversation, for the AI footprint ([#29 spec](29-analytics-api.md)). Non-narrative, so allowed on declined records. |
+| PII fields | completed | see the [#20 spec](20-pii-flagging.md) | `pii_entity_types`, `pii_matches`, `pii_check`, `pii_review` |
 
 - **Agent fields stay the agent's.** `tags`, `summary_original` and `summary_english` always hold the agent's output. Reviewer corrections never overwrite them.
 - **Effective values** for queries are the reviewer's value if set, otherwise the agent's.
@@ -88,8 +92,8 @@ Changes go in the Pydantic record models. JSON Schema and TypeScript types are r
   - A create is conditioned on the record not existing.
   - An update is conditioned on the stored `version` matching the one read and the stored `producer_id` matching the request's producer ID.
   - A failed condition is an error, logged and surfaced as an `error` event. It is not retried: the chat API's turn lock already serializes saves for a conversation, so a conflict means a bug.
-- **Permissions:** the agent runtime role may read and write only this table.
-- **Reviewer writes** (later spec) follow the same rules. They may change only the `reviewer_*` and review fields, and only on records with `closed_at` set.
+- **Permissions:** of DynamoDB tables, the agent runtime role may read and write only this one. Its full permission list is in the [#13 spec](13-conversation-steps.md).
+- **Reviewer writes** ([#27 spec](27-review-api.md)) follow the same validation and version rules, but are conditioned on `version` and `closed_at` being set, not on `producer_id` (reviewers have none). They may change only the `reviewer_*` fields, `pii_review` and the review fields.
 
 ## Testing Decisions
 
@@ -108,7 +112,6 @@ Changes go in the Pydantic record models. JSON Schema and TypeScript types are r
 
 - Sync to S3 and Athena ([#28 spec](28-athena-sync.md))
 - The review view and API (later batch), beyond the write rules above
-- PII detection (later batch)
 
 ## Further Notes
 

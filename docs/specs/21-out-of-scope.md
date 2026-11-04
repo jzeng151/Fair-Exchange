@@ -28,7 +28,7 @@ FEX declines the request, says plainly why, and offers to return to the open que
 - **In-scope requests** include anonymized peer examples returned by the peer-example tool. They remain part of every answer.
 - **Response.** FEX declines with a one-sentence reason in the producer's language and offers to return to the open question. It does not call any data tool for the request.
 - **Steps.** The conversation stays in its current step. If the producer has nothing else, they use `end` ([#13 spec](13-conversation-steps.md)).
-- **Record.** Summaries and tags are generated from the confirmed playback only ([#26 spec](26-write-back.md)). The playback must not include the misdirected request.
+- **Record.** Summaries and tags are generated from the confirmed playback only ([#26 spec](26-write-back.md)). The playback must not include the misdirected request. PII results from out-of-scope messages are not recorded either ([#20 spec](20-pii-flagging.md)).
 
 ## Testing Decisions
 

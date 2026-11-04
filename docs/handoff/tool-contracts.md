@@ -83,4 +83,4 @@ It never substitutes a neighbouring region. Strength is `nearest` for climate an
 | `regional_facts.json` | `fx_data.regional build` (offline) | after `fetch` |
 | `peer_projects.json`, `producer_profiles.json` | `fx_data.peers` (offline) | when the sample data changes |
 
-The architecture in `Fair-Exchange-Scaffolding/README.md` puts the regional table in S3 and peer search in a Knowledge Base. For the sandbox these ship as package data, like `clauses.json` (#9). Moving them to S3 or a Knowledge Base changes the loaders in `fx_data`, not the tool contracts.
+The architecture in the [repository README](../../README.md) puts the regional table in S3 and peer search in a Knowledge Base. For the sandbox these ship as package data, like `clauses.json` (#9). Moving them to S3 or a Knowledge Base changes the loaders in `fx_data`, not the tool contracts.
