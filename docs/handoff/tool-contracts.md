@@ -7,7 +7,7 @@ What each FEX tool takes, returns and guarantees. Code: `agent/src/fex/tools/`. 
 - Every tool is `@tool(context=True)` and gets the producer only from `tool_context.invocation_state["producer_id"]`, through `fex.tools._scope.session_producer_id`. The AgentCore entrypoint sets it from the producer's login.
 - No tool has a producer, location or crop parameter, so the model cannot ask for another producer's data. A value the model adds anyway is ignored. `agent/tests/test_scope_guard.py` checks every tool in `ALL_TOOLS`.
 - No producer in the session: the tool returns an error (`PermissionError: No producer in session`).
-- Location, crop and entity type come from the producer's profile (`fx_data.peers.ProducerProfiles`). Today that is a stand-in built from the sample accounts. When the producer-record tool (#14) and the Athena tables (#28) exist, swap the profile lookup; the tool contracts do not change.
+- Location, crop and entity type come from the producer's profile (`fx_data.peers.ProducerProfiles`), built from the sample accounts. `get_producer_record` returns the same profile. When the Athena tables (#28) exist, swap the loaders in `fx_data`; the tool contracts do not change.
 
 ## Step gating (all data tools, #13)
 
@@ -19,6 +19,36 @@ What each FEX tool takes, returns and guarantees. Code: `agent/src/fex/tools/`. 
 ## Citations
 
 Each fact and peer example has a `source` string. That is the value the citation verifier (#17) records from tool results and checks `Citation.source` against, so FEX must copy it unchanged into the claim's `Citation.source`. Tools do not choose a standard clause; that comes from `check_standards`. Copy `period` and `strength` into the `Citation` too.
+
+## `get_producer_record()` (#14)
+
+**Parameters (model-visible):** none.
+
+**Returns:**
+
+```json
+{
+  "found": true,
+  "profile": {"country": "Peru", "region": "Cajamarca", "crop": "Coffee", "entity_type": "1st Grade",
+              "certification_status": "Authorized", "certification_scope": "Producer",
+              "supply_chain_role": "Producer", "source": "FTUSA producer account (sample data)"},
+  "premium_projects": [{"project_ref": "PROJ-…", "source": "FTUSA Premium project (sample data, own record) PROJ-…",
+                        "challenge_tag": "water", "name": "…", "challenge": "…", "action": "…",
+                        "intended_outcome": "…", "status": "Completed", "start_date": "…", "end_date": "…"}],
+  "survey": {"responses": 683,
+             "facts": [{"text": "96% of 676 survey responses say they use soil conservation practices.",
+                        "source": "FTUSA survey responses (sample data)", "period": "2021-2026",
+                        "responses": 676, "strength": "exact"}],
+             "note": null}
+}
+```
+
+- The producer's own projects keep their real names and text; it is their own record. Sample placeholder rows (lorem ipsum) are left out. `project_ref` is unique per project and is the same ref the peer table uses. `status` and dates are `null` where the sample cannot tell similar projects apart.
+- **Survey answers are summarized, never returned row by row**, and only from an allowlist of farming, water and practice questions (`fx_data.records`). Harassment, borrowing, medical access, child schooling, committees and income questions are never read. A share needs at least 5 **distinct survey responses** (a response that picks several options counts once), and a reason is only named if at least 5 responses gave it. Each fact's `period` is the years of the responses behind that fact. Facts say "survey responses", not "households": about half the sample's survey rows are not household surveys.
+- 22 of the 146 sample producers have survey responses; 14 have enough to summarize. Otherwise `survey.facts` is empty and `survey.note` says why.
+- Unknown producer: `{"found": false, "note": "No record on file for this producer."}`
+
+**Feed the verifier:** `evidence.record_tool_result([record["profile"], *record["premium_projects"], *record["survey"]["facts"]])`.
 
 ## `get_regional_context()` (#15, data from #8)
 
@@ -71,6 +101,7 @@ It never substitutes a neighbouring region. Strength is `nearest` for climate an
 - Never the session producer's own projects. At most one project per organization.
 - Organizations are fictionalized; account ids never appear.
 - `intended_outcome` is what the project aimed for. The sample data has no recorded results, so FEX must not describe it as what happened. `status` says whether the project was completed.
+- `status` and dates are `null` for the few projects the sample cannot tell apart (same account and text, different statuses). FEX should not claim a status for those.
 - Empty list: no comparable project. FEX should say so rather than invent one. The sample covers environmental projects only, so market, labor, health and similar challenges return nothing today.
 
 **Feed the verifier:** `evidence.record_tool_result(result)`.
@@ -82,5 +113,6 @@ It never substitutes a neighbouring region. Strength is `nearest` for climate an
 | `regional_sources.json` | `fx_data.regional fetch` (network) | when adding regions or refreshing data |
 | `regional_facts.json` | `fx_data.regional build` (offline) | after `fetch` |
 | `peer_projects.json`, `producer_profiles.json` | `fx_data.peers` (offline) | when the sample data changes |
+| `producer_records.json` | `fx_data.records` (offline) | when the sample data changes |
 
 The architecture in the [repository README](../../README.md) puts the regional table in S3 and peer search in a Knowledge Base. For the sandbox these ship as package data, like `clauses.json` (#9). Moving them to S3 or a Knowledge Base changes the loaders in `fx_data`, not the tool contracts.
