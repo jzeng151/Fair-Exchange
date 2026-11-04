@@ -101,7 +101,8 @@ Every Bedrock model call carries the FEX Guardrail when `FEX_GUARDRAIL_ID` and `
 (`conversation/runtime.py`), with trace on and **redaction off** (Strands redacts input by default; FEX never
 alters what a producer wrote). The Guardrail itself (`infra/lib/guardrail-stack.ts`) is in detect mode: every
 action is `NONE`. `conversation/guardrail.py` wraps each model per conversation and logs detected findings to the
-`fex.guardrail` logger as JSON: conversation ID, input/output, policy type and topic or category. **Never text**,
+`fex.guardrail` logger as JSON: conversation ID, input/output, policy type and topic or category. `runtime.configure_logging()`
+(called when the AgentCore app starts) sets that logger to INFO and writes it to stdout, which AgentCore ships to CloudWatch. **Never text**,
 and never written to the record. See [`docs/specs/12-guardrail.md`](../docs/specs/12-guardrail.md).
 
 ## Write-back (issue #26)

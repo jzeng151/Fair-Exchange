@@ -122,3 +122,34 @@ def test_a_half_configured_guardrail_is_an_error(monkeypatch, missing):
     monkeypatch.delenv(missing)
     with pytest.raises(ValueError):
         runtime.guardrail_config()
+
+
+# ---------------------------------------------------------------- review fix (Codex on #80)
+
+@pytest.fixture
+def default_logging():
+    """The guardrail logger exactly as Python leaves it: no level, no handler (no test-only override)."""
+    lg = logging.getLogger("fex.guardrail")
+    saved = (lg.level, list(lg.handlers), lg.propagate)
+    lg.setLevel(logging.NOTSET)
+    lg.handlers.clear()
+    lg.propagate = True
+    yield lg
+    lg.setLevel(saved[0])
+    lg.handlers[:] = saved[1]
+    lg.propagate = saved[2]
+
+
+def test_runtime_logging_writes_findings_to_stdout_for_cloudwatch(default_logging, capsys):
+    from fex.conversation.guardrail import log_findings
+    runtime.configure_logging()
+    log_findings(TRACE, "conv-9")
+    out = capsys.readouterr().out
+    assert '"conversation_id": "conv-9"' in out and "Certification status and audit results" in out
+    assert SECRET not in out
+
+
+def test_configuring_logging_twice_adds_one_handler(default_logging):
+    runtime.configure_logging()
+    runtime.configure_logging()
+    assert len(default_logging.handlers) == 1

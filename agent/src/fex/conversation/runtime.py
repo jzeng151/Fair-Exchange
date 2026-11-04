@@ -9,8 +9,10 @@ State: in-memory per runtime session until AgentCore Memory (docs/specs/memory.m
 Records (#26): saved to the DynamoDB table named by FEX_RECORDS_TABLE; not saved when it is unset.
 Guardrail (#12): FEX_GUARDRAIL_ID + FEX_GUARDRAIL_VERSION attach the Guardrail to every model call, in detect mode.
 """
+import logging
 import os
 import queue
+import sys
 import threading
 from collections.abc import Iterator
 from functools import lru_cache
@@ -28,6 +30,22 @@ DEFAULT_LARGE = "us.anthropic.claude-sonnet-5-5"
 
 def model_ids() -> tuple[str, str]:
     return os.environ.get("FEX_SMALL_MODEL", DEFAULT_SMALL), os.environ.get("FEX_LARGE_MODEL", DEFAULT_LARGE)
+
+
+def configure_logging() -> None:
+    """Send Guardrail findings (INFO, logger `fex.guardrail`) to stdout, which AgentCore ships to CloudWatch.
+
+    Python's default would drop them: the logger inherits WARNING and has no handler, and the AgentCore app
+    only configures its own `bedrock_agentcore.app` logger. Safe to call more than once.
+    """
+    logger = logging.getLogger("fex.guardrail")
+    logger.setLevel(logging.INFO)
+    if not any(getattr(h, "_fex_guardrail", False) for h in logger.handlers):
+        handler = logging.StreamHandler(sys.stdout)
+        handler.setFormatter(logging.Formatter("%(asctime)s %(name)s %(message)s"))
+        handler._fex_guardrail = True  # marks our handler so repeated calls don't add another
+        logger.addHandler(handler)
+    logger.propagate = False  # one copy of each finding, not another via the root logger
 
 
 def guardrail_config() -> dict[str, Any]:
@@ -118,6 +136,7 @@ def stream(payload: dict[str, Any], engine: ConversationEngine | None = None) ->
 def create_app():  # pragma: no cover - exercised when deployed
     from bedrock_agentcore.runtime import BedrockAgentCoreApp
 
+    configure_logging()  # Guardrail findings must reach CloudWatch (#12)
     app = BedrockAgentCoreApp()
 
     @app.entrypoint
