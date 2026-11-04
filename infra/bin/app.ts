@@ -5,6 +5,7 @@ import { AnalyticsQueriesStack } from '../lib/analytics-queries-stack';
 import { AthenaSyncStack } from '../lib/athena-sync-stack';
 import { FairExchangeStack } from '../lib/fair-exchange-stack';
 import { ArtifactsStack } from '../lib/artifacts-stack';
+import { FairExchangeEvalStack } from '../lib/fair-eval-stack';
 
 const app = new App();
 const env = { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION ?? 'us-west-2' };
@@ -55,3 +56,15 @@ const analyticsQueries = new AnalyticsQueriesStack(app, 'FairExchangeAnalyticsQu
   env,
 });
 analyticsQueries.addDependency(athenaSync);
+
+// Spec 36: the eval stack — the six code-based evaluator Lambdas plus the disposable eval data
+// (records table + evidence bucket, kept apart from demo/reviewer data). The eval deploy step
+// uploads the evaluator zip (eval/src/fx_evals + agent/src/fex) and passes it as context;
+// placeholders keep `cdk synth` working in CI. The judge model defaults to the app's large model.
+new FairExchangeEvalStack(app, 'FairExchangeEval', {
+  env,
+  codeBucketName: ctx('evalCodeBucket', 'unset-eval-code-bucket'),
+  codeKey: ctx('evalCodeKey', 'eval/unset.zip'),
+  codeKeyArn: app.node.tryGetContext('evalCodeKeyArn'),
+  judgeModelId: ctx('evalJudgeModelId', 'us.anthropic.claude-sonnet-5-5'),
+});
