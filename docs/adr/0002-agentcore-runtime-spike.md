@@ -51,6 +51,11 @@ agent(prompt, invocation_state={"producer_id": producer_id})       # set by the 
   - the one code object
   - runtime log groups, X-Ray, metrics in the `bedrock-agentcore` namespace, workload identity
 - **Entry point must be `["opentelemetry-instrument", "main.py"]`.** With plain `main.py`, the runtime ran fine but emitted **no traces at all**.
+- **Spans need CloudWatch Transaction Search, set once per account and region.** `aws/spans` exists only after it is turned on. In the sandbox it was turned on at 06:27 UTC on 2026-11-04, before this spike was deployed. A clean account (#40) needs it first, and CDK does not do it:
+  1. Add a CloudWatch Logs resource policy that lets `xray.amazonaws.com` write to `aws/spans` and `/aws/application-signals/data`.
+  2. Run `aws xray update-trace-segment-destination --destination CloudWatchLogs`. It went from PENDING to ACTIVE in 64 seconds.
+
+  A runtime built with the L2 `Runtime` construct and `tracingEnabled: true` fails to deploy without it: CloudFormation rejects the `AWS::Logs::Delivery` resource and rolls the stack back.
 - **Cost:** you pay only while a request runs. The spike, including several invocations, cost well under $0.05.
 
 ## Do AgentCore traces capture message content? (for #38, the decline question)
@@ -64,12 +69,36 @@ agent(prompt, invocation_state={"producer_id": producer_id})       # set by the 
 **What this means:** if a producer **declines** (#19), the record write-back already stores nothing, but **their words would still sit in CloudWatch logs indefinitely**. Before real conversations:
 
 1. Set a **short retention** on the runtime log group in CDK (#5). Create the log group in the stack with retention, for example 1–7 days.
-2. Decide with FTUSA (#38) whether message content may be logged at all. If not, turn off GenAI content capture in the OpenTelemetry settings and **verify** the result the same way this spike did: search `otel-rt-logs` for a test sentence. That setting was not verified in this spike.
+2. Decide with FTUSA (#38) whether message content may be logged at all. If not, turn off GenAI content capture in the OpenTelemetry settings and **verify** the result the same way this spike did: search `otel-rt-logs` for a test sentence. One setting is not enough: see [Turning off content capture](#turning-off-content-capture).
 3. Limit who can read those log groups (IAM), since they can hold producer narratives.
+
+### Turning off content capture
+
+Tested on 2026-11-04 with `strands-agents` 1.63.0 and `aws-opentelemetry-distro` 0.22.0. The runtime had `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=false` set, was invoked with a test sentence, and `otel-rt-logs` was searched for that sentence.
+
+The content in `otel-rt-logs` comes from two sources, and the setting stops only one of them:
+
+| Source (log event scope) | Default | Setting `false` |
+|---|---|---|
+| `opentelemetry.instrumentation.botocore.bedrock-runtime` (the Bedrock call) | content logged | nothing logged |
+| `strands.telemetry.tracer` (the Strands agent) | content logged | **still logged** (5 events held the test sentence) |
+
+The ADOT distro sets the variable to `true` unless it is already set. The Strands tracer does not read it. Strands 1.63 documents a redaction list in `OTEL_SEMCONV_STABILITY_OPT_IN`, but its docstring says per-message events are always emitted. That option was not tested. Dropping `opentelemetry-instrument` removes all traces (see Deployment).
+
+The runtime's stdout stream held logger lines and `Tool #1: <name>` only, with no message text.
+
+## Sessions across turns (#13, #25)
+
+Tested on 2026-11-04 with a variant of the hello agent that keeps one `Agent` per `context.session_id` in a module-level dict. That code was not merged.
+
+- Two calls with the same `runtimeSessionId` ran on the same instance (same `service.instance.id` in the logs). The second turn saw the first turn's messages.
+- A call with a new `runtimeSessionId` started a new instance. It saw none of the other session's history, and its tool returned that call's own `producerId`.
+
+So module-level state lasts between the turns of one session and is not shared between sessions.
 
 ## Not covered (left to the issues it unblocks)
 
-- Multi-turn sessions and conversation state (#13, #25). The spike creates a fresh agent per invocation.
+- How long an idle session lasts, and what happens to its state after it ends (#13, #25). The merged spike creates a fresh agent per invocation; see [Sessions across turns](#sessions-across-turns-13-25) for what was tested.
 - Sign-in and IAM so that only the API can call the runtime (#11, #25).
 - Folding the runtime into the single stack with KMS encryption (#5). The spike bucket uses S3-managed keys to avoid a KMS key's monthly charge.
 - Guardrails (#12).

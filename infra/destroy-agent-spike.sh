@@ -10,4 +10,4 @@ bucket="$(aws cloudformation describe-stacks --stack-name FairExchangeAgentArtif
 [[ -n "$bucket" && "$bucket" != "None" ]] && aws s3 rm --only-show-errors --recursive "s3://$bucket"
 aws cloudformation delete-stack --stack-name FairExchangeAgentArtifacts
 aws cloudformation wait stack-delete-complete --stack-name FairExchangeAgentArtifacts
-echo "Agent spike removed. CloudWatch log groups under /aws/bedrock-agentcore/runtimes/ remain until their retention ends."
+echo "Agent spike removed. CloudWatch log groups under /aws/bedrock-agentcore/runtimes/ are not removed and never expire by default. Delete them by hand."
