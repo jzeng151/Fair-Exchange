@@ -99,9 +99,9 @@ class AgentCoreMemoryStateStore:
     """StateStore backed by AgentCore Memory short-term events (spec: "Short-term memory (resume)").
 
     One conversation's state is stored as a chain of short-term events under (actor=producer_id,
-    session=conversation_id). The newest event holds the current ConversationState as JSON. `load`
-    reads the newest event; `save` appends a new event after checking the revision, which gives the
-    same optimistic-concurrency contract as InMemoryStateStore. AgentCore's long-term strategies read
+    session=conversation_id). Each event holds a whole ConversationState as JSON; the current state is
+    the one with the highest revision. `load` reads it; `save` appends a new event after checking the
+    revision, which gives the same optimistic-concurrency contract as InMemoryStateStore. AgentCore's long-term strategies read
     these events to extract per-producer summaries and facts under `producer_namespace`.
     """
 
@@ -112,15 +112,11 @@ class AgentCoreMemoryStateStore:
     # ------------------------------------------------------------------ StateStore
 
     def load(self, producer_id: str, conversation_id: str) -> ConversationState | None:
-        event = self._latest_event(producer_id, conversation_id)
-        if event is None:
-            return None
-        return ConversationState.model_validate(json.loads(self._state_json(event)))
+        return self._current_state(producer_id, conversation_id)
 
     def save(self, state: ConversationState, expected_revision: int | None) -> None:
-        latest = self._latest_event(state.producer_id, state.conversation_id)
-        stored = None if latest is None else ConversationState.model_validate(
-            json.loads(self._state_json(latest))).revision
+        current = self._current_state(state.producer_id, state.conversation_id)
+        stored = None if current is None else current.revision
         if stored != expected_revision:
             raise StateConflict(
                 f"conversation {state.conversation_id}: stored revision {stored}, expected {expected_revision}")
@@ -157,7 +153,10 @@ class AgentCoreMemoryStateStore:
     _PAGE = 100
 
     def _all_events(self, producer_id: str, conversation_id: str) -> list[dict[str, Any]]:
-        """Every short-term event for this conversation, in chronological order.
+        """Every short-term event for this conversation, in the order the API returns them.
+
+        The order is not relied on: the live ListEvents returns newest first, while the client's docstring
+        says chronological. `_current_state` picks by revision instead.
 
         `list_events` returns at most `max_results` events and then stops, so a fixed cap would
         silently read a stale event once a conversation has more saves than the cap. Raise the limit a
@@ -172,12 +171,12 @@ class AgentCoreMemoryStateStore:
                 memory_id=self.memory_id, actor_id=producer_id, session_id=conversation_id, max_results=limit)
         return events
 
-    def _latest_event(self, producer_id: str, conversation_id: str) -> dict[str, Any] | None:
-        events = self._all_events(producer_id, conversation_id)
-        if not events:
-            return None
-        # list_events returns chronological order; the newest event is the current state.
-        return events[-1]
+    def _current_state(self, producer_id: str, conversation_id: str) -> ConversationState | None:
+        """The state with the highest revision. Each save writes revision + 1 after checking the stored
+        revision, so the highest one is the newest save whatever order the events come back in."""
+        states = [ConversationState.model_validate(json.loads(self._state_json(event)))
+                  for event in self._all_events(producer_id, conversation_id)]
+        return max(states, key=lambda s: s.revision, default=None)
 
     @staticmethod
     def _state_json(event: dict[str, Any]) -> str:

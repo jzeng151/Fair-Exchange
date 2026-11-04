@@ -209,7 +209,8 @@ class FakeMemoryClient:
 
     Implements only the data-plane methods the AgentCoreMemoryStateStore uses, with the real event
     payload shape: {"eventId", "payload": [{"conversational": {"content": {"text": ...}, "role": ...}}]}.
-    Events are kept per (memory_id, actor_id, session_id) in insertion (chronological) order.
+    Events are kept per (memory_id, actor_id, session_id) in insertion order and returned newest first, as the
+    live ListEvents does (seen in the sandbox on 2026-11-04), so code that assumes chronological order fails here.
     """
 
     def __init__(self):
@@ -226,7 +227,7 @@ class FakeMemoryClient:
         return event
 
     def list_events(self, *, memory_id, actor_id, session_id, max_results=100):
-        return list(self._events.get((memory_id, actor_id, session_id), []))[:max_results]
+        return list(reversed(self._events.get((memory_id, actor_id, session_id), [])))[:max_results]
 
     def delete_event(self, *, memory_id, actor_id, session_id, event_id):
         key = (memory_id, actor_id, session_id)
