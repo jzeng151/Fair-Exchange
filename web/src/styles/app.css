@@ -236,3 +236,9 @@ pre.sub { background: none; border-left: 3px solid var(--ft-ui-border); padding:
 .side-switch a { min-height: 44px; padding: 6px 16px; display: inline-flex; align-items: center; gap: 6px; background: var(--ft-ui-surface); color: var(--ft-ui-primary); font-weight: 500; text-decoration: none; }
 .side-switch a + a { border-left: 1px solid var(--ft-ui-primary); }
 .side-switch a.active { background: var(--ft-ui-primary); color: #fff; }
+
+/* Narrow screens: the side switch shares the width instead of pushing past the edge (five sides with live mode, #116) */
+@media (max-width: 600px) {
+  .top-right, .side-switch { max-width: 100%; }
+  .side-switch a { flex: 1 1 0; min-width: 0; padding: 6px 8px; justify-content: center; text-align: center; font-size: 13px; }
+}
