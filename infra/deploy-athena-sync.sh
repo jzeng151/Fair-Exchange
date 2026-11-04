@@ -32,8 +32,13 @@ key="sync/sync-$(shasum -a 256 "$build/sync.zip" | cut -c1-12).zip"  # new key p
 
 echo "2/4 Code bucket ($code_bucket)"
 if ! aws s3api head-bucket --bucket "$code_bucket" 2>/dev/null; then
-  aws s3api create-bucket --bucket "$code_bucket" --region "$AWS_REGION" \
-    --create-bucket-configuration LocationConstraint="$AWS_REGION" >/dev/null
+  # us-east-1 rejects a LocationConstraint; every other region requires one.
+  if [[ "$AWS_REGION" == "us-east-1" ]]; then
+    aws s3api create-bucket --bucket "$code_bucket" --region "$AWS_REGION" >/dev/null
+  else
+    aws s3api create-bucket --bucket "$code_bucket" --region "$AWS_REGION" \
+      --create-bucket-configuration LocationConstraint="$AWS_REGION" >/dev/null
+  fi
   aws s3api put-public-access-block --bucket "$code_bucket" --public-access-block-configuration \
     BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true
   aws s3api put-bucket-encryption --bucket "$code_bucket" --server-side-encryption-configuration \
@@ -60,5 +65,5 @@ aws cloudformation describe-stacks --stack-name FairExchangeAthenaSync \
 
 echo
 echo "Done. Backfill or repair the records with the resync command:"
-echo "  RECORDS_TABLE=$RECORDS_TABLE_NAME SYNC_BUCKET=<RecordsBucketName above> uv run --project ../sync python -m fex_sync.resync"
+echo "  RECORDS_TABLE=$RECORDS_TABLE_NAME SYNC_BUCKET=<RecordsBucketName above> uv run --project $sync_src python -m fex_sync.resync"
 echo "Query from the fex Athena workgroup; the named queries are journey-3-... and athena-only-tag-counts."
