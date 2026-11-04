@@ -25,7 +25,7 @@ from fex.tools.standards import RETRIEVER_KEY, RetrievedClause
 
 PROFILES = ProducerProfiles.load()._profiles
 PRODUCERS = sorted(PROFILES)
-RECORDS = ProducerRecords.load()._records
+RECORDS = ProducerRecords.load()
 PEER_ROWS = PeerProjects.load()._projects
 TAGS = list(ChallengeTag.__args__)
 CLAUSES = ("APS 1.1", "APS 3.6.1", "FPS 1.1")
@@ -101,9 +101,10 @@ def test_tool_returns_only_session_scoped_data(case):
         status, spoofed = call(tool, spoof(victim), pid, session=session)
         assert status == "success" and spoofed == honest, (tool.tool_name, session)
 
-        # 2. No producer's account id ever appears in a tool result.
+        # 2. No other producer's account id ever appears in a tool result. The producer's own ID may
+        #    appear, in their own certification record's source (#14 spec).
         text = json.dumps(honest)
-        assert not [a for a in PRODUCERS if a in text], tool.tool_name
+        assert not [a for a in PRODUCERS if a != pid and a in text], tool.tool_name
 
         # 3. Tool-specific: the producer or location in the result is the session one.
         check = TOOL_CHECKS.get(tool.tool_name)
@@ -111,17 +112,23 @@ def test_tool_returns_only_session_scoped_data(case):
         check(honest, pid, session)
 
 
+def _bracket_id(source: str) -> str:
+    return source.rsplit("[", 1)[1].rstrip("]")
+
+
 def _check_record(result, pid, _session):
+    assert result == RECORDS.items(pid)
     own = RECORDS.get(pid)
     if own is None:
         assert result == []
         return
     assert all(item["kind"] == "producer_record" for item in result)
-    expected = ({own["profile"]["source"]} | {p["source"] for p in own["premium_projects"]}
-                | {f["source"] for f in own["survey"]["facts"]})
-    assert {item["source"] for item in result} == expected
     own_refs = {p["project_ref"] for p in own["premium_projects"]}
-    assert {i["data"]["project_ref"] for i in result if "project_ref" in i["data"]} == own_refs
+    projects = [i for i in result if i["source"].startswith("Your Premium project: ")]
+    assert {_bracket_id(i["source"]) for i in projects} == own_refs
+    # The producer's own ID appears only in their certification record's source
+    others = [i for i in result if not i["source"].startswith("Your certification record ")]
+    assert pid not in json.dumps(others)
 
 
 def _check_regional(result, pid, _session):

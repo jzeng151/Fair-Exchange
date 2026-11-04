@@ -35,28 +35,27 @@ The decision log records only the codes.
 
 ## `get_producer_record()` (#14)
 
-Items with `kind: "producer_record"`: first the profile, then the producer's own Premium projects, then survey facts.
+Items with `kind: "producer_record"`, built by `fx_data.records.ProducerRecords.items`, in this order:
+
+- **Certification scope**, one item. `source` is `Your certification record [<producer_id>]`; `data` is `{"certification_scope": …}`. Certification status and audit results are never read (#21).
+- **Own Premium projects**, one item per project. `source` is `Your Premium project: <name> [<project_ref>]`; `data` is `{category, sub_category, year, amount, description}`. The sample has no amounts, so `amount` is `null`. The producer's own projects keep their real names and text; it is their own record. Placeholder rows (lorem ipsum) are left out.
+- **Survey summaries**, one item per allowlisted column with enough answers. `source` is `Your <years> survey: <column> [SV-…]`; `data` is `{column, responses}`.
 
 ```json
-[{"source": "FTUSA producer account (sample data)", "kind": "producer_record",
-  "text": "Location on file: Cajamarca, Peru; crop: Coffee; entity type: 1st Grade; certification scope: Producer",
-  "period": null, "strength": "exact",
-  "data": {"country": "Peru", "region": "Cajamarca", "crop": "Coffee", "entity_type": "1st Grade",
-           "certification_scope": "Producer", "supply_chain_role": "Producer"}},
- {"source": "FTUSA Premium project (sample data, own record) PROJ-…", "kind": "producer_record",
-  "text": "Your Premium project <name> (Completed): <action>", "period": "<start> to <end>", "strength": "exact",
-  "data": {"project_ref": "PROJ-…", "challenge_tag": "water", "name": "…", "challenge": "…", "action": "…",
-           "intended_outcome": "…", "status": "Completed", "start_date": "…", "end_date": "…"}},
- {"source": "FTUSA survey responses (sample data)", "kind": "producer_record",
-  "text": "96% of 676 survey responses say they use soil conservation practices.", "period": "2021-2026",
-  "strength": "exact", "data": {"text": "…", "period": "2021-2026", "responses": 676, "strength": "exact"}}]
+[{"source": "Your certification record [7F7F…]", "kind": "producer_record", "text": "Certification scope: Producer.",
+  "period": null, "strength": "exact", "data": {"certification_scope": "Producer"}},
+ {"source": "Your Premium project: environmental plan [PROJ-8085A49F]", "kind": "producer_record",
+  "text": "Your Premium project \"environmental plan\", started 2024: …", "period": "2024", "strength": "exact",
+  "data": {"category": "Environmental", "sub_category": "…", "year": 2024, "amount": null, "description": "…"}},
+ {"source": "Your 2024 survey: has_soil_conservation_practices_code [SV-EEDA42]", "kind": "producer_record",
+  "text": "99% of 150 survey responses say they use soil conservation practices.", "period": "2024",
+  "strength": "exact", "data": {"column": "has_soil_conservation_practices_code", "responses": 150}}]
 ```
 
-- The producer's own projects keep their real names and text; it is their own record. Sample placeholder rows (lorem ipsum) are left out. `project_ref` is unique per project and is the same ref the peer table uses. `status` and dates are `null` where the sample cannot tell similar projects apart.
-- **Survey answers are summarized, never returned row by row**, and only from an allowlist of farming, water and practice questions (`fx_data.records`). Harassment, borrowing, medical access, child schooling, committees and income questions are never read. A share needs at least 5 **distinct survey responses** (a response that picks several options counts once), and a reason is only named if at least 5 responses gave it. Each fact's `period` is the years of the responses behind that fact. Facts say "survey responses", not "households": about half the sample's survey rows are not household surveys.
-- 22 of the 146 sample producers have survey responses; 14 have enough to summarize. Otherwise there are no survey items.
+- **Survey answers are summarized, never returned row by row**, and only from the #14 allowlist (`fx_data.records`). A share needs at least 5 **distinct survey responses** (a response that picks several options counts once), and a reason is only named if at least 5 responses gave it. Each item's `period` is the years of the responses behind it. Items say "survey responses", not "households": about half the sample's survey rows are not household surveys.
+- **Differs from the #14 spec:** the spec asks for one item per column per survey response, with the survey response ID in the source. This tool keeps the aggregated summaries (one item per column, ID `SV-` + a hash of producer and column), because single responses could be picked out and the sample has up to 683 responses per producer. Open question for the spec owner.
+- 22 of the 146 sample producers have survey responses; 12 have enough to summarize. The rest get certification and project items only.
 - Unknown producer: an empty list.
-- The per-item `[<id>]` source labels are #14 retro work.
 
 ## `get_regional_context()` (#15, data from #8)
 
