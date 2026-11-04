@@ -1,7 +1,9 @@
 """Issue #41 (voice notes): capture → Transcribe streaming (us-west-2) → VoiceTurn; local-first `VoiceStore` (S3 swaps in later); lazy SDK import keeps tests credential-free."""
+import os
 import uuid
 from datetime import datetime, timezone
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from typing import Iterable, Protocol
 
 from fex.models import VoiceTurn
@@ -16,6 +18,20 @@ def _segment(value: str, name: str) -> str:
     if not value or value in (".", "..") or "/" in value or "\\" in value:
         raise ValueError(f"{name} must be a single path segment")
     return value
+
+
+def _atomic_write(path: Path, data: bytes) -> None:
+    """Publish one complete file; overlapping writers own separate temporary files."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary_path = None
+    try:
+        with NamedTemporaryFile(dir=path.parent, prefix=f".{path.name}.", suffix=".part", delete=False) as temporary:
+            temporary_path = Path(temporary.name)
+            temporary.write(data)
+        os.replace(temporary_path, path)
+    finally:
+        if temporary_path is not None:
+            temporary_path.unlink(missing_ok=True)
 
 
 class VoiceStore(Protocol):
@@ -44,10 +60,7 @@ class LocalVoiceStore:
             raise ValueError(f"audio extension must be short and alphanumeric: {ext!r}")
         key = "/".join((_segment(producer_id, "producer_id"), _segment(conversation_id, "conversation_id"),
                         _segment(turn_id, "turn_id") + "." + ext))
-        path = self._resolve(key); path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = path.with_suffix(path.suffix + ".part")
-        tmp.write_bytes(audio)
-        tmp.replace(path)  # atomic: never leave a half-written note
+        _atomic_write(self._resolve(key), audio)
         return key
 
     def audio_path(self, audio_key: str) -> Path:
@@ -57,10 +70,8 @@ class LocalVoiceStore:
         return path
 
     def save_transcript(self, audio_key: str, turn: VoiceTurn) -> None:
-        sidecar = self._resolve(audio_key.rsplit(".", 1)[0] + _TRANSCRIPT_SUFFIX); sidecar.parent.mkdir(parents=True, exist_ok=True)
-        tmp = sidecar.with_suffix(sidecar.suffix + ".part")
-        tmp.write_text(turn.model_dump_json(), encoding="utf-8")
-        tmp.replace(sidecar)
+        sidecar = self._resolve(audio_key.rsplit(".", 1)[0] + _TRANSCRIPT_SUFFIX)
+        _atomic_write(sidecar, turn.model_dump_json().encode("utf-8"))
 
 
 def _f(obj, name):

@@ -38,32 +38,62 @@ export class VoiceNoteRecorder {
     this.endpoint = objectURL;  // POST target for the 16 kHz PCM
     this.conversationId = null; // set by the chat; server scopes the store path
     this._result = null;        // first stop() wins; later calls return it
+    this.chunks = null;
   }
 
   async _start() {
-    const stream = await navigator.mediaDevices.getUserMedia({audio: true});
-    this.stream = stream;
-    this.ctx = new AudioContext();
-    this.sourceRate = this.ctx.sampleRate;
-    const workletURL = URL.createObjectURL(new Blob([workletCode], {type: 'application/javascript'}));
-    await this.ctx.audioWorklet.addModule(workletURL);
-    const node = new AudioWorkletNode(this.ctx, 'capture-processor');
-    this.chunks = [];
-    node.port.onmessage = (e) => this.chunks.push(e.data);
-    this.ctx.createMediaStreamSource(stream).connect(node);
-    this._timer = setTimeout(() => { this.stop().catch(() => {}); }, MAX_SECONDS * 1000); // hard cap
+    let workletURL;
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia({audio: true});
+      this.ctx = new AudioContext();
+      this.sourceRate = this.ctx.sampleRate;
+      workletURL = URL.createObjectURL(new Blob([workletCode], {type: 'application/javascript'}));
+      await this.ctx.audioWorklet.addModule(workletURL);
+      this.node = new AudioWorkletNode(this.ctx, 'capture-processor');
+      this.chunks = [];
+      this.node.port.onmessage = (e) => this.chunks?.push(e.data);
+      this.source = this.ctx.createMediaStreamSource(this.stream);
+      this.source.connect(this.node);
+      this._timer = setTimeout(() => { this.stop().catch(() => {}); }, MAX_SECONDS * 1000); // hard cap
+    } catch (error) {
+      this.chunks = null;
+      await this._cleanup();
+      throw error;
+    } finally {
+      if (workletURL) URL.revokeObjectURL(workletURL);
+    }
+  }
+
+  async _cleanup() {
+    clearTimeout(this._timer);
+    this._timer = null;
+    this.stream?.getTracks().forEach((track) => track.stop());
+    this.stream = null;
+    this.source?.disconnect();
+    this.source = null;
+    if (this.node) {
+      this.node.port.onmessage = null;
+      this.node.disconnect();
+      this.node = null;
+    }
+    const ctx = this.ctx;
+    this.ctx = null;
+    if (ctx) {
+      try {
+        await ctx.close();
+      } catch {
+        // Tracks are already stopped; a close failure must not mask the start error.
+      }
+    }
   }
 
   /** Idempotently ends capture; resolves once, with the VoiceTurn echoed by the backend. */
   async stop() {
     if (this._result) return this._result;   // auto-stop and manual stop share one POST
     if (!this.chunks) throw new Error('voice capture was never started');
-    clearTimeout(this._timer);
-    this.ctx && this.ctx.close();
-    this.stream && this.stream.getTracks().forEach((t) => t.stop()); // free the mic
     const captured = this.chunks;
     this.chunks = null;
-    return (this._result = this._post(captured));
+    return (this._result = this._cleanup().then(() => this._post(captured)));
   }
 
   async _post(captured) {

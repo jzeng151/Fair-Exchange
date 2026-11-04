@@ -11,7 +11,7 @@ How a producer voice note becomes a `VoiceTurn`. Status: implemented on branch
 
 ## Contracts
 - **Client → endpoint:** only the four POST fields. `VoiceTurn` is `extra="forbid"` as backstop.
-- **Storage (`fex.voice.VoiceStore`):** `save_audio(...) -> key`, `audio_path(key) -> path`, `save_transcript(key, turn) -> None`. Layout `data/voice-notes/<producer>/<conversation>/<turn>.<ext>` (default `.pcm`) + sidecar; every segment validated (`_segment`) — traversal/empty/separators refused; writes are atomic (`.part` + rename).
+- **Storage (`fex.voice.VoiceStore`):** `save_audio(...) -> key`, `audio_path(key) -> path`, `save_transcript(key, turn) -> None`. Layout `data/voice-notes/<producer>/<conversation>/<turn>.<ext>` (default `.pcm`) + sidecar; every segment validated (`_segment`) — traversal/empty/separators refused. Each write uses a unique temporary file in the destination directory, then atomically replaces its target. Overlapping writes to one file use last-replacement-wins semantics; audio and sidecar writes are separate operations. Failed writes remove their temporary files.
 - **`VoiceTurn`:** turn_id, conversation_id, producer_id, created_at, transcript, language_code (ISO 639-1), confidence ∈ [0, 1], audio_key (opaque), pii_flag (starts `False`).
 
 ## Decisions left for Jason (single-point swaps, no rework)
@@ -20,6 +20,7 @@ How a producer voice note becomes a `VoiceTurn`. Status: implemented on branch
 - **Endpoint:** ~15 lines around `ingest_voice_note`, rides the chat API once #25/#13 settle the turn surface.
 
 ## Ops notes
+- Capture releases microphone tracks and audio nodes on stop or initialization failure, closes the audio context, and revokes the worklet blob URL after initialization. Initialization failures never upload a note.
 - Empty transcripts refuse to ingest — and a missing `language_code` **fails loudly** (no silent "en" guess); audio still rests either way: retry-safe (deterministic turn_id per session).
 - Credential-free tests; the reducer covers SDK objects, wire dicts, and partials. `amazon-transcribe` imports lazily inside `run_stream_transcription` — declared for the live path; SDK-object test fixture skips if absent.
 - Confidence averages **pronunciation items only** — punctuation padding (often 0.0) would skew it; `alternatives[0]` is the service-final hypothesis.

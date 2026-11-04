@@ -3,7 +3,10 @@
 Pure-logic tests only: no AWS credentials; the SDK-object fixture skips if the SDK is absent (lazy import).
 """
 import json
+import os
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
+from threading import Barrier
 
 import pytest
 from pydantic import ValidationError
@@ -119,3 +122,60 @@ def test_ingest_refuses_missing_language_code_instead_of_guessing(tmp_path):
         ingest_voice_note(store, producer_id="258CC6A1", conversation_id="C-1001", turn_id="t-02",
                           audio=b"raw", events=no_lang)
     assert store.audio_path("258CC6A1/C-1001/t-02.pcm")  # audio rests for retry
+
+
+@pytest.mark.parametrize("kind", ["audio", "transcript"])
+def test_overlapping_store_writes_keep_one_complete_payload(tmp_path, monkeypatch, kind):
+    store = LocalVoiceStore(tmp_path)
+    key = "258CC6A1/C-1001/t-01.pcm"
+    turns = [VoiceTurn(**voice_turn(transcript=text)) for text in ("Hola.", "Una nota más larga.")]
+    payloads = [b"first", b"a longer second recording"] if kind == "audio" else [
+        turn.model_dump_json().encode("utf-8") for turn in turns
+    ]
+    destination = tmp_path / (key if kind == "audio" else key.replace(".pcm", ".transcript.json"))
+    ready_to_replace = Barrier(2)
+    replace = os.replace
+
+    def overlapping_replace(source, target, *args, **kwargs):
+        # Both writers finish their temporary files before either publishes one.
+        ready_to_replace.wait(timeout=5)
+        return replace(source, target, *args, **kwargs)
+
+    monkeypatch.setattr(os, "replace", overlapping_replace)
+
+    def save(index):
+        if kind == "audio":
+            return store.save_audio("258CC6A1", "C-1001", "t-01", payloads[index])
+        return store.save_transcript(key, turns[index])
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        list(pool.map(save, range(2)))  # Both calls must complete without losing a temporary file.
+
+    assert destination.read_bytes() in payloads
+    assert [path for path in tmp_path.rglob("*") if path.is_file()] == [destination]
+
+
+@pytest.mark.parametrize("kind", ["audio", "transcript"])
+def test_failed_store_replacement_preserves_existing_file_and_removes_temp(tmp_path, monkeypatch, kind):
+    store = LocalVoiceStore(tmp_path)
+    key = "258CC6A1/C-1001/t-01.pcm"
+
+    def save(text):
+        if kind == "audio":
+            store.save_audio("258CC6A1", "C-1001", "t-01", text.encode("utf-8"))
+        else:
+            store.save_transcript(key, VoiceTurn(**voice_turn(transcript=text)))
+
+    save("Original note.")
+    destination = tmp_path / (key if kind == "audio" else key.replace(".pcm", ".transcript.json"))
+    original = destination.read_bytes()
+
+    def fail_replace(*args, **kwargs):
+        raise OSError("replacement failed")
+
+    monkeypatch.setattr(os, "replace", fail_replace)
+    with pytest.raises(OSError, match="replacement failed"):
+        save("Replacement note.")
+
+    assert destination.read_bytes() == original
+    assert [path for path in tmp_path.rglob("*") if path.is_file()] == [destination]
