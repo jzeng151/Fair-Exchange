@@ -269,10 +269,10 @@
    "end_date": "2024-12-31"
   },
   {
-   "project_ref": "PROJ-C13F2AE6",
+   "project_ref": "PROJ-FF3E8BBD",
    "org_ref": "ORG-E18955AA",
    "owner_key": "6bf1d8a7a0eb108e",
-   "source": "FTUSA Premium project (sample data, fictionalized) PROJ-C13F2AE6",
+   "source": "FTUSA Premium project (sample data, fictionalized) PROJ-FF3E8BBD",
    "challenge_tag": "biodiversity and conservation",
    "crop": "Coffee",
    "entity_type": "1st Grade",
@@ -284,8 +284,8 @@
    "action": "Preservation of the environment, planting trees and reforestation for sustainability, in order to help development in a sustainable way.",
    "intended_outcome": "climate change; water preservation; alternative transportation; reducing the emission of pollutants; recycling policies.",
    "status": "In Progress",
-   "start_date": "2022-01-01",
-   "end_date": null
+   "start_date": "2023-01-01",
+   "end_date": "2023-12-31"
   },
   {
    "project_ref": "PROJ-295DB6A0",
@@ -621,7 +621,7 @@
    "country": "Guatemala",
    "region": "Solola",
    "subcategory": "Crop Diversification",
-   "name": "Incentives for CORCI members",
+   "name": "Incentives for the cooperative members",
    "challenge": "What is the identified need? Lack of new vegetable production tests. What did they do before they had the project? Traditional plantings",
    "action": "Activities in which the premium investment was applied: Implementation of demonstration plots",
    "intended_outcome": "Encourage the producer to fully comply with the training processes.",
@@ -642,7 +642,7 @@
    "subcategory": null,
    "name": "Tents & Chairs",
    "challenge": "Lack of Facilities such as tents and chairs for shelter during events/functions by premium participants and the community.",
-   "action": "Provision of 10 tents & 400 chairs to Chemase Estate,Marinyn Estate,Kaproret Estate,Kitumbe Factory,Finteaflo office and Chepkembe head office.",
+   "action": "Provision of 10 tents & 400 chairs to an estate,an estate,an estate,a factory,an office and the head office.",
    "intended_outcome": "To discourage need for cutting of trees for makeshift shelters leading to deforestation effecting the environment negatively. These temporary makeshift structures are unsafe and time consuming to put up.",
    "status": "Completed",
    "start_date": "2021-01-01",
@@ -740,8 +740,8 @@
    "action": "This Project continuous to be implemented to the Premium Participants with a vacant in their respective areas.",
    "intended_outcome": "The goal of this project is to have a continuity of the supply of coconuts that will provide sufficient number of volumes needed by the company to produce more finished products that may generate more premiums.",
    "status": "In Progress",
-   "start_date": "2023-01-01",
-   "end_date": "2025-12-31"
+   "start_date": "2015-12-09",
+   "end_date": null
   },
   {
    "project_ref": "PROJ-8FBC2317",
@@ -911,8 +911,8 @@
    "action": "Environmental awareness through procurement of T-shirts with a printed environmental awareness message. Environmental campaign on Endangered, Threatened and Protected (ETP) species will be addressed by the group. A uniform containing an environmental message will be distributed to each member. The group will wear the uniform during the activity at the dock and other unloading areas to convey a message on the importance of ETP species during the fishing operation.",
    "intended_outcome": "The goal of this project is to increase the awareness of fellow fishermen and other members of the community on the value of many ETP species to the ecosystem and the fact that some species are threathened and should be handeled according to local laws.",
    "status": "Completed",
-   "start_date": "2022-11-15",
-   "end_date": "2023-05-01"
+   "start_date": "2021-12-01",
+   "end_date": "2022-12-01"
   },
   {
    "project_ref": "PROJ-66408D1E",
@@ -930,8 +930,8 @@
    "action": "Environmental awareness through procurement of \"\"Jacker of ETp and environmental campaign\"\" with a printed environmental awareness message. A jacket containing an environmental message will be distributed to each member. The group will wear the jaket during the activity at the sea or in the dock and other unloading areas to convey a message on the importance of ETP species and environmental issues during the fishing operation.",
    "intended_outcome": "The goal of this project is to increase the awareness of fellow fishermen and other members that so important for protecting our environtmental",
    "status": "Completed",
-   "start_date": "2023-11-01",
-   "end_date": "2023-12-31"
+   "start_date": "2022-11-10",
+   "end_date": "2023-05-01"
   },
   {
    "project_ref": "PROJ-9E3478A2",
@@ -965,7 +965,7 @@
    "subcategory": "Waste management (Trash collection, recycling facilities etc.)",
    "name": "Environmental Campaig - beach clean in World Clean-Up Day",
    "challenge": "Based on the observation a lot of rubbish thrown into the sea, near with the port. The members made decision to clean-up the rubbish in World Clean-Up Event",
-   "action": "Beach clean activities in aroung PT. BMB to Fishing Port (PPS Bitung), while also commemorating of World Clean-Up Day Event in September 2023",
+   "action": "Beach clean activities in aroung a company to Fishing Port (PPS Bitung), while also commemorating of World Clean-Up Day Event in September 2023",
    "intended_outcome": "To improve the awareness of the members to keep the environment clean in around the port. And to give a direct impact on cleaning the beach and having social interactions while keeping the environment clean.",
    "status": "Completed",
    "start_date": "2023-09-24",
@@ -1229,9 +1229,9 @@
    "country": "Colombia",
    "region": "Antioquia",
    "subcategory": "Waste management (Trash collection, recycling facilities etc.)",
-   "name": "SMTA Honey Water Management Systems",
+   "name": "the group's Honey Water Management Systems",
    "challenge": "Faced with the requirements of environmental authorities and recommendations for continuous improvement since certifications, the implementation of treatments for honey waters has become a necessity, accounting for 9% of respondents' responses. This seeks an environmental improvement that impacts the coffee community in general, due to the reduction in the pollutant load and better quality of the discharged water. Previously, these waters were disposed directly to the environment with the consequent pollution.",
-   "action": "Agreement with the Departmental Committee of Coffee Growers of Antioquia, Coratioquia and other Cooperatives of the Department, where 10 compost bins for coffee pulp and 10 honey water treatment systems (7 of 300@, 2 of 500@ and 1 of 1000@, respectively) were installed, with the corresponding monitoring of installed systems and training, for 14 beneficiaries in Andes. In addition, the project began with the selection, quotation, contracting and purchase of materials for the installation of 66 honey water treatment systems, 33 with a capacity of 500@ and 33 of 300@ in the first half of 2022, f…",
+   "action": "Agreement with the Departmental Committee of Coffee Growers of Antioquia, the committee and other Cooperatives of the Department, where 10 compost bins for coffee pulp and 10 honey water treatment systems (7 of 300@, 2 of 500@ and 1 of 1000@, respectively) were installed, with the corresponding monitoring of installed systems and training, for 14 beneficiaries in Andes. In addition, the project began with the selection, quotation, contracting and purchase of materials for the installation of 66 honey water treatment systems, 33 with a capacity of 500@ and 33 of 300@ in the first half of 2022,…",
    "intended_outcome": "Reduce the contamination of water sources by mucilage and coffee pulp, facilitating the adoption of new technologies and good agricultural practices and avoiding the payment of a remuneration fee by associates.",
    "status": "In Progress",
    "start_date": "2021-01-01",
@@ -1345,8 +1345,8 @@
    "subcategory": null,
    "name": "2025 FOREST CONSERVATION CAMPAIGN",
    "challenge": "The main need are environmental problems, forest degradation, pollution and climate change.",
-   "action": "In coordination with a packing company, a local fair trade association and the a national producers' association. As part of the Social Responsibility activities, in relation to the care and protection of the environment, the 2025 Forest Conservation Campaign was carried out, in which the goal of planting 2,000 pine trees was met. This activity was carried out in the the producer's orchard, owned by Certified Fair Trade Producer a certified producer, located in the town of La Zarzamora, municipality of Erongarícuaro, Michoacán. There was the participation of workers from a packing company, as…",
-   "intended_outcome": "The expected results are to plant 2,000 pine trees in the the producer's orchard conservation area of the Fair Trade Certified Producer, with the objective of restoring green areas and providing environmental protection, in order to reduce climate change and environmental pollution. The activity will be carried out with workers from a packing company, staff from the producer's orchard, and Primary School Students located in the town of La Zarzamora, in the municipality of Erongarícuaro, Michoacán. As an environmental project, the activity will benefit the entire municipality and will provide…",
+   "action": "In coordination with a packing company, a local fair trade association and the a national producers' association. As part of the Social Responsibility activities, in relation to the care and protection of the environment, the 2025 Forest Conservation Campaign was carried out, in which the goal of planting 2,000 pine trees was met. This activity was carried out in the the producer's orchard, owned by Certified Fair Trade Producer a certified producer, located in the town of a village, municipality of Erongarícuaro, Michoacán. There was the participation of workers from a packing company de Méx…",
+   "intended_outcome": "The expected results are to plant 2,000 pine trees in the the producer's orchard conservation area of the Fair Trade Certified Producer, with the objective of restoring green areas and providing environmental protection, in order to reduce climate change and environmental pollution. The activity will be carried out with workers from a packing company, staff from the producer's orchard, and Primary School Students located in the town of a village, in the municipality of Erongarícuaro, Michoacán. As an environmental project, the activity will benefit the entire municipality and will provide sig…",
    "status": "Completed",
    "start_date": "2024-12-17",
    "end_date": "2025-08-15"
@@ -1364,7 +1364,7 @@
    "subcategory": null,
    "name": "CLEANING AND REFORESTATION MAINTENANCE CAMPAIGN 2024 “LET'S REFOREST TOGETHER, A BETTER FUTURE”",
    "challenge": "The main need are environmental problems, forest degradation, pollution and climate change.",
-   "action": "In coordination with a packing company, a local fair trade association and the producers' association. As part of the Social Responsibility activities, in relation to the care and protection of the environment, the 2024 Reforestation Campaign “Let's Reforest Together, a Better Future” was carried out, in which the goal of planting 500 pine trees distributed in areas where Fair Trade certified producers are concentrated, as well as maintenance, we carried out a cleaning and reforestation maintenance campaign in the Fair Trade Certified Producer's garden in the town of Atapan, Municipality of L…",
+   "action": "In coordination with a packing company, a local fair trade association and the producers' association. As part of the Social Responsibility activities, in relation to the care and protection of the environment, the 2024 Reforestation Campaign “Let's Reforest Together, a Better Future” was carried out, in which the goal of planting 500 pine trees distributed in areas where Fair Trade certified producers are concentrated, as well as maintenance, we carried out a cleaning and reforestation maintenance campaign in the Fair Trade Certified Producer's garden in the town of a village, Municipality o…",
    "intended_outcome": "Restore green areas and provide environmental protection, in order to reduce climate change and environmental pollution.",
    "status": "Completed",
    "start_date": "2024-07-20",
@@ -1613,15 +1613,15 @@
    "challenge": "Natural disasters due to depletion of natural resources, environmental pollution and climate changes.",
    "action": "Implementation of environmental programs giving priority to the conservation and protection of the natural environment",
    "intended_outcome": "Giving priority to the conservation and protection of the natural environment, protecting the farmers' certified organic cultivation fields and the surrounding environment, protecting the watersheds and forest reserves with proper management without harming the local biodiversity, and implementing environmental programs.",
-   "status": "Completed",
-   "start_date": "2022-01-01",
-   "end_date": "2022-12-31"
+   "status": null,
+   "start_date": null,
+   "end_date": null
   },
   {
-   "project_ref": "PROJ-61B2B535",
+   "project_ref": "PROJ-6E7D1B96",
    "org_ref": "ORG-3B0EC98A",
    "owner_key": "f5bb4d97c450a3a4",
-   "source": "FTUSA Premium project (sample data, fictionalized) PROJ-61B2B535",
+   "source": "FTUSA Premium project (sample data, fictionalized) PROJ-6E7D1B96",
    "challenge_tag": "biodiversity and conservation",
    "crop": "Tea;Other;Grains;Herbs and Spices;Produce",
    "entity_type": "1st Grade",
@@ -1632,9 +1632,9 @@
    "challenge": "Natural disasters due to depletion of natural resources, environmental pollution and climate changes.",
    "action": "Implementation of environmental programs giving priority to the conservation and protection of the natural environment",
    "intended_outcome": "Giving priority to the conservation and protection of the natural environment, protecting the farmers' certified organic cultivation fields and the surrounding environment, protecting the watersheds and forest reserves with proper management without harming the local biodiversity, and implementing environmental programs.",
-   "status": "Completed",
-   "start_date": "2022-01-01",
-   "end_date": "2022-12-31"
+   "status": null,
+   "start_date": null,
+   "end_date": null
   },
   {
    "project_ref": "PROJ-E4D71522",
@@ -1670,15 +1670,15 @@
    "challenge": "Strengths: The corporation is in line with sustainability and care for the environment. Weaknesses: There are finite short-range projects that do not fully meet social criteria. Opportunities: The necessary funding is available to increase the scope and delimitation of projects over time. Threats: Lack of support from regional governments to promote the Corporation's environmental project.",
    "action": "The project focuses on promoting the active participation of family and community collaborators in the development of the Environmental Project, which promotes environmental care, protection and awareness through the execution of good environmental practices.",
    "intended_outcome": "Generate actions for the recovery of streams in the area, awareness of environmental impact and waste management with collaborators and the community",
-   "status": "Completed",
-   "start_date": "2025-04-08",
-   "end_date": "2025-12-31"
+   "status": null,
+   "start_date": null,
+   "end_date": null
   },
   {
-   "project_ref": "PROJ-FE3D6A0A",
+   "project_ref": "PROJ-9EB6A7B6",
    "org_ref": "ORG-CE84FACF",
    "owner_key": "360626181547285d",
-   "source": "FTUSA Premium project (sample data, fictionalized) PROJ-FE3D6A0A",
+   "source": "FTUSA Premium project (sample data, fictionalized) PROJ-9EB6A7B6",
    "challenge_tag": "biodiversity and conservation",
    "crop": "Flowers and Plants",
    "entity_type": "Estate",
@@ -1689,9 +1689,9 @@
    "challenge": "Strengths: The corporation is in line with sustainability and care for the environment. Weaknesses: There are finite short-range projects that do not fully meet social criteria. Opportunities: The necessary funding is available to increase the scope and delimitation of projects over time. Threats: Lack of support from regional governments to promote the Corporation's environmental project.",
    "action": "The project focuses on promoting the active participation of family and community collaborators in the development of the Environmental Project, which promotes environmental care, protection and awareness through the execution of good environmental practices.",
    "intended_outcome": "Recovery of streams in the area, environmental impact awareness and waste management with collaborators and the community.",
-   "status": "Completed",
-   "start_date": "2025-04-08",
-   "end_date": "2025-12-31"
+   "status": null,
+   "start_date": null,
+   "end_date": null
   },
   {
    "project_ref": "PROJ-A3105A0F",
@@ -1709,8 +1709,8 @@
    "action": "In the Urabá region, given the history that its inhabitants have had to live and the little investment in the most vulnerable communities, the initiative was born to carry out projects with a positive social impact on them, which is why the the producer organization, through the resources of the Fairtrade bonus, is convinced that through the union and teamwork with public and private entities, it will be possible to carry out projects that generate greater impact and improve the quality of life of the most vulnerable communities in the Urabá region.",
    "intended_outcome": "GENERAL OBJECTIVE To contribute to the improvement of the quality of life of the communities that are part of the territory in which the Corporation is located, thus contributing to the development and consolidation of a more just society, which prioritizes well-being, health, education and environmental sustainability. SPECIFIC OBJECTIVES • Provide basic and timely care to vulnerable communities facing an emergency situation, especially those located in the Urabá subregion. • Promote safe and comfortable educational spaces for the development of training activities. • Build or participate in…",
    "status": "In Progress",
-   "start_date": "2022-01-01",
-   "end_date": "2022-12-31"
+   "start_date": "2021-06-01",
+   "end_date": null
   },
   {
    "project_ref": "PROJ-9BC9698A",
@@ -1992,7 +1992,7 @@
    "name": "Renewal of Organic and Social Certificates.",
    "challenge": "To be able to certify production volumes, benefiting 100% of the members of the Common House Federation. The causes are volatility in the international market.",
    "action": "Pay for Fairtrade USA Certification Membership and renewal of Organic Certificates, benefiting producers.",
-   "intended_outcome": "Organically and socially certify 100% of Casa Común's production volumes, to guarantee greater sales differentials.",
+   "intended_outcome": "Organically and socially certify 100% of the organization's production volumes, to guarantee greater sales differentials.",
    "status": "In Progress",
    "start_date": "2024-01-01",
    "end_date": "2026-12-01"
@@ -2085,7 +2085,7 @@
    "region": "Aceh",
    "subcategory": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
    "name": "COFFEE SEED SHARING AND SOCIAL ASSISTANCE NATURAL DISASTER DONATION",
-   "challenge": "1. The distribution of seeds for the entire village of Perpetani to get 40 coffee seedlings costs Rp. 240,720.000, - 2. Operations and salaries for 1 month (December 2025) cost Rp. 146,977,496, - 3. Social assistance (natural disasters) for 3 villages, namely Rime Raya, Pulo Intan, and Simpang Antara villages spent Rp. 79,987,000, -",
+   "challenge": "1. The distribution of seeds for the entire village of the village to get 40 coffee seedlings costs Rp. 240,720.000, - 2. Operations and salaries for 1 month (December 2025) cost Rp. 146,977,496, - 3. Social assistance (natural disasters) for 3 villages, namely Rime Raya, Pulo Intan, and Simpang Antara villages spent Rp. 79,987,000, -",
    "action": "This project is the distribution of coffee seeds & aid for 3 villages built by cooperative producers of working farmers who are in dire need of assistance after natural disasters (landslides and floods) which resulted in each village in dire need of assistance according to the needs of the village, i.e.: 1. Pulo intan santa village needs rice because the lack of access makes pulo intan village difficult to get rice 2. Simpang Antara village requires a Sling for inter-village access 3. Rime Raya village needs pipes to repair clean drains damaged by floods and landslides",
    "intended_outcome": "the cooperative's expected outcome for some of these projects is to help farmer members in distress and reawaken member morale post disaster",
    "status": "Completed",
@@ -2409,7 +2409,7 @@
    "subcategory": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
    "name": "PAYMENT OF ENVIRONMENTAL LICENSE",
    "challenge": "The need that was detected is that the Cooperative does not have an environmental license, since some inconveniences have arisen when wanting to enter into some alliances with other institutions.",
-   "action": "The project consists of obtaining an environmental license for our COMIXCAEL Cooperative, to comply with national legislation with regard to it.",
+   "action": "The project consists of obtaining an environmental license for our the cooperative Cooperative, to comply with national legislation with regard to it.",
    "intended_outcome": "Comply with National Legislation regarding obtaining an Environmental License for our cooperative.",
    "status": "In Progress",
    "start_date": "2023-05-01",
@@ -2465,8 +2465,8 @@
    "region": "Maluku",
    "subcategory": null,
    "name": "Drainage",
-   "challenge": "Considering that the village where Fair-Trade is located is located in a remote area, some village facilities are inadequate. Among them are irrigation and drainage facilities that are not yet available both in Yaholu Village. With these conditions, FA Tunas Beringin is trying to utilize premium funds to build drainage facilities.",
-   "action": "The drainage program aims to reduce the potential for abrasion and flooding during the rainy season. It is fully implemented by the member of Fishing assiciation (Tuna Tuna Beringinh Yaholu)",
+   "challenge": "Considering that the village where Fair-Trade is located is located in a remote area, some village facilities are inadequate. Among them are irrigation and drainage facilities that are not yet available both in a village. With these conditions, a member farmers' association is trying to utilize premium funds to build drainage facilities.",
+   "action": "The drainage program aims to reduce the potential for abrasion and flooding during the rainy season. It is fully implemented by the member of Fishing assiciation (Tuna Tuna Beringinh the village)",
    "intended_outcome": "this project is expected to help the community to handle the issue such as: flooding because there is no irrigation. this projects not only benefited the fishers but also the familiy and community member",
    "status": "Completed",
    "start_date": "2024-01-22",
@@ -2560,7 +2560,7 @@
    "region": "Tolima",
    "subcategory": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
    "name": "Vivero",
-   "challenge": "Acquired by FABICOOP Ltda. A nursery, where members can find a variety of trees and plants in order to mitigate environmental risks.",
+   "challenge": "Acquired by the cooperative A nursery, where members can find a variety of trees and plants in order to mitigate environmental risks.",
    "action": "Build a coffee colander nursery using seeds from the same farm and purchase seedlings for producers to build their living barriers to avoid external contamination and, on the other hand, encourage agroforestry systems.",
    "intended_outcome": "Encourage agroforestry systems in productive units and adapt borders with living fences to avoid cross contamination.",
    "status": "Completed",
@@ -2600,7 +2600,7 @@
    "name": "Delivery of wastewater systems, management of coffee honey water and personal protection elements, protection of coffee ecosystems.",
    "challenge": "Currently, having the diagnosis of beneficial infrastructure, additional points related to the management of honey and gray water have been identified, where it is observed that some of the septic systems are already in poor condition. With regard to the management of honey water, it has become evident that some farms do not have systems for the management of honey water, since most of them collect it for banana fertilization or irrigation through ditches in the crop lot. On the other hand, deterioration has been identified in the personal protection elements used by associates and their work…",
    "action": "Reduce the level of pollution generated by gray water and honey waters, in addition to reducing risks due to the inadequate management of pesticides and contributing to the conservation and protection of the environment",
-   "intended_outcome": "Delivering septic systems or systems such as acidogenic hydrolytic reactors for honey water management will reduce contamination of soils or water sources, so CAFICAICEDONIA will provide support to its associates in reducing risks of contamination due to coffee by-products or household wastewater. Provide personal protection elements to associates and workers when handling, storing and applying pesticides in order to make them aware of safety and health in farm work, while improving environmental practices that lead to environmental protection and conservation.",
+   "intended_outcome": "Delivering septic systems or systems such as acidogenic hydrolytic reactors for honey water management will reduce contamination of soils or water sources, so the cooperative will provide support to its associates in reducing risks of contamination due to coffee by-products or household wastewater. Provide personal protection elements to associates and workers when handling, storing and applying pesticides in order to make them aware of safety and health in farm work, while improving environmental practices that lead to environmental protection and conservation.",
    "status": "Completed",
    "start_date": "2021-03-21",
    "end_date": "2022-12-30"
@@ -2618,7 +2618,7 @@
    "subcategory": "Waste Disposal / Recycling",
    "name": "management of the solution of non-compliances during internal and external audits and sustainable management of the environmental needs of the productive unit",
    "challenge": "According to the diligence carried out to diagnose the state of the benefit facilities, it was possible to identify that 80 associates have weaknesses in systems for the management of wastewater and honey coffee waters. With the execution of this proposal, it seeks to improve the management of this water through the delivery of systems such as septic wells and acidogenic hydrolytic reactors. Although it has not been implemented in the delivery of these systems, it has already been quoted and the commercial process is being carried out to purchase these systems. Since currently, the associates…",
-   "action": "In search of continuous improvement in compliance with FLOCERT criteria and to improve the practices or management of environmental needs that arise in the productive units of CAFISEVILLA's associates. In order to meet the above, identical needs have been identified in systems such as septic tanks and acidogenic hydrolitic reactors to provide adequate management of this water. The beneficiaries of the FLO premium project are members of the Seville cacaficulturers' cooperative - CAFISEVILLA.",
+   "action": "In search of continuous improvement in compliance with FLOCERT criteria and to improve the practices or management of environmental needs that arise in the productive units of the cooperative's associates. In order to meet the above, identical needs have been identified in systems such as septic tanks and acidogenic hydrolitic reactors to provide adequate management of this water. The beneficiaries of the FLO premium project are members of the the cacaficulturers' cooperative.",
    "intended_outcome": "Reduce the level of pollution generated by wastewater and honey water from coffee, in order to implement systems that help associates to properly manage these waters generated on farms.",
    "status": "Completed",
    "start_date": "2021-03-19",
@@ -2751,7 +2751,7 @@
    "subcategory": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
    "name": "Provide Trainings for Farmers and their families",
    "challenge": "Youths and women participation in coffee farming is rampant and serious challenge in the coffee industry. The most fascinating challenge is lack of know-how in farming practices. \"\" Due to lack of know-how skills on coffee skills like nursery establishment and maintenance, farmers were lacking seedlings to rejuvenate aging coffee trees or expand coffee plots, therefore lower production and low coffee quality were produced. Before the project Being Implemented, farmers were aging with old coffee trees, the coffee quality produced were limited and bad quality, pests were ravaging coffee plots a…",
-   "action": "Launching training centre nicknamed “MUSASA Coffee School” that train members and their family members mostly youths and women. Through Musasa Coffee school, youths and women are equipped with entrepreneurial skills set in coffee value chain skills like coffee nursery establishment and maintenances, transplanting, weeding and mulching, pruning, fertilizer/ pesticide applications , harvesting, quality grading, barista skills and roasting skills.",
+   "action": "Launching training centre nicknamed “the coffee school” that train members and their family members mostly youths and women. Through the coffee school, youths and women are equipped with entrepreneurial skills set in coffee value chain skills like coffee nursery establishment and maintenances, transplanting, weeding and mulching, pruning, fertilizer/ pesticide applications , harvesting, quality grading, barista skills and roasting skills.",
    "intended_outcome": "The goal of the project is open the training space for farmers, youths and women on coffee best practices, motivating youths’ participation in the coffee industry and equipping them with entrepreneurial knowledge in the coffee processing and quality grading.",
    "status": "Completed",
    "start_date": "2021-09-09",
@@ -3035,8 +3035,8 @@
    "region": "Cesar",
    "subcategory": "Sustainability efforts",
    "name": "Technical assistance",
-   "challenge": "Technical assistance is provided annually from April to July, with an Internal Asoprokia Control System made up of two auditors and 2 promoters, delegated to gather information regarding the changes that the productive unit presents annually, monitoring and control of the productive units so that the producer complies with the established parameters for organic production and fair trade, advice is provided in phytosanitary management, weed management, solid waste management, and they are also trained in topics related to organic production.",
-   "action": "Develop Asoprokia's environmental plan and train producers on issues related to good agricultural practices focused on organic production.",
+   "challenge": "Technical assistance is provided annually from April to July, with an Internal the association Control System made up of two auditors and 2 promoters, delegated to gather information regarding the changes that the productive unit presents annually, monitoring and control of the productive units so that the producer complies with the established parameters for organic production and fair trade, advice is provided in phytosanitary management, weed management, solid waste management, and they are also trained in topics related to organic production.",
+   "action": "Develop the association's environmental plan and train producers on issues related to good agricultural practices focused on organic production.",
    "intended_outcome": "One of the main objectives is to provide technical assistance in the management of organic production so that it can be put into practice in each of the productive units, it brings many benefits such as knowing the producers to continue with the certification process.",
    "status": "Completed",
    "start_date": "2021-04-02",
@@ -3074,7 +3074,7 @@
    "subcategory": "Sustainability efforts",
    "name": "2025 D2 Waimate Stream Restoration Project",
    "challenge": "Cyclone Gabrielle caused significant flooding and erosion, leaving the stream vulnerable and degraded. The needs assessment and local context highlight the urgent need for environmental restoration to prevent further damage, improve water quality, and protect biodiversity. This project aligns with Fair Trade standards by supporting environmental sustainability and community engagement, ensuring long-term resilience and ecological health.",
-   "action": "The Tutaekuri-Waimate Stream Restoration and Protection Project aims to restore and protect the Waimate Stream along the farm, which was severely impacted by Cyclone Gabrielle. The project involves fencing off stream edges and planting native vegetation to exclude livestock, stabilize banks, improve water quality, and enhance biodiversity. Initial work has already seen 700 meters fenced and planted in July 2025. This is a collaboration between the Joan Fernie Charitable Trust (JFCT) and Fair Trade, with plans to extend restoration along the entire stream boundary. Completion will involve cont…",
+   "action": "The Tutaekuri-Waimate Stream Restoration and Protection Project aims to restore and protect the Waimate Stream along the farm, which was severely impacted by Cyclone Gabrielle. The project involves fencing off stream edges and planting native vegetation to exclude livestock, stabilize banks, improve water quality, and enhance biodiversity. Initial work has already seen 700 meters fenced and planted in July 2025. This is a collaboration between the a charitable trust and Fair Trade, with plans to extend restoration along the entire stream boundary. Completion will involve continued planting, f…",
    "intended_outcome": "The project will: Exclude livestock from the stream to prevent contamination. Stabilize stream banks and reduce erosion. Improve water quality and restore natural habitats. Promote biodiversity and resilience against future weather events. Impact will be measured by: Length of stream fenced and planted. Survival rates of native plants. Water quality improvements and biodiversity indicators. Beneficiaries include local communities, environmental stakeholders, and future generations who rely on a healthy ecosystem.",
    "status": "Completed",
    "start_date": "2025-03-13",
@@ -3187,8 +3187,8 @@
    "region": "Cajamarca",
    "subcategory": "Sustainability efforts",
    "name": "Provide economic support to producers who have lost some asset or part of their coffee plantation as a result of natural events as a result of disasters.",
-   "challenge": "There are numerous requests submitted by members to the board of directors to provide them with support for reasons of having been affected by natural disasters. This request is in all areas of Cenfrocafe, so it is necessary to direct funds to meet this area of high demand by producers.",
-   "action": "30 families who are members of Cenfrocafe have received financial support to buy coffee seedlings and replant the plantations lost due to landslides, trees are planted as living barriers, each family receives an average of about 1000 soles, which they invest in their affected farm, after a report of the facts made by the regional councilor.",
+   "challenge": "There are numerous requests submitted by members to the board of directors to provide them with support for reasons of having been affected by natural disasters. This request is in all areas of the cooperative, so it is necessary to direct funds to meet this area of high demand by producers.",
+   "action": "30 families who are members of the cooperative have received financial support to buy coffee seedlings and replant the plantations lost due to landslides, trees are planted as living barriers, each family receives an average of about 1000 soles, which they invest in their affected farm, after a report of the facts made by the regional councilor.",
    "intended_outcome": "To cover expenses incurred on the partner's farm, as a result of the inclemency of nature, due to heavy rains, frost or rain that cause landslides, erosion and loss of plantations, and even cause damage to producers' homes.",
    "status": "Completed",
    "start_date": "2021-03-01",
@@ -3208,7 +3208,7 @@
    "name": "ENVIRONMENT: INSTALLATION OF SOLAR PANELS AND ELECTRICAL APPLIANCES",
    "challenge": "The results of the needs assessment showed that our workers and their families cook using mainly LP gas and this represents an expense that seriously impacts their economy when, without warning, they run out of gas to continue cooking and have to buy it overnight. In addition, as a second source of energy for cooking, many families use firewood, which when burned pollutes the atmosphere and increases the risk of families suffering respiratory diseases when they inhale the smoke that is generated. That is why there is a need for workers' homes to migrate and start using clean and renewable ene…",
    "action": "The project is an initiative that stems from the need identified in the needs assessment carried out by our committee in 2025, the idea is to install solar panels for the generation of electrical energy in homes that are owned by workers, helping to avoid environmental wear and tear by generating clean and renewable energy and providing appliances such as pots, heaters, air fryers, induction stoves, and others to gradually migrate to electrical energy from solar panels and eliminate the use of gas or wood burning appliances, thereby reducing the carbon footprint generated by all workers' home…",
-   "intended_outcome": "Install solar panels to generate electricity in workers' homes and provide them with stoves, ovens, electric heaters, etc. to make it a self-sustainable home. The beneficiaries will be the workers of Edulag and Pentágono Agrícola and their families, approximately 300 people between children and adults. The impact will be measured in updates to the needs assessment when the number of people who rely on gas and firewood in addition to paying for the electricity they consume is getting lower and lower. In addition, the Fair Trade Committee will carry out the following activities: President: to f…",
+   "intended_outcome": "Install solar panels to generate electricity in workers' homes and provide them with stoves, ovens, electric heaters, etc. to make it a self-sustainable home. The beneficiaries will be the workers of two farms and their families, approximately 300 people between children and adults. The impact will be measured in updates to the needs assessment when the number of people who rely on gas and firewood in addition to paying for the electricity they consume is getting lower and lower. In addition, the Fair Trade Committee will carry out the following activities: President: to follow up on projects…",
    "status": "In Progress",
    "start_date": "2025-06-02",
    "end_date": null
@@ -3300,7 +3300,7 @@
    "country": "Côte d’Ivoire",
    "region": "Bas-Sassandra",
    "subcategory": null,
-   "name": "How GSC Community Service Group works",
+   "name": "How a community service group works",
    "challenge": "The community service group was created to help members follow good agricultural practices, size.",
    "action": "The community service group was created to help members follow good agricultural practices, size.",
    "intended_outcome": "The community service group was created to help members follow good agricultural practices, size.",
@@ -3338,9 +3338,9 @@
    "country": "Vietnam",
    "region": "Ho Chi Minh",
    "subcategory": "Waste Disposal / Recycling",
-   "name": "Green Awareness, Green Action with Nobland",
+   "name": "Green Awareness, Green Action with a company",
    "challenge": "The need that was detected is that some people still use a lot of plastic bags in daily life, and people's waste classification at home has not been improved. One of the reasons is that people are not well aware of the long-term harmful effects of plastic bags and the effects of waste classification. This has a negative impact on the environment and people's health.",
-   "action": "The project will help to raise environmental awareness for all employees through 2 activities: + Give gifts to all employees of the company (Combo 1 environmentally friendly bag + 1 towel/ person). + Do a survey on environmental awareness and the 1st Fair Trade PMT project evaluation through CIQ, and participate in a lucky draw to win environmentally friendly bags or towels. Beneficiaries: Nobland VN workers and subcontractor: Canteen, Security guards, Housekeeping workers",
+   "action": "The project will help to raise environmental awareness for all employees through 2 activities: + Give gifts to all employees of the company (Combo 1 environmentally friendly bag + 1 towel/ person). + Do a survey on environmental awareness and the 1st Fair Trade PMT project evaluation through CIQ, and participate in a lucky draw to win environmentally friendly bags or towels. Beneficiaries: a company workers and subcontractor: Canteen, Security guards, Housekeeping workers",
    "intended_outcome": "Desire to raise environmental awareness for employees and encourage using the of eco bags to replace plastic bags.",
    "status": "Completed",
    "start_date": "2024-05-14",
@@ -3779,9 +3779,9 @@
    "challenge": "In this way, environmental advertising campaigns in Colombia have been developing with greater growth, encouraging each individual and company to become aware and begin to carry out activities in favor of the environment.",
    "action": "This project covers the different needs, as soon as the environmental pollution caused by these substances and wastes may arise, which generate multiple problems for nature and for all living beings.",
    "intended_outcome": "The purpose of this project is to be able to develop a social campaign aimed at the community in order to make them aware of the current environmental situation and encourage the recycling and rational use of waste and how to provide them with good knowledge about caring for the environment.",
-   "status": "Completed",
-   "start_date": "2022-01-01",
-   "end_date": "2022-12-31"
+   "status": null,
+   "start_date": null,
+   "end_date": null
   },
   {
    "project_ref": "PROJ-FB472C83",
@@ -3798,9 +3798,9 @@
    "challenge": "In this way, environmental advertising campaigns in Colombia have been developing with greater growth, encouraging each individual and company to become aware and begin to carry out activities in favor of the environment.",
    "action": "This project covers the different needs, as soon as the environmental pollution caused by these substances and wastes may arise, which generate multiple problems for nature and for all living beings.",
    "intended_outcome": "The purpose of this project is to be able to develop a social campaign aimed at the community in order to make them aware of the current environmental situation and to encourage the recycling and rational use of waste and to provide them with good knowledge about caring for the environment.",
-   "status": "Completed",
-   "start_date": "2022-01-01",
-   "end_date": "2022-12-31"
+   "status": null,
+   "start_date": null,
+   "end_date": null
   },
   {
    "project_ref": "PROJ-8F137B21",
@@ -3909,9 +3909,9 @@
    "region": "Quiche",
    "subcategory": "Sustainability efforts",
    "name": "PAYMENT OF FREIGHT TRANSPORTATION OF COFFEE PLANTS AND ORGANIC FERTILIZERS.",
-   "challenge": "To cover the cost of transporting plants and fertilizers for all registered coffee producing partners, due to the passage of the ETA and IOTA storms, 54 hectares of coffee were eroded. With this project, in coordination with other importing clients and with the support of Popoyan, it is possible to reforest 100 hectares.",
+   "challenge": "To cover the cost of transporting plants and fertilizers for all registered coffee producing partners, due to the passage of the ETA and IOTA storms, 54 hectares of coffee were eroded. With this project, in coordination with other importing clients and with the support of a partner organization, it is possible to reforest 100 hectares.",
    "action": "Transfer of coffee seedlings and organic fertilizers to the communities where the associates live to begin the post-hurricane Eta and Iota recovery plan.",
-   "intended_outcome": "To cover the cost of transporting plants and fertilizers for all registered coffee producing partners, due to the passage of the ETA and IOTA storms, 54 hectares of coffee were eroded. With this project, in coordination with other importing clients and with the support of Popoyan, it is possible to reforest 100 hectares. This project aims to recover the damage and increase the production of all partners.",
+   "intended_outcome": "To cover the cost of transporting plants and fertilizers for all registered coffee producing partners, due to the passage of the ETA and IOTA storms, 54 hectares of coffee were eroded. With this project, in coordination with other importing clients and with the support of a partner organization, it is possible to reforest 100 hectares. This project aims to recover the damage and increase the production of all partners.",
    "status": "Completed",
    "start_date": "2021-06-01",
    "end_date": "2022-12-31"
@@ -4042,7 +4042,7 @@
    "region": "Antioquia",
    "subcategory": "Waste Disposal / Recycling",
    "name": "adaptation of the rainwater and wastewater channel",
-   "challenge": "The purpose is to contribute to the improvement of the needs suffered by some banana workers of the Montesol Group corporation and the community that live in the Americas sector of the municipality of Apartadó and who for several years were affected by a rainwater and wastewater channel that affects them due to bad odors causing diseases and floods, in addition to contributing to the environment, generating life and social well-being. To this end, the project was intervened, thus building a rainwater and wastewater channel, a work delivered at the end of December and is already serving commun…",
+   "challenge": "The purpose is to contribute to the improvement of the needs suffered by some banana workers of the a banana company and the community that live in the Americas sector of the municipality of Apartadó and who for several years were affected by a rainwater and wastewater channel that affects them due to bad odors causing diseases and floods, in addition to contributing to the environment, generating life and social well-being. To this end, the project was intervened, thus building a rainwater and wastewater channel, a work delivered at the end of December and is already serving communities and…",
    "action": "This project consists of the adaptation of the rainwater and wastewater channel in the 20 de Janeiro neighborhood and in the Las Américas Urbanization, the objective is to be able to create an environment suitable for the communities allowing to improve the quality of life of the inhabitants, for many years it was managed with the local mayors but it was impossible to obtain the investment.",
    "intended_outcome": "* create suitable environments for the families of banana workers and the community in general.",
    "status": "Completed",
@@ -4364,9 +4364,9 @@
    "country": "Brazil",
    "region": "Piaui",
    "subcategory": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
-   "name": "Expenditure on the reforestation project of the MELCOOP singular cooperative",
+   "name": "Expenditure on the reforestation project of the the cooperative singular cooperative",
    "challenge": "The need to implement environmental measures that contribute, in the future, to the maintenance of clusters and the production of members.",
-   "action": "Defray the costs of the reforestation project on the properties of members of the individual cooperative MELCOOP.",
+   "action": "Defray the costs of the reforestation project on the properties of members of the individual cooperative the cooperative.",
    "intended_outcome": "The expected benefits of investing in the apiculture reforestation project include increased honey production and quality, conservation of biodiversity, crop pollination, and conservation of soil and water resources.",
    "status": "Completed",
    "start_date": "2022-04-01",
@@ -4593,7 +4593,7 @@
    "region": "Risaralda",
    "subcategory": "Sustainability efforts",
    "name": "LINE OF INVESTMENT IN PRODUCTIVE AND QUALITY PROGRAMS",
-   "challenge": "It is proposed to carry out the “Everyone to Water” project, which consists of a series of coordinated activities aimed at implementing solutions that respond to the main problems of coffee farms located in the municipalities of Mistrató and Guatica Risaralda. Taking into account these problems and the potential for producing high-quality coffee in this area of the department, the Cooperative and the coffee importer, RGC COFFEE, promote the “Everyone to Water” program in the international market, with the purpose of encouraging the demand for Fairtrade coffee, generating, between RGC and the…",
+   "challenge": "It is proposed to carry out the “Everyone to Water” project, which consists of a series of coordinated activities aimed at implementing solutions that respond to the main problems of coffee farms located in the municipalities of Mistrató and Guatica Risaralda. Taking into account these problems and the potential for producing high-quality coffee in this area of the department, the Cooperative and the coffee importer, a coffee importer, promote the “Everyone to Water” program in the international market, with the purpose of encouraging the demand for Fairtrade coffee, generating, between the i…",
    "action": "PRODUCTIVE PROJECT “ALL TO THE WATER",
    "intended_outcome": "Working with 316 producers who are in an area of great ecological importance since their farms are in the buffer zones of two protected areas, La Cristalina and Cuchilla del San Juan, for this reason, landscape regeneration work will contribute to regional objectives of protecting the landscape and biodiversity. Each region will contribute its results for a common impact focused on reducing emissions, restored hectares and producers receiving technical assistance.",
    "status": "In Progress",
@@ -5051,7 +5051,7 @@
    "name": "Monthly Community Clean-Up Drive",
    "challenge": "The clean-up drive enhances the cleanliness of the streets in Brgy. 7 and Brgy. Aroma, helping prevent flooding by reducing waste buildup, keeping drainage pathways clear and contribute to overall environmental protection.",
    "action": "A monthly clean-up drive that encourages residents of Brgy. Aroma and Brgy. 7 to participate in cleaning streets, public areas, and common spaces. The activity promotes environmental responsibility, strengthens community involvement, and helps maintain a clean and livable barangay.",
-   "intended_outcome": "It is expected that the overall cleanliness of the community will improve and that the initiative will strengthen camaraderie and cooperation among FFSM members.",
+   "intended_outcome": "It is expected that the overall cleanliness of the community will improve and that the initiative will strengthen camaraderie and cooperation among the association members.",
    "status": "In Progress",
    "start_date": "2024-04-29",
    "end_date": "2030-12-31"
@@ -5736,15 +5736,15 @@
    "challenge": "From the needs assessment survey, highlighted as one of several environmental concerns was Waste and Trash. Healthcare was one of the highest concerns and getting rid of unsanitary trash piles would be a way of preventing disease and illness due to poor sanitation.",
    "action": "Lack of community rubbish bins to contain household waste. Those that do not have access to company arranged bins, tend to burn, or throw household waste in the sea or in the bushy areas or just beside the road. Aside from household waste there is also biodegradable waste that is being created in volumes from grass cuttings off the main Noro road, and also from the town market. All this biodegradable waste is currently disposed of at the local dumpsite taking up unnecessary space not to mention naturally composting but not able to be used. This project looks various activities that address th…",
    "intended_outcome": "Help residential communities to have proper disposal of household rubbish/Trash, so that household areas can be clean and free from problems of unmanaged rubbish disposal.",
-   "status": "Completed",
-   "start_date": "2022-07-04",
-   "end_date": "2022-07-13"
+   "status": null,
+   "start_date": null,
+   "end_date": null
   },
   {
-   "project_ref": "PROJ-49A89CB7",
+   "project_ref": "PROJ-6165949F",
    "org_ref": "ORG-708313A6",
    "owner_key": "7fdc3d92a2f22fd5",
-   "source": "FTUSA Premium project (sample data, fictionalized) PROJ-49A89CB7",
+   "source": "FTUSA Premium project (sample data, fictionalized) PROJ-6165949F",
    "challenge_tag": "biodiversity and conservation",
    "crop": "Seafood",
    "entity_type": null,
@@ -5755,9 +5755,9 @@
    "challenge": "From the needs assessment survey, highlighted as one of several environmental concerns was Waste and Trash. Healthcare was one of the highest concerns and getting rid of unsanitary trash piles would be a way of preventing disease and illness due to poor sanitation.",
    "action": "Lack of community rubbish bins to contain household waste. Those that do not have access to company arranged bins, tend to burn, or throw household waste in the sea or in the bushy areas or just beside the road. Aside from household waste there is also biodegradable waste that is being created in volumes from grass cuttings off the main Noro road, and also from the town market. All this biodegradable waste is currently disposed of at the local dumpsite taking up unnecessary space not to mention naturally composting but not able to be used. This project looks various activities that address th…",
    "intended_outcome": "Help residential communities to have proper disposal of household rubbish/Trash, so that household areas can be clean and free from problems of unmanaged rubbish disposal.",
-   "status": "Completed",
-   "start_date": "2022-07-04",
-   "end_date": "2022-07-13"
+   "status": null,
+   "start_date": null,
+   "end_date": null
   },
   {
    "project_ref": "PROJ-C9CDC552",
@@ -5865,7 +5865,7 @@
    "country": "Colombia",
    "region": "Caldas",
    "subcategory": "Sustainability efforts",
-   "name": "Basic sanitation systems and modular systems for the treatment of water and coffee honey (SMTA)",
+   "name": "Basic sanitation systems and modular systems for the treatment of water and coffee honey (the group's)",
    "challenge": "The project was born out of the need to seek alternatives for the care and conservation of natural resources through the treatment of water derived from the benefit of coffee and domestic wastewater, and with these projects we can guarantee the protection of the health of coffee families.",
    "action": "The systems are delivered and installed on the farm and their operation and proper maintenance are explained.",
    "intended_outcome": "Subsidize the installation of systems for the treatment of honey water derived from the processing and processing of coffee and domestic wastewater in order to protect soil and nearby water sources.",
@@ -5982,10 +5982,10 @@
    "name": "21. Reforestation of Green Areas",
    "challenge": "The lack of green areas led to the creation of the reforestation plan.",
    "action": "Purchase and monitor the planting of trees in green spaces, river banks and water sources.",
-   "intended_outcome": "Contribute to environmental conservation by planting trees in hydrographic basins and educational centers in coordination with CECJ - CLAC",
-   "status": "In Planning",
-   "start_date": "2023-01-01",
-   "end_date": "2023-12-31"
+   "intended_outcome": "Contribute to environmental conservation by planting trees in hydrographic basins and educational centers in coordination with a partner group - CLAC",
+   "status": "Completed",
+   "start_date": "2021-01-01",
+   "end_date": "2021-12-31"
   },
   {
    "project_ref": "PROJ-7183767E",
@@ -6003,8 +6003,8 @@
    "action": "Acquisition and monitoring of tree planting in green spaces, river banks and water sources.",
    "intended_outcome": "Contribute to the conservation of the environment by planting trees.",
    "status": "In Planning",
-   "start_date": "2024-01-01",
-   "end_date": "2024-12-31"
+   "start_date": "2025-01-01",
+   "end_date": "2025-12-31"
   },
   {
    "project_ref": "PROJ-DFB6F74B",
@@ -6022,8 +6022,8 @@
    "action": "Purchase and monitor the planting of trees in green spaces, river banks and water sources.",
    "intended_outcome": "Contribute to the conservation of the environment by planting trees..",
    "status": "In Planning",
-   "start_date": "2023-01-01",
-   "end_date": "2023-12-31"
+   "start_date": "2022-01-01",
+   "end_date": "2022-12-31"
   },
   {
    "project_ref": "PROJ-B3E851D8",
@@ -6074,9 +6074,9 @@
    "country": "Honduras",
    "region": "Lempira",
    "subcategory": "Waste Disposal / Recycling",
-   "name": "Latrine project for CAFESCOR members.",
+   "name": "Latrine project for the cooperative members.",
    "challenge": "It was identified that the plots belonging to producers in the Lempira area did not have an adequate health system that would guarantee people's health, around 95 producers did not have this basic service, which will have a positive impact on health and avoiding environmental pollution since there were no adequate means.",
-   "action": "Construction of 95 sanitary modules, consisting of two cubicles based on galvanized aluzin foil, which have concrete latrines that are discharged into a septic tank. Latrine project for CAFESCOR members.",
+   "action": "Construction of 95 sanitary modules, consisting of two cubicles based on galvanized aluzin foil, which have concrete latrines that are discharged into a septic tank. Latrine project for the cooperative members.",
    "intended_outcome": "Implement measures to reduce environmental pollution through the installation of latrines and improve accessibility for producers and collaborators.",
    "status": "Completed",
    "start_date": "2021-07-02",
@@ -6115,7 +6115,7 @@
    "name": "Soil analysis",
    "challenge": "Fertilization without technical arguments can increase production costs, degrade soils and generate environmental pollution.",
    "action": "To contribute to the continuous improvement of the productivity of our Associates' coffee companies and to the management and conservation of coffee soils.",
-   "intended_outcome": "Achieve adequate soil management and conservation, contributing to the productive improvement of the coffee companies associated with COOCAFISA, through the use of technological tools, which allow the correct use of fertilizers and thus reduce the loss and pollution of water sources, due to excess nitrogen fertilizers.",
+   "intended_outcome": "Achieve adequate soil management and conservation, contributing to the productive improvement of the coffee companies associated with the cooperative, through the use of technological tools, which allow the correct use of fertilizers and thus reduce the loss and pollution of water sources, due to excess nitrogen fertilizers.",
    "status": "In Progress",
    "start_date": "2023-03-23",
    "end_date": "2024-02-28"
@@ -6151,11 +6151,11 @@
    "region": "Antioquia",
    "subcategory": "Waste Disposal / Recycling",
    "name": "Day: collection of empty pesticide containers throughout the Cooperative's range of action",
-   "challenge": "The inadequate disposal of post-consumer pesticide waste in open fields, water sources, for burning and/or reuse, violates the International Code of Conduct for the Distribution and Use of Pesticides. To avoid this, the Campo Limpio corporation has in our area two collection sites for pesticide containers located in Bolombolo and Urrao, places that many coffee growers cannot easily reach, but through container collection days, significant volumes can be collected and contamination avoided",
+   "challenge": "The inadequate disposal of post-consumer pesticide waste in open fields, water sources, for burning and/or reuse, violates the International Code of Conduct for the Distribution and Use of Pesticides. To avoid this, the a collection corporation has in our area two collection sites for pesticide containers located in Bolombolo and Urrao, places that many coffee growers cannot easily reach, but through container collection days, significant volumes can be collected and contamination avoided",
    "action": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
    "intended_outcome": "Farms free of post-consumer pesticide residues, proper management and correct final disposal of these",
-   "status": "Completed",
-   "start_date": "2024-01-03",
+   "status": null,
+   "start_date": null,
    "end_date": null
   },
   {
@@ -6178,10 +6178,10 @@
    "end_date": "2024-02-28"
   },
   {
-   "project_ref": "PROJ-4DCC6147",
+   "project_ref": "PROJ-FFA14ED1",
    "org_ref": "ORG-3AD80C57",
    "owner_key": "28704c2b61c120e5",
-   "source": "FTUSA Premium project (sample data, fictionalized) PROJ-4DCC6147",
+   "source": "FTUSA Premium project (sample data, fictionalized) PROJ-FFA14ED1",
    "challenge_tag": "biodiversity and conservation",
    "crop": "Coffee",
    "entity_type": "1st Grade",
@@ -6192,8 +6192,8 @@
    "challenge": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
    "action": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
    "intended_outcome": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
-   "status": "Completed",
-   "start_date": "2024-01-03",
+   "status": null,
+   "start_date": null,
    "end_date": null
   },
   {
@@ -6267,7 +6267,7 @@
    "name": "Quality and Productivity Development",
    "challenge": "for the completeness of the administration of the socialization of fairtrade standards in order to facilitate members to remember the introduction of the standards",
    "action": "Procurement of billboards, posters, guidebooks and other documents related to the introduction of Fairtrade standards",
-   "intended_outcome": "To improve the understanding of Fairtrade farmer member KSU Rahmat Kinara towards Fairtrade certification standards",
+   "intended_outcome": "To improve the understanding of Fairtrade farmer member a member farmers' group towards Fairtrade certification standards",
    "status": "Completed",
    "start_date": "2025-04-29",
    "end_date": "2025-12-31"
@@ -6588,7 +6588,7 @@
    "region": "Minas Gerais",
    "subcategory": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
    "name": "Maintenance “Sustainable energy",
-   "challenge": "Coopervitae has two photovoltaic power stations that generate an average of 24000 kwh/month and are distributed among member families and four philanthropic institutions in the city of Nova Resende. 151 families and 4 entities benefit. The project is estimated to last until 2045. It will have a very good social, economic and environmental impact.",
+   "challenge": "the cooperative has two photovoltaic power stations that generate an average of 24000 kwh/month and are distributed among member families and four philanthropic institutions in the city of Nova Resende. 151 families and 4 entities benefit. The project is estimated to last until 2045. It will have a very good social, economic and environmental impact.",
    "action": "maintain the structure of the stations of the 'sustainable energy' project during the year 2022. Cleaning the photovoltaic panels. Land clearing. Payment of the basic energy rate. Payment for an internet line for monitoring.",
    "intended_outcome": "reduction of 3.8 million kg of CO2 in the atmosphere, savings of 15 billion liters of water in hydroelectric plants for energy generation equivalent to 23 thousand trees planted by 2045.",
    "status": "In Progress",
