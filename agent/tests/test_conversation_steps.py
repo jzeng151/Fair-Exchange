@@ -11,6 +11,7 @@ from tests.conversation_harness import (
 )
 from tests.tool_harness import call_tool
 
+from fex.conversation.state import StateConflict
 from fex.tools.peer_examples import find_peer_examples
 from fex.tools.regional_context import get_regional_context
 
@@ -510,3 +511,34 @@ def test_a_disputed_location_reaches_the_summary_model():
     r.action("confirm_playback")
     summary_prompt = r.small.prompts[-1]
     assert r.state().location_note in summary_prompt
+
+
+# ---------------------------------------------------------------- review fix, round 3 (Codex on #67)
+
+def test_an_in_flight_answer_cannot_undo_a_stop_that_arrived_meanwhile():
+    """The chat API's turn lock (#25) should prevent this; if it ever fails, the stale turn must not win."""
+    r = Run()
+    r.to_playback()
+    r.small.add(summary())
+    stopped = []
+
+    def stop_meanwhile():  # an `end` processed while the large model is still writing the answer
+        if not stopped:
+            stopped.append(r.action("end"))
+    r.large.watch = stop_meanwhile
+    r.large.add(*RETRIEVE, r.good_answer())
+    events = r.action("confirm_playback")
+    assert of(stopped[0], "step")[-1].step == "closed"
+    assert r.state().step == "closed"  # the stop holds
+    assert r.state().history[-1].role == "action" and r.state().history[-1].name == "end"
+    assert of(events, "error")[0].code == "agent_failed"
+
+
+def test_a_stale_save_is_rejected_by_the_store():
+    r = Run()
+    r.small.add(intake("Hola"))
+    r.send("start")
+    first, second = r.state(), r.state()
+    r.store.save(first, expected_revision=first.revision)
+    with pytest.raises(StateConflict):
+        r.store.save(second, expected_revision=second.revision)
