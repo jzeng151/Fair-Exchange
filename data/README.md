@@ -54,25 +54,32 @@ cd data && uv sync && uv run pytest
 | WRI Aqueduct 4.0 | Baseline water stress, and projected stress for 2030 and 2050 (business as usual) | region (river basin at the point) |
 | World Bank Pink Sheet | Benchmark price change over 12 months and vs the 5-year average: Arabica coffee, cocoa, US bananas | crop |
 
-56 regions in 16 countries, including all of Peru, Côte d'Ivoire, Colombia, Honduras and Mexico in the sample. Each region is one point near its centre (`REGIONS` in `regional.py`), so climate and water facts have strength `nearest`. Prices are world benchmarks, not farm-gate prices, so they have strength `limited`.
+56 regions in 16 countries, including all of Peru, Côte d'Ivoire, Colombia, Honduras and Mexico in the sample. Each region is one point near its centre (`REGIONS` in `regional.py`).
+
+The table is `src/fx_data/regional_facts.csv`, one fact per row, with exactly the #8 spec columns: `fact_id, scope, country, admin1, crop, tags, indicator, value, unit, comparison, period, source_name, source_url, extracted_at, curated`. `RegionalFacts.load()` validates every row and fails on a bad one.
+
+- `scope` is `region` (one point near the region's centre), `country` (the average of that country's region rows in this table, said in `comparison`) or `global` (benchmark prices, by `crop`).
+- `fact_id` is `RF-` plus a hash of scope, country, admin1, crop and indicator, so it stays the same across rebuilds.
+- `tags` are the challenge tags the indicator speaks to (`INDICATOR_TAGS` in `regional.py`), `;`-separated.
+- Prices are world benchmarks, not farm-gate prices; their `comparison` says so.
 
 ```python
 from fx_data.regional import RegionalFacts
 facts = RegionalFacts.load()
-answer = facts.lookup("Colombia", "Cauca", "Coffee")
-answer.facts   # [{"text", "source", "metric", "value", "unit", "period", "strength"}, ...]
+items = facts.lookup("Colombia", "Cauca", {"coffee"}, {"water", "climate and weather"})
+# [{"source", "kind": "regional", "text", "period", "strength", "data": <the CSV row>}, ...]
 ```
 
-`lookup` never substitutes another region: an unknown region returns crop prices only (`match_level="country"`), or nothing.
+`lookup` (#15) returns region rows (`exact`), then country rows (`nearest`), then global rows (`limited`), at most 8, filtered by tag and crop. It never substitutes another region; nothing matching is an empty list.
 
 ### Rebuild
 
 ```bash
 PYTHONPATH=src uv run python -m fx_data.regional fetch   # network, ~15 min -> regional_sources.json
-PYTHONPATH=src uv run python -m fx_data.regional build   # offline -> regional_facts.json
+PYTHONPATH=src uv run python -m fx_data.regional build   # offline -> regional_facts.csv
 ```
 
-Both files are committed. `tests/test_regional.py` fails if `regional_facts.json` no longer matches `regional_sources.json`. To add a region, add it to `REGIONS` and run both steps. The Pink Sheet workbook URL changes each year; update `PINK_SHEET_URL` when it does.
+Both files are committed. `tests/test_regional.py` fails if `regional_facts.csv` no longer matches `regional_sources.json`. To add a region, add it to `REGIONS` and run both steps. The Pink Sheet workbook URL changes each year; update `PINK_SHEET_URL` when it does.
 
 ## Peer projects and producer profiles (issue #16)
 

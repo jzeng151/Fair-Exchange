@@ -17,7 +17,7 @@ import json
 import pytest
 from fx_data.peers import PeerProjects, ProducerProfiles, owner_key
 from fx_data.records import ProducerRecords
-from fx_data.regional import RegionalFacts
+from fx_data.regional import RegionalFacts, country_code, normalize, normalize_crops
 
 from fex.models import ChallengeTag
 from fex.tools import ALL_TOOLS
@@ -27,6 +27,7 @@ PROFILES = ProducerProfiles.load()._profiles
 PRODUCERS = sorted(PROFILES)
 RECORDS = ProducerRecords.load()._records
 PEER_ROWS = PeerProjects.load()._projects
+FACTS = RegionalFacts.load()
 TAGS = list(ChallengeTag.__args__)
 CLAUSES = ("APS 1.1", "APS 3.6.1", "FPS 1.1")
 
@@ -62,6 +63,8 @@ def sessions_for(tool) -> list[dict]:
     """Every session context the engine could give this tool. The model's input is always empty (#17)."""
     if tool.tool_name == "find_peer_examples":
         return [{"tags": [tag]} for tag in TAGS]
+    if tool.tool_name == "get_regional_context":
+        return [{"tags": list(TAGS)}] + [{"tags": [tag]} for tag in TAGS]
     if tool.tool_name == "find_standards":
         return [{"tags": ["water"], "summary_english": "Rain fell.", RETRIEVER_KEY: StaticRetriever()}]
     return [{}]
@@ -72,7 +75,7 @@ def spoof(victim: str) -> dict:
     p = PROFILES[victim]
     return {"producer_id": victim, "producerId": victim, "account_sk": victim, "country": p["country"],
             "region": p["region"], "location": f"{p['region']}, {p['country']}", "crop": p["crop"],
-            "entity_type": p["entity_type"], "challenge": "health"}
+            "entity_type": p["entity_type"], "challenge": "health", "admin1": p["region"], "tags": ["health"]}
 
 
 def victim_for(pid: str) -> str:
@@ -124,15 +127,17 @@ def _check_record(result, pid, _session):
     assert {i["data"]["project_ref"] for i in result if "project_ref" in i["data"]} == own_refs
 
 
-def _check_regional(result, pid, _session):
+def _check_regional(result, pid, session):
     profile = PROFILES[pid]
-    expected = (RegionalFacts.load().lookup(profile["country"], profile["region"], profile["crop"]).as_dict()
-                if profile["country"] else {"matched": False, "facts": []})
-    assert [i["text"] for i in result] == ([f["text"] for f in expected["facts"]] if expected["matched"] else [])
+    tags = set(session["tags"])
+    assert result == FACTS.lookup(profile["country"], profile["region"], normalize_crops(profile["crop"]), tags)
     for item in result:
-        assert item["kind"] == "regional"
-        assert item["data"]["region"] == {"country": profile["country"], "region": profile["region"],
-                                          "crop": profile["crop"]}
+        row = item["data"]
+        assert item["kind"] == "regional" and set(row["tags"].split(";")) & tags
+        if row["scope"] in ("region", "country"):
+            assert row["country"] == country_code(profile["country"]), "another country's facts"
+        if row["scope"] == "region":
+            assert normalize(row["admin1"]) == normalize(profile["region"]), "another region's facts"
 
 
 def _check_peers(result, pid, session):

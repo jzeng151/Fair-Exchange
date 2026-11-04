@@ -8,26 +8,30 @@ Sources:
 Nothing calls these services at runtime. Building the table has two steps:
 
     PYTHONPATH=src uv run python -m fx_data.regional fetch   # network, ~15 min: writes regional_sources.json
-    PYTHONPATH=src uv run python -m fx_data.regional build   # offline: writes regional_facts.json
+    PYTHONPATH=src uv run python -m fx_data.regional build   # offline: writes regional_facts.csv
 
-Both JSON files ship inside the package. `RegionalFacts.load()` reads the facts at runtime.
+Both files ship inside the package. `RegionalFacts.load()` reads and validates the CSV at runtime.
 
-Each region is represented by one point near its centre (admin-1 centroid). Values describe that
-point, not the whole region, so climate and water facts carry strength "nearest". Prices are global
-benchmarks, not farm-gate prices, so they carry strength "limited".
+Rows follow the #8 spec's columns (`fact_id`, `scope`, `country`, `admin1`, `crop`, `tags`, ...):
+  - region rows: one point near the region's centre (admin-1 centroid), so the value describes that
+    point; the `comparison` column says so for water stress;
+  - country rows: the average of that country's region rows in this table (said in `comparison`);
+  - global rows: World Bank benchmark prices, which are world market prices, not farm-gate prices.
+The regional-context tool (#15) gives region rows strength "exact", country "nearest", global "limited".
 """
 from __future__ import annotations
 
 import argparse
+import csv
+import hashlib
 import io
 import json
 import sys
 import time
 import urllib.parse
 import urllib.request
-from collections import defaultdict
+from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from dataclasses import dataclass
 from datetime import date, datetime, timezone
 from pathlib import Path
 
@@ -35,7 +39,7 @@ from fx_data.text import normalize
 
 HERE = Path(__file__).parent
 SOURCES_PATH = HERE / "regional_sources.json"
-FACTS_PATH = HERE / "regional_facts.json"
+FACTS_PATH = HERE / "regional_facts.csv"
 
 # ---------------------------------------------------------------------------------------------
 # Regions: (country, region) -> representative point near the region's centre.
@@ -267,12 +271,70 @@ def fetch(workers: int = 4) -> dict:
 
 
 # ---------------------------------------------------------------------------------------------
-# Build (offline): sources -> facts
+# Build (offline): sources -> fact table (CSV, columns per the #8 spec)
 # ---------------------------------------------------------------------------------------------
 
-def _fact(text: str, source: str, metric: str, value, unit: str | None, period: str, strength: str) -> dict:
-    return {"text": text, "source": source, "metric": metric, "value": value, "unit": unit,
-            "period": period, "strength": strength}
+# ISO 3166-1 alpha-2 for the countries in REGIONS (and the producer table's spellings).
+COUNTRY_CODES = {
+    "Brazil": "BR", "Colombia": "CO", "Costa Rica": "CR", "Côte d'Ivoire": "CI", "Ecuador": "EC",
+    "Ethiopia": "ET", "Guatemala": "GT", "Honduras": "HN", "India": "IN", "Indonesia": "ID",
+    "Kenya": "KE", "Mexico": "MX", "Nicaragua": "NI", "Peru": "PE", "Rwanda": "RW", "Sri Lanka": "LK",
+}
+COUNTRY_NAMES = {code: name for name, code in COUNTRY_CODES.items()}
+_CODE_BY_KEY = {normalize(name): code for name, code in COUNTRY_CODES.items()}
+
+CROPS = ("coffee", "banana", "cocoa")
+CHALLENGE_TAGS = (
+    "climate and weather", "water", "soil and land", "market and price", "labor and migration",
+    "financial and access to capital", "education", "health", "infrastructure",
+    "biodiversity and conservation", "social and community",
+)
+COLUMNS = ("fact_id", "scope", "country", "admin1", "crop", "tags", "indicator", "value", "unit",
+           "comparison", "period", "source_name", "source_url", "extracted_at", "curated")
+
+# Which challenges each indicator speaks to (#8: "each fact mapped to challenge tags").
+INDICATOR_TAGS = {
+    "rainfall_anomaly_pct": ("climate and weather", "water"),
+    "water_stress_score": ("water",),
+    "water_stress_score_2050": ("water", "climate and weather"),
+    "price_usd_per_kg": ("market and price",),
+    "price_vs_5yr_avg_pct": ("market and price",),
+}
+PRICE_CROPS = {"coffee": "Coffee, Arabica", "cocoa": "Cocoa", "banana": "Banana, US"}  # Pink Sheet series
+SOURCE_URLS = {
+    "CHIRPS v2.0": "https://www.chc.ucsb.edu/data/chirps",
+    "WRI Aqueduct 4.0": "https://www.wri.org/data/aqueduct-global-maps-40-data",
+}
+
+
+def country_code(name: str | None) -> str | None:
+    """'Cote d'Ivoire', 'Côte d’Ivoire' and 'Côte d'Ivoire' all give 'CI'."""
+    return _CODE_BY_KEY.get(normalize(name))
+
+
+def normalize_crops(raw: str | None) -> set[str]:
+    """'Cocoa;Coffee' -> {'cocoa', 'coffee'}; 'Bananas' -> {'banana'}. Anything else is dropped.
+    Stand-in for the reviewed vocabulary mapping table (#7)."""
+    out = set()
+    for part in (normalize(p) for p in (raw or "").split(";")):
+        part = {"bananas": "banana"}.get(part, part)
+        if part in CROPS:
+            out.add(part)
+    return out
+
+
+def _fact_id(scope: str, country: str, admin1: str, crop: str, indicator: str) -> str:
+    key = "|".join((scope, country, admin1, crop, indicator))
+    return "RF-" + hashlib.sha1(key.encode()).hexdigest()[:6].upper()
+
+
+def _row(scope, country, admin1, crop, indicator, value, unit, comparison, period, source_name,
+         source_url, extracted_at, curated=False) -> dict:
+    return {"fact_id": _fact_id(scope, country, admin1, crop, indicator), "scope": scope, "country": country,
+            "admin1": admin1, "crop": crop, "tags": ";".join(INDICATOR_TAGS[indicator]),
+            "indicator": indicator, "value": value, "unit": unit, "comparison": comparison, "period": period,
+            "source_name": source_name, "source_url": source_url, "extracted_at": extracted_at,
+            "curated": "true" if curated else "false"}
 
 
 def _band(label: str | None) -> str | None:
@@ -284,9 +346,13 @@ def _band(label: str | None) -> str | None:
     return text.replace("Low-Medium", "low to medium").replace("Medium-High", "medium to high").lower()
 
 
-def _climate_facts(record: dict) -> list[dict]:
-    place = f"near the centre of {record['region']}, {record['country']}"
-    facts = []
+def _month_label(key: str) -> str:
+    year, month = key.split("M")
+    return date(int(year), int(month), 1).strftime("%B %Y")
+
+
+def _region_rows(record: dict, extracted: str) -> list[dict]:
+    cc, admin1, rows = COUNTRY_CODES[record["country"]], record["region"], []
     chirps = record.get("chirps") or {}
     complete = {int(y): v["total_mm"] for y, v in chirps.items()
                 if v["days"] >= (366 if int(y) % 4 == 0 else 365) - MAX_MISSING_DAYS_PER_YEAR}
@@ -294,131 +360,196 @@ def _climate_facts(record: dict) -> list[dict]:
         recent = sum(complete[y] for y in RECENT_YEARS) / len(RECENT_YEARS)
         baseline = sum(complete[y] for y in BASELINE_YEARS) / len(BASELINE_YEARS)
         if baseline > 0:
-            pct = round((recent - baseline) / baseline * 100, 1)
-            direction = "below" if pct < 0 else "above"
             r0, r1, b0, b1 = RECENT_YEARS[0], RECENT_YEARS[-1], BASELINE_YEARS[0], BASELINE_YEARS[-1]
-            facts.append(_fact(
-                f"Rainfall {place} averaged {recent:,.0f} mm a year in {r0}-{r1}, "
-                f"{abs(pct)}% {direction} the {b0}-{b1} average of {baseline:,.0f} mm.",
-                SOURCE_CHIRPS, "rainfall_change_pct", pct, "%", f"{b0}-{r1}", "nearest"))
+            rows.append(_row("region", cc, admin1, "", "rainfall_anomaly_pct",
+                             round((recent - baseline) / baseline * 100, 1), "%",
+                             f"vs {b0}-{b1} mean ({recent:,.0f} mm vs {baseline:,.0f} mm a year)", f"{r0}-{r1}",
+                             "CHIRPS v2.0", SOURCE_URLS["CHIRPS v2.0"], extracted))
     water = record.get("aqueduct") or {}
-    baseline_band = _band(water.get("baseline_label"))
-    if baseline_band:
-        facts.append(_fact(
-            f"Baseline water stress in the river basin {place} is {baseline_band}.",
-            SOURCE_AQUEDUCT, "baseline_water_stress", water.get("baseline_score"), "score 0-5",
-            "1979-2019 baseline", "nearest"))
-    projected = {y: _band(v.get("label")) for y, v in (water.get("bau") or {}).items() if v.get("label")}
-    if {"2030", "2050"} <= projected.keys():
-        facts.append(_fact(
-            f"If current trends continue (business as usual), water stress there is projected to be "
-            f"{projected['2030']} by 2030 and {projected['2050']} by 2050.",
-            SOURCE_AQUEDUCT, "projected_water_stress_2050", (water["bau"]["2050"] or {}).get("score"),
-            "score 0-5", "2030-2050 projection", "nearest"))
-    return facts
+    if band := _band(water.get("baseline_label")):
+        rows.append(_row("region", cc, admin1, "", "water_stress_score", round(water["baseline_score"], 2),
+                         "score 0-5", f"{band}; river basin at the region's centre", "1979-2019",
+                         "WRI Aqueduct 4.0", SOURCE_URLS["WRI Aqueduct 4.0"], extracted))
+    bau = water.get("bau") or {}
+    b30, b50 = _band((bau.get("2030") or {}).get("label")), _band((bau.get("2050") or {}).get("label"))
+    if b30 and b50 and (bau["2050"] or {}).get("score") is not None:
+        rows.append(_row("region", cc, admin1, "", "water_stress_score_2050", round(bau["2050"]["score"], 2),
+                         "score 0-5", f"business-as-usual projection: {b30} by 2030, {b50} by 2050",
+                         "2030-2050", "WRI Aqueduct 4.0", SOURCE_URLS["WRI Aqueduct 4.0"], extracted))
+    return rows
 
 
-def _month_label(key: str) -> str:
-    year, month = key.split("M")
-    return date(int(year), int(month), 1).strftime("%B %Y")
-
-
-def _price_facts(prices: dict) -> dict[str, list[dict]]:
-    out = {}
-    for crop, name in PRICE_SERIES.items():
-        series = prices["series"][name]
-        monthly, unit = series["monthly"], series["unit"].replace("$", "US$")
-        latest = max(monthly)
-        year, month = latest.split("M")
-        year_ago = f"{int(year) - 1}M{month}"
-        start = f"{int(year) - PRICE_BASELINE_YEARS}M{month}"
-        window = [v for k, v in monthly.items() if start < k <= latest]
-        value = monthly[latest]
-        facts = []
-        if year_ago in monthly:
-            change = round((value - monthly[year_ago]) / monthly[year_ago] * 100, 1)
-            direction = "lower" if change < 0 else "higher"
-            facts.append(_fact(
-                f"The world benchmark price for {name.lower()} averaged {unit.split('/')[0]} {value:.2f} "
-                f"per {unit.split('/')[1]} in {_month_label(latest)}, {abs(change)}% {direction} than a year "
-                f"earlier. This is an international market price, not a farm-gate price.",
-                f"{SOURCE_PINK_SHEET}: {name}", "benchmark_price_change_pct", change, "%",
-                f"{_month_label(year_ago)} to {_month_label(latest)}", "limited"))
-        if len(window) >= 12 * PRICE_BASELINE_YEARS - 1:
-            avg = sum(window) / len(window)
-            facts.append(_fact(
-                f"Over the past {PRICE_BASELINE_YEARS} years the {name.lower()} benchmark averaged "
-                f"{unit.split('/')[0]} {avg:.2f} per {unit.split('/')[1]}, so the latest price is "
-                f"{abs(round((value - avg) / avg * 100))}% {'below' if value < avg else 'above'} that average.",
-                f"{SOURCE_PINK_SHEET}: {name}", "benchmark_price_vs_5yr_avg_pct",
-                round((value - avg) / avg * 100, 1), "%",
-                f"{_month_label(start)} to {_month_label(latest)}", "limited"))
-        out[crop] = facts
+def _country_rows(region_rows: list[dict]) -> list[dict]:
+    """Country rows: the average of that country's region rows in this table, labelled as such."""
+    out, groups = [], defaultdict(list)
+    for r in region_rows:
+        if r["indicator"] in ("rainfall_anomaly_pct", "water_stress_score"):
+            groups[(r["country"], r["indicator"])].append(r)
+    for (cc, indicator), rows in sorted(groups.items()):
+        mean = sum(float(r["value"]) for r in rows) / len(rows)
+        first = rows[0]
+        out.append(_row("country", cc, "", "", indicator, round(mean, 1 if indicator.endswith("pct") else 2),
+                        first["unit"], f"average of {len(rows)} region{'s' if len(rows) > 1 else ''} in this table",
+                        first["period"], first["source_name"], first["source_url"], first["extracted_at"]))
     return out
 
 
-def build(sources: dict) -> dict:
-    regions = []
-    for record in sources["regions"]:
-        regions.append({"country": record["country"], "region": record["region"],
-                        "lat": record["lat"], "lon": record["lon"], "facts": _climate_facts(record)})
-    return {
-        "description": "Pre-extracted regional facts for the regional-context tool. Built offline from "
-                       "regional_sources.json; never fetched at runtime.",
-        "sources_fetched_at": sources["fetched_at"],
-        "prices_updated": sources["prices"]["updated"],
-        "regions": regions,
-        "prices": _price_facts(sources["prices"]),
-    }
+def _price_rows(prices: dict, extracted: str) -> list[dict]:
+    rows = []
+    for crop, series_name in PRICE_CROPS.items():
+        series = prices["series"][series_name]
+        monthly = series["monthly"]
+        latest = max(monthly)
+        year, month = latest.split("M")
+        year_ago, start = f"{int(year) - 1}M{month}", f"{int(year) - PRICE_BASELINE_YEARS}M{month}"
+        value = monthly[latest]
+        name = f"World Bank Pink Sheet ({series_name})"
+        if year_ago in monthly:
+            change = round((value - monthly[year_ago]) / monthly[year_ago] * 100, 1)
+            rows.append(_row("global", "", "", crop, "price_usd_per_kg", round(value, 2), "US$/kg",
+                             f"{abs(change)}% {'lower' if change < 0 else 'higher'} than {_month_label(year_ago)}; "
+                             "world benchmark, not a farm-gate price", _month_label(latest), name, prices["url"],
+                             extracted))
+        window = [v for k, v in monthly.items() if start < k <= latest]
+        if len(window) >= 12 * PRICE_BASELINE_YEARS - 1:
+            avg = sum(window) / len(window)
+            rows.append(_row("global", "", "", crop, "price_vs_5yr_avg_pct", round((value - avg) / avg * 100, 1),
+                             "%", f"{_month_label(latest)} price vs the {_month_label(start)} to "
+                             f"{_month_label(latest)} average of US${avg:.2f}/kg; world benchmark",
+                             _month_label(latest), name, prices["url"], extracted))
+    return rows
+
+
+def build(sources: dict) -> list[dict]:
+    extracted = sources["fetched_at"]
+    region = [r for record in sources["regions"] for r in _region_rows(record, extracted)]
+    rows = region + _country_rows(region) + _price_rows(sources["prices"], extracted)
+    validate_rows(rows)
+    return rows
+
+
+def write_csv(rows: list[dict], path: Path = FACTS_PATH) -> None:
+    with open(path, "w", encoding="utf-8", newline="") as fh:
+        writer = csv.DictWriter(fh, fieldnames=COLUMNS, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(rows)
 
 
 # ---------------------------------------------------------------------------------------------
-# Lookup (runtime)
+# Load + validate (runtime)
 # ---------------------------------------------------------------------------------------------
 
-@dataclass
-class RegionalAnswer:
-    matched: bool
-    match_level: str  # "region", "country", or "none"
-    facts: list[dict]
-    note: str | None = None
+def validate_rows(rows: list[dict]) -> None:
+    """Reject rows the #8 spec rules out. Raises ValueError naming the first bad row."""
+    seen = set()
+    for r in rows:
+        fid = r.get("fact_id") or "?"
+        def bad(why: str):
+            raise ValueError(f"fact {fid}: {why}")
+        if fid in seen:
+            bad("duplicate fact_id")
+        seen.add(fid)
+        if r["scope"] not in ("region", "country", "global"):
+            bad(f"unknown scope {r['scope']!r}")
+        if r["scope"] == "global" and (r["country"] or r["admin1"]):
+            bad("global rows have no country or region")
+        if r["scope"] != "global" and r["country"] not in COUNTRY_NAMES:
+            bad(f"unknown country code {r['country']!r}")
+        if (r["scope"] == "region") != bool(r["admin1"]):
+            bad("admin1 is set on region rows only")
+        if r["crop"] and r["crop"] not in CROPS:
+            bad(f"unknown crop {r['crop']!r}")
+        tags = [t for t in str(r["tags"]).split(";") if t]
+        if not tags or any(t not in CHALLENGE_TAGS for t in tags):
+            bad(f"bad tags {r['tags']!r}")
+        for col in ("indicator", "unit", "comparison", "period", "source_name", "source_url", "extracted_at"):
+            if not str(r.get(col) or "").strip():
+                bad(f"empty {col}")
+        if str(r["curated"]) not in ("true", "false"):
+            bad("curated must be true or false")
 
-    def as_dict(self) -> dict:
-        return {"matched": self.matched, "match_level": self.match_level, "facts": self.facts,
-                "note": self.note}
+
+INDICATOR_LABELS = {
+    "rainfall_anomaly_pct": "rainfall anomaly",
+    "water_stress_score": "baseline water stress",
+    "water_stress_score_2050": "projected water stress",
+    "price_usd_per_kg": "price",
+    "price_vs_5yr_avg_pct": "price vs 5-year average",
+}
+
+
+def source_label(row: dict) -> str:
+    """`<source_name> [<crop>] <indicator>, <where>, <period>[ (curated stand-in)] [<fact_id>]` (#8 spec),
+    e.g. `CHIRPS v2.0 rainfall anomaly, Cauca, Colombia, 2024-2025 [RF-F8C4E1]`."""
+    where = (f"{row['admin1']}, {COUNTRY_NAMES[row['country']]}" if row["scope"] == "region"
+             else COUNTRY_NAMES[row["country"]] if row["scope"] == "country" else "global")
+    what = " ".join(x for x in (row["crop"], INDICATOR_LABELS.get(row["indicator"], row["indicator"])) if x)
+    curated = " (curated stand-in)" if str(row["curated"]) == "true" else ""
+    return f"{row['source_name']} {what}, {where}, {row['period']}{curated} [{row['fact_id']}]"
+
+
+def fact_text(row: dict) -> str:
+    """A plain sentence with the value, unit, comparison and period."""
+    v, ind = float(row["value"]), row["indicator"]
+    where = (f"near the centre of {row['admin1']}, {COUNTRY_NAMES[row['country']]}" if row["scope"] == "region"
+             else f"across {COUNTRY_NAMES[row['country']]}" if row["scope"] == "country" else "")
+    if ind == "rainfall_anomaly_pct":
+        # Region rows compare with "vs 2014-2023 mean (...)"; country rows say how they were averaged.
+        comparison = row["comparison"]
+        baseline = (comparison.removeprefix("vs ") if comparison.startswith("vs ")
+                    else f"{BASELINE_YEARS[0]}-{BASELINE_YEARS[-1]} mean ({comparison})")
+        return f"Rainfall {where} in {row['period']} was {abs(v)}% {'below' if v < 0 else 'above'} the {baseline}."
+    if ind == "water_stress_score":
+        return f"Baseline water stress {where} scores {v:.2f} on a 0-5 scale ({row['comparison']}, {row['period']})."
+    if ind == "water_stress_score_2050":
+        return f"Water stress {where} is projected to score {v:.2f} on a 0-5 scale by 2050 ({row['comparison']})."
+    crop = row["crop"]
+    if ind == "price_usd_per_kg":
+        return f"The world benchmark price for {crop} was US${v:.2f} per kg in {row['period']} ({row['comparison']})."
+    if ind == "price_vs_5yr_avg_pct":
+        return (f"The world benchmark price for {crop} was {abs(v)}% {'below' if v < 0 else 'above'} its "
+                f"5-year average ({row['comparison']}).")
+    return f"{ind}: {row['value']} {row['unit']} ({row['comparison']}, {row['period']})."
+
+
+STRENGTH = {"region": "exact", "country": "nearest", "global": "limited"}
+MAX_ITEMS = 8
 
 
 class RegionalFacts:
-    """Read-only lookup over regional_facts.json."""
+    """Read-only lookup over regional_facts.csv, validated when loaded."""
 
-    def __init__(self, table: dict):
-        self._table = table
-        self._regions = {(normalize(r["country"]), normalize(r["region"])): r for r in table["regions"]}
+    def __init__(self, rows: list[dict]):
+        validate_rows(rows)
+        self.rows = rows
 
     @classmethod
     def load(cls, path: Path = FACTS_PATH) -> "RegionalFacts":
-        return cls(json.loads(Path(path).read_text(encoding="utf-8")))
+        with open(path, encoding="utf-8", newline="") as fh:
+            return cls(list(csv.DictReader(fh)))
 
-    def price_facts(self, crop: str | None) -> list[dict]:
-        """Benchmark price facts for a crop field such as 'Coffee' or 'Cocoa;Coffee'."""
-        out = []
-        for part in (normalize(p) for p in (crop or "").split(";")):
-            key = "bananas" if part in ("banana", "bananas") else part
-            for fact in self._table["prices"].get(key, []):
-                if fact not in out:
-                    out.append(fact)
-        return out
+    def lookup(self, country: str | None, admin1: str | None, crops: set[str], tags: set[str]) -> list[dict]:
+        """Items for one producer (#15 spec). Location, crops and tags come from conversation state.
 
-    def lookup(self, country: str, region: str | None, crop: str | None) -> RegionalAnswer:
-        """Facts for a producer's own country, region and crop. Never guesses another region."""
-        record = self._regions.get((normalize(country), normalize(region)))
-        prices = self.price_facts(crop)
-        if record:
-            return RegionalAnswer(True, "region", record["facts"] + prices)
-        note = (f"No regional climate data is pre-loaded for {region or 'an unknown region'}, {country}. "
-                "Only crop price benchmarks are available." if prices else
-                f"No regional data is pre-loaded for {region or 'an unknown region'}, {country}.")
-        return RegionalAnswer(bool(prices), "country" if prices else "none", prices, note)
+        A row qualifies if its tags overlap `tags`, its crop (if any) is one of `crops`, and it is a
+        region row for this region, a country row for this country, or a global row. At most 8,
+        region rows first. Never substitutes another region.
+        """
+        cc, key = country_code(country), normalize(admin1)
+        picked = {"region": [], "country": [], "global": []}
+        for r in self.rows:
+            if not set(r["tags"].split(";")) & tags:
+                continue
+            if r["crop"] and r["crop"] not in crops:
+                continue
+            if r["scope"] == "region" and not (cc and r["country"] == cc and key and normalize(r["admin1"]) == key):
+                continue
+            if r["scope"] == "country" and r["country"] != cc:
+                continue
+            picked[r["scope"]].append(r)
+        rows = (picked["region"] + picked["country"] + picked["global"])[:MAX_ITEMS]
+        return [{"source": source_label(r), "kind": "regional", "text": fact_text(r), "period": r["period"],
+                 "strength": STRENGTH[r["scope"]], "data": dict(r)} for r in rows]
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -430,11 +561,10 @@ def main(argv: list[str] | None = None) -> None:
         SOURCES_PATH.write_text(json.dumps(sources, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"wrote {SOURCES_PATH}", file=sys.stderr)
     else:
-        sources = json.loads(SOURCES_PATH.read_text(encoding="utf-8"))
-        facts = build(sources)
-        FACTS_PATH.write_text(json.dumps(facts, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-        n = sum(len(r["facts"]) for r in facts["regions"])
-        print(f"wrote {FACTS_PATH}: {len(facts['regions'])} regions, {n} regional facts", file=sys.stderr)
+        rows = build(json.loads(SOURCES_PATH.read_text(encoding="utf-8")))
+        write_csv(rows)
+        counts = Counter(r["scope"] for r in rows)
+        print(f"wrote {FACTS_PATH}: {len(rows)} facts ({dict(counts)})", file=sys.stderr)
 
 
 if __name__ == "__main__":

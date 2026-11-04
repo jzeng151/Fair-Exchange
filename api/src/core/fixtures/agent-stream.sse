@@ -22,7 +22,7 @@ data: {"seq": 11, "type": "text", "text": "dónde "}
 
 data: {"seq": 12, "type": "text", "text": "viene."}
 
-data: {"seq": 13, "type": "claim", "section": "insights", "claim": {"text": "Rainfall fell.", "citation": {"source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)", "standard_clause": "APS 1.1", "period": null, "strength": "exact"}}}
+data: {"seq": 13, "type": "claim", "section": "insights", "claim": {"text": "Rainfall fell.", "citation": {"source": "CHIRPS v2.0 rainfall anomaly, Cauca, Colombia, 2024-2025 [RF-F8C4E1]", "standard_clause": "APS 1.1", "period": null, "strength": "exact"}}}
 
 data: {"seq": 14, "type": "claim", "section": "peer_examples", "claim": {"text": "A peer built tanks.", "citation": {"source": "FTUSA Premium project (sample data, fictionalized) PROJ-6128A37C", "standard_clause": "APS 1.1", "period": null, "strength": "exact"}}}
 
@@ -56,7 +56,7 @@ data: {"seq": 28, "type": "text", "text": "su "}
 
 data: {"seq": 29, "type": "text", "text": "situación."}
 
-data: {"seq": 30, "type": "answer", "insights": [{"text": "Rainfall fell.", "citation": {"source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)", "standard_clause": "APS 1.1", "period": null, "strength": "exact"}}], "peer_examples": [{"text": "A peer built tanks.", "citation": {"source": "FTUSA Premium project (sample data, fictionalized) PROJ-6128A37C", "standard_clause": "APS 1.1", "period": null, "strength": "exact"}}], "evidence": "full"}
+data: {"seq": 30, "type": "answer", "insights": [{"text": "Rainfall fell.", "citation": {"source": "CHIRPS v2.0 rainfall anomaly, Cauca, Colombia, 2024-2025 [RF-F8C4E1]", "standard_clause": "APS 1.1", "period": null, "strength": "exact"}}], "peer_examples": [{"text": "A peer built tanks.", "citation": {"source": "FTUSA Premium project (sample data, fictionalized) PROJ-6128A37C", "standard_clause": "APS 1.1", "period": null, "strength": "exact"}}], "evidence": "full"}
 
 data: {"seq": 31, "type": "step", "step": "consent", "language": "es"}
 
