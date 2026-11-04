@@ -42,7 +42,8 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 ### Shape
 
 - **API type:** an API Gateway REST API, not HTTP API. Start, message and action routes use Lambda response streaming. The other routes use normal proxy integration.
-- **Handlers:** TypeScript on Node.js, using Lambda Powertools for logging and tracing.
+- **Handlers:** TypeScript on the Node.js 24 Lambda runtime (`nodejs24.x`), using Lambda Powertools for logging and tracing.
+- **Runtime version (decided 2026-11-04):** the technical environment document says Node 20.x, but Lambda deprecated it on 2026-04-30. Node 24 is supported until 2028-04-30, past FTUSA's 2027 workshops and launch. The api package's Node engine and types move to 24.
 - **Supersedes the existing stubs:** they use HTTP API event types and a single chat route. That includes the TypeScript write-back handler, since write-back runs in Python ([#26 spec](26-write-back.md)).
 - **Timeouts:** the integration and Lambda timeout on streaming routes is 5 minutes.
 - **CORS:** allows only the web app's CloudFront origin.
@@ -139,5 +140,4 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 ### Not decided (do not build or assume)
 
 - The inactivity period and the maximum conversation lifetime
-- The Node.js runtime version. The technical environment document says Node 20.x, which Lambda has deprecated.
 - The deployed sign-in stand-in ([#11 spec](11-identity.md))
