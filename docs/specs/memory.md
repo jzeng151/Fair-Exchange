@@ -1,4 +1,4 @@
-# Spec: Persistent conversation memory (no issue yet)
+# Spec: Persistent conversation memory (#59)
 
 Status: approved for build, 2026-11-04. Revised 2026-11-04 after review. The client asked for persistent conversation memory on 2026-11-04.
 
