@@ -1,0 +1,5 @@
+# Packaged into the AgentCore code zip (ARM64 Linux wheels). Same versions as agent/ dev tests.
+strands-agents==1.63.0
+bedrock-agentcore==1.25.3
+# AgentCore Observability (OpenTelemetry traces to CloudWatch)
+aws-opentelemetry-distro==0.22.0
