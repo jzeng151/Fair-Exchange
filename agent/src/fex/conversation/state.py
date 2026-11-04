@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field
 from fex.conversation.contract import (
     Answer, ConsentScope, Evidence, FeedbackValue, HistoryEntry, Step,
 )
-from fex.models import ChallengeTag, Claim
+from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer
 
 
 class Profile(BaseModel):
@@ -46,18 +46,6 @@ class ShownClaims(BaseModel):
     peer_examples: list[Claim] = Field(default_factory=list)
 
 
-class EarlierAnswer(BaseModel):
-    insights: list[Claim]
-    peer_examples: list[Claim]
-    evidence: Evidence | None = None
-    reason: Literal["reopened", "interrupted"]
-
-
-class ConsentChoice(BaseModel):
-    scope: ConsentScope
-    at: datetime
-
-
 class ConversationState(BaseModel):
     producer_id: str
     conversation_id: str
@@ -68,7 +56,9 @@ class ConversationState(BaseModel):
     location_note: str | None = Field(default=None, description="Set when the producer disputes the location on file")
     playback: Playback | None = None
     answer: Answer | None = None
+    answer_given_at: datetime | None = None
     partial: ShownClaims | None = Field(default=None, description="Claims shown in an answer that has not finished")
+    partial_started_at: datetime | None = None
     answer_failed: bool = False
     earlier_answers: list[EarlierAnswer] = Field(default_factory=list)
     consent: ConsentScope | None = None
@@ -76,7 +66,15 @@ class ConversationState(BaseModel):
     feedback: FeedbackValue | None = None
     evidence_sources: list[str] = Field(default_factory=list, description="Sources tools returned this session")
     history: list[HistoryEntry] = Field(default_factory=list)
+    excluded_history: list[int] = Field(
+        default_factory=list, description="History positions of out-of-scope exchanges (#21): shown on resume, "
+                                          "never given to a model, so they can't reach the playback or record")
     closed_reason: Literal["end", "inactivity", "max_lifetime"] | None = None
+    closed_at: datetime | None = None
+    # Write-back (#26): what this conversation last saved, for conditional updates and no-op detection
+    record_version: int | None = None
+    record_created_at: datetime | None = None
+    record_hash: str | None = None
     started_at: datetime
     updated_at: datetime
     revision: int = Field(default=0, description="Increases on every save; a save must match the revision it loaded")

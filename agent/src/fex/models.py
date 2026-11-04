@@ -58,6 +58,32 @@ class DeclinedConsent(BaseModel):
     recorded_at: datetime
 
 
+class ConsentChoice(BaseModel):
+    """One consent choice the producer made (#19, #26). Non-narrative, so allowed on declined records."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    scope: Literal["internal", "internal_and_outward", "declined"]
+    recorded_at: datetime
+
+
+class EarlierAnswer(BaseModel):
+    """An answer shown to the producer and later replaced (#26).
+
+    reopened: the full answer shown before the producer reopened the playback
+    interrupted: only the claims shown before a failed answer was retried
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    given_at: datetime
+    reason: Literal["reopened", "interrupted"]
+    insights: list[Claim] = Field(default_factory=list)
+    peer_examples: list[Claim] = Field(default_factory=list)
+    evidence: Literal["full", "limited"] | None = Field(
+        default=None, description="null for an interrupted answer, which never finished")
+
+
 class _RecordBase(BaseModel):
     """Fields every record has. Unknown fields are rejected, so nothing slips in unnoticed."""
 
@@ -68,6 +94,13 @@ class _RecordBase(BaseModel):
     created_at: datetime
     source: Literal["agent conversation"] = Field(
         default="agent conversation", description="Never confused with mandatory or compliance reporting data")
+    # Write-back (#26): one record per conversation, saved with a version and owner check
+    updated_at: datetime = Field(description="Time of the latest save")
+    version: int = Field(ge=1, description="Starts at 1; incremented on every save; used for conditional writes")
+    closed_at: datetime | None = Field(
+        default=None, description="Set when the conversation closes. Records are reviewable only when set.")
+    consent_history: list[ConsentChoice] = Field(
+        default_factory=list, description="The producer's distinct consent choices, in order")
 
 
 # Cross-field rule the JSON Schema must carry too (TypeScript cannot express it)
@@ -90,7 +123,11 @@ class CompletedRecord(_RecordBase):
     summary_original: str = Field(min_length=1, description="The challenge in the producer's own words and language")
     summary_english: str | None = Field(default=None, min_length=1,
                                        description="English version; required for non-English conversations")
-    tags: list[ChallengeTag] = Field(min_length=1, description="Challenge tags from the 11-tag set")
+    tags: list[ChallengeTag] = Field(min_length=1, description="Challenge tags from the 11-tag set (the agent's)")
+    evidence: Literal["full", "limited"] = Field(
+        description="limited when the shown answer had no insights or no peer examples")
+    earlier_answers: list[EarlierAnswer] = Field(
+        default_factory=list, description="Answers shown and later replaced, oldest first")
     insights: list[Claim] = Field(default_factory=list, description="What the data shows, as given to the producer")
     peer_examples: list[Claim] = Field(default_factory=list, description="What others tried, as given to the producer")
     feedback: Literal["yes", "somewhat", "no"] | None = Field(default=None, description="Was the guidance helpful?")
@@ -98,6 +135,12 @@ class CompletedRecord(_RecordBase):
     review_status: Literal["pending", "reviewed"] = "pending"
     reviewed_by: str | None = None
     reviewed_at: datetime | None = None
+    # Reviewer corrections sit next to the agent's values; they never overwrite them (#26)
+    reviewer_tags: list[ChallengeTag] | None = Field(default=None, description="Reviewer's corrected tags")
+    reviewer_summary_original: str | None = Field(
+        default=None, min_length=1, description="Reviewer's corrected summary in the producer's language")
+    reviewer_summary_english: str | None = Field(
+        default=None, min_length=1, description="Reviewer's corrected English summary")
 
     @model_validator(mode="after")
     def _non_english_needs_english_summary(self):

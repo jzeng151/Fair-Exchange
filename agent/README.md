@@ -80,6 +80,34 @@ intake → playback → respond → consent → feedback → closed
 - **Tests:** `tests/test_conversation_steps.py` (seam 1: scripted Strands models in `tests/conversation_harness.py`,
   real tools and data, real verifier).
 
+## Out-of-scope requests (issue #21)
+
+Every typed message first goes through one detection function, `scope_check(text, step) -> ScopeVerdict`
+(`fex/conversation/scope.py`), following [`docs/specs/21-out-of-scope.md`](../docs/specs/21-out-of-scope.md).
+An out-of-scope message (another producer's data, certification or audit results, grievances) gets fixed
+decline text in the producer's language plus an offer to return to the open question. No model is called, no
+data tool runs, and the step stays the same. The exchange stays in the resume history but is never given to a
+model, so it can't reach the playback, summaries or record. **How detection decides is "Not decided"**: the
+default, `always_in_scope`, treats everything as in scope. Pass `scope_check=` to `ConversationEngine` to plug one in.
+The check also covers text sent with `correct_playback`. A verdict can carry the message's `language`, so a
+producer whose first message is out of scope still gets the decline in their own language (no model is called).
+
+## Write-back (issue #26)
+
+`fex.records` builds the record from the conversation state and saves it, following
+[`docs/specs/26-write-back.md`](../docs/specs/26-write-back.md). Code saves; the model has no save tool.
+
+- **Save points:** `set_consent`, `set_feedback`, `end` and `auto_close`. Each save emits `record_saved`. A save
+  that would change nothing writes nothing. No record exists before the first consent choice.
+- **One record per conversation:** `record_id` is the conversation ID. Completed and declined records switch as
+  consent changes; earlier answers (`reopened`, `interrupted`) and the consent history are kept.
+- **Write rules:** validated with the record models before writing. A create requires that the record doesn't
+  exist. An update requires that the stored `version` is the one this conversation last saved and that the stored
+  `producer_id` matches. A failed condition raises `RecordConflict` and becomes an `error` event, never retried.
+- **Where:** `DynamoRecordStore` on the table named by `FEX_RECORDS_TABLE` (unset: records aren't saved).
+  The table itself (KMS, Streams) and the runtime role's permissions are CDK work (#5, #28).
+- **Tests:** `tests/test_write_back.py` runs the entrypoint against moto DynamoDB, so conditional writes behave as in AWS.
+
 ## Tools
 
 Every tool is `@tool(context=True)` and learns who the producer is only through `fex.tools._scope.session_producer_id`, which reads `tool_context.invocation_state["producer_id"]`. No tool takes a producer, location or crop parameter; `tests/test_scope_guard.py` checks this for every tool in `ALL_TOOLS`. Contracts are in [`docs/handoff/tool-contracts.md`](../docs/handoff/tool-contracts.md).

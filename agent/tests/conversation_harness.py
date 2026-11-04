@@ -114,13 +114,17 @@ RETRIEVE = (("tool", "get_regional_context", {}), ("tool", "find_peer_examples",
 class Run:
     """One conversation against a fresh engine."""
 
-    def __init__(self, producer_id: str | None = None, profiles=None):
+    def __init__(self, producer_id: str | None = None, profiles=None, records=None, scope_check=None):
         self.producer_id = producer_id or cauca_producer()
         self.conversation_id = "conv-1"
         self.small, self.large = ScriptedModel(), ScriptedModel()
         self.store = InMemoryStateStore()
         self.now = datetime(2026, 11, 4, 12, tzinfo=UTC)
         kwargs = {"profiles": profiles} if profiles else {}
+        if records is not None:
+            kwargs["records"] = records
+        if scope_check is not None:
+            kwargs["scope_check"] = scope_check
         self.engine = ConversationEngine(store=self.store, small_model=self.small, large_model=self.large,
                                          standards=STANDARDS, clock=self._clock, **kwargs)
         self.regional, self.peers = real_sources(self.producer_id)

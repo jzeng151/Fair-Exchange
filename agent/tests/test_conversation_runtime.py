@@ -39,6 +39,14 @@ def test_invoke_rejects_a_malformed_request_without_raising():
     assert out["error"]["code"] == "invalid_request"
 
 
+def test_records_are_saved_only_when_a_table_is_configured(monkeypatch):
+    monkeypatch.delenv("FEX_RECORDS_TABLE", raising=False)
+    assert runtime.record_store() is None
+    monkeypatch.setenv("FEX_RECORDS_TABLE", "fair-exchange-records")
+    monkeypatch.setenv("AWS_DEFAULT_REGION", "us-west-2")
+    store = runtime.record_store()
+    assert store is not None and store.table.name == "fair-exchange-records"
+
 def test_stream_yields_every_event_in_order():
     # Incremental delivery itself is proven deterministically at the engine level
     # (test_events_are_delivered_as_they_happen_not_after_the_turn); here: the runtime passes each one on.

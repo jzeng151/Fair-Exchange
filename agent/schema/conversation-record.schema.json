@@ -84,18 +84,57 @@
         ]
       },
       "properties": {
+        "closed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Set when the conversation closes. Records are reviewable only when set.",
+          "title": "Closed At"
+        },
         "consent": {
           "$ref": "#/$defs/StoredConsent"
+        },
+        "consent_history": {
+          "description": "The producer's distinct consent choices, in order",
+          "items": {
+            "$ref": "#/$defs/ConsentChoice"
+          },
+          "title": "Consent History",
+          "type": "array"
         },
         "created_at": {
           "format": "date-time",
           "title": "Created At",
           "type": "string"
         },
+        "earlier_answers": {
+          "description": "Answers shown and later replaced, oldest first",
+          "items": {
+            "$ref": "#/$defs/EarlierAnswer"
+          },
+          "title": "Earlier Answers",
+          "type": "array"
+        },
         "entity_type": {
           "description": "e.g. cooperative, smallholder, hired-labor farm, processor",
           "minLength": 1,
           "title": "Entity Type",
+          "type": "string"
+        },
+        "evidence": {
+          "description": "limited when the shown answer had no insights or no peer examples",
+          "enum": [
+            "full",
+            "limited"
+          ],
+          "title": "Evidence",
           "type": "string"
         },
         "feedback": {
@@ -189,6 +228,63 @@
           "default": null,
           "title": "Reviewed By"
         },
+        "reviewer_summary_english": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reviewer's corrected English summary",
+          "title": "Reviewer Summary English"
+        },
+        "reviewer_summary_original": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reviewer's corrected summary in the producer's language",
+          "title": "Reviewer Summary Original"
+        },
+        "reviewer_tags": {
+          "anyOf": [
+            {
+              "items": {
+                "enum": [
+                  "climate and weather",
+                  "water",
+                  "soil and land",
+                  "market and price",
+                  "labor and migration",
+                  "financial and access to capital",
+                  "education",
+                  "health",
+                  "infrastructure",
+                  "biodiversity and conservation",
+                  "social and community"
+                ],
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reviewer's corrected tags",
+          "title": "Reviewer Tags"
+        },
         "source": {
           "const": "agent conversation",
           "default": "agent conversation",
@@ -222,7 +318,7 @@
           "type": "string"
         },
         "tags": {
-          "description": "Challenge tags from the 11-tag set",
+          "description": "Challenge tags from the 11-tag set (the agent's)",
           "items": {
             "enum": [
               "climate and weather",
@@ -242,18 +338,33 @@
           "minItems": 1,
           "title": "Tags",
           "type": "array"
+        },
+        "updated_at": {
+          "description": "Time of the latest save",
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "version": {
+          "description": "Starts at 1; incremented on every save; used for conditional writes",
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
         }
       },
       "required": [
         "record_id",
         "producer_id",
         "created_at",
+        "updated_at",
+        "version",
         "status",
         "consent",
         "language",
         "entity_type",
         "summary_original",
-        "tags"
+        "tags",
+        "evidence"
       ],
       "then": {
         "properties": {
@@ -267,6 +378,32 @@
         ]
       },
       "title": "CompletedRecord",
+      "type": "object"
+    },
+    "ConsentChoice": {
+      "additionalProperties": false,
+      "description": "One consent choice the producer made (#19, #26). Non-narrative, so allowed on declined records.",
+      "properties": {
+        "recorded_at": {
+          "format": "date-time",
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "scope": {
+          "enum": [
+            "internal",
+            "internal_and_outward",
+            "declined"
+          ],
+          "title": "Scope",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scope",
+        "recorded_at"
+      ],
+      "title": "ConsentChoice",
       "type": "object"
     },
     "DeclinedConsent": {
@@ -295,8 +432,30 @@
       "additionalProperties": false,
       "description": "The producer declined. Only identifiers, status and time are kept: no narrative content.",
       "properties": {
+        "closed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Set when the conversation closes. Records are reviewable only when set.",
+          "title": "Closed At"
+        },
         "consent": {
           "$ref": "#/$defs/DeclinedConsent"
+        },
+        "consent_history": {
+          "description": "The producer's distinct consent choices, in order",
+          "items": {
+            "$ref": "#/$defs/ConsentChoice"
+          },
+          "title": "Consent History",
+          "type": "array"
         },
         "created_at": {
           "format": "date-time",
@@ -325,16 +484,86 @@
           "const": "declined",
           "title": "Status",
           "type": "string"
+        },
+        "updated_at": {
+          "description": "Time of the latest save",
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "version": {
+          "description": "Starts at 1; incremented on every save; used for conditional writes",
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
         }
       },
       "required": [
         "record_id",
         "producer_id",
         "created_at",
+        "updated_at",
+        "version",
         "status",
         "consent"
       ],
       "title": "DeclinedRecord",
+      "type": "object"
+    },
+    "EarlierAnswer": {
+      "additionalProperties": false,
+      "description": "An answer shown to the producer and later replaced (#26).\n\nreopened: the full answer shown before the producer reopened the playback\ninterrupted: only the claims shown before a failed answer was retried",
+      "properties": {
+        "evidence": {
+          "anyOf": [
+            {
+              "enum": [
+                "full",
+                "limited"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "null for an interrupted answer, which never finished",
+          "title": "Evidence"
+        },
+        "given_at": {
+          "format": "date-time",
+          "title": "Given At",
+          "type": "string"
+        },
+        "insights": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "title": "Insights",
+          "type": "array"
+        },
+        "peer_examples": {
+          "items": {
+            "$ref": "#/$defs/Claim"
+          },
+          "title": "Peer Examples",
+          "type": "array"
+        },
+        "reason": {
+          "enum": [
+            "reopened",
+            "interrupted"
+          ],
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "given_at",
+        "reason"
+      ],
+      "title": "EarlierAnswer",
       "type": "object"
     },
     "StoredConsent": {

@@ -6,6 +6,7 @@ for the grounded answer. Defaults are US inference profiles so processing stays 
 Deploy pattern: docs/adr/0002-agentcore-runtime-spike.md.
 
 State: in-memory per runtime session until AgentCore Memory (docs/specs/memory.md) replaces the store.
+Records (#26): saved to the DynamoDB table named by FEX_RECORDS_TABLE; not saved when it is unset.
 """
 import os
 import queue
@@ -28,13 +29,25 @@ def model_ids() -> tuple[str, str]:
     return os.environ.get("FEX_SMALL_MODEL", DEFAULT_SMALL), os.environ.get("FEX_LARGE_MODEL", DEFAULT_LARGE)
 
 
+def record_store():
+    """The records table from configuration, or None when FEX_RECORDS_TABLE is unset (local runs)."""
+    name = os.environ.get("FEX_RECORDS_TABLE")
+    if not name:
+        return None
+    import boto3
+
+    from fex.records import DynamoRecordStore
+
+    return DynamoRecordStore(boto3.resource("dynamodb").Table(name))
+
+
 @lru_cache(maxsize=1)
 def default_engine() -> ConversationEngine:
     from strands.models.bedrock import BedrockModel
 
     small, large = model_ids()
     return ConversationEngine(store=InMemoryStateStore(), small_model=BedrockModel(model_id=small),
-                              large_model=BedrockModel(model_id=large))
+                              large_model=BedrockModel(model_id=large), records=record_store())
 
 
 def invoke(payload: dict[str, Any], engine: ConversationEngine | None = None) -> dict[str, Any]:

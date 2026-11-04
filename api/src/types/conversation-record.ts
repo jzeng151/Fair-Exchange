@@ -1,23 +1,30 @@
 // GENERATED FILE. Do not edit by hand.
 // Source: agent/src/fex/models.py  ->  agent/scripts/generate_types.py
-// schema-sha256: 003e6d8f316aa6e8deb17623e3ceb07966d5604b7c8630763aaec455ca6531e9
-// body-sha256: f87710a425ab921de255c5df37a2a3e6ce8e239f558d78d33e3709b08d7c993a
+// schema-sha256: c284675744ec3db2711335ba461c075f321cdadbbdd000f31da1d6d2141990aa
+// body-sha256: 5ec5345a13493f0482edab75141e5c7a7e1a4eea7154f0009e057a4cb549ce65
 // end-of-banner
 /**
  * One record per Fair Exchange conversation. Generated from agent/src/fex/models.py; do not edit by hand.
  */
 export type ConversationRecord = CompletedRecord | DeclinedRecord;
+/**
+ * Set when the conversation closes. Records are reviewable only when set.
+ */
+export type ClosedAt = string | null;
 export type RecordedAt = string;
 export type Scope = "internal" | "internal_and_outward";
+export type RecordedAt1 = string;
+export type Scope1 = "internal" | "internal_and_outward" | "declined";
+/**
+ * The producer's distinct consent choices, in order
+ */
+export type ConsentHistory = ConsentChoice[];
 export type CreatedAt = string;
 /**
- * e.g. cooperative, smallholder, hired-labor farm, processor
+ * null for an interrupted answer, which never finished
  */
-export type EntityType = string;
-/**
- * Was the guidance helpful?
- */
-export type Feedback = ("yes" | "somewhat" | "no") | null;
+export type Evidence = ("full" | "limited") | null;
+export type GivenAt = string;
 /**
  * Time period of the data, if any
  */
@@ -35,10 +42,29 @@ export type StandardClause = string;
  */
 export type Strength = "exact" | "nearest" | "limited";
 export type Text = string;
+export type Insights = Claim[];
+export type PeerExamples = Claim[];
+export type Reason = "reopened" | "interrupted";
+/**
+ * Answers shown and later replaced, oldest first
+ */
+export type EarlierAnswers = EarlierAnswer[];
+/**
+ * e.g. cooperative, smallholder, hired-labor farm, processor
+ */
+export type EntityType = string;
+/**
+ * limited when the shown answer had no insights or no peer examples
+ */
+export type Evidence1 = "full" | "limited";
+/**
+ * Was the guidance helpful?
+ */
+export type Feedback = ("yes" | "somewhat" | "no") | null;
 /**
  * What the data shows, as given to the producer
  */
-export type Insights = Claim[];
+export type Insights1 = Claim[];
 /**
  * ISO 639-1 code of the producer's language, e.g. 'es'
  */
@@ -46,7 +72,7 @@ export type Language = string;
 /**
  * What others tried, as given to the producer
  */
-export type PeerExamples = Claim[];
+export type PeerExamples1 = Claim[];
 /**
  * Personal information flagged for human review; never redacted
  */
@@ -59,6 +85,32 @@ export type RecordId = string;
 export type ReviewStatus = "pending" | "reviewed";
 export type ReviewedAt = string | null;
 export type ReviewedBy = string | null;
+/**
+ * Reviewer's corrected English summary
+ */
+export type ReviewerSummaryEnglish = string | null;
+/**
+ * Reviewer's corrected summary in the producer's language
+ */
+export type ReviewerSummaryOriginal = string | null;
+/**
+ * Reviewer's corrected tags
+ */
+export type ReviewerTags =
+  | (
+      | "climate and weather"
+      | "water"
+      | "soil and land"
+      | "market and price"
+      | "labor and migration"
+      | "financial and access to capital"
+      | "education"
+      | "health"
+      | "infrastructure"
+      | "biodiversity and conservation"
+      | "social and community"
+    )[]
+  | null;
 /**
  * Never confused with mandatory or compliance reporting data
  */
@@ -73,7 +125,7 @@ export type SummaryEnglish = string | null;
  */
 export type SummaryOriginal = string;
 /**
- * Challenge tags from the 11-tag set
+ * Challenge tags from the 11-tag set (the agent's)
  *
  * @minItems 1
  */
@@ -105,8 +157,24 @@ export type Tags = [
     | "social and community"
   )[]
 ];
-export type RecordedAt1 = string;
-export type Scope1 = "declined";
+/**
+ * Time of the latest save
+ */
+export type UpdatedAt = string;
+/**
+ * Starts at 1; incremented on every save; used for conditional writes
+ */
+export type Version = number;
+/**
+ * Set when the conversation closes. Records are reviewable only when set.
+ */
+export type ClosedAt1 = string | null;
+export type RecordedAt2 = string;
+export type Scope2 = "declined";
+/**
+ * The producer's distinct consent choices, in order
+ */
+export type ConsentHistory1 = ConsentChoice[];
 export type CreatedAt1 = string;
 /**
  * Set from the session, never from the conversation
@@ -118,29 +186,46 @@ export type RecordId1 = string;
  */
 export type Source2 = "agent conversation";
 export type Status1 = "declined";
+/**
+ * Time of the latest save
+ */
+export type UpdatedAt1 = string;
+/**
+ * Starts at 1; incremented on every save; used for conditional writes
+ */
+export type Version1 = number;
 
 /**
  * A conversation the producer agreed to save.
  */
 export interface CompletedRecord {
+  closed_at?: ClosedAt;
   consent: StoredConsent;
+  consent_history?: ConsentHistory;
   created_at: CreatedAt;
+  earlier_answers?: EarlierAnswers;
   entity_type: EntityType;
+  evidence: Evidence1;
   feedback?: Feedback;
-  insights?: Insights;
+  insights?: Insights1;
   language: Language;
-  peer_examples?: PeerExamples;
+  peer_examples?: PeerExamples1;
   pii_flag?: PiiFlag;
   producer_id: ProducerId;
   record_id: RecordId;
   review_status?: ReviewStatus;
   reviewed_at?: ReviewedAt;
   reviewed_by?: ReviewedBy;
+  reviewer_summary_english?: ReviewerSummaryEnglish;
+  reviewer_summary_original?: ReviewerSummaryOriginal;
+  reviewer_tags?: ReviewerTags;
   source?: Source1;
   status: Status;
   summary_english?: SummaryEnglish;
   summary_original: SummaryOriginal;
   tags: Tags;
+  updated_at: UpdatedAt;
+  version: Version;
 }
 /**
  * The producer agreed to store the conversation. Consent is a scope, not a yes/no:
@@ -151,6 +236,26 @@ export interface CompletedRecord {
 export interface StoredConsent {
   recorded_at: RecordedAt;
   scope: Scope;
+}
+/**
+ * One consent choice the producer made (#19, #26). Non-narrative, so allowed on declined records.
+ */
+export interface ConsentChoice {
+  recorded_at: RecordedAt1;
+  scope: Scope1;
+}
+/**
+ * An answer shown to the producer and later replaced (#26).
+ *
+ * reopened: the full answer shown before the producer reopened the playback
+ * interrupted: only the claims shown before a failed answer was retried
+ */
+export interface EarlierAnswer {
+  evidence?: Evidence;
+  given_at: GivenAt;
+  insights?: Insights;
+  peer_examples?: PeerExamples;
+  reason: Reason;
 }
 /**
  * One insight or peer example given to the producer, with its citation.
@@ -172,17 +277,21 @@ export interface Citation {
  * The producer declined. Only identifiers, status and time are kept: no narrative content.
  */
 export interface DeclinedRecord {
+  closed_at?: ClosedAt1;
   consent: DeclinedConsent;
+  consent_history?: ConsentHistory1;
   created_at: CreatedAt1;
   producer_id: ProducerId1;
   record_id: RecordId1;
   source?: Source2;
   status: Status1;
+  updated_at: UpdatedAt1;
+  version: Version1;
 }
 /**
  * The producer declined: nothing narrative is stored.
  */
 export interface DeclinedConsent {
-  recorded_at: RecordedAt1;
-  scope: Scope1;
+  recorded_at: RecordedAt2;
+  scope: Scope2;
 }

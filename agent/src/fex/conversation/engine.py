@@ -19,13 +19,14 @@ from pydantic import BaseModel, Field, TypeAdapter
 from strands import Agent
 
 from fex.conversation import copy
+from fex.conversation.scope import ScopeCheck, always_in_scope
 from fex.conversation.contract import (
     ActionEntry, ActionName, Answer, Event, Request, ResumeResponse, SpokenEntry,
 )
 from fex.conversation.state import (
-    ConsentChoice, ConversationState, EarlierAnswer, Playback, Profile, ShownClaims, StateConflict, StateStore,
+    ConversationState, Playback, Profile, ShownClaims, StateConflict, StateStore,
 )
-from fex.models import ChallengeTag, Claim
+from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer
 from fex.tools import ALL_TOOLS
 from fex.verifier import Problem, SessionEvidence, verify
 
@@ -178,6 +179,7 @@ class _Turn:
         self.events: list = []
         self.on_event = on_event
         self.spoken: list[str] = []
+        self.excluded = False  # an out-of-scope exchange (#21): kept in history, hidden from models
         self.loaded_revision: int | None = None  # the state revision this request started from
 
     def emit(self, type_: str, **fields) -> None:
@@ -202,7 +204,8 @@ class _AgentFailed(Exception):
 class ConversationEngine:
     def __init__(self, *, store: StateStore, small_model: Any, large_model: Any, standards: Standards | None = None,
                  profiles: Callable[[str], Profile | None] | None = None, tools: list | None = None,
-                 clock: Callable[[], datetime] | None = None, max_retries: int = 2) -> None:
+                 clock: Callable[[], datetime] | None = None, max_retries: int = 2,
+                 records: Any = None, scope_check: ScopeCheck | None = None) -> None:
         self.store = store
         self.small_model, self.large_model = small_model, large_model
         self.standards = standards or Standards.load()
@@ -210,6 +213,8 @@ class ConversationEngine:
         self.tools = tools if tools is not None else ALL_TOOLS
         self.clock = clock or (lambda: datetime.now(UTC))
         self.max_retries = max_retries
+        self.records = records  # a fex.records.RecordStore; None = records are not saved (#26)
+        self.scope_check = scope_check or always_in_scope  # how it decides is "Not decided" (#21)
 
     # ------------------------------------------------------------------ entrypoint
 
@@ -255,6 +260,8 @@ class ConversationEngine:
     def _message(self, state: ConversationState, turn: _Turn, text: str):
         before = state.step
         state.history.append(SpokenEntry(role="producer", text=text, at=self.clock()))
+        if self._declined(state, turn, text):
+            return self._finish(state, turn, step_changed=False)
         if state.step == "intake":
             self._intake(state, turn)
         elif state.step == "playback":
@@ -276,7 +283,8 @@ class ConversationEngine:
         if name == "confirm_playback":
             self._confirm(state, turn)
         elif name == "correct_playback":
-            self._playback(state, turn, correction=args["text"])
+            if not self._declined(state, turn, args["text"]):  # a correction gets the same scope check (#21)
+                self._playback(state, turn, correction=args["text"])
         elif name == "reopen_playback":
             self._reopen(state, turn)
         elif name == "retry_answer":
@@ -284,11 +292,27 @@ class ConversationEngine:
             self._respond(state, turn)
         elif name == "set_consent":
             self._set_consent(state, args["scope"])
+            self._save_record(state, turn)
         elif name == "set_feedback":
             state.feedback = args["value"]
+            self._save_record(state, turn)
         elif name == "end":
             return self._close(state, turn, "end")
         return self._finish(state, turn, step_changed=state.step != before)
+
+    def _declined(self, state: ConversationState, turn: _Turn, text: str) -> bool:
+        """The one scope check for producer text (#21). Out of scope: fixed decline in the producer's language,
+        no model, no data tool, step unchanged; the exchange stays in history but is hidden from models."""
+        verdict = self.scope_check(text, state.step)
+        if verdict.in_scope:
+            return False
+        if verdict.language:
+            state.language = verdict.language
+        state.excluded_history.append(len(state.history) - 1)
+        turn.excluded = True
+        turn.say(copy.text(state.language, f"out_of_scope_{verdict.reason or 'other_producer_data'}"))
+        turn.say(copy.text(state.language, "back_to_open"))
+        return True
 
     @staticmethod
     def _is_repeat(state: ConversationState, name: str, args: dict) -> bool:
@@ -297,8 +321,26 @@ class ConversationEngine:
                (name == "set_feedback" and args["value"] == state.feedback)
 
     def _close(self, state: ConversationState, turn: _Turn, reason: str):
-        state.step, state.closed_reason = "closed", reason
+        state.step, state.closed_reason, state.closed_at = "closed", reason, self.clock()
+        self._save_record(state, turn)
         return self._finish(state, turn, step_changed=True)
+
+    def _save_record(self, state: ConversationState, turn: _Turn) -> None:
+        """Save point (#26): code saves the record; each save emits `record_saved`.
+        A conflict or invalid record is logged and surfaced as an error, never retried."""
+        if self.records is None:
+            return
+        from fex.records import RecordConflict, save_record  # local: records imports conversation state
+
+        try:
+            result = save_record(state, self.records, self.clock())
+        except (RecordConflict, ValueError) as exc:
+            log.error("record not saved for conversation %s: %s", state.conversation_id, exc)
+            turn.emit("error", code="agent_failed", message="Your answer could not be saved. Please try again.")
+            return
+        if result:
+            turn.emit("record_saved", status=result.status, consent_scope=result.consent_scope,
+                      version=result.version)
 
     # ------------------------------------------------------------------ steps
 
@@ -344,7 +386,8 @@ class ConversationEngine:
 
     def _reopen(self, state: ConversationState, turn: _Turn) -> None:
         if state.answer:
-            state.earlier_answers.append(EarlierAnswer(**state.answer.model_dump(), reason="reopened"))
+            state.earlier_answers.append(EarlierAnswer(**state.answer.model_dump(), reason="reopened",
+                                                       given_at=state.answer_given_at or self.clock()))
         self._retire_partial(state)
         state.answer, state.answer_failed = None, False
         state.consent, state.feedback = None, None
@@ -358,12 +401,13 @@ class ConversationEngine:
         if state.partial and (state.partial.insights or state.partial.peer_examples):
             state.earlier_answers.append(EarlierAnswer(insights=state.partial.insights,
                                                        peer_examples=state.partial.peer_examples,
-                                                       reason="interrupted"))
-        state.partial = None
+                                                       reason="interrupted",
+                                                       given_at=state.partial_started_at or self.clock()))
+        state.partial, state.partial_started_at = None, None
 
     def _set_consent(self, state: ConversationState, scope: str) -> None:
         state.consent = scope
-        state.consent_history.append(ConsentChoice(scope=scope, at=self.clock()))
+        state.consent_history.append(ConsentChoice(scope=scope, recorded_at=self.clock()))
         if scope == "declined":
             state.feedback = None
             state.step = "consent"
@@ -374,7 +418,7 @@ class ConversationEngine:
 
     def _respond(self, state: ConversationState, turn: _Turn) -> None:
         state.step, state.answer, state.answer_failed = "respond", None, False
-        state.partial = ShownClaims()
+        state.partial, state.partial_started_at = ShownClaims(), self.clock()
         lang = state.language
         try:
             turn.say(copy.text(lang, "respond_opening"))
@@ -419,7 +463,8 @@ class ConversationEngine:
             turn.say(copy.text(lang, "no_peers"))
         turn.say(copy.text(lang, "hand_back"))
         state.answer = Answer(insights=shown.insights, peer_examples=shown.peer_examples, evidence=evidence_level)
-        state.partial = None
+        state.answer_given_at = state.partial_started_at
+        state.partial, state.partial_started_at = None, None
         turn.emit("answer", insights=[c.model_dump() for c in shown.insights],
                   peer_examples=[c.model_dump() for c in shown.peer_examples], evidence=evidence_level)
         state.step = "consent"
@@ -465,8 +510,9 @@ class ConversationEngine:
         p = state.profile
         lines = [f"Profile on file: location {p.region}, {p.country}; crop {p.crop}; "
                  f"entity type {state.effective_entity_type}. Language so far: {state.language}."]
-        for h in state.history:
-            if h.role in ("producer", "fex"):
+        hidden = set(state.excluded_history)
+        for i, h in enumerate(state.history):
+            if h.role in ("producer", "fex") and i not in hidden:
                 lines.append(f"{h.role}: {h.text}")
         choices = [f"{name}: {value}" for name, value in (("consent", state.consent), ("feedback", state.feedback))
                    if value]
@@ -490,6 +536,8 @@ class ConversationEngine:
     def _finish(self, state: ConversationState, turn: _Turn, *, step_changed: bool, save: bool = True):
         if turn.spoken:
             state.history.append(SpokenEntry(role="fex", text=" ".join(turn.spoken), at=self.clock()))
+            if turn.excluded:
+                state.excluded_history.append(len(state.history) - 1)
         steps = [e.step for e in turn.events if e.type == "step"]
         if not steps or steps[-1] != state.step:
             self._emit_step(state, turn)
