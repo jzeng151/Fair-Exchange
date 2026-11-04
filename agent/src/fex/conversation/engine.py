@@ -20,7 +20,7 @@ from strands import Agent
 
 from fex.conversation import copy
 from fex.conversation.contract import (
-    ActionEntry, ActionName, Answer, Request, ResumeResponse, SpokenEntry,
+    ActionEntry, ActionName, Answer, Event, Request, ResumeResponse, SpokenEntry,
 )
 from fex.conversation.state import (
     ConsentChoice, ConversationState, EarlierAnswer, Playback, Profile, ShownClaims, StateStore,
@@ -31,6 +31,7 @@ from fex.verifier import Problem, SessionEvidence, verify
 
 log = logging.getLogger(__name__)
 _REQUEST = TypeAdapter(Request)
+_EVENT = TypeAdapter(Event)
 
 # ------------------------------------------------------------------ structured outputs the models write
 
@@ -95,7 +96,8 @@ PLAYBACK_SYSTEM = _RULES + (
 )
 SUMMARY_SYSTEM = (
     "Summarize the confirmed playback in the producer's own words (summary_original) and in English "
-    "(summary_english; required unless the language is English). Tag it with one or more of the 11 challenge tags."
+    "(summary_english; required unless the language is English). Tag it with one or more of the 11 challenge tags. "
+    "If a location note is given, say in both summaries that the producer disputes the location on file."
 )
 SHORT_REPLY_SYSTEM = _RULES + (
     " Answer the producer's typed question in one or two sentences. You cannot change their consent, feedback or "
@@ -169,14 +171,19 @@ def _tool_sources(messages: list[dict]) -> list[str]:
 
 
 class _Turn:
-    """Events for one request, numbered in order."""
+    """Events for one request, numbered in order. Each event goes to `on_event` the moment it is created,
+    so text and checked claims reach the producer while later model calls are still running."""
 
-    def __init__(self) -> None:
-        self.events: list[dict] = []
+    def __init__(self, on_event: Callable[[Any], None] | None = None) -> None:
+        self.events: list = []
+        self.on_event = on_event
         self.spoken: list[str] = []
 
     def emit(self, type_: str, **fields) -> None:
-        self.events.append({"type": type_, "seq": len(self.events) + 1, **fields})
+        event = _EVENT.validate_python({"type": type_, "seq": len(self.events) + 1, **fields})
+        self.events.append(event)
+        if self.on_event:
+            self.on_event(event)
 
     def say(self, text: str) -> None:
         """Text streams word by word as `text` events."""
@@ -205,11 +212,15 @@ class ConversationEngine:
 
     # ------------------------------------------------------------------ entrypoint
 
-    def handle(self, payload: dict) -> list | ResumeResponse:
-        """Validate a request and run it. Raises ValueError for a malformed request."""
+    def handle(self, payload: dict, on_event: Callable[[Any], None] | None = None) -> list | ResumeResponse:
+        """Validate a request and run it. Raises ValueError for a malformed request.
+
+        Returns every event of the turn. With `on_event`, each event is also delivered as soon as it exists
+        (streaming); the returned list is the same events.
+        """
         request = _REQUEST.validate_python(payload)
         state = self.store.load(request.producer_id, request.conversation_id)
-        turn = _Turn()
+        turn = _Turn(on_event)
 
         if request.kind == "start":
             state = state or self._new_state(request.producer_id, request.conversation_id)
@@ -317,9 +328,10 @@ class ConversationEngine:
 
     def _confirm(self, state: ConversationState, turn: _Turn) -> None:
         assert state.playback is not None
+        note = f"\nLocation note (keep it in both summaries): {state.location_note}" if state.location_note else ""
         summary = self._structured(self.small_model, SUMMARY_SYSTEM,
-                                   f"Language: {state.language}\nConfirmed playback: {state.playback.model_dump_json()}",
-                                   RecordSummary)
+                                   f"Language: {state.language}\nConfirmed playback: {state.playback.model_dump_json()}"
+                                   + note, RecordSummary)
         state.playback.summary_original = summary.summary_original
         state.playback.summary_english = None if state.language == "en" else summary.summary_english
         state.playback.tags = summary.tags
@@ -454,6 +466,10 @@ class ConversationEngine:
         for h in state.history:
             if h.role in ("producer", "fex"):
                 lines.append(f"{h.role}: {h.text}")
+        choices = [f"{name}: {value}" for name, value in (("consent", state.consent), ("feedback", state.feedback))
+                   if value]
+        if choices:  # button choices are actions, not spoken history
+            lines.append("The producer's current choices: " + "; ".join(choices) + ".")
         shown = state.answer or state.partial
         if shown and (shown.insights or shown.peer_examples):  # claims are events, not spoken history
             lines.append("FEX showed these checked points (insights, then peer examples):")
@@ -472,7 +488,7 @@ class ConversationEngine:
     def _finish(self, state: ConversationState, turn: _Turn, *, step_changed: bool, save: bool = True):
         if turn.spoken:
             state.history.append(SpokenEntry(role="fex", text=" ".join(turn.spoken), at=self.clock()))
-        steps = [e["step"] for e in turn.events if e["type"] == "step"]
+        steps = [e.step for e in turn.events if e.type == "step"]
         if not steps or steps[-1] != state.step:
             self._emit_step(state, turn)
         turn.emit("actions", allowed=allowed_actions(state), language=state.language)
@@ -483,7 +499,5 @@ class ConversationEngine:
 
     @staticmethod
     def _events(turn: _Turn, state: ConversationState | None) -> list:
-        from fex.conversation.contract import Event  # local: keeps the module import light
         turn.emit("done")
-        adapter = TypeAdapter(Event)
-        return [adapter.validate_python(e) for e in turn.events]
+        return list(turn.events)
