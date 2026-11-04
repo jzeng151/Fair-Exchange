@@ -1,16 +1,30 @@
 <script setup lang="ts">
-// TODO(#30): producer chat (FEX) · TODO(#31): reviewer view · TODO(#33): Fair Trade USA dashboard
-// Reference design: the local Fair Exchange prototype and the FTUSA UI/UX specification v1.1.
+// Producer chat (#30). The Fair Trade USA reviewer view (#31) and dashboard (#33) come later.
+import { ref } from 'vue'
+import ChatView from './components/ChatView.vue'
+import FexMark from './components/FexMark.vue'
+
+const subtitles = ref(true) // English under every Spanish line (for presenters who don't read Spanish)
 </script>
 
 <template>
-  <main class="placeholder">
-    <h1>Fair Exchange</h1>
-    <p>FEX, Fair Trade USA's computer assistant for producers. Scaffolding only.</p>
+  <header class="topbar">
+    <div class="brand">
+      <FexMark :size="36" />
+      <span class="brand-name">Fair Exchange</span>
+      <span class="brand-product">by Fair Trade USA</span>
+    </div>
+    <div class="top-right">
+      <button class="view-toggle" role="switch" :aria-checked="subtitles" @click="subtitles = !subtitles">
+        <span class="switch" :class="{ on: subtitles }" aria-hidden="true"></span>
+        English subtitles
+      </button>
+    </div>
+  </header>
+  <div class="synthetic-banner" role="note">
+    Demo · synthetic data · scripted replies until the chat API (#25) is connected
+  </div>
+  <main class="container">
+    <ChatView :producer-view="true" :subtitles="subtitles" />
   </main>
 </template>
-
-<style scoped>
-.placeholder { max-width: 640px; margin: 64px auto; padding: 0 16px; }
-h1 { font-family: var(--ft-font-brand-heading); color: var(--ft-brand-indigo); }
-</style>
