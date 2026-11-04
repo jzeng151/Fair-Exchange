@@ -67,7 +67,7 @@
     "claim": {
       "text": "Rainfall fell.",
       "citation": {
-        "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+        "source": "CHIRPS v2.0 rainfall anomaly, Cauca, Colombia, 2024-2025 [RF-F8C4E1]",
         "standard_clause": "APS 1.1",
         "period": null,
         "strength": "exact"
@@ -170,7 +170,7 @@
       {
         "text": "Rainfall fell.",
         "citation": {
-          "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+          "source": "CHIRPS v2.0 rainfall anomaly, Cauca, Colombia, 2024-2025 [RF-F8C4E1]",
           "standard_clause": "APS 1.1",
           "period": null,
           "strength": "exact"
