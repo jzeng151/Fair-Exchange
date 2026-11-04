@@ -46,14 +46,15 @@ The stack provides these to the application; each is a value FTUSA sets for thei
 |---|---|---|---|
 | `CONVERSATIONS_TABLE` | chat + sweep Lambdas | DynamoDB table of conversations | [#25](../specs/25-chat-endpoint.md) |
 | `AGENT_RUNTIME_ARN` | chat + sweep Lambdas | the AgentCore Runtime to invoke | [#25](../specs/25-chat-endpoint.md) |
-| `INACTIVITY_MINUTES` | sweep Lambda | idle period before a conversation is auto-closed (value "Not decided", [#13](../specs/13-conversation-steps.md)) | [#25](../specs/25-chat-endpoint.md) |
+| `INACTIVITY_MINUTES` | sweep Lambda | idle period before a conversation is auto-closed: 120 (decided 2026-11-04, [#13](../specs/13-conversation-steps.md)) | [#25](../specs/25-chat-endpoint.md) |
 | `RECORDS_TABLE` | write-back, review, "your record" Lambdas | DynamoDB records table | [#26](../specs/26-write-back.md) |
 | `FEX_SMALL_MODEL`, `FEX_LARGE_MODEL` | agent runtime | the Claude inference profiles (default to `us.` profiles) | [#13](../specs/13-conversation-steps.md) |
 | `FEX_RECORDS_TABLE` | agent runtime | records table the agent writes | [#26](../specs/26-write-back.md) |
 | `FEX_GUARDRAIL_ID`, `FEX_GUARDRAIL_VERSION` | agent runtime | the detect-mode Guardrail (`guardrail.runtimeEnvironment`) | [#12](../specs/12-guardrail.md) |
 | `FEX_STANDARDS_KB_ID` | agent runtime | the standards Knowledge Base (the `StandardsKnowledgeBaseId` output). Required for a non-demo runtime: without it the standards retrieval is unconfigured and the grounded-answer turn fails | [#17](../specs/17-standards-grounding.md) |
 | `FEX_MEMORY_ID` | agent runtime | the AgentCore Memory resource (resume + long-term memory) | [memory](../specs/memory.md) |
-| `FEX_EVENT_EXPIRY_DAYS`, `FEX_MAX_LIFETIME_MINUTES` | agent runtime | memory retention; event expiry must exceed the max conversation lifetime | [memory](../specs/memory.md) |
+| `FEX_EVENT_EXPIRY_DAYS`, `FEX_MAX_LIFETIME_MINUTES` | agent runtime | memory retention (7 days) and the maximum conversation lifetime (1,440 minutes, decided 2026-11-04); event expiry must exceed the lifetime. `deploy.sh` takes the lifetime as `FEX_MAX_LIFETIME_MINUTES` | [memory](../specs/memory.md) |
+| `LOG_RETENTION_DAYS` | `deploy.sh` input | agent runtime log retention; required, no default. The sandbox uses 30 (see [FTUSA decisions](06-known-limitations.md#decisions-for-ftusa)) | [#5](../specs/05-cdk-stack.md) |
 | `SYNC_BUCKET` (with `RECORDS_TABLE`) | the manual resync command (`python -m fex_sync.resync`, [sync/README](../../sync/README.md)) | the records bucket to rebuild from the table | [#28](../specs/28-athena-sync.md) |
 
 **Never set `FEX_DEMO_MODELS` on a deployed runtime.** It replaces Claude with the scripted demo model used for

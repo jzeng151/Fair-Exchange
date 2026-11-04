@@ -132,6 +132,10 @@ Buttons send structured actions. Actions never carry a producer ID or conversati
   - `inactivity`: idle longer than the inactivity period;
   - `max_lifetime`: open longer than the maximum conversation lifetime, however active it is.
 
+  - **Values (decided 2026-11-04 for the sandbox and pilot):** inactivity period 2 hours (120 minutes); maximum
+    conversation lifetime 24 hours (1,440 minutes). The lifetime stays shorter than memory's 7-day event expiry, as
+    the [memory spec](memory.md) requires.
+
   `auto_close` is valid in every open step and closes the conversation exactly as `end` does. The maximum lifetime stops an active conversation outliving its stored messages ([memory spec](memory.md)).
 - Once `closed`, nothing changes from the chat.
 
@@ -199,5 +203,4 @@ Seam 3 covers one scripted conversation through all steps, plus one limited-evid
 
 ### Not decided (do not build or assume)
 
-- The inactivity period and the maximum conversation lifetime
 - What outcome and record a conversation gets when it closes (by `end` or automatic closing) without any consent choice. This covers leaving before the consent question and leaving after only an out-of-scope request.
