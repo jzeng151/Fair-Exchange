@@ -80,10 +80,10 @@ Both files are committed. `tests/test_regional.py` fails if `regional_facts.json
 PYTHONPATH=src uv run python -m fx_data.peers   # offline -> peer_projects.json, producer_profiles.json
 ```
 
-- **`peer_projects.json`**: 347 of the 349 environmental Premium projects (2 lorem-ipsum placeholder rows dropped), each with a challenge tag, status and dates. Organizations get a stable `ORG-xxxxxxxx` reference, and organization and person names in the text are replaced (`NAME_REPLACEMENTS` in `peers.py`). The owning account is stored only as a salted hash (`owner_key`) so a producer's own projects can be left out.
+- **`peer_projects.json`**: the peer catalog (#16), 347 of the 349 environmental Premium projects (2 lorem-ipsum placeholder rows dropped). Each row holds only the publishable fields (fictional organization name, country, crop, entity type, category, sub-category, start year, description), an opaque `catalog_id` and the challenge `tags`. Organizations get a fictional name (`FICTIONAL_NAMES` in `peers.py`), and organization and person names in descriptions are replaced (`NAME_REPLACEMENTS`). One private column, `owner_producer_id`, is used only to leave a producer's own projects out and is never returned (#7 spec). An interim build until the #7 generator, which adds the Comprehend PII check and the reviewed crop and entity-type vocabulary.
 - **`producer_profiles.json`**: producer id → country, region, crop, entity type. A stand-in until the producer-record tool (#14) and the Athena tables (#28) exist. Region is the region most of the producer's projects are in; 7 of the 146 sample producers have none.
 
-`tests/test_peers.py` fails if either file is stale, or if an account id or a listed name appears in `peer_projects.json`.
+`tests/test_peers.py` fails if either file is stale, if an account ID appears outside `owner_producer_id`, or if a listed name appears in `peer_projects.json`.
 
 ## Producer records (issue #14)
 

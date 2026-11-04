@@ -101,7 +101,7 @@ def test_shipped_records_have_no_placeholder_projects():
 def test_project_refs_are_unique_and_match_the_peer_table():
     refs = [p["project_ref"] for r in build_records()["records"].values() for p in r["premium_projects"]]
     assert len(refs) == len(set(refs))
-    peer_refs = {p["project_ref"] for p in json.loads(PEERS_PATH.read_text(encoding="utf-8"))["projects"]}
+    peer_refs = {p["catalog_id"] for p in json.loads(PEERS_PATH.read_text(encoding="utf-8"))["projects"]}
     assert set(refs) == peer_refs
 
 

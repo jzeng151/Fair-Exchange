@@ -2,10 +2,9 @@
 
 Spec: docs/specs/13-conversation-steps.md. One test per case in its "Testing Decisions".
 """
-from dataclasses import replace
 
 import pytest
-from fx_data.peers import PeerProjects, ProducerProfiles
+from fx_data.peers import PeerProjects, ProducerProfiles, crop_set
 from tests.conversation_harness import (
     RETRIEVE, FakeRetriever, Run, allowed, answer, cauca_producer, claim, intake, last_step, of, playback, short_reply, summary, types,
 )
@@ -221,10 +220,7 @@ def test_entity_type_correction_is_kept_and_used_for_peer_matching():
                               {"producer_id": r.producer_id, "step": "respond", "entity_type": "estate",
                                "tags": ["water"]})
     assert status == "success" and peers
-    projects = {p["project_ref"]: p for p in PeerProjects.load()._projects}
-    corrected = replace(profile, entity_type="estate")
-    assert [p["data"]["match_score"] for p in peers] == [
-        PeerProjects.score(projects[p["data"]["project_ref"]], corrected) for p in peers]
+    assert peers == PeerProjects.load().find(r.producer_id, {"water"}, crop_set(profile.crop), "estate")
 
 
 def test_disputed_location_is_noted_and_the_location_on_file_is_kept():

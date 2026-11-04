@@ -75,22 +75,28 @@ Items with `kind: "regional"`, one per fact for the producer's region and crop:
 
 ## `find_peer_examples()` (#16)
 
-Items with `kind: "peer"`, up to 3, best match first, for the confirmed tags:
+Peer catalog projects (`peer_projects.json`) that share a confirmed tag, excluding the session producer's own projects:
+
+| Matches | `strength` |
+|---|---|
+| tag + a profile crop + entity type (the corrected one if the producer corrected it) | `exact` |
+| tag + one of crop or entity type | `nearest` |
+| tag only | `limited` |
+
+At most 3 items, strongest first, ties broken by most recent start year. At most one project per organization (an addition to the spec, so one group cannot fill every slot).
 
 ```json
-[{"source": "FTUSA Premium project (sample data, fictionalized) PROJ-2735455E", "kind": "peer",
-  "text": "<project name> (Completed, Peru): <action>", "period": "2021-01-01 to 2022-12-31", "strength": "exact",
-  "data": {"project_ref": "PROJ-2735455E", "org_ref": "ORG-F1037E8F", "challenge_tag": "water", "crop": "Coffee",
-           "entity_type": "1st Grade", "country": "Peru", "region": "San Martin", "subcategory": "Clean Water",
-           "name": "...", "challenge": "...", "action": "...", "intended_outcome": "...", "status": "Completed",
-           "start_date": "2021-01-01", "end_date": "2022-12-31", "match_score": 1.0}}]
+[{"source": "Premium project, Higuera Producers' Group [PROJ-295DB6A0]", "kind": "peer",
+  "text": "Higuera Producers' Group (1st Grade, Coffee, Colombia) funded a Premium project starting in 2024: …",
+  "period": "2024", "strength": "exact",
+  "data": {"organization": "Higuera Producers' Group", "country": "Colombia", "crop": "Coffee", "entity_type": "1st Grade",
+           "category": "Environmental", "sub_category": "Clean Water", "start_year": 2024, "description": "…"}}]
 ```
 
-- Only projects sharing a confirmed tag. Ranked by crop (0.4), entity type (0.3), same country (0.2), completed (0.1). `strength` is `exact` for a crop and entity type match, `nearest` for one of them, `limited` for the tag only.
-- Never the session producer's own projects. At most one project per organization. Organizations are fictionalized; account IDs never appear.
-- `intended_outcome` is what the project aimed for, not a recorded result. `status` says whether it was completed; it and the dates are `null` for the few projects the sample cannot tell apart, and FEX should not claim a status for those.
-- Empty list: no comparable project. The sample covers environmental projects only.
-- The publishable-field list, catalog IDs and `Premium project, <name> [<catalog_id>]` labels are the #16 retro work.
+- `data` holds only the publishable fields. Organization names are fictional (`fx_data.peers.FICTIONAL_NAMES`), names in descriptions are replaced, and no account or sample project ID appears. `catalog_id` is opaque.
+- The catalog's private `owner_producer_id` is used only to leave out the producer's own projects and is never returned (#7, #16 specs).
+- Interim build until the #7 generator: descriptions are not yet checked with Comprehend PII detection, and crop and entity type use the sample's raw values rather than the #14 vocabulary.
+- Empty list: no comparable project. The sample covers environmental projects only, so market, labor, health and similar challenges return nothing today.
 
 ## `find_standards()` (#17)
 
