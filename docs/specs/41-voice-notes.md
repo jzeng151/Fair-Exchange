@@ -32,19 +32,25 @@ These are on the same REST API, TypeScript on Node.js 24, `producer` role, with 
 
 | Method and path | Purpose |
 |---|---|
-| `POST /conversations/{id}/voice` | Creates a `voice_id` and returns a pre-signed upload URL. It is valid for 5 minutes, for `audio/webm` at most 5 MB, and the key is under the conversation's prefix. |
+| `POST /conversations/{id}/voice` | Creates a `voice_id` and returns a pre-signed POST form: URL plus fields. It is valid for 5 minutes. Its policy fixes the key under the conversation's prefix, limits `Content-Type` to `audio/webm` or `audio/mp4` (Safari records MP4), and sets `content-length-range` to at most 5 MB. |
 | `POST /conversations/{id}/voice/{voice_id}/transcribe` | Starts a Transcribe batch job and returns 202. |
-| `GET /conversations/{id}/voice/{voice_id}` | Returns `status` (`pending`, `done`, `failed`) and, when done, `transcript` |
+| `GET /conversations/{id}/voice/{voice_id}` | Returns `status` (`pending`, `done`, `failed`, `cancelled`) and, when done, `transcript`. After the transcript expires (below), it returns 404. |
+| `DELETE /conversations/{id}/voice/{voice_id}` | Cancels: stops the job if running and deletes the audio and any output. |
 
 ### Transcription
 
 - **Language.** The conversation's language if identified. Otherwise Transcribe's language identification is limited to `en-US`, `es-US` and `fr-FR` (only `en` and `es` until #24 is built).
-- **Job.** A batch job, with output written to the voice bucket. When it finishes, the handler reads the transcript text, returns it on the next `GET`, then deletes the audio and the job output.
+- **Job.** A batch job, with output written to the voice bucket.
+- **Completion worker.** An EventBridge rule on Transcribe job state changes (completed or failed) triggers a worker Lambda. It doesn't depend on the browser:
+  - on completion it reads the transcript, stores it on the voice item, and deletes the audio and job output;
+  - on failure it marks the item `failed` and deletes the audio.
+  - Cleanup is idempotent, so a repeat event is harmless.
+- **Voice items.** A small voice table (key `voice_id`) holds `conversation_id`, `status` and the transcript. Items expire one hour after creation through DynamoDB TTL, so the transcript isn't kept.
 - **Limits.** Recordings are at most 2 minutes. Failed jobs return `failed`, and the producer can type instead.
 
 ### Client
 
-- **Recording.** Records with the browser's media recorder (`audio/webm`, Opus).
+- **Recording.** Records with the browser's media recorder: `audio/webm` (Opus) where supported, otherwise `audio/mp4`.
 - **Indicator.** Shows a visible and announced recording state, with stop and cancel controls.
 - **Polling.** Polls the status route every 2 seconds, for up to 90 seconds.
 - **Review before sending.** Puts the transcript in the message box for editing and sends it as an ordinary `message` ([#25](25-chat-endpoint.md)) only when the producer presses send.
@@ -54,10 +60,13 @@ These are on the same REST API, TypeScript on Node.js 24, `producer` role, with 
 - **Voice bucket:**
   - KMS-encrypted, public access blocked;
   - a lifecycle rule deletes any object older than 1 day, as a backstop to the explicit deletes.
-- **Deletion (decided 2026-11-04 while writing).** Audio and raw Transcribe output are deleted as soon as the transcript is returned, or when the job fails.
+- **Deletion (decided 2026-11-04 while writing).** The completion worker deletes the audio and raw Transcribe output as soon as the job finishes or fails. Cancelling deletes them at once. Transcripts expire with the voice item after one hour.
+- **CORS.** The voice bucket allows `POST` from the web app's CloudFront origin only.
+- **Roles:**
+  - **Voice route handler:** read on the conversations table (ownership check), read and write on the voice table, write to the voice bucket prefix, `transcribe:StartTranscriptionJob`, and the KMS key.
+  - **Completion worker:** `transcribe:GetTranscriptionJob`, read and delete on the voice bucket, write on the voice table, and the KMS key.
 - **PII and scope.**
   - The sent transcript is producer-typed text, so it gets the PII check ([#20](20-pii-flagging.md)) and the out-of-scope check ([#21](21-out-of-scope.md)) like any message.
-  - The voice handler's role can use Transcribe and the voice bucket only.
 - **Logs.** IDs, status and durations only. Never transcript text.
 - **Routes table.** These routes are added to the [#25](25-chat-endpoint.md) routes table by reference.
 
@@ -66,9 +75,11 @@ These are on the same REST API, TypeScript on Node.js 24, `producer` role, with 
 - **Seam 2 (Lambda handlers)** with `aws-sdk-client-mock`:
   - another producer's conversation returns 404 on every voice route;
   - a closed conversation returns 409;
-  - the upload URL is limited to the conversation's prefix, type and size;
-  - a finished job returns the transcript and deletes the audio and output;
-  - a failed job returns `failed` and deletes the audio;
+  - the POST form's policy fixes the conversation's prefix, the allowed types and the 5 MB limit;
+  - the completion worker stores the transcript and deletes the audio and output, even when no client is polling;
+  - a failed job is marked `failed` and its audio deleted;
+  - cancel stops the job and deletes the audio;
+  - a `GET` after the item expires returns 404;
   - no transcript text is logged.
 - **Component tests:**
   - the transcript lands in the message box and is not sent automatically;

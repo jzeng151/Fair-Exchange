@@ -31,7 +31,19 @@ FEX handles a full exchange in French using the same language rules as Spanish (
 
 - **Guardrail change ([#12](12-guardrail.md)).** The FEX Guardrail adds a sensitive-information filter for `NAME`, `PHONE`, `EMAIL` and `ADDRESS`, with action `NONE` (detect only) for input and output. On ordinary model calls, its findings go to CloudWatch only, like every other Guardrail finding.
 - **PII change ([#20](20-pii-flagging.md)).** For `fr` conversations, each producer text is checked with the Guardrail's apply-guardrail operation (input source) instead of Comprehend. The returned PII detections fill `pii_flag`, `pii_entity_types` and `pii_matches` (match plus about 10 words either side). The same per-text status, failure and out-of-scope rules apply. `unsupported_language` remains for languages other than `en`, `es` and `fr`.
+- **No confidence threshold for French.** Guardrail detections carry no confidence score, so every detected `NAME`, `PHONE`, `EMAIL` or `ADDRESS` counts. The 0.8 threshold applies to Comprehend only.
 - **Permissions.** No change: the agent role already has `bedrock:ApplyGuardrail` ([#13](13-conversation-steps.md)).
+
+### Changes to other specs, made in the PR that builds this
+
+These contracts are owned elsewhere, so the build PR edits those specs. Nothing changes before #24 is built.
+- **[#17](17-standards-grounding.md):** the shared directive-phrase list gains French phrases, e.g. "vous devriez", "nous recommandons", "la meilleure option", "il faut que vous".
+- **[#20](20-pii-flagging.md):**
+  - the language rule adds `fr` through the Guardrail;
+  - the threshold applies to Comprehend only;
+  - the test "a French conversation flags with `unsupported_language`" changes to cover a language other than `en`, `es` and `fr`.
+- **[#22](22-spanish-exchange.md):** the language rules list `fr`.
+- **[#12](12-guardrail.md):** the sensitive-information filter above is added to the configuration.
 
 ### Scenario
 
@@ -44,6 +56,7 @@ A French scenario S8 is added to the scenario files ([#35](35-scenarios-and-labe
   - the French and English summaries are present;
   - a name detected by the Guardrail fills the PII fields with match and context;
   - a Guardrail error sets `failed`;
+  - a directive phrase in French fails the claim check;
   - the fixed text is in French.
 - **Component tests:** French labels in the chat and "your record" views.
 - **Eval:** S8 meets its expected outcomes.
