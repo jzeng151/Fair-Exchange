@@ -54,6 +54,11 @@ class MemoryRecordStore implements RecordStore {
   async listClosedCompleted() {
     return [...this.items.values()].filter((r) => r.status === 'completed' && typeof r.closed_at === 'string');
   }
+  async listClosedByProducer(producerId: string) {
+    return [...this.items.values()].filter(
+      (r) => r.producer_id === producerId && typeof r.closed_at === 'string',
+    );
+  }
   async get(id: string) {
     return this.items.get(id);
   }

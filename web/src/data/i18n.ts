@@ -83,6 +83,28 @@ export const t = {
     cardTitle: 'Fair Exchange summary',
     cardFooter: 'Prepared with Fair Exchange by Fair Trade USA · demo with synthetic data',
     closing: 'Thank you for sharing your experience. It helps Fair Trade USA better understand and support producers like you.',
+    yourRecord: {
+      title: 'Your record',
+      intro: 'What Fair Trade USA stored from your conversations, and the consent you gave. This view is read-only.',
+      empty: 'You have no stored records yet.',
+      summary: 'Your summary',
+      tags: 'Challenge tags',
+      consent: 'Consent you gave',
+      insights: 'What the data showed',
+      peers: 'What others tried',
+      feedback: 'Your feedback',
+      reviewStatus: 'Review status',
+      reviewed: 'Reviewed by Fair Trade USA',
+      pending: 'Awaiting review',
+      changedByReviewer: 'A Fair Trade USA reviewer corrected this.',
+      scope: {
+        internal: 'Fair Trade USA internal review only',
+        internal_and_outward: 'Fair Trade USA, and may be shared outward',
+        declined: 'Not stored: you declined',
+      },
+      feedbackValue: { yes: 'Helpful', somewhat: 'Somewhat helpful', no: 'Not helpful' },
+      contact: 'To ask Fair Trade USA to change or remove anything here, contact your Fair Trade USA representative. This view cannot change your record.',
+    },
   },
   es: {
     greet: '¡Hola! Soy FEX, el asistente computarizado de Fair Trade USA. No soy una persona y no tomo decisiones por usted. Estoy aquí para escuchar y compartir información. ¿Qué ha sido difícil para su organización recientemente?',
@@ -167,6 +189,61 @@ export const t = {
     cardTitle: 'Resumen de Fair Exchange',
     cardFooter: 'Preparado con Fair Exchange de Fair Trade USA · demo con datos sintéticos',
     closing: 'Gracias por compartir su experiencia. Nos ayuda en Fair Trade USA a entender y apoyar mejor a productores como usted.',
+    yourRecord: {
+      title: 'Su registro',
+      intro: 'Lo que Fair Trade USA guardó de sus conversaciones, y el consentimiento que dio. Esta vista es solo de lectura.',
+      empty: 'Aún no tiene registros guardados.',
+      summary: 'Su resumen',
+      tags: 'Etiquetas del desafío',
+      consent: 'Consentimiento que dio',
+      insights: 'Lo que mostraron los datos',
+      peers: 'Lo que otros intentaron',
+      feedback: 'Su opinión',
+      reviewStatus: 'Estado de revisión',
+      reviewed: 'Revisado por Fair Trade USA',
+      pending: 'En espera de revisión',
+      changedByReviewer: 'Un revisor de Fair Trade USA corrigió esto.',
+      scope: {
+        internal: 'Solo para revisión interna de Fair Trade USA',
+        internal_and_outward: 'Fair Trade USA, y puede compartirse hacia afuera',
+        declined: 'No guardado: usted rechazó',
+      },
+      feedbackValue: { yes: 'Útil', somewhat: 'Algo útil', no: 'No útil' },
+      contact: 'Para pedir a Fair Trade USA que cambie o elimine algo aquí, comuníquese con su representante de Fair Trade USA. Esta vista no puede cambiar su registro.',
+    },
+  },
+}
+
+/**
+ * Translated challenge-tag names (#32). Keys are the canonical CHALLENGE_TAGS (scenarios.ts); a test
+ * checks every tag has an entry in both languages. French arrives with #24.
+ */
+export const tagNames: Record<'en' | 'es', Record<string, string>> = {
+  en: {
+    'climate and weather': 'Climate and weather',
+    water: 'Water',
+    'soil and land': 'Soil and land',
+    'market and price': 'Market and price',
+    'labor and migration': 'Labor and migration',
+    'financial and access to capital': 'Financial and access to capital',
+    education: 'Education',
+    health: 'Health',
+    infrastructure: 'Infrastructure',
+    'biodiversity and conservation': 'Biodiversity and conservation',
+    'social and community': 'Social and community',
+  },
+  es: {
+    'climate and weather': 'Clima y tiempo',
+    water: 'Agua',
+    'soil and land': 'Suelo y tierra',
+    'market and price': 'Mercado y precio',
+    'labor and migration': 'Trabajo y migración',
+    'financial and access to capital': 'Finanzas y acceso a capital',
+    education: 'Educación',
+    health: 'Salud',
+    infrastructure: 'Infraestructura',
+    'biodiversity and conservation': 'Biodiversidad y conservación',
+    'social and community': 'Social y comunidad',
   },
 }
 
