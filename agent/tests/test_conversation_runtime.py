@@ -90,6 +90,8 @@ def test_demo_models_are_used_when_asked(monkeypatch):
     try:
         eng = runtime.default_engine()
         assert isinstance(eng.small_model, DemoModel) and isinstance(eng.large_model, DemoModel)
+        from fex.tools.standards_local import LocalClauseRetriever
+        assert isinstance(eng.retriever, LocalClauseRetriever)  # no Knowledge Base needed locally (#17)
     finally:
         runtime.default_engine.cache_clear()
 

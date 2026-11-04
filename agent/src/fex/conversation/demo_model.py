@@ -1,9 +1,10 @@
 """A deterministic demo model (#101): runs the REAL engine end to end with no AWS and no cost.
 
 It is a Strands model, so the engine treats it exactly like Claude: it answers each structured-output request
-the engine makes (IntakeTurn, PlaybackDraft, RecordSummary, ShortReply, AnswerDraft) and, when writing an
-answer, calls the REAL data tools first and builds claims only from what they returned, citing their sources
-and a real APS clause, so the REAL citation verifier passes them. It doesn't understand language: it follows
+the engine makes (IntakeTurn, PlaybackDraft, RecordSummary, ShortReply, AnswerDraft). In the retrieval step it
+calls each REAL data tool once (they take no arguments, #17); in the writing step it builds claims only from the
+items those tools returned, citing their sources and a clause the standards tool returned, so the REAL citation
+verifier passes them. It doesn't understand language: it follows
 the intake script, detects Spanish from simple markers, and tags from keywords. Not for producers: for local
 runs, demos without AWS and integration tests. Real Claude is one setting away (FEX_DEMO_MODELS unset).
 """
@@ -40,11 +41,8 @@ TAG_KEYWORDS = [
     ("financial and access to capital", ("crédito", "credit", "préstamo", "loan")),
     ("climate and weather", ("lluvia", "rain", "sequía", "drought", "clima", "weather", "calor", "heat")),
 ]
-# Related APS clause per tag (all exist in the standards; the demo mapping the web demo also uses).
-CLAUSES = {"climate and weather": "APS 4.1.1", "water": "APS 4.1.1", "soil and land": "APS 4.2.1",
-           "biodiversity and conservation": "APS 4.2.1", "market and price": "APS 5.2.3",
-           "labor and migration": "APS 3.3.1"}
-DEFAULT_CLAUSE = "APS 1.2.2"
+INSIGHT_KINDS = ("producer_record", "regional")  # what the data shows (#17 source kinds)
+ITEMS_HEADER = "Items the data tools returned (cite only these):"
 
 
 def _text_of(messages: list[dict]) -> str:
@@ -70,17 +68,22 @@ def tags_for(text: str) -> list[str]:
     return tags[:2] or ["climate and weather"]
 
 
-def _tool_results(messages: list[dict]) -> dict[str, Any]:
-    """The JSON each tool returned so far, by tool name."""
-    names = {b["toolUse"]["toolUseId"]: b["toolUse"]["name"]
-             for m in messages for b in m["content"] if "toolUse" in b}
-    out = {}
-    for m in messages:
-        for b in m["content"]:
-            result = b.get("toolResult")
-            if result and result.get("content"):
-                part = result["content"][0]
-                out[names.get(result["toolUseId"], "?")] = part.get("json") or json.loads(part.get("text") or "null")
+def _tools_called(messages: list[dict]) -> set[str]:
+    return {b["toolUse"]["name"] for m in messages for b in m["content"] if "toolUse" in b}
+
+
+def _items(prompt: str) -> list[dict]:
+    """The evidence items the engine lists in the claim-writing prompt (#17), one JSON object per line."""
+    if ITEMS_HEADER not in prompt:
+        return []
+    out = []
+    for line in prompt.split(ITEMS_HEADER, 1)[1].splitlines():
+        line = line.strip()
+        if line.startswith("{"):
+            try:
+                out.append(json.loads(line))
+            except ValueError:
+                continue
     return out
 
 
@@ -101,12 +104,19 @@ class DemoModel(Model):
         names = [s["name"] for s in (tool_specs or [])]
         output = next((n for n in OUTPUTS if n in names), None)
         prompt = _text_of(messages)
-        if output == "AnswerDraft":
-            name, data = self._answer_step(prompt, messages)
-        else:
-            name, data = output, getattr(self, f"_{output}")(prompt)
         call_id = f"demo-{len(messages)}"
         yield {"messageStart": {"role": "assistant"}}
+        if output is None:  # the retrieval step (#17): call each data tool once, then stop
+            pending = [n for n in names if n not in _tools_called(messages)]
+            if not pending:
+                yield {"contentBlockStart": {"start": {}}}
+                yield {"contentBlockDelta": {"delta": {"text": "Done."}}}
+                yield {"contentBlockStop": {}}
+                yield {"messageStop": {"stopReason": "end_turn"}}
+                return
+            name, data = pending[0], {}
+        else:
+            name, data = output, getattr(self, f"_{output}")(prompt)
         yield {"contentBlockStart": {"start": {"toolUse": {"toolUseId": call_id, "name": name}}}}
         yield {"contentBlockDelta": {"delta": {"toolUse": {"input": json.dumps(data, ensure_ascii=False)}}}}
         yield {"contentBlockStop": {}}
@@ -143,22 +153,19 @@ class DemoModel(Model):
     def _ShortReply(self, prompt: str) -> dict:
         return {"reply": SHORT_REPLY[_language(prompt)]}
 
-    def _answer_step(self, prompt: str, messages: list[dict]) -> tuple[str, dict]:
-        """Like a model with tools: look up regional data, then peer examples, then write cited claims."""
-        situation = json.loads(re.search(r"Confirmed situation: (\{.*\})", prompt).group(1))
-        tag = (situation.get("tags") or ["climate and weather"])[0]
-        results = _tool_results(messages)
-        if "get_regional_context" not in results:
-            return "get_regional_context", {}
-        if "find_peer_examples" not in results:
-            return "find_peer_examples", {"challenge": tag}
-        clause = CLAUSES.get(tag, DEFAULT_CLAUSE)
-        regional, peers = results["get_regional_context"] or {}, results["find_peer_examples"] or []
-        facts = regional.get("facts", []) if isinstance(regional, dict) else []
-        insights = [{"text": f["text"], "citation": {"source": f["source"], "standard_clause": clause,
-                                                     "period": f.get("period"), "strength": f.get("strength", "exact")}}
-                    for f in facts[:2]]
-        examples = [{"text": f"{p['action']} Intended outcome: {p['intended_outcome']}",
-                     "citation": {"source": p["source"], "standard_clause": clause, "strength": "nearest"}}
-                    for p in (peers if isinstance(peers, list) else [])[:2]]
-        return "AnswerDraft", {"insights": insights, "peer_examples": examples}
+    def _AnswerDraft(self, prompt: str) -> dict:
+        """Claims only from the items the tools returned, each citing the top clause the standards tool returned."""
+        items = _items(prompt)
+        clauses = [i["source"] for i in items if i.get("kind") == "standard"]
+        if not clauses:
+            return {"insights": [], "peer_examples": []}  # nothing citable: the engine shows limited evidence
+
+        def claim(item: dict) -> dict:
+            return {"text": item["text"], "citation": {"source": item["source"], "standard_clause": clauses[0],
+                                                       "period": item.get("period"),
+                                                       "strength": item.get("strength") or "exact"}}
+        # Regional data first: it speaks to the challenge itself; the producer's own record adds context.
+        insights = sorted((i for i in items if i.get("kind") in INSIGHT_KINDS),
+                          key=lambda i: INSIGHT_KINDS.index(i["kind"]) * -1)
+        return {"insights": [claim(i) for i in insights][:2],
+                "peer_examples": [claim(i) for i in items if i.get("kind") == "peer"][:2]}

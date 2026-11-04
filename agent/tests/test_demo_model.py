@@ -12,6 +12,7 @@ from fex.conversation import ConversationEngine, InMemoryStateStore
 from fex.conversation.demo_model import DemoModel
 from fex.models import parse_record
 from fex.records.local import FileRecordStore
+from fex.tools.standards_local import LocalClauseRetriever
 
 SPANISH = ["La lluvia ha bajado mucho y la cosecha de café cayó este año.",
            "Empezó hace dos temporadas.", "Es grave, perdimos casi la mitad.",
@@ -27,7 +28,7 @@ def cauca() -> str:
 def engine(tmp_path, model=None):
     model = model or DemoModel()
     return ConversationEngine(store=InMemoryStateStore(), small_model=model, large_model=model,
-                              records=FileRecordStore(tmp_path))
+                              records=FileRecordStore(tmp_path), retriever=LocalClauseRetriever())
 
 
 def talk(eng, producer, conversation, messages):
@@ -63,8 +64,11 @@ def test_every_claim_passes_the_real_citation_verifier(tmp_path):
     eng = engine(tmp_path)
     turns = talk(eng, cauca(), "conv-v", SPANISH)
     standards = Standards.load()
+    state = eng.store.load(cauca(), "conv-v")
     for c in [e.claim for t in turns for e in t if e.type == "claim"]:
         assert standards.exists(c.citation.standard_clause), c.citation.standard_clause
+        # #17: a cited clause must be one the standards tool returned in this conversation
+        assert c.citation.standard_clause in state.evidence_clauses
     answer = [e for t in turns for e in t if e.type == "answer"][0]
     assert answer.insights and answer.peer_examples
 
