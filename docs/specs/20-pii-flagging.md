@@ -22,6 +22,7 @@ Amazon Comprehend `DetectPiiEntities` scans the producer's own messages, in Engl
 
 - **Engine.** Amazon Comprehend `DetectPiiEntities`, called from Python in the agent process during record saves ([#26 spec](26-write-back.md)). The agent runtime role gets `comprehend:DetectPiiEntities`.
 - **Input.** Every piece of text the producer typed: messages and `correct_playback` text. FEX's own summaries are not scanned.
+- **Out-of-scope messages.** A message the out-of-scope detection function classifies as `out_of_scope` ([#21 spec](21-out-of-scope.md)) adds nothing to the record: no flag, no entity type and no match or context. Nothing from it is quoted in the record, so there is nothing for a reviewer to check, and #21 keeps the misdirected request out of the record.
 - **Per-message status.** Each text has a scan status in the conversation state: `pending`, `done` or `failed`. At each save, every text that is `pending` or `failed` is scanned. A text marked `done` is never scanned again.
 - **Language.** `en` and `es` are scanned. Any other conversation language sets the check result to `unsupported_language`.
 - **Entity types.** `NAME`, `PHONE`, `EMAIL`, `ADDRESS` only, with a confidence threshold that is a configuration value, default 0.8.
@@ -53,6 +54,7 @@ Amazon Comprehend `DetectPiiEntities` scans the producer's own messages, in Engl
   - a French conversation flags with `unsupported_language`;
   - a failed text is rescanned at the next save, and `pii_check` stays `failed` until it succeeds;
   - `correct_playback` text is scanned;
+  - mixed conversation: a grievance naming a worker (out of scope), then an in-scope challenge. The record's PII fields contain nothing from the grievance;
   - `pii_matches` holds the words and context, and is removed when consent changes to declined;
   - texts marked `done` are not scanned again;
   - no text is altered;

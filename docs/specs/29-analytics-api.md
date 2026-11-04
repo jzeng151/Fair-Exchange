@@ -38,7 +38,14 @@ An admin-only route that runs fixed Athena queries over the records table and th
   - **Small cells.** Any live cell with a count from 1 to 4 is returned as `{"suppressed": true}`, never as a number.
   - **Second cell.** If a breakdown has exactly one suppressed cell, the next-smallest cell in that breakdown is also suppressed, so the hidden one can't be worked out from a total or from another breakdown.
   - **Totals.** No breakdown returns a total. The single overall count of completed records is returned once and is itself suppressed if it is 1 to 4.
-  - **Pending toggle.** With `include_pending=true`, a cell is also suppressed if its pending-only count (all minus reviewed) is 1 to 4, so comparing the two views reveals nothing.
+  - **Pending toggle.** With `include_pending=true`, a cell is also suppressed if its pending-only count (all minus reviewed) is 1 to 4.
+  - **Both views together.** Suppression is always computed for the reviewed-only and the include-pending view together, whichever one is requested:
+    1. Apply the small-cell and pending rules.
+    2. Hide in both views any cell hidden in either.
+    3. Re-apply second-cell hiding in both views.
+    4. Repeat 2 and 3 until every breakdown has either no hidden cells or at least two, in both views.
+
+    So comparing the two responses reveals nothing.
 - **Response.** One JSON object with a `live` and a `seeded` section, each holding every breakdown, plus the filters applied.
 - **Latency.** The queries run on request, in parallel, with a 20-second limit. If any query times out or fails, the route returns 503 with a retry message, and nothing partial is returned.
 
@@ -51,6 +58,7 @@ An admin-only route that runs fixed Athena queries over the records table and th
   - no breakdown returns a total;
   - seeded counts are returned separately and never added to live cells;
   - with `include_pending`, a cell whose pending-only count is 1 to 4 is suppressed;
+  - reconstruction case: reviewed A=1, B=5 with five pending records added to A. Both A and B stay hidden in both views, so the reviewed counts can't be recovered by comparing the responses;
   - a query timeout returns 503;
   - declined records appear only as a count;
   - pending records are excluded by default;

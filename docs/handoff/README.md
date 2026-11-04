@@ -2,9 +2,11 @@
 
 ## Sandbox scaffold deployment
 
-The hosting slice for issues #5 and #30 deploys the existing Vue placeholder.
-Follow [the deployment instructions](../../infra/README.md). The API, AgentCore,
-data loaders, and review flows remain unimplemented and are not deployed.
+The hosting slice for issues #5 and #30 deploys the Vue website.
+Follow [the deployment instructions](../../infra/README.md). The website publishing
+workflow does not deploy API, AgentCore, or data resources. See the
+[remaining work for #5](sandbox-deployment.md#remaining-work-for-issue-5) for the
+full-stack deployment checklist and the completed AgentCore spike.
 
 The GitHub Actions workflow implements the checks in #10 and adds OIDC-based
 website publishing after successful checks on `main`. See the GitHub Actions
