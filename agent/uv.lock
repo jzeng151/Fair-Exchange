@@ -205,6 +205,7 @@ source = { editable = "." }
 dependencies = [
     { name = "fx-data" },
     { name = "pydantic" },
+    { name = "strands-agents" },
 ]
 
 [package.dev-dependencies]
@@ -219,6 +220,7 @@ dev = [
 requires-dist = [
     { name = "fx-data", directory = "../data" },
     { name = "pydantic", specifier = ">=2.8,<3" },
+    { name = "strands-agents", specifier = ">=1.60,<2" },
 ]
 
 [package.metadata.requires-dev]

@@ -74,3 +74,13 @@ PYTHONPATH=src uv run python -m fx_data.regional build   # offline -> regional_f
 
 Both files are committed. `tests/test_regional.py` fails if `regional_facts.json` no longer matches `regional_sources.json`. To add a region, add it to `REGIONS` and run both steps. The Pink Sheet workbook URL changes each year; update `PINK_SHEET_URL` when it does.
 
+## Peer projects and producer profiles (issue #16)
+
+```bash
+PYTHONPATH=src uv run python -m fx_data.peers   # offline -> peer_projects.json, producer_profiles.json
+```
+
+- **`peer_projects.json`**: 347 of the 349 environmental Premium projects (2 lorem-ipsum placeholder rows dropped), each with a challenge tag, status and dates. Organizations get a stable `ORG-xxxxxxxx` reference, and organization and person names in the text are replaced (`NAME_REPLACEMENTS` in `peers.py`). The owning account is stored only as a salted hash (`owner_key`) so a producer's own projects can be left out.
+- **`producer_profiles.json`**: producer id → country, region, crop, entity type. A stand-in until the producer-record tool (#14) and the Athena tables (#28) exist. Region is the region most of the producer's projects are in; 7 of the 146 sample producers have none.
+
+`tests/test_peers.py` fails if either file is stale, or if an account id or a listed name appears in `peer_projects.json`.
