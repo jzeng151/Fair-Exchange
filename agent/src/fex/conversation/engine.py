@@ -24,7 +24,7 @@ from fex.conversation.contract import (
     ActionEntry, ActionName, Answer, Event, Request, ResumeResponse, SpokenEntry,
 )
 from fex.conversation.state import (
-    ConversationState, Playback, Profile, ShownClaims, StateStore,
+    ConversationState, Playback, Profile, ShownClaims, StateConflict, StateStore,
 )
 from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer
 from fex.tools import ALL_TOOLS
@@ -180,6 +180,7 @@ class _Turn:
         self.on_event = on_event
         self.spoken: list[str] = []
         self.excluded = False  # an out-of-scope exchange (#21): kept in history, hidden from models
+        self.loaded_revision: int | None = None  # the state revision this request started from
 
     def emit(self, type_: str, **fields) -> None:
         event = _EVENT.validate_python({"type": type_, "seq": len(self.events) + 1, **fields})
@@ -226,6 +227,7 @@ class ConversationEngine:
         request = _REQUEST.validate_python(payload)
         state = self.store.load(request.producer_id, request.conversation_id)
         turn = _Turn(on_event)
+        turn.loaded_revision = state.revision if state else None
 
         if request.kind == "start":
             state = state or self._new_state(request.producer_id, request.conversation_id)
@@ -532,7 +534,12 @@ class ConversationEngine:
         turn.emit("actions", allowed=allowed_actions(state), language=state.language)
         if save:
             state.updated_at = self.clock()
-            self.store.save(state)
+            try:
+                self.store.save(state, expected_revision=turn.loaded_revision)
+            except StateConflict as exc:  # a newer turn already saved: never overwrite it
+                log.error("stale turn not saved: %s", exc)
+                turn.emit("error", code="agent_failed",
+                          message="This conversation changed while I was answering. Please reload it.")
         return self._events(turn, state)
 
     @staticmethod

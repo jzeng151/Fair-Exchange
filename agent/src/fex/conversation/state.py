@@ -77,19 +77,28 @@ class ConversationState(BaseModel):
     record_hash: str | None = None
     started_at: datetime
     updated_at: datetime
+    revision: int = Field(default=0, description="Increases on every save; a save must match the revision it loaded")
 
     @property
     def effective_entity_type(self) -> str | None:
         return self.entity_type or self.profile.entity_type
 
 
+class StateConflict(Exception):
+    """The stored state changed since this request loaded it. The chat API's turn lock (#25) should make this
+    impossible; if it happens, the stale request must not overwrite the newer state."""
+
+
 class StateStore(Protocol):
     """Keyed by (producer ID, conversation ID), both from the request context.
-    AgentCore Memory implements this in production (memory spec); tests use InMemoryStateStore."""
+    AgentCore Memory implements this in production (memory spec); tests use InMemoryStateStore.
+
+    `save` must reject the write with StateConflict unless the stored revision equals `expected_revision`
+    (None: the conversation must not exist yet), then store the state with its revision increased by one."""
 
     def load(self, producer_id: str, conversation_id: str) -> ConversationState | None: ...
 
-    def save(self, state: ConversationState) -> None: ...
+    def save(self, state: ConversationState, expected_revision: int | None) -> None: ...
 
 
 class InMemoryStateStore:
@@ -102,8 +111,15 @@ class InMemoryStateStore:
         raw = self._data.get((producer_id, conversation_id))
         return ConversationState.model_validate(json.loads(raw)) if raw else None
 
-    def save(self, state: ConversationState) -> None:
-        self._data[(state.producer_id, state.conversation_id)] = state.model_dump_json()
+    def save(self, state: ConversationState, expected_revision: int | None) -> None:
+        key = (state.producer_id, state.conversation_id)
+        current = self._data.get(key)
+        stored = None if current is None else ConversationState.model_validate(json.loads(current)).revision
+        if stored != expected_revision:
+            raise StateConflict(f"conversation {state.conversation_id}: stored revision {stored}, "
+                                f"expected {expected_revision}")
+        state.revision = 0 if expected_revision is None else expected_revision + 1
+        self._data[key] = state.model_dump_json()
 
     def raw(self, producer_id: str, conversation_id: str) -> str | None:
         return self._data.get((producer_id, conversation_id))
