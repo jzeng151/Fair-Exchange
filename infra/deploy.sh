@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Issue #5: one command that builds, provisions, loads data and publishes Fair Exchange, in dependency order.
 #   EXPECTED_AWS_ACCOUNT=100300582834 AWS_REGION=us-west-2 bash infra/deploy.sh
+# Required (no defaults; the specs leave them to whoever deploys):
+#   FEX_MAX_LIFETIME_MINUTES - maximum conversation lifetime (#25); must be shorter than memory's 7-day event expiry
+#   LOG_RETENTION_DAYS       - retention of the agent runtime's log group (spec 05), a CloudWatch Logs value
 # Optional: STANDARDS_DOCS_TTL_DAYS (default 30) - days before uploaded clause documents expire.
 # Needs: AWS credentials that can create IAM roles, KMS keys, Bedrock Knowledge Bases and S3 Vectors;
 # access to Amazon Titan Text Embeddings V2 in the region; uv; Node 22. Bootstraps CDK in the account if needed.
@@ -8,6 +11,8 @@ set -euo pipefail
 export AWS_PAGER=""
 export AWS_REGION="${AWS_REGION:-us-west-2}"
 : "${EXPECTED_AWS_ACCOUNT:?Set EXPECTED_AWS_ACCOUNT to your sandbox account ID}"
+: "${FEX_MAX_LIFETIME_MINUTES:?Set FEX_MAX_LIFETIME_MINUTES (maximum conversation lifetime, minutes; no default)}"
+: "${LOG_RETENTION_DAYS:?Set LOG_RETENTION_DAYS (agent runtime log retention, days; no default)}"
 ttl_days="${STANDARDS_DOCS_TTL_DAYS:-30}"
 
 account="$(aws sts get-caller-identity --query Account --output text)"
@@ -34,7 +39,7 @@ deploy() {  # stack name, extra args
     --no-fail-on-empty-changeset "$@"
 }
 
-step "1/8 Checking CDK bootstrap"
+step "1/9 Checking CDK bootstrap and Transaction Search"
 # The application stack uses CDK's standard synthesizer (docs/specs/05-cdk-stack.md), which needs a bootstrapped
 # account. The bootstrap version parameter is how the CDK CLI itself checks.
 if aws ssm get-parameter --name /cdk-bootstrap/hnb659fds/version >/dev/null 2>&1; then
@@ -43,30 +48,55 @@ else
   echo "Not bootstrapped: running cdk bootstrap (creates the CDKToolkit stack)."
   (cd "$infra" && npm ci --silent && npx cdk bootstrap "aws://$account/$AWS_REGION")
 fi
+# AgentCore traces need CloudWatch Transaction Search, set once per account and region (ADR 0002).
+destination="$(aws xray get-trace-segment-destination --query Destination --output text 2>/dev/null || true)"
+if [[ "$destination" != CloudWatchLogs ]]; then
+  echo "CloudWatch Transaction Search is off (trace destination: ${destination:-unknown}). Turn it on first;" >&2
+  echo "see docs/adr/0002-agentcore-runtime-spike.md (Logs resource policy, then update-trace-segment-destination)." >&2
+  exit 1
+fi
+echo "Transaction Search: on."
 
-step "2/8 Building the website"
+step "2/9 Building the website"
 (cd "$repo/web" && npm ci --silent && npm run build)
 
-step "3/8 Building one standards document per clause"
+step "3/9 Building one standards document per clause"
 hash="$(cd "$repo/data" && uv run --quiet python -m fx_data.standards_kb "$build/docs")"
 echo "Clause documents hash: $hash"
 
-step "4/8 Checking the infrastructure code"
+step "4/9 Checking the infrastructure code"
 (cd "$infra" && npm ci --silent && npx tsc --noEmit)
 
-step "5/8 Artifacts stack (artifacts key and bucket)"
+step "5/9 Artifacts stack (artifacts key and bucket)"
 synth
 deploy FairExchangeArtifacts
 bucket="$(output FairExchangeArtifacts ArtifactsBucketName)"
 key_arn="$(output FairExchangeArtifacts ArtifactsKeyArn)"
 [[ -n "$bucket" && "$bucket" != None && "$key_arn" == arn:aws:kms:* ]] || { echo "Artifacts stack outputs missing" >&2; exit 1; }
 
-step "6/8 Uploading clause documents to s3://$bucket/clauses/"
+step "6/9 Uploading clause documents to s3://$bucket/clauses/"
 # Freshly built files: sync re-uploads every document (resetting its expiry) and restores any that expired
 # before an ingestion can run. --delete removes clauses that no longer exist.
 aws s3 sync --only-show-errors --delete "$build/docs/clauses/" "s3://$bucket/clauses/"
 
-step "7/8 Main stack (website hosting, standards Knowledge Base; ingestion runs when the clauses change)"
+step "7/9 Packaging the agent (ARM64 Linux wheels, ADR 0002) and uploading it"
+# The agent and data packages are built as wheels; their dependencies come from agent/uv.lock (minus the
+# OpenTelemetry pins, which aws-opentelemetry-distro sets for the traces).
+(cd "$repo/agent" && uv export --frozen --no-dev --no-hashes --no-emit-project --no-emit-package fx-data -q) \
+  | grep -v -E '^opentelemetry-' > "$build/agent-requirements.txt"
+uv build -q --wheel --out-dir "$build/dist" "$repo/data"
+uv build -q --wheel --out-dir "$build/dist" "$repo/agent"
+uv pip install -q --target "$build/agent" --python-platform aarch64-manylinux2014 --python-version 3.12 \
+  --only-binary=:all: -r "$build/agent-requirements.txt" "$build"/dist/fx_data-*.whl "$build"/dist/fex_agent-*.whl \
+  aws-opentelemetry-distro==0.22.0
+cp "$repo/agent/runtime/fex/main.py" "$build/agent/main.py"
+(cd "$build/agent" && find . -name '__pycache__' -prune -exec rm -rf {} + && zip -qr -X "$build/agent.zip" .)
+sha256() { if command -v sha256sum >/dev/null; then sha256sum "$1"; else shasum -a 256 "$1"; fi; }  # Linux / macOS
+agent_key="agent/fex-$(sha256 "$build/agent.zip" | cut -c1-12).zip"  # new key per build, so CloudFormation sees a change
+aws s3 cp --only-show-errors "$build/agent.zip" "s3://$bucket/$agent_key"
+echo "Agent code: s3://$bucket/$agent_key ($(du -h "$build/agent.zip" | cut -f1))"
+
+step "8/9 Main stack (website hosting, standards Knowledge Base; ingestion runs when the clauses change)"
 # Migration for stacks deployed before the data source used RETAIN: switch the existing data source first.
 # A change that replaces the vector store also replaces the data source, and the old one is deleted after the
 # Knowledge Base role's vector permission has moved to the new index. With DELETE, that cleanup fails and leaves
@@ -92,9 +122,10 @@ fi
 # cdk deploy (not aws cloudformation deploy): it publishes the stack's CDK assets through the bootstrap roles
 (cd "$infra" && CDK_DEFAULT_ACCOUNT="$account" CDK_DEFAULT_REGION="$AWS_REGION" npx cdk deploy FairExchange \
   --require-approval never --progress events -c standardsDocsTtlDays="$ttl_days" \
-  -c artifactsBucket="$bucket" -c artifactsKeyArn="$key_arn" -c standardsDocsHash="$hash")
+  -c artifactsBucket="$bucket" -c artifactsKeyArn="$key_arn" -c standardsDocsHash="$hash" \
+  -c agentCodeKey="$agent_key" -c maxLifetimeMinutes="$FEX_MAX_LIFETIME_MINUTES" -c logRetentionDays="$LOG_RETENTION_DAYS")
 
-step "8/8 Publishing the website and running smoke tests"
+step "9/9 Publishing the website and running smoke tests"
 bash "$infra/publish-web.sh"
 kb_id="$(output FairExchange StandardsKnowledgeBaseId)"
 (cd "$repo/agent" && FEX_STANDARDS_KB_ID="$kb_id" uv run --quiet pytest -q -p no:cacheprovider \

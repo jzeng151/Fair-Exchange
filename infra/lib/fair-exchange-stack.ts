@@ -2,8 +2,10 @@ import { CfnOutput, RemovalPolicy, Stack, type StackProps } from 'aws-cdk-lib';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as kms from 'aws-cdk-lib/aws-kms';
+import type * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import type { Construct } from 'constructs';
+import { FexRuntime } from './agent-runtime';
 import { FexGuardrail } from './guardrail';
 import { FexMemory } from './memory';
 import { FexTables } from './tables';
@@ -12,6 +14,14 @@ import { StandardsKnowledgeBase, type StandardsKnowledgeBaseProps } from './stan
 export interface FairExchangeStackProps extends StackProps {
   /** From FairExchangeArtifacts and the clause build; infra/deploy.sh passes them as CDK context. */
   standards: Omit<StandardsKnowledgeBaseProps, 'dataKey'>;
+  /** The FEX agent runtime (#5). deploy.sh builds and uploads the code zip and passes its key. */
+  agent: {
+    codeKey: string;
+    /** Maximum conversation lifetime, minutes (#25: required deploy-time value, no default). */
+    maxLifetimeMinutes: number;
+    /** Runtime log retention (spec 05: required deploy-time value, no default). */
+    logRetention: logs.RetentionDays;
+  };
 }
 
 /**
@@ -25,7 +35,7 @@ const MEMORY_EVENT_EXPIRY_DAYS = 7;
  * The whole Fair Exchange stack, deployable with one command (issue #5).
  * Add each piece here as its issue lands:
  *   - Data: S3 buckets (encrypted, KMS), Glue database + tables, Athena workgroup        (#28)
- *   - Agent: AgentCore Runtime for FEX + execution role (bedrock:InvokeModel on us. profiles only) (#4)
+ *   - Agent: AgentCore Runtime for FEX + execution role (bedrock:InvokeModel on us. profiles only) (#4: done)
  *   - Guardrail in detect mode (FexGuardrail; the FEX runtime takes runtimeEnvironment + grantApply) (#12)
  *   - Knowledge Bases (S3 Vectors, NOT OpenSearch Serverless: it has an always-on cost)    (#16, #17: standards done)
  *   - API: API Gateway + Lambdas (chat, write-back, review, analytics), Powertools          (#25–#29)
@@ -88,7 +98,7 @@ export class FairExchangeStack extends Stack {
     new CfnOutput(this, 'DataKeyArn', { value: dataKey.keyArn });
 
     // Standards grounding (#17): the agent runtime (#4) gets bedrock:Retrieve on it and FEX_STANDARDS_KB_ID
-    new StandardsKnowledgeBase(this, 'StandardsKnowledgeBase', { ...props.standards, dataKey });
+    const standards = new StandardsKnowledgeBase(this, 'StandardsKnowledgeBase', { ...props.standards, dataKey });
 
     // Persistent conversation memory (#59). The agent reads FEX_MEMORY_ID from its runtime configuration.
     // When the agent runtime lands in this stack (#5), grant its role access with memory.grantAgentAccess(role).
@@ -98,6 +108,22 @@ export class FairExchangeStack extends Stack {
 
     // Records (#26) and conversations (#25) tables. The agent runtime (#5, next) gets read/write on the records
     // table only (#13 "Agent runtime permissions"); the chat API Lambdas get the conversations table.
-    new FexTables(this, 'Tables', { encryptionKey: dataKey });
+    const tables = new FexTables(this, 'Tables', { encryptionKey: dataKey });
+
+    // The FEX agent (#5, #13): AgentCore Runtime with the role limited to the #13 permission list
+    new FexRuntime(this, 'Agent', {
+      codeBucketName: props.standards.artifactsBucketName,
+      codeKey: props.agent.codeKey,
+      artifactsKeyArn: props.standards.artifactsKeyArn,
+      dataKey,
+      guardrail,
+      memory,
+      memoryEventExpiryDays: MEMORY_EVENT_EXPIRY_DAYS,
+      records: tables.records,
+      knowledgeBaseId: standards.knowledgeBaseId,
+      knowledgeBaseArn: standards.knowledgeBaseArn,
+      maxLifetimeMinutes: props.agent.maxLifetimeMinutes,
+      logRetention: props.agent.logRetention,
+    });
   }
 }
