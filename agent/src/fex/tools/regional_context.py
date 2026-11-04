@@ -6,7 +6,7 @@ from fx_data.regional import RegionalFacts
 from strands import tool
 from strands.types.tools import ToolContext
 
-from fex.tools._scope import session_producer_id
+from fex.tools._scope import retrieval_refusal, session_producer_id
 
 
 @lru_cache(maxsize=1)
@@ -23,6 +23,8 @@ def get_regional_context(tool_context: ToolContext) -> dict:
     point near the region's centre; "limited" means a world benchmark, not a local price).
     If `matched` is false, there is no data for this producer's region: say so, do not guess.
     """
+    if refusal := retrieval_refusal(tool_context):
+        return refusal
     producer_id = session_producer_id(tool_context)
     facts, profiles = _tables()
     profile = profiles.get(producer_id)

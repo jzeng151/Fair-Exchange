@@ -17,16 +17,17 @@ Use `parse_record(data)` to validate stored or incoming data; it picks the type 
 
 ## Generated files (never edit by hand)
 
-- `schema/conversation-record.schema.json`: JSON Schema
-- `../api/src/types/conversation-record.ts`: TypeScript types
+- `schema/conversation-record.schema.json` and `../api/src/types/conversation-record.ts`: the record (#6)
+- `schema/conversation-contract.schema.json` and `../api/src/types/conversation-contract.ts`: requests, actions,
+  events and the resume response between the chat API and the agent (#13)
 
-After changing `models.py`, regenerate (needs Node.js):
+After changing `models.py` or `conversation/contract.py`, regenerate (needs Node.js):
 
 ```bash
 uv run python scripts/generate_types.py
 ```
 
-`tests/test_generated_types.py` fails if the models change without regenerating, or if a generated file is edited by hand.
+`tests/test_generated_types.py` and `tests/test_generated_contract_types.py` fail if the models change without regenerating, or if a generated file is edited by hand.
 
 ## Tests
 
@@ -56,6 +57,28 @@ result.removed     # problems behind any claim that was dropped
 `write_answer(problems)` writes the answer; on a retry it receives the problems from the previous attempt so it can fix them. After `max_retries` (default 2), unverified claims are **removed and logged**, so they never reach the producer.
 
 `agent/` depends on `data/` (`fx-data`) as a regular, non-editable install. After changing `data/`, run `uv sync --reinstall-package fx-data`.
+
+## Conversation steps (issue #13)
+
+`fex.conversation` runs one conversation per (producer ID, conversation ID), following
+[`docs/specs/13-conversation-steps.md`](../docs/specs/13-conversation-steps.md). Code holds the step; the model only writes words.
+
+```
+intake → playback → respond → consent → feedback → closed
+```
+
+- **Entrypoint:** `ConversationEngine.handle(request)`, with `start`, `message`, `action`, `resume` and `auto_close`
+  requests (`conversation/contract.py`). The AgentCore wrapper is `conversation/runtime.py`.
+- **Models:** the small model (`FEX_SMALL_MODEL`) handles intake, playback, tagging and short replies, and is
+  never offered data tools. The large model (`FEX_LARGE_MODEL`) retrieves in `respond` and writes claims as
+  structured output.
+- **Claim by claim:** each claim is checked by the citation verifier before it is sent as a `claim` event.
+  Failures are rewritten up to the retry limit, then dropped and logged.
+- **Fixed text:** in `respond`, the opening line, limited-evidence notice and hand-back come from `conversation/copy.py`.
+- **State:** `ConversationState`, stored as JSON through a `StateStore` and rebuilt on every request.
+  `InMemoryStateStore` is used until AgentCore Memory (`docs/specs/memory.md`) is built.
+- **Tests:** `tests/test_conversation_steps.py` (seam 1: scripted Strands models in `tests/conversation_harness.py`,
+  real tools and data, real verifier).
 
 ## Tools
 

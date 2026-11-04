@@ -1,0 +1,57 @@
+"""AgentCore Runtime entrypoint for the FEX conversation (issue #13).
+
+The chat API (#25) invokes the runtime with one request per call ({kind, producerId, conversationId, ...}).
+Model IDs are configuration (ADR 0001): a small model for intake, playback and tagging; a large model
+for the grounded answer. Defaults are US inference profiles so processing stays in US regions.
+Deploy pattern: docs/adr/0002-agentcore-runtime-spike.md.
+
+State: in-memory per runtime session until AgentCore Memory (docs/specs/memory.md) replaces the store.
+"""
+import os
+from functools import lru_cache
+from typing import Any
+
+from pydantic import ValidationError
+
+from fex.conversation.contract import ResumeResponse
+from fex.conversation.engine import ConversationEngine
+from fex.conversation.state import InMemoryStateStore
+
+DEFAULT_SMALL = "us.anthropic.claude-haiku-5-5"
+DEFAULT_LARGE = "us.anthropic.claude-sonnet-5-5"
+
+
+def model_ids() -> tuple[str, str]:
+    return os.environ.get("FEX_SMALL_MODEL", DEFAULT_SMALL), os.environ.get("FEX_LARGE_MODEL", DEFAULT_LARGE)
+
+
+@lru_cache(maxsize=1)
+def default_engine() -> ConversationEngine:
+    from strands.models.bedrock import BedrockModel
+
+    small, large = model_ids()
+    return ConversationEngine(store=InMemoryStateStore(), small_model=BedrockModel(model_id=small),
+                              large_model=BedrockModel(model_id=large))
+
+
+def invoke(payload: dict[str, Any], engine: ConversationEngine | None = None) -> dict[str, Any]:
+    """Run one request. Returns {"events": [...]}, {"resume": {...}} or {"error": {...}} as plain JSON."""
+    try:
+        result = (engine or default_engine()).handle(payload)
+    except ValidationError as exc:
+        return {"error": {"code": "invalid_request", "message": exc.errors(include_url=False)[0]["msg"]}}
+    if isinstance(result, ResumeResponse):
+        return {"resume": result.model_dump(mode="json")}
+    return {"events": [e.model_dump(mode="json") for e in result]}
+
+
+def create_app():  # pragma: no cover - exercised when deployed
+    from bedrock_agentcore.runtime import BedrockAgentCoreApp
+
+    app = BedrockAgentCoreApp()
+
+    @app.entrypoint
+    def entry(payload: dict[str, Any], context: Any = None) -> dict[str, Any]:
+        return invoke(payload)
+
+    return app
