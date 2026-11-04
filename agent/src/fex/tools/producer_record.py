@@ -5,7 +5,7 @@ from fx_data.records import ProducerRecords
 from strands import tool
 from strands.types.tools import ToolContext
 
-from fex.tools._scope import session_producer_id
+from fex.tools._scope import retrieval_refusal, session_producer_id
 
 
 @lru_cache(maxsize=1)
@@ -24,6 +24,8 @@ def get_producer_record(tool_context: ToolContext) -> dict:
         there is nothing to summarize. No survey data is normal; say so rather than guess.
     Cite each item's `source`.
     """
+    if refusal := retrieval_refusal(tool_context):
+        return refusal
     producer_id = session_producer_id(tool_context)
     record = _records().get(producer_id)
     if record is None:

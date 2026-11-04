@@ -14,17 +14,18 @@ describe('resolveIdentity (placeholder until sign-in is decided)', () => {
         body: JSON.stringify({ roles: ['producer'] }),
       }),
     );
-    expect(id).toEqual({ user_id: 'u1', roles: ['reviewer', 'admin'] });
+    expect(id.userId).toBe('u1');
+    expect([...id.roles].sort()).toEqual(['admin', 'reviewer']); // order doesn't matter; 'bogus' and non-context roles are dropped
   });
 
   it('sets producer_id only with the producer role', async () => {
     expect(await resolveIdentity(event({ userId: 'u1', roles: 'producer', producerId: 'p1' }))).toEqual({
-      user_id: 'u1',
+      userId: 'u1',
       roles: ['producer'],
-      producer_id: 'p1',
+      producerId: 'p1',
     });
     expect(await resolveIdentity(event({ userId: 'u1', roles: 'admin', producerId: 'p1' }))).toEqual({
-      user_id: 'u1',
+      userId: 'u1',
       roles: ['admin'],
     });
   });
@@ -37,7 +38,7 @@ describe('resolveIdentity (placeholder until sign-in is decided)', () => {
 
 describe('requireRole', () => {
   it('throws Forbidden without the role', () => {
-    expect(() => requireRole({ user_id: 'u', roles: ['reviewer'] }, 'admin')).toThrow(Forbidden);
-    expect(() => requireRole({ user_id: 'u', roles: ['admin'] }, 'admin')).not.toThrow();
+    expect(() => requireRole({ userId: 'u', roles: ['reviewer'] }, 'admin')).toThrow(Forbidden);
+    expect(() => requireRole({ userId: 'u', roles: ['admin'] }, 'admin')).not.toThrow();
   });
 });

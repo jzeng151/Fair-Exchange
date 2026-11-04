@@ -18,13 +18,62 @@ from typing import Any, Protocol
 
 from botocore.exceptions import ClientError
 
+from fex.conversation.contract import ActionEntry, SpokenEntry
 from fex.conversation.state import ConversationState
-from fex.models import CompletedRecord, DeclinedRecord, parse_record
+from fex.models import CompletedRecord, DeclinedRecord, PiiScanState, TextScanStatus, parse_record
+from fex.pii import PiiText, scan_texts
 
 log = logging.getLogger(__name__)
 
 # Fields that change on every save; they don't count when deciding whether anything changed.
 _SAVE_FIELDS = {"updated_at", "version", "created_at"}
+
+
+def producer_texts(state: ConversationState) -> list[tuple[int, PiiText]]:
+    """The texts the record keeps, in history order: the producer's messages and the correct-playback
+    text (issue #20). Out-of-scope history positions are skipped: a grievance adds nothing, not even
+    a scan error. Each text carries its scan status from the conversation state.
+    """
+    tracked = {t.history_index: t for t in (state.pii.per_text if state.pii else [])}
+    texts: list[tuple[int, PiiText]] = []
+    for i, entry in enumerate(state.history):
+        if i in state.excluded_history:
+            continue
+        if isinstance(entry, SpokenEntry) and entry.role == "producer":
+            kind, raw = "message", entry.text
+        elif isinstance(entry, ActionEntry) and entry.name == "correct_playback":
+            kind, raw = "correct_playback", str(entry.args.get("text") or "")
+        else:
+            continue
+        if not raw.strip():
+            continue
+        texts.append((i, PiiText(text=raw, message_at=entry.at, kind=kind,
+                                 status=tracked[i].status if i in tracked else "pending")))
+    return texts
+
+
+def run_pii_scan(state: ConversationState, scanner) -> None:
+    """Scan this conversation's producer texts during a save (issue #20) and update `state.pii`.
+
+    A declined record keeps no narrative content, so a declined conversation is not scanned; the
+    accumulated state is kept in case consent comes back. An unconfigured scanner (None) changes
+    nothing: a missing configuration is not a failed scan.
+    """
+    if state.consent is None or state.consent == "declined":
+        return
+    texts = producer_texts(state)
+    result = scan_texts(
+        [t for _, t in texts], state.language, scanner,
+        prior_flag=state.pii.flagged if state.pii else False,
+        prior_entity_types=state.pii.entity_types if state.pii else [],
+        prior_matches=state.pii.matches if state.pii else [],
+    )
+    state.pii = PiiScanState(
+        per_text=[TextScanStatus(history_index=i, at=t.message_at, kind=t.kind, status=t.status)
+                  for i, t in texts],
+        flagged=result.flag, entity_types=result.entity_types,
+        matches=result.matches, check=result.check,
+    )
 
 
 class RecordConflict(Exception):
@@ -73,9 +122,16 @@ def build_record(state: ConversationState, *, version: int, created_at: datetime
     playback, answer = state.playback, state.answer
     if playback is None or answer is None:
         return None
+    pii = ({} if state.pii is None else {
+        "pii_flag": state.pii.flagged,
+        "pii_entity_types": state.pii.entity_types,
+        "pii_matches": state.pii.matches,
+        "pii_check": state.pii.check,
+    })
     return parse_record({
         **common,
         "status": "completed",
+        **pii,
         "consent": {"scope": state.consent, "recorded_at": latest},
         "language": state.language,
         "entity_type": state.effective_entity_type or "unknown",
@@ -97,12 +153,17 @@ def _content_hash(record: CompletedRecord | DeclinedRecord) -> str:
 
 # ------------------------------------------------------------------------------------------- save
 
-def save_record(state: ConversationState, store: RecordStore, now: datetime) -> SaveResult | None:
+def save_record(state: ConversationState, store: RecordStore, now: datetime,
+                pii_scanner=None) -> SaveResult | None:
     """Save this conversation's record if it changed. Updates `state` with the saved version.
 
-    Returns None when there is nothing to save or nothing changed (no write). Raises ValidationError for
-    an invalid record and RecordConflict when a condition fails; in both cases nothing is written.
+    Runs the PII scan (`pii_scanner`, issue #20) first so the built record carries the current
+    flag, types, matches and check. Returns None when there is nothing to save or nothing changed
+    (no write). Raises ValidationError for an invalid record and RecordConflict when a condition
+    fails; in both cases nothing is written.
     """
+    if pii_scanner is not None:
+        run_pii_scan(state, pii_scanner)
     first = state.record_version is None
     version = 1 if first else state.record_version + 1
     created_at = now if first else state.record_created_at
@@ -158,4 +219,5 @@ class DynamoRecordStore:
             raise
 
 
-__all__ = ["DynamoRecordStore", "RecordConflict", "RecordStore", "SaveResult", "build_record", "save_record"]
+__all__ = ["DynamoRecordStore", "RecordConflict", "RecordStore", "SaveResult", "build_record",
+           "producer_texts", "run_pii_scan", "save_record"]

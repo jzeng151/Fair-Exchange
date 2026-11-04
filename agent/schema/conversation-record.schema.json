@@ -183,6 +183,23 @@
           "title": "Pii Flag",
           "type": "boolean"
         },
+        "pii_review": {
+          "anyOf": [
+            {
+              "enum": [
+                "confirmed",
+                "cleared"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reviewer decision on the PII flag",
+          "title": "Pii Review"
+        },
         "producer_id": {
           "description": "Set from the session, never from the conversation",
           "minLength": 1,

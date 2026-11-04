@@ -28,6 +28,10 @@ def test_json_schema_file_matches_the_models():
         "agent/schema JSON is stale; run scripts/generate_types.py"
 
 
+def test_api_schema_copy_matches_the_models():
+    copy = REPO / "api" / "src" / "types" / "conversation-record.schema.json"
+    assert copy.read_text(encoding="utf-8") == export_json_schema(), \
+        "api/src/types schema copy is stale; run scripts/generate_types.py"
 def test_typescript_types_come_from_the_current_schema():
     ts = TS_TYPES.read_text(encoding="utf-8")
     assert banner_value(ts, "schema-sha256") == sha256(export_json_schema()), \

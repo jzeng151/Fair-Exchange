@@ -11,7 +11,7 @@ import {
   type QueryName,
 } from '../analytics/athena.js';
 import { buildResponse } from '../analytics/response.js';
-import { requireRole, resolveIdentity, type RoleResolver } from '../core/identity.js';
+import { requireRole, resolveIdentity, type IdentityFullResolver } from '../core/identity.js';
 import { json, toErrorResult, type JsonResult } from '../core/routes.js';
 
 /**
@@ -37,7 +37,7 @@ const asProxyResult = (r: JsonResult): APIGatewayProxyResult => ({
 const includePending = (event: APIGatewayProxyEvent) => event.queryStringParameters?.include_pending === 'true';
 
 /** Builds the handler. Exported so tests can pass fakes; the Lambda export below uses the real ones. */
-export function createAnalyticsHandler(getDeps: () => AnalyticsDeps, resolve: RoleResolver = resolveIdentity) {
+export function createAnalyticsHandler(getDeps: () => AnalyticsDeps, resolve: IdentityFullResolver = resolveIdentity) {
   // The named queries' SQL is loaded once per container; a failed load is retried next request.
   let sql: Promise<Record<QueryName, string>> | undefined;
 

@@ -23,6 +23,7 @@ from fex.conversation.scope import ScopeCheck, always_in_scope
 from fex.conversation.contract import (
     ActionEntry, ActionName, Answer, Event, Request, ResumeResponse, SpokenEntry,
 )
+from fex.guardrail import CONVERSATION_KEY, OutputAssessor, narrative_texts
 from fex.conversation.state import (
     ConversationState, Playback, Profile, ShownClaims, StateConflict, StateStore,
 )
@@ -205,16 +206,21 @@ class ConversationEngine:
     def __init__(self, *, store: StateStore, small_model: Any, large_model: Any, standards: Standards | None = None,
                  profiles: Callable[[str], Profile | None] | None = None, tools: list | None = None,
                  clock: Callable[[], datetime] | None = None, max_retries: int = 2,
-                 records: Any = None, scope_check: ScopeCheck | None = None) -> None:
+                 records: Any = None, scope_check: ScopeCheck | None = None,
+                 pii_scanner: Callable[[str, str], list[dict]] | None = None,
+                 output_assessor: OutputAssessor | None = None) -> None:
         self.store = store
         self.small_model, self.large_model = small_model, large_model
         self.standards = standards or Standards.load()
         self.profiles = profiles or _default_profiles()
         self.tools = tools if tools is not None else ALL_TOOLS
+        self.pii_scanner = pii_scanner  # the Comprehend seam (#20): None in tests, wired in runtime
         self.clock = clock or (lambda: datetime.now(UTC))
         self.max_retries = max_retries
         self.records = records  # a fex.records.RecordStore; None = records are not saved (#26)
         self.scope_check = scope_check or always_in_scope  # how it decides is "Not decided" (#21)
+        # Assesses structured-output text, which the Converse guardrail skips (#12). No-op when unconfigured.
+        self.output_assessor = output_assessor or OutputAssessor()
 
     # ------------------------------------------------------------------ entrypoint
 
@@ -236,7 +242,7 @@ class ConversationEngine:
                 # written yet, so the model's guess doesn't set it; intake switches once the producer writes.
                 state.language = state.profile.language or "en"
                 opening = self._structured(
-                    self.small_model, INTAKE_SYSTEM,
+                    state, self.small_model, INTAKE_SYSTEM,
                     self._transcript(state) + f"\n\nStart the conversation with an open question, written in the "
                     f"language with ISO 639-1 code '{state.language}'.", IntakeTurn)
                 turn.say(opening.reply)
@@ -272,7 +278,7 @@ class ConversationEngine:
         elif state.step == "playback":
             self._playback(state, turn, correction=text)
         else:  # respond, consent, feedback: a short reply that changes nothing
-            reply = self._structured(self.small_model, SHORT_REPLY_SYSTEM, self._transcript(state), ShortReply)
+            reply = self._structured(state, self.small_model, SHORT_REPLY_SYSTEM, self._transcript(state), ShortReply)
             turn.say(reply.reply)
         return self._finish(state, turn, step_changed=state.step != before)
 
@@ -338,7 +344,7 @@ class ConversationEngine:
         from fex.records import RecordConflict, save_record  # local: records imports conversation state
 
         try:
-            result = save_record(state, self.records, self.clock())
+            result = save_record(state, self.records, self.clock(), pii_scanner=self.pii_scanner)
         except (RecordConflict, ValueError) as exc:
             log.error("record not saved for conversation %s: %s", state.conversation_id, exc)
             turn.emit("error", code="agent_failed", message="Your answer could not be saved. Please try again.")
@@ -350,7 +356,7 @@ class ConversationEngine:
     # ------------------------------------------------------------------ steps
 
     def _ask(self, state: ConversationState, turn: _Turn, system: str, prompt: str) -> IntakeTurn:
-        result = self._structured(self.small_model, system, prompt, IntakeTurn)
+        result = self._structured(state, self.small_model, system, prompt, IntakeTurn)
         state.language = result.language or state.language
         return result
 
@@ -363,7 +369,7 @@ class ConversationEngine:
 
     def _playback(self, state: ConversationState, turn: _Turn, correction: str | None = None) -> None:
         prompt = self._transcript(state) + (f"\n\nThe producer corrected the playback: {correction}" if correction else "")
-        draft = self._structured(self.small_model, PLAYBACK_SYSTEM, prompt, PlaybackDraft)
+        draft = self._structured(state, self.small_model, PLAYBACK_SYSTEM, prompt, PlaybackDraft)
         state.playback = Playback(text=draft.text, challenge=draft.challenge, timing=draft.timing,
                                   severity=draft.severity, tried=draft.tried)
         if draft.entity_type:  # every correction applies; back to the value on file clears the override
@@ -378,7 +384,7 @@ class ConversationEngine:
     def _confirm(self, state: ConversationState, turn: _Turn) -> None:
         assert state.playback is not None
         note = f"\nLocation note (keep it in both summaries): {state.location_note}" if state.location_note else ""
-        summary = self._structured(self.small_model, SUMMARY_SYSTEM,
+        summary = self._structured(state, self.small_model, SUMMARY_SYSTEM,
                                    f"Language: {state.language}\nConfirmed playback: {state.playback.model_dump_json()}"
                                    + note, RecordSummary)
         state.playback.summary_original = summary.summary_original
@@ -480,7 +486,8 @@ class ConversationEngine:
 
     def _retrieve_and_write(self, state: ConversationState, prompt: str) -> tuple[AnswerDraft, list[str]]:
         invocation_state = {"producer_id": state.producer_id, "step": "respond",
-                            "entity_type": state.effective_entity_type}
+                            "entity_type": state.effective_entity_type,
+                            CONVERSATION_KEY: state.conversation_id}  # for Guardrail findings (#12)
         try:
             agent = Agent(model=self.large_model, system_prompt=ANSWER_SYSTEM, tools=list(self.tools),
                           callback_handler=None)
@@ -489,7 +496,9 @@ class ConversationEngine:
             raise _AgentFailed(str(exc)) from exc
         if errors := _tool_errors(agent.messages):  # a tool failure Strands returned as a result
             raise _AgentFailed("data tool failed: " + "; ".join(errors))
-        return result.structured_output, _tool_sources(agent.messages)
+        draft = result.structured_output
+        self.output_assessor.assess(narrative_texts(draft), state.conversation_id)
+        return draft, _tool_sources(agent.messages)
 
     def _answer_prompt(self, state: ConversationState) -> str:
         pb = state.playback
@@ -506,10 +515,15 @@ class ConversationEngine:
 
     # ------------------------------------------------------------------ helpers
 
-    def _structured(self, model: Any, system: str, prompt: str, output: type[BaseModel]) -> Any:
+    def _structured(self, state: ConversationState, model: Any, system: str, prompt: str,
+                    output: type[BaseModel]) -> Any:
         """Small-model calls: no data tools are ever offered here."""
         agent = Agent(model=model, system_prompt=system, tools=[], callback_handler=None)
-        return agent(prompt, structured_output_model=output).structured_output
+        # Only the conversation ID: no producer ID, step or entity type, so no data tool could ever run.
+        result = agent(prompt, structured_output_model=output,
+                       invocation_state={CONVERSATION_KEY: state.conversation_id}).structured_output
+        self.output_assessor.assess(narrative_texts(result), state.conversation_id)
+        return result
 
     def _transcript(self, state: ConversationState) -> str:
         p = state.profile

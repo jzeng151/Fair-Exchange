@@ -131,7 +131,7 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 
 ## Out of Scope
 
-- Review, analytics and "your record" routes (later batch)
+- Review, analytics and "your record" routes ([#27](27-review-api.md), [#29](29-analytics-api.md), [#32](32-your-record.md))
 - The web UI beyond the routes and stream format
 - Production identity, WAF and rate limiting beyond API Gateway defaults
 

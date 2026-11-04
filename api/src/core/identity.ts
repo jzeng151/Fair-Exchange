@@ -29,6 +29,16 @@ export const resolveCaller: IdentityResolver = (event) => {
   return producerId;
 };
 
+export type Role = 'producer' | 'reviewer' | 'admin';
+
+/** The caller as the identity-resolution function returns it (#11 spec). */
+export interface Identity {
+  userId: string;
+  roles: Role[];
+  /** Present only with the `producer` role. */
+  producerId?: string;
+}
+
 /** Thrown when the caller is identified but lacks the route's role. Handlers return 403. */
 export class Forbidden extends Error {
   constructor() {
@@ -37,39 +47,30 @@ export class Forbidden extends Error {
   }
 }
 
-export type Role = 'producer' | 'reviewer' | 'admin';
+export type IdentityFullResolver = (event: APIGatewayProxyEvent) => Promise<Identity> | Identity;
 
-/** The caller's identity (#11 spec). `producer_id` is present only with the `producer` role. */
-export interface CallerIdentity {
-  user_id: string;
-  roles: Role[];
-  producer_id?: string;
-}
-
-/** Identity resolution for routes that check roles (#11 spec). Throws Unauthorized when unidentified. */
-export type RoleResolver = (event: APIGatewayProxyEvent) => Promise<CallerIdentity> | CallerIdentity;
-
-const ROLES: readonly Role[] = ['producer', 'reviewer', 'admin'];
+const ROLES: readonly string[] = ['producer', 'reviewer', 'admin'];
 
 /**
- * Placeholder, like `resolveCaller`, until FTUSA decides how callers sign in (not decided in the
- * #11 spec). Reads `userId` and `roles` (comma-separated, because authorizer context values are
- * strings) from the API Gateway authorizer context only, never from the body, path, query string
- * or headers. Replace this function when the sign-in method is chosen; no handler changes.
+ * Placeholder, like `resolveCaller`: reads `userId`, `roles` (comma separated) and `producerId` from the
+ * API Gateway authorizer context, never from the request. Replace it when the sign-in method is chosen.
  */
-export const resolveIdentity: RoleResolver = (event) => {
+export const resolveIdentity: IdentityFullResolver = (event) => {
   const ctx = event.requestContext?.authorizer;
   const userId = ctx?.userId;
   if (typeof userId !== 'string' || userId.length === 0) throw new Unauthorized();
-  const given = typeof ctx?.roles === 'string' ? ctx.roles.split(',').map((s: string) => s.trim()) : [];
-  const roles = ROLES.filter((r) => given.includes(r));
-  const producerId = ctx?.producerId;
-  return roles.includes('producer') && typeof producerId === 'string' && producerId.length > 0
-    ? { user_id: userId, roles, producer_id: producerId }
-    : { user_id: userId, roles };
+  const roles = (typeof ctx?.roles === 'string' ? ctx.roles.split(',') : [])
+    .map((r: string) => r.trim())
+    .filter((r: string): r is Role => ROLES.includes(r));
+  const identity: Identity = { userId, roles };
+  if (roles.includes('producer') && typeof ctx?.producerId === 'string' && ctx.producerId.length > 0) {
+    identity.producerId = ctx.producerId;
+  }
+  return identity;
 };
 
-/** Throws Forbidden (403) unless the caller has `role`. */
-export function requireRole(identity: CallerIdentity, role: Role): void {
+/** Returns the identity if it has the role, otherwise throws Forbidden. */
+export function requireRole(identity: Identity, role: Role): Identity {
   if (!identity.roles.includes(role)) throw new Forbidden();
+  return identity;
 }

@@ -1,7 +1,7 @@
 // GENERATED FILE. Do not edit by hand.
 // Source: agent/src/fex/models.py  ->  agent/scripts/generate_types.py
-// schema-sha256: c284675744ec3db2711335ba461c075f321cdadbbdd000f31da1d6d2141990aa
-// body-sha256: 5ec5345a13493f0482edab75141e5c7a7e1a4eea7154f0009e057a4cb549ce65
+// schema-sha256: cca9aed75c59b7dba5fce1131f554e46c957f1a39a3d72491d17219c6bf3dddd
+// body-sha256: 9c1823be00ca2f205d03c692b3a6d03f1272b16998514bf1aa6b953d8e2d0430
 // end-of-banner
 /**
  * One record per Fair Exchange conversation. Generated from agent/src/fex/models.py; do not edit by hand.
@@ -77,6 +77,10 @@ export type PeerExamples1 = Claim[];
  * Personal information flagged for human review; never redacted
  */
 export type PiiFlag = boolean;
+/**
+ * Reviewer decision on the PII flag
+ */
+export type PiiReview = ("confirmed" | "cleared") | null;
 /**
  * Set from the session, never from the conversation
  */
@@ -211,6 +215,7 @@ export interface CompletedRecord {
   language: Language;
   peer_examples?: PeerExamples1;
   pii_flag?: PiiFlag;
+  pii_review?: PiiReview;
   producer_id: ProducerId;
   record_id: RecordId;
   review_status?: ReviewStatus;

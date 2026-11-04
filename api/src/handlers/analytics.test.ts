@@ -11,7 +11,7 @@ import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
 import { mockClient } from 'aws-sdk-client-mock';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { QUERY_NAMES } from '../analytics/athena.js';
-import { Unauthorized, type CallerIdentity, type RoleResolver } from '../core/identity.js';
+import { Unauthorized, type Identity, type IdentityFullResolver } from '../core/identity.js';
 import { CaptureLog } from '../core/testing.js';
 import { createAnalyticsHandler, type AnalyticsDeps } from './analytics.js';
 
@@ -25,9 +25,9 @@ type Usage = [string, number, number][];
 
 const athena = mockClient(AthenaClient);
 
-const ADMIN: CallerIdentity = { user_id: 'admin-1', roles: ['admin'] };
+const ADMIN: Identity = { userId: 'admin-1', roles: ['admin'] };
 const fakeResolver =
-  (identity: CallerIdentity | null): RoleResolver =>
+  (identity: Identity | null): IdentityFullResolver =>
   () => {
     if (!identity) throw new Unauthorized();
     return identity;
@@ -120,7 +120,7 @@ function deps(overrides: Partial<AnalyticsDeps> = {}): AnalyticsDeps {
 }
 
 async function call(
-  opts: { identity?: CallerIdentity | null; query?: Record<string, string> | null; deps?: Partial<AnalyticsDeps> } = {},
+  opts: { identity?: Identity | null; query?: Record<string, string> | null; deps?: Partial<AnalyticsDeps> } = {},
 ): Promise<{ status: number; body: any }> {
   const d = deps(opts.deps);
   const h = createAnalyticsHandler(() => d, fakeResolver(opts.identity === undefined ? ADMIN : opts.identity));
@@ -151,9 +151,9 @@ beforeEach(() => athena.reset());
 
 describe('access', () => {
   it('returns 403 for a caller without the admin role', async () => {
-    for (const roles of [['producer'], ['reviewer'], []] as CallerIdentity['roles'][]) {
+    for (const roles of [['producer'], ['reviewer'], []] as Identity['roles'][]) {
       given({ live: BASE });
-      const r = await call({ identity: { user_id: 'u', roles } });
+      const r = await call({ identity: { userId: 'u', roles } });
       expect(r.status).toBe(403);
       expect(r.body).toEqual({ message: 'Forbidden' });
     }
