@@ -260,12 +260,7 @@ class ConversationEngine:
     def _message(self, state: ConversationState, turn: _Turn, text: str):
         before = state.step
         state.history.append(SpokenEntry(role="producer", text=text, at=self.clock()))
-        verdict = self.scope_check(text, state.step)
-        if not verdict.in_scope:  # decline in fixed text; no model, no data tool, step unchanged (#21)
-            state.excluded_history.append(len(state.history) - 1)
-            turn.excluded = True
-            turn.say(copy.text(state.language, f"out_of_scope_{verdict.reason or 'other_producer_data'}"))
-            turn.say(copy.text(state.language, "back_to_open"))
+        if self._declined(state, turn, text):
             return self._finish(state, turn, step_changed=False)
         if state.step == "intake":
             self._intake(state, turn)
@@ -288,7 +283,8 @@ class ConversationEngine:
         if name == "confirm_playback":
             self._confirm(state, turn)
         elif name == "correct_playback":
-            self._playback(state, turn, correction=args["text"])
+            if not self._declined(state, turn, args["text"]):  # a correction gets the same scope check (#21)
+                self._playback(state, turn, correction=args["text"])
         elif name == "reopen_playback":
             self._reopen(state, turn)
         elif name == "retry_answer":
@@ -303,6 +299,20 @@ class ConversationEngine:
         elif name == "end":
             return self._close(state, turn, "end")
         return self._finish(state, turn, step_changed=state.step != before)
+
+    def _declined(self, state: ConversationState, turn: _Turn, text: str) -> bool:
+        """The one scope check for producer text (#21). Out of scope: fixed decline in the producer's language,
+        no model, no data tool, step unchanged; the exchange stays in history but is hidden from models."""
+        verdict = self.scope_check(text, state.step)
+        if verdict.in_scope:
+            return False
+        if verdict.language:
+            state.language = verdict.language
+        state.excluded_history.append(len(state.history) - 1)
+        turn.excluded = True
+        turn.say(copy.text(state.language, f"out_of_scope_{verdict.reason or 'other_producer_data'}"))
+        turn.say(copy.text(state.language, "back_to_open"))
+        return True
 
     @staticmethod
     def _is_repeat(state: ConversationState, name: str, args: dict) -> bool:

@@ -89,6 +89,8 @@ decline text in the producer's language plus an offer to return to the open ques
 data tool runs, and the step stays the same. The exchange stays in the resume history but is never given to a
 model, so it can't reach the playback, summaries or record. **How detection decides is "Not decided"**: the
 default, `always_in_scope`, treats everything as in scope. Pass `scope_check=` to `ConversationEngine` to plug one in.
+The check also covers text sent with `correct_playback`. A verdict can carry the message's `language`, so a
+producer whose first message is out of scope still gets the decline in their own language (no model is called).
 
 ## Write-back (issue #26)
 

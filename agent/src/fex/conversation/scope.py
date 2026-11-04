@@ -18,6 +18,9 @@ OutOfScopeReason = Literal["certification_status", "grievance", "other_producer_
 class ScopeVerdict:
     in_scope: bool
     reason: OutOfScopeReason | None = None
+    # ISO 639-1 language of the message, if the detector knows it. The decline makes no model call, so this
+    # is how a producer whose FIRST message is out of scope still gets the decline in their own language.
+    language: str | None = None
 
 
 ScopeCheck = Callable[[str, str], ScopeVerdict]

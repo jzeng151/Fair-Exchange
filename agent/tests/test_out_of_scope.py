@@ -128,3 +128,43 @@ def test_resume_history_still_shows_the_exchange():
 
 def test_the_default_detector_treats_everything_as_in_scope():
     assert always_in_scope("anything", "intake") == ScopeVerdict(in_scope=True)
+
+
+# ---------------------------------------------------------------- review fixes (Codex on #71)
+
+def test_an_out_of_scope_correction_is_declined_and_the_playback_kept():
+    detector = FakeDetector()
+    r = run_in("playback", detector)
+    before, small_calls = r.state().playback.text, len(r.small.calls)
+    events = r.action("correct_playback", text=MISDIRECTED)
+    assert r.state().playback.text == before and r.state().step == "playback"
+    assert len(r.small.calls) == small_calls  # no model saw it
+    assert "otros productores" in spoken(events).lower()
+    assert detector.calls[-1] == (MISDIRECTED, "playback")
+
+
+def test_an_out_of_scope_correction_never_reaches_later_prompts():
+    r = run_in("playback", FakeDetector())
+    r.action("correct_playback", text=MISDIRECTED)
+    r.small.add(summary())
+    r.large.add(*RETRIEVE, r.good_answer())
+    r.action("confirm_playback")
+    assert all("Vecina" not in p for p in r.small.prompts + r.large.prompts)
+
+
+class SpanishDetector(FakeDetector):
+    def __call__(self, text, step):
+        self.calls.append((text, step))
+        if text == MISDIRECTED:
+            return ScopeVerdict(in_scope=False, reason="other_producer_data", language="es")
+        return ScopeVerdict(in_scope=True)
+
+
+def test_a_first_message_decline_uses_the_messages_language_not_the_default():
+    r = Run(scope_check=SpanishDetector())
+    r.small.add(intake("What has been difficult?", language="en"))  # an English opening
+    r.send("start")
+    assert r.state().language == "en"
+    text = spoken(r.send("message", text=MISDIRECTED)).lower()
+    assert "otros productores" in text and "¿qué ha sido difícil" in text
+    assert r.state().language == "es"
