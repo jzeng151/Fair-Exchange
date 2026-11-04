@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Scaffold checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      AWS_EC2_METADATA_DISABLED: 'true'
+      AWS_DEFAULT_REGION: us-west-2
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: Fair-Exchange-Scaffolding/*/package-lock.json
+      - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
+        with:
+          version: '0.13.7'
+          python-version: '3.12'
+      - name: Python tests
+        working-directory: Fair-Exchange-Scaffolding/agent
+        run: |
+          uv sync --locked
+          uv run --no-sync pytest tests ../eval/tests
+      - name: API type check
+        working-directory: Fair-Exchange-Scaffolding/api
+        run: npm ci && npm run typecheck
+      - name: Web build and type check
+        working-directory: Fair-Exchange-Scaffolding/web
+        run: npm ci && npm run build
+      - name: Infrastructure type check and synthesis
+        working-directory: Fair-Exchange-Scaffolding/infra
+        run: |
+          npm ci
+          npx tsc --noEmit
+          npx cdk synth --quiet
+
+  deploy:
+    name: Publish sandbox
+    needs: checks
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && vars.AWS_DEPLOY_ROLE_ARN != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: fair-exchange-sandbox-deploy
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      EXPECTED_AWS_ACCOUNT: '100300582834'
+      AWS_REGION: us-west-2
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: Fair-Exchange-Scaffolding/web/package-lock.json
+      - name: Build website
+        working-directory: Fair-Exchange-Scaffolding/web
+        run: npm ci && npm run build
+      - name: Authenticate to sandbox
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ vars.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-west-2
+          allowed-account-ids: '100300582834'
+          role-session-name: GitHub-${{ github.run_id }}
+      - name: Publish and verify website
+        run: bash Fair-Exchange-Scaffolding/infra/publish-web.sh
