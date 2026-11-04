@@ -23,6 +23,11 @@ export class VersionConflict extends Error {
 export interface RecordStore {
   /** Every closed completed record. Filtering and ordering are the caller's job (a filtered scan, per #27). */
   listClosedCompleted(): Promise<StoredRecord[]>;
+  /**
+   * Every closed record for one producer, completed or declined (a filtered scan on producer_id, per #32).
+   * Ordering and field projection are the caller's job. The producer ID comes only from the identity.
+   */
+  listClosedByProducer(producerId: string): Promise<StoredRecord[]>;
   /** Strongly consistent read of one record, or undefined. */
   get(recordId: string): Promise<StoredRecord | undefined>;
   /**
@@ -53,6 +58,26 @@ export class DynamoRecordStore implements RecordStore {
           FilterExpression: '#status = :completed AND attribute_type(closed_at, :string)',
           ExpressionAttributeNames: { '#status': 'status' },
           ExpressionAttributeValues: { ':completed': { S: 'completed' }, ':string': { S: 'S' } },
+          ExclusiveStartKey: startKey,
+        }),
+      );
+      for (const item of out.Items ?? []) records.push(toRecord(item));
+      startKey = out.LastEvaluatedKey;
+    } while (startKey);
+    return records;
+  }
+
+  async listClosedByProducer(producerId: string): Promise<StoredRecord[]> {
+    const records: StoredRecord[] = [];
+    let startKey: Item | undefined;
+    do {
+      const out = await this.client.send(
+        new ScanCommand({
+          TableName: this.table,
+          // Closed records for this producer, completed or declined. The producer ID is the caller's,
+          // from the identity; a producer can never scan another's records.
+          FilterExpression: 'producer_id = :pid AND attribute_type(closed_at, :string)',
+          ExpressionAttributeValues: { ':pid': { S: producerId }, ':string': { S: 'S' } },
           ExclusiveStartKey: startKey,
         }),
       );

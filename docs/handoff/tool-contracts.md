@@ -42,7 +42,7 @@ Items with `kind: "producer_record"`: first the profile, then the producer's own
   "text": "Location on file: Cajamarca, Peru; crop: Coffee; entity type: 1st Grade; certification scope: Producer",
   "period": null, "strength": "exact",
   "data": {"country": "Peru", "region": "Cajamarca", "crop": "Coffee", "entity_type": "1st Grade",
-           "certification_status": "Authorized", "certification_scope": "Producer", "supply_chain_role": "Producer"}},
+           "certification_scope": "Producer", "supply_chain_role": "Producer"}},
  {"source": "FTUSA Premium project (sample data, own record) PROJ-…", "kind": "producer_record",
   "text": "Your Premium project <name> (Completed): <action>", "period": "<start> to <end>", "strength": "exact",
   "data": {"project_ref": "PROJ-…", "challenge_tag": "water", "name": "…", "challenge": "…", "action": "…",
@@ -56,7 +56,7 @@ Items with `kind: "producer_record"`: first the profile, then the producer's own
 - **Survey answers are summarized, never returned row by row**, and only from an allowlist of farming, water and practice questions (`fx_data.records`). Harassment, borrowing, medical access, child schooling, committees and income questions are never read. A share needs at least 5 **distinct survey responses** (a response that picks several options counts once), and a reason is only named if at least 5 responses gave it. Each fact's `period` is the years of the responses behind that fact. Facts say "survey responses", not "households": about half the sample's survey rows are not household surveys.
 - 22 of the 146 sample producers have survey responses; 14 have enough to summarize. Otherwise there are no survey items.
 - Unknown producer: an empty list.
-- The per-item `[<id>]` source labels and dropping `certification_status` (the #14 spec says it is never read) are the #14 retro work.
+- The per-item `[<id>]` source labels are #14 retro work.
 
 ## `get_regional_context()` (#15, data from #8)
 
