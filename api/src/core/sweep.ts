@@ -1,4 +1,4 @@
-import { Conflict, beginTurn, boundedStream, endTurn } from './turn.js';
+import { Conflict, beginTurn, boundedResume, boundedStream, endTurn } from './turn.js';
 import type { Deps, Conversation } from './types.js';
 
 export interface SweepResult {
@@ -79,7 +79,8 @@ async function closeIfStillIdle(
 async function reconcile(deps: Deps, candidate: Conversation): Promise<boolean> {
   // A live turn will mark the conversation closed itself.
   if (candidate.lockExpiresAt !== undefined && candidate.lockExpiresAt > deps.now()) return false;
-  const resumed = await deps.agent.resume({
+  // Bounded, so a stalled agent is skipped (and retried next run) instead of blocking the sweep.
+  const resumed = await boundedResume(deps, {
     kind: 'resume',
     producerId: candidate.producerId,
     conversationId: candidate.conversationId,

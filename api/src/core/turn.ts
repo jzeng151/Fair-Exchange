@@ -1,4 +1,4 @@
-import type { AgentEvent, AgentRequest, Conversation, Deps } from './types.js';
+import type { AgentEvent, AgentRequest, Conversation, Deps, ResumeResult } from './types.js';
 import { writeErrorThenDone, writeEvent, type Sink } from './stream.js';
 
 export class Conflict extends Error {
@@ -98,6 +98,32 @@ export async function* boundedStream(deps: Deps, request: AgentRequest): AsyncGe
     controller.abort();
     // Close the agent stream without waiting on it: a hung stream may never settle.
     void iterator.return?.(undefined)?.catch?.(() => undefined);
+  }
+}
+
+/**
+ * Calls `resume`, aborting it once `resumeTimeoutMs` passes. A stalled call rejects with
+ * TurnTimeout instead of blocking the caller (for the sweep, every later conversation).
+ */
+export async function boundedResume(
+  deps: Deps,
+  request: { kind: 'resume'; producerId: string; conversationId: string },
+): Promise<ResumeResult> {
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const expired = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new TurnTimeout());
+    }, deps.resumeTimeoutMs);
+  });
+  const call = deps.agent.resume(request, controller.signal);
+  // If the deadline wins, the aborted call's rejection must not go unhandled.
+  call.catch(() => undefined);
+  try {
+    return await Promise.race([call, expired]);
+  } finally {
+    clearTimeout(timer);
   }
 }
 

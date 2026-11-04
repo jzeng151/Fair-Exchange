@@ -1,5 +1,5 @@
 import { BedrockAgentCoreClient, InvokeAgentRuntimeCommand } from '@aws-sdk/client-bedrock-agentcore';
-import type { AgentClient, AgentEvent, AgentRequest } from './types.js';
+import type { AgentClient, AgentEvent, AgentRequest, ResumeResult } from './types.js';
 
 /** Splits a byte stream into newline-delimited JSON events (application/x-ndjson). */
 export async function* parseNdjson(chunks: AsyncIterable<Uint8Array>): AsyncGenerator<AgentEvent> {
@@ -47,8 +47,8 @@ export class AgentCoreClient implements AgentClient {
     yield* parseNdjson(out.response as unknown as AsyncIterable<Uint8Array>);
   }
 
-  async resume(request: AgentRequest): Promise<Record<string, unknown> & { step?: string }> {
-    const out = await this.invoke(request, 'application/json');
+  async resume(request: AgentRequest, signal?: AbortSignal): Promise<ResumeResult> {
+    const out = await this.invoke(request, 'application/json', signal);
     if (!out.response) throw new Error('Agent returned no response body');
     return JSON.parse(await out.response.transformToString());
   }

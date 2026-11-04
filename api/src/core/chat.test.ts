@@ -444,3 +444,38 @@ describe('review fixes', () => {
     expect(t.store.items.get(id)!.lockExpiresAt).toBeUndefined();
   });
 });
+
+describe('review fixes, round 2', () => {
+  it('skips a conversation whose resume stalls and still closes later idle ones', async () => {
+    const t = makeDeps({ resumeTimeoutMs: 20 });
+    const IDLE = 30 * 60 * 1000;
+    const idle = await startConversation(t);
+    t.clock.t += IDLE + 1;
+    // Active (so the sweep reconciles it with resume), and its resume never answers.
+    const stalled = await startConversation(t);
+    t.agent.stallResume.add(stalled.id);
+    // Scan order: the stalled conversation first, the idle one after it.
+    const items = t.store.items;
+    t.store.items = new Map([
+      [stalled.id, items.get(stalled.id)!],
+      [idle.id, items.get(idle.id)!],
+    ]);
+    t.agent.script.push([{ type: 'step', seq: 1, step: 'closed' }, { type: 'done', seq: 2 }]);
+
+    const r = await runSweep(t.deps, IDLE);
+
+    expect(r).toMatchObject({ closedIdle: 1, skipped: 1 });
+    expect((await t.store.get(idle.id))?.status).toBe('closed');
+    expect((await t.store.get(stalled.id))?.status).toBe('open');
+    const resumeIdx = t.agent.requests.findIndex((q) => q.kind === 'resume');
+    expect(t.agent.signals[resumeIdx]?.aborted).toBe(true);
+  });
+
+  it('returns 500 instead of hanging when GET resume stalls', async () => {
+    const t = makeDeps({ resumeTimeoutMs: 20 });
+    const { id } = await startConversation(t);
+    t.agent.stallResume.add(id);
+    const r = await getConversation(t.deps, resolve, makeEvent({ id })).catch((e) => toErrorResult(e, t.deps, 'get'));
+    expect(r.statusCode).toBe(500);
+  });
+});

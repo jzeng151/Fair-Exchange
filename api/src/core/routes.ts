@@ -1,7 +1,7 @@
 import type { APIGatewayProxyEvent } from 'aws-lambda';
 import { Unauthorized, type IdentityResolver } from './identity.js';
 import { writeEvent, type Sink } from './stream.js';
-import { Conflict, NotFound, beginTurn, endTurn, loadOwned, streamTurn } from './turn.js';
+import { Conflict, NotFound, beginTurn, boundedResume, endTurn, loadOwned, streamTurn } from './turn.js';
 import type { Conversation, Deps } from './types.js';
 import {
   BadRequest,
@@ -126,7 +126,7 @@ export async function getConversation(
   const producerId = await resolve(event);
   const conversationId = pathId(event);
   const conversation = await loadOwned(deps, conversationId, producerId);
-  const resumed = await deps.agent.resume({ kind: 'resume', producerId, conversationId });
+  const resumed = await boundedResume(deps, { kind: 'resume', producerId, conversationId });
   return json(200, {
     ...resumed,
     conversationId,

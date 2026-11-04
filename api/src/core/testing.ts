@@ -64,6 +64,8 @@ export class ScriptedAgent implements AgentClient {
   /** Signals passed to each stream call, in order. */
   signals: Array<AbortSignal | undefined> = [];
   resumeResult: Record<string, unknown> & { step?: string } = { step: 'intake' };
+  /** Conversation IDs whose `resume` stalls until aborted. */
+  stallResume = new Set<string>();
   /** Called at the start of each stream call (lets tests act "during" a turn). */
   onStream?: () => Promise<void> | void;
 
@@ -84,8 +86,16 @@ export class ScriptedAgent implements AgentClient {
       yield e;
     }
   }
-  async resume(request: AgentRequest) {
+  async resume(request: AgentRequest, signal?: AbortSignal) {
     this.requests.push(request);
+    this.signals.push(signal);
+    if (this.stallResume.has(request.conversationId)) {
+      await new Promise<void>((resolve) => {
+        if (signal?.aborted) return resolve();
+        signal?.addEventListener('abort', () => resolve());
+      });
+      throw new Error('aborted');
+    }
     return this.resumeResult;
   }
 }
@@ -124,6 +134,7 @@ export function makeDeps(overrides: Partial<Deps> = {}) {
     now: () => clock.t,
     newId: () => `00000000-0000-4000-8000-${String(++n).padStart(12, '0')}`,
     turnTimeoutMs: 290_000,
+    resumeTimeoutMs: 20_000,
     lockTtlMs: 330_000,
     ...overrides,
   };

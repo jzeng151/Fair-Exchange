@@ -37,6 +37,6 @@ Contract: `docs/specs/25-chat-endpoint.md`. Code: `api/src/core/`, `api/src/hand
 | `GET /conversations/{id}` | no | Agent `resume` output plus `conversationId` and `status` |
 | `GET /conversations` | no | `{ "conversations": [{ conversationId, createdAt, status }] }`, newest first |
 Streams are `application/x-ndjson`. Errors: 400 (unknown field, or any producer or conversation ID in the body), 401 (caller not identified), 404 (missing or someone else's conversation, same response), 409 (conversation closed, or a turn is in progress).
-Turn lock: each turn holds a lease (`lock_expires_at`, `lock_token`) taken before the response starts, so a 409 is a real HTTP 409. Agent calls are cut off at 290 s (Lambda timeout 300 s, lease 330 s), and only the holder's token can release the lock.
+Turn lock: each turn holds a lease (`lock_expires_at`, `lock_token`) taken before the response starts, so a 409 is a real HTTP 409. Agent calls are cut off at 290 s (Lambda timeout 300 s, lease 330 s), and only the holder's token can release the lock. `resume` calls (`GET /conversations/{id}` and the sweep) are cut off at 20 s, so a stalled agent is skipped rather than blocking the sweep.
 
 Deploy inputs the stack must provide: the conversations table and index, `AGENT_RUNTIME_ARN`, the REST API with response streaming and a 5 minute timeout on the three POST routes, the 15 minute schedule for the sweep, and `INACTIVITY_MINUTES`. Only the chat handlers and the sweep may write the table or invoke the runtime. Until the stack is wired, these handlers are not deployed.
