@@ -1,8 +1,8 @@
 import type { APIGatewayProxyEvent } from 'aws-lambda';
-import { Unauthorized, type IdentityResolver } from './identity.js';
+import { Forbidden, Unauthorized, type IdentityResolver } from './identity.js';
 import { writeEvent, type Sink } from './stream.js';
 import { Conflict, NotFound, beginTurn, boundedResume, endTurn, loadOwned, streamTurn } from './turn.js';
-import type { Conversation, Deps } from './types.js';
+import type { Conversation, Deps, Log } from './types.js';
 import {
   BadRequest,
   isConversationId,
@@ -20,8 +20,9 @@ export interface JsonResult {
 export const json = (statusCode: number, body: unknown): JsonResult => ({ statusCode, body });
 
 /** Maps a thrown error to a status code. Anything unexpected becomes a 500 with no detail. */
-export function toErrorResult(err: unknown, deps: Deps, route: string): JsonResult {
+export function toErrorResult(err: unknown, deps: { log: Log }, route: string): JsonResult {
   if (err instanceof Unauthorized) return json(401, { message: 'Unauthorized' });
+  if (err instanceof Forbidden) return json(403, { message: 'Forbidden' });
   if (err instanceof BadRequest) return json(400, { message: err.message });
   if (err instanceof NotFound) return json(404, { message: 'Not found' });
   if (err instanceof Conflict) return json(409, { message: err.message });
