@@ -1,7 +1,7 @@
 """The enablement-tone judge (spec [36](https://github.com/jzeng151/Fair-Exchange/issues/36)).
 
 A Bedrock large model scores the shown answer on the #17 rubric: 1 = dismissive or clinical,
-3 = neutral, 5 = collaborative and options-forward. AWS-only: boto3 `InvokeModel`, `us-west-2`.
+3 = neutral, 5 = collaborative and options-forward. AWS-only: boto3 `Converse`, `us-west-2`.
 The judge model config comes from the eval stack (env `EVAL_JUDGE_MODEL_ID`, default the
 app's `small`/`large` Bedrock model id); a callable seam keeps unit tests hermetic.
 """
@@ -50,10 +50,11 @@ class BedrockToneJudge:
             "messages": [{"role": "user", "content": [{"text": f"{RUBRIC}\n\nAnswer:\n{text}"}]}],
             "inferenceConfig": {"temperature": 0.0, "maxTokens": 200},
         }
-        response = self.client.invoke_model(
-            modelId=self.model_id, body=json.dumps(body))
-        payload = json.loads(response["body"].read())
-        content = payload["output"]["message"]["content"][0]["text"]
+        response = self.client.converse(
+            modelId=self.model_id,
+            messages=body["messages"],
+            inferenceConfig=body["inferenceConfig"])
+        content = response["output"]["message"]["content"][0]["text"]
         return parse_rubric(content)
 
 
