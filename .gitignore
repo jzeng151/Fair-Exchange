@@ -168,8 +168,19 @@ notebooks/fisher-puns.tar.gz
 HCM_BACKUP.pg.dump
 
 
-# Fair Exchange source folders that the general patterns above ("data", "lib/") would hide.
-# Without these, new files in the root data/ package and in web/src/{data,lib}/ are silently ignored.
+# --- Fair Exchange (merged from the old Fair-Exchange-Scaffolding/.gitignore) ---
+~$*
+.idea/
+node_modules/
+dist/
+cdk.out/
+cdk.context.json
+.env.*
+!.env.example
+
+# Source folders that the general "data" and "lib/" patterns above would hide.
+# Without these, NEW files in them are silently ignored.
 !/data/
-!/Fair-Exchange-Scaffolding/web/src/data/
-!/Fair-Exchange-Scaffolding/web/src/lib/
+!/infra/lib/
+!/web/src/lib/
+!/web/src/data/

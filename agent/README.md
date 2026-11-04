@@ -34,3 +34,25 @@ uv run python scripts/generate_types.py
 uv sync
 uv run pytest
 ```
+
+## Citation verifier (issue #17)
+
+`src/fex/verifier.py` checks FEX's answer **after** it is written, deterministically (no model involved). Every insight and peer example must:
+
+1. cite a **source a tool returned in this session**: tools add what they return to `SessionEvidence` (`record()` / `record_tool_result()`), so nothing can be invented;
+2. cite a **clause that exists** in APS or FPS (via `fx_data.standards`, issue #9).
+
+```python
+from fex.verifier import SessionEvidence, generate_verified
+
+evidence = SessionEvidence()
+evidence.record_tool_result(peer_examples_from_tool)      # each tool, as it runs
+result = generate_verified(write_answer, evidence, standards)
+result.answer      # GroundedAnswer with verified claims only
+result.attempts    # 1 = verified first time
+result.removed     # problems behind any claim that was dropped
+```
+
+`write_answer(problems)` writes the answer; on a retry it receives the problems from the previous attempt so it can fix them. After `max_retries` (default 2), unverified claims are **removed and logged**, so they never reach the producer.
+
+`agent/` depends on `data/` (`fx-data`) as a regular, non-editable install. After changing `data/`, run `uv sync --reinstall-package fx-data`.
