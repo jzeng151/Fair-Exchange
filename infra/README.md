@@ -94,6 +94,10 @@ while it is created, like the clause documents, are uploaded by `deploy.sh` into
    ingestion job and a Step Functions loop polls it: ingestion failure, any failed document, or more than
    20 minutes fails the deploy, and CloudFormation rolls back only the new resources. The hash is a custom
    resource property, so changed clauses re-ingest and unchanged ones do not.
+- Uploads the producer data to the data bucket (after `FairExchange` is deployed): `python -m fx_data.export`
+  writes one JSON-lines file per table (producers, certification, Premium projects, survey summary facts, the
+  peer catalog) and `aws s3 sync --delete` uploads them. Glue tables in the `<stack>_source` database
+  (`DataGlueDatabase` output) read them for Athena. Only allowlisted data is exported; raw survey answers never are.
 8. Publishes the website (`publish-web.sh`) and runs the Knowledge Base smoke test
    (`eval/tests/test_standards_kb_smoke.py`). It prints `StandardsKnowledgeBaseId` for `FEX_STANDARDS_KB_ID`.
 

@@ -2,6 +2,13 @@
 
 How Fair Exchange's data is built, and how to replace each piece with FTUSA's own. All of it lives in
 the `data/` package (`fx_data`) and ships as package data, so nothing parses source files at runtime.
+
+**Where it is stored on AWS.** The deploy also uploads the producer data to the **data bucket**
+(`DataBucketName` output): `python -m fx_data.export` writes one JSON-lines file per table (`producers`,
+`certification`, `premium_projects`, `survey_facts`, `peer_catalog`), and Glue tables over the first four
+(`DataGlueDatabase` output) let Athena join them with the conversation records (#28). Only allowlisted data is
+exported: survey data leaves only as summary facts with at least 5 responses each, never as raw answers. The agent
+still reads the packaged copy today; moving the tools to the bucket (#14 "one copy in S3") is the next step.
 Details and rebuild commands are in [`data/README.md`](../../data/README.md); the tool-side view is in
 [tool contracts](tool-contracts.md#data-files-shipped-inside-fx_data).
 
