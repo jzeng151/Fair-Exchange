@@ -10,7 +10,7 @@ account="$(aws sts get-caller-identity --query Account --output text)"
 [[ "$account" == "$EXPECTED_AWS_ACCOUNT" ]] || { echo "Account mismatch: expected $EXPECTED_AWS_ACCOUNT, got $account" >&2; exit 1; }
 
 infra="$(cd "$(dirname "$0")" && pwd)"
-src="$infra/../../agent/runtime/hello"
+src="$infra/../agent/runtime/hello"
 build="$(mktemp -d)"
 trap 'rm -rf "$build"' EXIT
 

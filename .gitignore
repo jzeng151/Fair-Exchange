@@ -168,5 +168,19 @@ notebooks/fisher-puns.tar.gz
 HCM_BACKUP.pg.dump
 
 
-# CDK stack sources: the general "lib/" pattern above would hide new files here.
-!/Fair-Exchange-Scaffolding/infra/lib/
+# --- Fair Exchange (merged from the old Fair-Exchange-Scaffolding/.gitignore) ---
+~$*
+.idea/
+node_modules/
+dist/
+cdk.out/
+cdk.context.json
+.env.*
+!.env.example
+
+# Source folders that the general "data" and "lib/" patterns above would hide.
+# Without these, NEW files in them are silently ignored.
+!/data/
+!/infra/lib/
+!/web/src/lib/
+!/web/src/data/

@@ -29,41 +29,32 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: Fair-Exchange-Scaffolding/*/package-lock.json
+          cache-dependency-path: '*/package-lock.json'
       - uses: astral-sh/setup-uv@68559e99cc807c1eb7e9238fd43a15bba460eec2 # v10.3.3
         with:
           version: '0.13.7'
           python-version: '3.12'
-      - name: Python tests
-        working-directory: Fair-Exchange-Scaffolding/agent
-        run: |
-          uv sync --locked
-          uv run --no-sync pytest tests ../eval/tests
-      # Root packages: the real code merged so far (record schema, standards, verifier).
-      # Each step skips until its folder exists on the branch being checked.
-      - name: Root agent tests
-        if: hashFiles('agent/pyproject.toml') != ''
+      - name: Agent tests
         working-directory: agent
         run: |
           uv sync --locked
           uv run --no-sync pytest
-      - name: Root data tests
-        if: hashFiles('data/pyproject.toml') != ''
+          uv run --no-sync pytest ../eval/tests
+      - name: Data tests
         working-directory: data
         run: |
           uv sync --locked
           uv run --no-sync pytest
       - name: Generated record types compile
-        if: hashFiles('api/src/types/*.ts') != ''
         run: npx --yes -p typescript@5.6.3 tsc --noEmit --strict api/src/types/*.ts
       - name: API type check
-        working-directory: Fair-Exchange-Scaffolding/api
+        working-directory: api
         run: npm ci && npm run typecheck
       - name: Web build and type check
-        working-directory: Fair-Exchange-Scaffolding/web
+        working-directory: web
         run: npm ci && npm run build
       - name: Infrastructure type check and synthesis
-        working-directory: Fair-Exchange-Scaffolding/infra
+        working-directory: infra
         run: |
           npm ci
           npx tsc --noEmit
@@ -92,9 +83,9 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: Fair-Exchange-Scaffolding/web/package-lock.json
+          cache-dependency-path: web/package-lock.json
       - name: Build website
-        working-directory: Fair-Exchange-Scaffolding/web
+        working-directory: web
         run: npm ci && npm run build
       - name: Authenticate to sandbox
         uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
@@ -104,4 +95,4 @@ jobs:
           allowed-account-ids: '100300582834'
           role-session-name: GitHub-${{ github.run_id }}
       - name: Publish and verify website
-        run: bash Fair-Exchange-Scaffolding/infra/publish-web.sh
+        run: bash infra/publish-web.sh

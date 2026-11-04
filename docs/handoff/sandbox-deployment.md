@@ -25,7 +25,7 @@ audit reported no known vulnerabilities. The build dependencies reported moderat
 advisories; they are not installed on the static hosting service.
 
 To redeploy, follow [infra/README.md](../../infra/README.md). The sandbox checkout
-is `/workshop/Fair-Exchange/Fair-Exchange-Scaffolding`; its deployment log is
+is `/workshop/Fair-Exchange` (before #57 the app lived in `Fair-Exchange-Scaffolding/`); its deployment log is
 `/tmp/fair-exchange-deploy.log`. The bucket and encryption key are retained on
 stack deletion. Full cleanup requires handling those retained resources.
 

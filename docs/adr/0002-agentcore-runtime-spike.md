@@ -1,4 +1,4 @@
-# ADR 0001: Run FEX on AgentCore Runtime, deployed with CDK
+# ADR 0002: Run FEX on AgentCore Runtime, deployed with CDK
 
 - **Status:** accepted (spike, issue #4)
 - **Date:** 2026-11-04
@@ -40,7 +40,7 @@ agent(prompt, invocation_state={"producer_id": producer_id})       # set by the 
 - The entrypoint takes `producerId` from the request payload. **The payload is only as trustworthy as its caller.** In production, only the chat API (#25) may invoke the runtime (IAM). It sets `producerId` from the signed-in identity (#11), never from what the producer types.
 - `agent/runtime/hello/main.py` is the reference. Strands 1.63 stores a dict tool result as JSON text, not a `json` block.
 
-**Deployment** (`Fair-Exchange-Scaffolding/infra/`):
+**Deployment** (`infra/`):
 
 - **Code zip from S3, not a container.** No Docker or ECR is needed. Dependencies must be **ARM64 Linux** wheels:
   `uv pip install --target … --python-platform aarch64-manylinux2014 --python-version 3.12 --only-binary=:all:`. The zip is about 100 MB unzipped.
@@ -77,7 +77,7 @@ agent(prompt, invocation_state={"producer_id": producer_id})       # set by the 
 ## Reproduce
 
 ```bash
-cd Fair-Exchange-Scaffolding/infra
+cd infra
 EXPECTED_AWS_ACCOUNT=<account> bash deploy-agent-spike.sh       # package, upload, deploy, invoke once
 bash invoke-agent-spike.sh P-001 "Whose record is this?"        # more calls
 bash destroy-agent-spike.sh                                       # remove everything
