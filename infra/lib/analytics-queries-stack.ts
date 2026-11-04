@@ -39,8 +39,10 @@ const GRANTED = `('internal', 'internal_and_outward')`;
  * - `participation`: completed records with granted consent vs declined records (count only).
  * - Every other breakdown is over completed records with granted consent.
  * - Effective tags are the reviewer's if set, else the agent's (spec 26).
- * - A record counts as reviewed only when review_status = 'reviewed'. Declined records have no
- *   review status, so they are pending and appear only with include_pending.
+ * - A completed record counts as reviewed only when review_status = 'reviewed'. A declined record has
+ *   nothing to review (spec 26: identifiers, times and consent only), so it counts in BOTH views:
+ *   its reviewed count equals its total. Decided 2026-11-04; the #29 spec's examples assumed declines
+ *   could be pending, which conflicts with #26. Raised for a spec update.
  * - Live counts only include closed records (`closed_at` set); `closedOnly` is false for seeded.
  */
 export function breakdownsQuery(table: string, closedOnly: boolean): string {
@@ -54,7 +56,7 @@ export function breakdownsQuery(table: string, closedOnly: boolean): string {
     COALESCE(feedback, 'none') AS feedback,
     evidence,
     array_distinct(COALESCE(reviewer_tags, tags)) AS effective_tags,
-    COALESCE(review_status, 'pending') = 'reviewed' AS reviewed
+    (status = 'declined' OR COALESCE(review_status, 'pending') = 'reviewed') AS reviewed
   FROM ${SYNC_DATABASE}.${table}
   ${where}
 ),

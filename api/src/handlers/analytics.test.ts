@@ -143,7 +143,7 @@ const S = { suppressed: true };
 
 /** A healthy base so only the cells under test are near the limits. */
 const BASE: Counts = {
-  participation: { completed: [40, 50], declined: [10, 20] },
+  participation: { completed: [40, 50], declined: [20, 20] },
   language: { en: [20, 25], es: [20, 25] },
 };
 
@@ -220,9 +220,10 @@ describe('suppression of live counts', () => {
     expect(body.live.by_evidence).toEqual({ full: S, limited: S });
   });
 
-  it('reconstruction case: 1 completed and 5 declined, all pending: both hidden in both views', async () => {
+  it('reconstruction case: 1 completed (pending) and 5 declined: both hidden in both views', async () => {
+    // Declines are never reviewed, so they count in both views (reviewed == all).
     const { reviewed, pending } = await bothViews({
-      live: { participation: { completed: [0, 1], declined: [0, 5] } },
+      live: { participation: { completed: [0, 1], declined: [5, 5] } },
     });
     for (const body of [reviewed, pending]) {
       expect(body.live.completed).toEqual(S);
@@ -230,10 +231,11 @@ describe('suppression of live counts', () => {
     }
   });
 
-  it('a pending-only difference of 1 to 4 in completed or declined hides both in both views', async () => {
+  it('a pending-only difference of 1 to 4 in the completed count hides both in both views', async () => {
+    // A declined count never differs between views (declines are never reviewed), so only completed can.
     for (const participation of [
-      { completed: [40, 43], declined: [10, 20] },
-      { completed: [40, 50], declined: [10, 12] },
+      { completed: [40, 43], declined: [20, 20] },
+      { completed: [12, 14], declined: [30, 30] },
     ] as Counts[string][]) {
       const { reviewed, pending } = await bothViews({ live: { participation } });
       for (const body of [reviewed, pending]) {
@@ -253,7 +255,7 @@ describe('suppression of live counts', () => {
 
   it('hides the same cells whichever view is requested', async () => {
     const live: Counts = {
-      participation: { completed: [40, 50], declined: [10, 20] },
+      participation: { completed: [40, 50], declined: [20, 20] },
       language: { en: [10, 10], es: [0, 3], fr: [7, 7] },
       tag: { x: [2, 10], y: [6, 50], z: [40, 45], w: [60, 60] },
     };
@@ -270,7 +272,7 @@ describe('suppression of live counts', () => {
 describe('response contents', () => {
   const FULL: Fixture = {
     live: {
-      participation: { completed: [40, 50], declined: [10, 20] },
+      participation: { completed: [40, 50], declined: [20, 20] },
       tag: { water: [20, 25], health: [20, 25] },
       language: { en: [20, 25], es: [20, 25] },
       entity_type: { cooperative: [40, 50] },
@@ -279,7 +281,7 @@ describe('response contents', () => {
       evidence: { full: [20, 25], limited: [20, 25] },
     },
     seeded: {
-      participation: { completed: [150, 180], declined: [10, 20] },
+      participation: { completed: [150, 180], declined: [20, 20] },
       tag: { water: [3, 4], health: [60, 70] },
       language: { en: [1, 2], es: [140, 160] },
     },
@@ -369,6 +371,12 @@ describe('response contents', () => {
       expect(Object.keys(entry).sort()).toEqual(['input_tokens', 'model_id', 'output_tokens']);
     }
     expect(JSON.stringify(body)).not.toMatch(/conversation|average|avg|mean|per_/i);
+  });
+
+  it('shows declines in the default reviewed-only view, the same as with pending included', async () => {
+    const { reviewed, pending } = await bothViews({ live: { participation: { completed: [40, 50], declined: [20, 20] } } });
+    expect(reviewed.live.declined).toBe(20);
+    expect(pending.live.declined).toBe(20);
   });
 
   it('shows declined records only as a count', async () => {
