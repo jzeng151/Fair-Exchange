@@ -174,6 +174,7 @@ Seam 3 covers one scripted conversation through all steps, plus one limited-evid
 - What the data tools return, nearest-match widening, and clause matching (later batch)
 - Memory storage details ([memory spec](memory.md))
 - Button labels and layout (web UI, later batch)
+- AgentCore Gateway (decided 2026-11-04: after the MVP). Tools stay in the agent process so the producer ID scope rule keeps working. The handoff notes list Gateway as the path for adding tools later, with that scope rule as the design constraint.
 
 ## Further Notes
 
