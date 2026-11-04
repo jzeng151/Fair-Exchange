@@ -124,3 +124,30 @@ EXPECTED_AWS_ACCOUNT=100300582834 RECORDS_TABLE_NAME="$(out RecordsTableName)" \
   RECORDS_TABLE_STREAM_ARN="$(out RecordsTableStreamArn)" RECORDS_TABLE_KEY_ARN="$(out DataKeyArn)" \
   bash infra/deploy-athena-sync.sh
 ```
+
+## Agent runtime (#5, #13)
+
+`deploy.sh` packages the agent (`agent/` and `data/` wheels plus the locked dependencies, ARM64 Linux wheels, and
+`agent/runtime/fex/main.py` as the entry point), uploads it to the artifacts bucket under `agent/fex-<hash>.zip`,
+and deploys `FairExchange` with the runtime (`AgentRuntimeArn`, `AgentRuntimeId`, `AgentRuntimeLogGroup` outputs).
+Two values are required, with no defaults (the specs leave them to whoever deploys):
+
+```bash
+EXPECTED_AWS_ACCOUNT=100300582834 AWS_REGION=us-west-2 \
+  FEX_MAX_LIFETIME_MINUTES=1440 LOG_RETENTION_DAYS=30 bash infra/deploy.sh   # the sandbox's current values
+```
+
+- **Role:** the #13 spec's "Agent runtime permissions" (`lib/agent-runtime.ts`): the two US model profiles, the
+  Guardrail, `bedrock:Retrieve` on the standards Knowledge Base, `GetItem`/`PutItem` on the records table, the
+  memory resource, Comprehend PII detection, its code object, its log group, X-Ray and metrics.
+- **Logs:** the stack creates the runtime log group (data key, `LOG_RETENTION_DAYS`) and its `otel-rt-logs`
+  stream. The role cannot create log groups, so nothing is written without retention. The CloudWatch OTLP logs
+  endpoint needs the stream to exist; without it every export fails with 400.
+- **No message content in logs:** `OTEL_INSTRUMENTATION_GENAI_CAPTURE_MESSAGE_CONTENT=false` (the Bedrock call) and
+  `OTEL_SEMCONV_STABILITY_OPT_IN=gen_ai_unredacted_attributes=` (the Strands tracer: every content attribute becomes
+  `[REDACTED]`). Verified in the sandbox on 2026-11-04: a marker sentence and the producer's words appeared in no
+  event of the runtime log group or `aws/spans`. Re-check after changing the agent or its OpenTelemetry versions.
+- **Transaction Search** must be on (ADR 0002); `deploy.sh` stops with instructions if it isn't.
+- **Try it** without the API: `cd agent && uv run python ../scripts/e2e/runtime_conversation.py --runtime-arn <AgentRuntimeArn>`
+  runs one scripted conversation with real models (a few cents) and saves a record (`record_id` = the printed
+  conversation ID).

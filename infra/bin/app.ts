@@ -25,6 +25,13 @@ new FairExchangeStack(app, 'FairExchange', {
     artifactsKeyArn: ctx('artifactsKeyArn', 'arn:aws:kms:us-west-2:000000000000:key/unset'),
     contentHash: ctx('standardsDocsHash', 'unset'),
   },
+  // Required deploy-time values with no defaults: deploy.sh refuses to run without them. The placeholders
+  // below exist only so `cdk synth` works in CI; they are never deployed.
+  agent: {
+    codeKey: ctx('agentCodeKey', 'fex/unset.zip'),
+    maxLifetimeMinutes: Number(ctx('maxLifetimeMinutes', '60')),
+    logRetention: Number(ctx('logRetentionDays', '1')),
+  },
 });
 
 // Issue #4 spike (deploy-agent-spike.sh passes the code location as context; placeholders keep `cdk synth` working)
