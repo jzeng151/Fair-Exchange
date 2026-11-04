@@ -35,6 +35,9 @@ SOURCE_SURVEY = "FTUSA survey responses (sample data)"
 # Answers that are not an answer. Left out of every share.
 NON_ANSWERS = {"", "refused", "don't know", "don’t know", "i don't know", "none of the above applies"}
 
+# The #14 spec's allowlist excludes land-conversion columns (compliance-sensitive) and household
+# drinking-water details, and says certification status is never read (checking status is out of
+# scope, #21). Only certification scope is kept. Adding a column needs a spec change.
 # Yes/No practice questions -> how to say "Yes" in a sentence.
 YES_NO_FIELDS = {
     "has_soil_conservation_practices_code": "use soil conservation practices",
@@ -42,15 +45,12 @@ YES_NO_FIELDS = {
     "has_water_contamination_prevention_practices_code": "take steps to prevent water contamination",
     "has_forest_protection_practices_code": "use forest protection practices",
     "has_received_fertilizer_training_code": "have received fertilizer training",
-    "coverted_natural_land_to_cropland_code": "have converted natural land to cropland",
-    "running_water_code": "have running water at home",
     "has_noticed_fishing_changes_code": "have noticed changes in fishing",
 }
 # Questions with named answers -> a short description of the question.
 CHOICE_FIELDS = {
     "harvest_changed_code": "How the harvest has changed",
     "has_integrated_pest_management_practices_name": "Pest management practice used",
-    "water_access_distance_name": "Access to drinking water",
     "adaption_strategies_name": "How fishers have adapted",
     "future_concerns_name": "Main concern for the future of fishing",
 }
@@ -165,7 +165,6 @@ def build_records() -> dict:
         records[pid] = {
             "profile": {
                 **profiles[pid],
-                "certification_status": account["certification_status_name"] or None,
                 "certification_scope": account["certification_scope_name"] or None,
                 "supply_chain_role": account["raw_supply_chain_role_txt"] or None,
                 "source": SOURCE_ACCOUNT,
