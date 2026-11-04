@@ -12,6 +12,7 @@ comes from the responses behind that fact.
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import sys
 from collections import Counter, defaultdict
@@ -75,9 +76,9 @@ def _years(dates: list[str]) -> str:
     return years[0] if len(years) == 1 else f"{years[0]}-{years[-1]}" if years else "date unknown"
 
 
-def _fact(text: str, dates: list[str], n: int) -> dict:
+def _fact(column: str, text: str, dates: list[str], n: int) -> dict:
     """`dates` are those of the responses behind this fact; `n` is how many distinct responses."""
-    return {"text": text, "source": SOURCE_SURVEY, "period": _years(dates), "responses": n,
+    return {"column": column, "text": text, "source": SOURCE_SURVEY, "period": _years(dates), "responses": n,
             "strength": "exact"}
 
 
@@ -89,14 +90,14 @@ def _survey_facts(rows: list[dict], reasons: list[dict]) -> list[dict]:
         answered = [(r, a) for r in rows if (a := _answer(r[field]))]
         if len(answered) >= MIN_RESPONSES:
             yes = sum(a.lower() == "yes" for _, a in answered) / len(answered)
-            facts.append(_fact(f"{yes:.0%} of {len(answered)} survey responses say they {phrase}.",
+            facts.append(_fact(field, f"{yes:.0%} of {len(answered)} survey responses say they {phrase}.",
                                [r["response_date"] for r, _ in answered], len(answered)))
     for field, question in CHOICE_FIELDS.items():
         answered = [(r, a) for r in rows if (a := _answer(r[field]))]
         if len(answered) >= MIN_RESPONSES:
             top = Counter(a for _, a in answered).most_common(3)
             shares = "; ".join(f"{a} ({n / len(answered):.0%})" for a, n in top)
-            facts.append(_fact(f"{question}, {len(answered)} survey responses: {shares}.",
+            facts.append(_fact(field, f"{question}, {len(answered)} survey responses: {shares}.",
                                [r["response_date"] for r, _ in answered], len(answered)))
     for label, question in MULTI_FIELDS.items():
         picked = [x for x in reasons if (a := _answer(x["choice"])) and a.lower() != "other"]
@@ -110,7 +111,7 @@ def _survey_facts(rows: list[dict], reasons: list[dict]) -> list[dict]:
                    if len(s) >= MIN_RESPONSES][:3]
             if top:
                 shares = "; ".join(f"{c} ({n} responses)" for c, n in top)
-                facts.append(_fact(f"{question}, {len(responses)} survey responses: {shares}.",
+                facts.append(_fact(label, f"{question}, {len(responses)} survey responses: {shares}.",
                                    [x["date"] for x in picked], len(responses)))
     return facts
 
@@ -127,11 +128,14 @@ def build_records() -> dict:
         if any(_PLACEHOLDER.search(x or "") for x in texts):
             continue  # lorem-ipsum test rows are not evidence (same rule as the peer table)
         status = resolve_status(status_index, row)
+        if (status.get("project_start_date") or "").startswith("1970-01-01"):  # Unix-epoch placeholder
+            status = {**status, "project_start_date": ""}
         ref = unique_project_ref(seen_refs, row["account_sk"], row["translated_project_name"],
                                  row["translated_project_description_txt"])
         projects[row["account_sk"]].append({
             "project_ref": ref, "source": f"{SOURCE_PROJECT} {ref}",
-            "challenge_tag": tag_for(row["subcategory"], *texts), "subcategory": row["subcategory"] or None,
+            "challenge_tag": tag_for(row["subcategory"], *texts), "category": row["category"] or None,
+            "subcategory": row["subcategory"] or None,
             "name": texts[0], "action": texts[1], "challenge": texts[2], "intended_outcome": texts[3],
             "status": status.get("project_status_name") or None,
             "start_date": status.get("project_start_date") or None,
@@ -187,6 +191,38 @@ class ProducerRecords:
 
     def get(self, producer_id: str) -> dict | None:
         return self._records.get(producer_id)
+
+    def items(self, producer_id: str) -> list[dict]:
+        """This producer's record as data-tool items (#17 contract): certification scope, own Premium
+        projects, then survey facts. An empty list when there is no record."""
+        record = self.get(producer_id)
+        if record is None:
+            return []
+        profile = record["profile"]
+        scope = profile["certification_scope"]
+        items = [_item(f"Your certification record [{producer_id}]",
+                       f"Certification scope: {scope}." if scope else "No certification scope on record.",
+                       None, {"certification_scope": scope})]
+        for p in record["premium_projects"]:
+            year = int(p["start_date"][:4]) if p["start_date"] else None
+            items.append(_item(f"Your Premium project: {p['name']} [{p['project_ref']}]",
+                               f"Your Premium project \"{p['name']}\"" + (f", started {year}" if year else "")
+                               + f": {p['action']}", str(year) if year else None,
+                               {"category": p["category"], "sub_category": p["subcategory"], "year": year,
+                                "amount": None,  # not in the FTUSA sample
+                                "description": p["action"]}))
+        for f in record["survey"]["facts"]:
+            # Aggregated across responses (see the module docstring), so the ID names the producer's
+            # summary of one column rather than one survey response.
+            ref = "SV-" + hashlib.sha1(f"{producer_id}|{f['column']}".encode()).hexdigest()[:6].upper()
+            items.append(_item(f"Your {f['period']} survey: {f['column']} [{ref}]", f["text"], f["period"],
+                               {"column": f["column"], "responses": f["responses"]}))
+        return items
+
+
+def _item(source: str, text: str, period: str | None, data: dict) -> dict:
+    return {"source": source, "kind": "producer_record", "text": text, "period": period, "strength": "exact",
+            "data": data}
 
 
 def main() -> None:
