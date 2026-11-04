@@ -150,6 +150,13 @@ export class FexRuntime extends Construct {
       removalPolicy: RemovalPolicy.DESTROY,
     });
     this.logGroup.node.addDependency(props.dataKey);
+    // The CloudWatch OTLP logs endpoint writes OpenTelemetry logs to this stream (ADR 0002) and needs it to exist;
+    // without it every export fails with 400. The runtime can't create it: the role has no CreateLogGroup.
+    new logs.LogStream(this, 'OtelLogStream', {
+      logGroup: this.logGroup,
+      logStreamName: 'otel-rt-logs',
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
 
     new CfnOutput(stack, 'AgentRuntimeArn', { value: this.runtime.attrAgentRuntimeArn });
     new CfnOutput(stack, 'AgentRuntimeId', { value: this.runtime.attrAgentRuntimeId });
