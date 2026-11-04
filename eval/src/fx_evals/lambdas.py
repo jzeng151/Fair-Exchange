@@ -95,7 +95,7 @@ def handler_enablement_tone(payload: dict[str, Any], _context: Any = None) -> di
     if _judge is None:
         _judge = judge_for_handler()
     return _run("enablement_tone", payload,
-                lambda session, _reference: enablement_tone(session, _judge),
+                lambda session: enablement_tone(session, _judge),
                 needs_reference=False)
 
 
