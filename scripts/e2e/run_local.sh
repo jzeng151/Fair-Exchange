@@ -15,7 +15,12 @@ export FEX_AGENT_PORT="${FEX_AGENT_PORT:-8080}" FEX_API_PORT="${FEX_API_PORT:-30
 export FEX_AGENT_URL="http://127.0.0.1:${FEX_AGENT_PORT}"
 export FEX_WEB_PORT="${FEX_WEB_PORT:-5173}"
 [[ "$FEX_DEMO_MODELS" == "1" ]] || unset FEX_DEMO_MODELS
+if [[ -z "${FEX_DEMO_MODELS:-}" && -z "${FEX_STANDARDS_KB_ID:-}" ]]; then
+  echo "WARNING: real-model mode without FEX_STANDARDS_KB_ID: intake works, grounded answers will fail" >&2
+  echo "         (set FEX_STANDARDS_KB_ID from the stack output, or use demo mode: docs/handoff/02-deploy.md)" >&2
+fi
 logs="$(mktemp -d)"
+echo "logs: $logs"
 
 # Never talk to a server left over from an earlier run: it may be running old code.
 ports=("$FEX_AGENT_PORT" "$FEX_API_PORT")
