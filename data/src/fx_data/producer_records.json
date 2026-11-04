@@ -1,5 +1,5 @@
 {
- "description": "Each sample producer's own record: profile, Premium projects and survey summary (allowlisted fields only, at least 5 answers per share).",
+ "description": "Each sample producer's own record: profile, Premium projects and survey summary (allowlisted fields only, at least 5 distinct survey responses per share).",
  "records": {
   "06CE905146294CED1250B91A97D8680D": {
    "profile": {
@@ -197,7 +197,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -229,7 +229,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -261,7 +261,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -293,9 +293,9 @@
     }
    ],
    "survey": {
-    "respondents": 1,
+    "responses": 1,
     "facts": [],
-    "note": "Fewer than 5 households answered each survey question, so nothing is summarized."
+    "note": "Fewer than 5 survey responses answered each question, so nothing is summarized."
    }
   },
   "0EE8D264D111FB5D78D7A4295495AAE1": {
@@ -325,9 +325,9 @@
     }
    ],
    "survey": {
-    "respondents": 1,
+    "responses": 1,
     "facts": [],
-    "note": "Fewer than 5 households answered each survey question, so nothing is summarized."
+    "note": "Fewer than 5 survey responses answered each question, so nothing is summarized."
    }
   },
   "104731E2F9439502969FAC6F2783D888": {
@@ -357,7 +357,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -389,7 +389,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -434,7 +434,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -479,7 +479,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -511,7 +511,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -725,7 +725,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -757,7 +757,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -789,7 +789,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -815,9 +815,9 @@
      "action": "Purchase and monitor the planting of trees in green spaces, river banks and water sources.",
      "challenge": "The lack of green areas led to the creation of the reforestation plan.",
      "intended_outcome": "Contribute to environmental conservation by planting trees in hydrographic basins and educational centers in coordination with CECJ - CLAC",
-     "status": "In Planning",
-     "start_date": "2023-01-01",
-     "end_date": "2023-12-31"
+     "status": "Completed",
+     "start_date": "2021-01-01",
+     "end_date": "2021-12-31"
     },
     {
      "project_ref": "PROJ-DFB6F74B",
@@ -829,8 +829,8 @@
      "challenge": "Increase planting areas for new forests Expand existing ones and create new protected areas, forest reserves. Introduce effective measures to prevent forest fires Carry out measures, including preventive measures, to combat diseases and pests.",
      "intended_outcome": "Contribute to the conservation of the environment by planting trees..",
      "status": "In Planning",
-     "start_date": "2023-01-01",
-     "end_date": "2023-12-31"
+     "start_date": "2022-01-01",
+     "end_date": "2022-12-31"
     },
     {
      "project_ref": "PROJ-F5A5704D",
@@ -846,19 +846,6 @@
      "end_date": "2023-12-31"
     },
     {
-     "project_ref": "PROJ-7183767E",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-7183767E",
-     "challenge_tag": "climate and weather",
-     "subcategory": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
-     "name": "25. Reforestation of green areas",
-     "action": "Acquisition and monitoring of tree planting in green spaces, river banks and water sources.",
-     "challenge": "Many banana farms face problems of soil degradation and loss of natural vegetation due to accelerated intensive agricultural practices. Green areas help restore these ecosystems, improve soil health and promote a more balanced environment. The planting of native species and trees that act as a natural barrier improves soil structure, prevents erosion and influences water retention, contributing to a more sustainable and resilient production.",
-     "intended_outcome": "Contribute to the conservation of the environment by planting trees.",
-     "status": "In Planning",
-     "start_date": "2024-01-01",
-     "end_date": "2024-12-31"
-    },
-    {
      "project_ref": "PROJ-B3E851D8",
      "source": "FTUSA Premium project (sample data, own record) PROJ-B3E851D8",
      "challenge_tag": "climate and weather",
@@ -870,6 +857,19 @@
      "status": "In Planning",
      "start_date": "2024-01-01",
      "end_date": "2024-12-31"
+    },
+    {
+     "project_ref": "PROJ-7183767E",
+     "source": "FTUSA Premium project (sample data, own record) PROJ-7183767E",
+     "challenge_tag": "climate and weather",
+     "subcategory": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
+     "name": "25. Reforestation of green areas",
+     "action": "Acquisition and monitoring of tree planting in green spaces, river banks and water sources.",
+     "challenge": "Many banana farms face problems of soil degradation and loss of natural vegetation due to accelerated intensive agricultural practices. Green areas help restore these ecosystems, improve soil health and promote a more balanced environment. The planting of native species and trees that act as a natural barrier improves soil structure, prevents erosion and influences water retention, contributing to a more sustainable and resilient production.",
+     "intended_outcome": "Contribute to the conservation of the environment by planting trees.",
+     "status": "In Planning",
+     "start_date": "2025-01-01",
+     "end_date": "2025-12-31"
     },
     {
      "project_ref": "PROJ-7AC6D3FD",
@@ -899,7 +899,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -931,7 +931,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -963,7 +963,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -995,7 +995,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -1027,7 +1027,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -1098,7 +1098,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -1195,7 +1195,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -1222,7 +1222,20 @@
      "challenge": "Generally speaking, there is a lack of knowledge and awareness about endangered and protected species in the waters around Bitung. By fellow fishermen but also other members in the community.",
      "intended_outcome": "The goal of this project is to increase the awareness of fellow fishermen and other members of the community on the value of many ETP species to the ecosystem and the fact that some species are threathened and should be handeled according to local laws.",
      "status": "Completed",
-     "start_date": "2022-11-15",
+     "start_date": "2021-12-01",
+     "end_date": "2022-12-01"
+    },
+    {
+     "project_ref": "PROJ-66408D1E",
+     "source": "FTUSA Premium project (sample data, own record) PROJ-66408D1E",
+     "challenge_tag": "biodiversity and conservation",
+     "subcategory": "Sustainability efforts",
+     "name": "Environmental awareness campaign for Sengkanaung FA",
+     "action": "Environmental awareness through procurement of \"\"Jacker of ETp and environmental campaign\"\" with a printed environmental awareness message. A jacket containing an environmental message will be distributed to each member. The group will wear the jaket during the activity at the sea or in the dock and other unloading areas to convey a message on the importance of ETP species and environmental issues during the fishing operation.",
+     "challenge": "To meets the fair trade standart in environmental program. The member agreed and need to provide the jacket (for protecting in the sea/when fishing) with the campaign meesage to protect the ocean from rubbish issues or catching of the ETP / by catch.",
+     "intended_outcome": "The goal of this project is to increase the awareness of fellow fishermen and other members that so important for protecting our environtmental",
+     "status": "Completed",
+     "start_date": "2022-11-10",
      "end_date": "2023-05-01"
     },
     {
@@ -1270,19 +1283,6 @@
      "challenge_tag": "biodiversity and conservation",
      "subcategory": null,
      "name": "Environmental awareness campaign for Tunas Muda FA",
-     "action": "Environmental awareness through procurement of \"\"Jacker of ETp and environmental campaign\"\" with a printed environmental awareness message. A jacket containing an environmental message will be distributed to each member. The group will wear the jaket during the activity at the sea or in the dock and other unloading areas to convey a message on the importance of ETP species and environmental issues during the fishing operation.",
-     "challenge": "To meets the fair trade standart in environmental program. The member agreed and need to provide the jacket (for protecting in the sea/when fishing) with the campaign meesage to protect the ocean from rubbish issues or catching of the ETP / by catch.",
-     "intended_outcome": "The goal of this project is to increase the awareness of fellow fishermen and other members that so important for protecting our environtmental",
-     "status": "Completed",
-     "start_date": "2023-11-01",
-     "end_date": "2023-12-31"
-    },
-    {
-     "project_ref": "PROJ-66408D1E",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-66408D1E",
-     "challenge_tag": "biodiversity and conservation",
-     "subcategory": "Sustainability efforts",
-     "name": "Environmental awareness campaign for Sengkanaung FA",
      "action": "Environmental awareness through procurement of \"\"Jacker of ETp and environmental campaign\"\" with a printed environmental awareness message. A jacket containing an environmental message will be distributed to each member. The group will wear the jaket during the activity at the sea or in the dock and other unloading areas to convey a message on the importance of ETP species and environmental issues during the fishing operation.",
      "challenge": "To meets the fair trade standart in environmental program. The member agreed and need to provide the jacket (for protecting in the sea/when fishing) with the campaign meesage to protect the ocean from rubbish issues or catching of the ETP / by catch.",
      "intended_outcome": "The goal of this project is to increase the awareness of fellow fishermen and other members that so important for protecting our environtmental",
@@ -1357,7 +1357,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -1374,6 +1374,32 @@
     "source": "FTUSA producer account (sample data)"
    },
    "premium_projects": [
+    {
+     "project_ref": "PROJ-FE3D6A0A",
+     "source": "FTUSA Premium project (sample data, own record) PROJ-FE3D6A0A",
+     "challenge_tag": "biodiversity and conservation",
+     "subcategory": "Sustainability efforts",
+     "name": "ENVIRONMENTAL PROJECT",
+     "action": "The project focuses on promoting the active participation of family and community collaborators in the development of the Environmental Project, which promotes environmental care, protection and awareness through the execution of good environmental practices.",
+     "challenge": "Strengths: The corporation is in line with sustainability and care for the environment. Weaknesses: There are finite short-range projects that do not fully meet social criteria. Opportunities: The necessary funding is available to increase the scope and delimitation of projects over time. Threats: Lack of support from regional governments to promote the Corporation's environmental project.",
+     "intended_outcome": "Generate actions for the recovery of streams in the area, awareness of environmental impact and waste management with collaborators and the community",
+     "status": null,
+     "start_date": null,
+     "end_date": null
+    },
+    {
+     "project_ref": "PROJ-9EB6A7B6",
+     "source": "FTUSA Premium project (sample data, own record) PROJ-9EB6A7B6",
+     "challenge_tag": "biodiversity and conservation",
+     "subcategory": "Sustainability efforts",
+     "name": "ENVIRONMENTAL PROJECT",
+     "action": "The project focuses on promoting the active participation of family and community collaborators in the development of the Environmental Project, which promotes environmental care, protection and awareness through the execution of good environmental practices.",
+     "challenge": "Strengths: The corporation is in line with sustainability and care for the environment. Weaknesses: There are finite short-range projects that do not fully meet social criteria. Opportunities: The necessary funding is available to increase the scope and delimitation of projects over time. Threats: Lack of support from regional governments to promote the Corporation's environmental project.",
+     "intended_outcome": "Recovery of streams in the area, environmental impact awareness and waste management with collaborators and the community.",
+     "status": null,
+     "start_date": null,
+     "end_date": null
+    },
     {
      "project_ref": "PROJ-4A737603",
      "source": "FTUSA Premium project (sample data, own record) PROJ-4A737603",
@@ -1399,38 +1425,12 @@
      "status": "Completed",
      "start_date": "2023-01-01",
      "end_date": "2023-12-31"
-    },
-    {
-     "project_ref": "PROJ-FE3D6A0A",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-FE3D6A0A",
-     "challenge_tag": "biodiversity and conservation",
-     "subcategory": "Sustainability efforts",
-     "name": "ENVIRONMENTAL PROJECT",
-     "action": "The project focuses on promoting the active participation of family and community collaborators in the development of the Environmental Project, which promotes environmental care, protection and awareness through the execution of good environmental practices.",
-     "challenge": "Strengths: The corporation is in line with sustainability and care for the environment. Weaknesses: There are finite short-range projects that do not fully meet social criteria. Opportunities: The necessary funding is available to increase the scope and delimitation of projects over time. Threats: Lack of support from regional governments to promote the Corporation's environmental project.",
-     "intended_outcome": "Generate actions for the recovery of streams in the area, awareness of environmental impact and waste management with collaborators and the community",
-     "status": "Completed",
-     "start_date": "2025-04-08",
-     "end_date": "2025-12-31"
-    },
-    {
-     "project_ref": "PROJ-FE3D6A0A",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-FE3D6A0A",
-     "challenge_tag": "biodiversity and conservation",
-     "subcategory": "Sustainability efforts",
-     "name": "ENVIRONMENTAL PROJECT",
-     "action": "The project focuses on promoting the active participation of family and community collaborators in the development of the Environmental Project, which promotes environmental care, protection and awareness through the execution of good environmental practices.",
-     "challenge": "Strengths: The corporation is in line with sustainability and care for the environment. Weaknesses: There are finite short-range projects that do not fully meet social criteria. Opportunities: The necessary funding is available to increase the scope and delimitation of projects over time. Threats: Lack of support from regional governments to promote the Corporation's environmental project.",
-     "intended_outcome": "Recovery of streams in the area, environmental impact awareness and waste management with collaborators and the community.",
-     "status": "Completed",
-     "start_date": "2025-04-08",
-     "end_date": "2025-12-31"
     }
    ],
    "survey": {
-    "respondents": 1,
+    "responses": 1,
     "facts": [],
-    "note": "Fewer than 5 households answered each survey question, so nothing is summarized."
+    "note": "Fewer than 5 survey responses answered each question, so nothing is summarized."
    }
   },
   "A4EDE054786BAF3B7650003FA91299F1": {
@@ -1445,6 +1445,32 @@
     "source": "FTUSA producer account (sample data)"
    },
    "premium_projects": [
+    {
+     "project_ref": "PROJ-61B2B535",
+     "source": "FTUSA Premium project (sample data, own record) PROJ-61B2B535",
+     "challenge_tag": "biodiversity and conservation",
+     "subcategory": "Sustainability efforts",
+     "name": "Development and protection of environment",
+     "action": "Implementation of environmental programs giving priority to the conservation and protection of the natural environment",
+     "challenge": "Natural disasters due to depletion of natural resources, environmental pollution and climate changes.",
+     "intended_outcome": "Giving priority to the conservation and protection of the natural environment, protecting the farmers' certified organic cultivation fields and the surrounding environment, protecting the watersheds and forest reserves with proper management without harming the local biodiversity, and implementing environmental programs.",
+     "status": null,
+     "start_date": null,
+     "end_date": null
+    },
+    {
+     "project_ref": "PROJ-6E7D1B96",
+     "source": "FTUSA Premium project (sample data, own record) PROJ-6E7D1B96",
+     "challenge_tag": "biodiversity and conservation",
+     "subcategory": "Sustainability efforts",
+     "name": "Development and protection of environment",
+     "action": "Implementation of environmental programs giving priority to the conservation and protection of the natural environment",
+     "challenge": "Natural disasters due to depletion of natural resources, environmental pollution and climate changes.",
+     "intended_outcome": "Giving priority to the conservation and protection of the natural environment, protecting the farmers' certified organic cultivation fields and the surrounding environment, protecting the watersheds and forest reserves with proper management without harming the local biodiversity, and implementing environmental programs.",
+     "status": null,
+     "start_date": null,
+     "end_date": null
+    },
     {
      "project_ref": "PROJ-02E42CA3",
      "source": "FTUSA Premium project (sample data, own record) PROJ-02E42CA3",
@@ -1485,32 +1511,6 @@
      "end_date": null
     },
     {
-     "project_ref": "PROJ-61B2B535",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-61B2B535",
-     "challenge_tag": "biodiversity and conservation",
-     "subcategory": "Sustainability efforts",
-     "name": "Development and protection of environment",
-     "action": "Implementation of environmental programs giving priority to the conservation and protection of the natural environment",
-     "challenge": "Natural disasters due to depletion of natural resources, environmental pollution and climate changes.",
-     "intended_outcome": "Giving priority to the conservation and protection of the natural environment, protecting the farmers' certified organic cultivation fields and the surrounding environment, protecting the watersheds and forest reserves with proper management without harming the local biodiversity, and implementing environmental programs.",
-     "status": "Completed",
-     "start_date": "2022-01-01",
-     "end_date": "2022-12-31"
-    },
-    {
-     "project_ref": "PROJ-61B2B535",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-61B2B535",
-     "challenge_tag": "biodiversity and conservation",
-     "subcategory": "Sustainability efforts",
-     "name": "Development and protection of environment",
-     "action": "Implementation of environmental programs giving priority to the conservation and protection of the natural environment",
-     "challenge": "Natural disasters due to depletion of natural resources, environmental pollution and climate changes.",
-     "intended_outcome": "Giving priority to the conservation and protection of the natural environment, protecting the farmers' certified organic cultivation fields and the surrounding environment, protecting the watersheds and forest reserves with proper management without harming the local biodiversity, and implementing environmental programs.",
-     "status": "Completed",
-     "start_date": "2022-01-01",
-     "end_date": "2022-12-31"
-    },
-    {
      "project_ref": "PROJ-E4D71522",
      "source": "FTUSA Premium project (sample data, own record) PROJ-E4D71522",
      "challenge_tag": "biodiversity and conservation",
@@ -1525,7 +1525,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -1583,83 +1583,83 @@
     }
    ],
    "survey": {
-    "respondents": 683,
+    "responses": 683,
     "facts": [
      {
-      "text": "96% of 676 surveyed households use soil conservation practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "96% of 676 survey responses say they use soil conservation practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
-      "respondents": 676,
+      "responses": 676,
       "strength": "exact"
      },
      {
-      "text": "79% of 668 surveyed households use water conservation practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "79% of 668 survey responses say they use water conservation practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
-      "respondents": 668,
+      "responses": 668,
       "strength": "exact"
      },
      {
-      "text": "91% of 666 surveyed households take steps to prevent water contamination.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "91% of 666 survey responses say they take steps to prevent water contamination.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
-      "respondents": 666,
+      "responses": 666,
       "strength": "exact"
      },
      {
-      "text": "94% of 679 surveyed households use forest protection practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "94% of 679 survey responses say they use forest protection practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
-      "respondents": 679,
+      "responses": 679,
       "strength": "exact"
      },
      {
-      "text": "92% of 680 surveyed households have received fertilizer training.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "92% of 680 survey responses say they have received fertilizer training.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
-      "respondents": 680,
+      "responses": 680,
       "strength": "exact"
      },
      {
-      "text": "14% of 682 surveyed households have converted natural land to cropland.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "14% of 682 survey responses say they have converted natural land to cropland.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
-      "respondents": 682,
+      "responses": 682,
       "strength": "exact"
      },
      {
-      "text": "96% of 494 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2021-2026",
-      "respondents": 494,
+      "text": "96% of 494 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2023-2026",
+      "responses": 494,
       "strength": "exact"
      },
      {
-      "text": "How the harvest has changed, 680 surveyed households: It has decreased (47%); It has not changed (29%); It has increased (24%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "How the harvest has changed, 680 survey responses: It has decreased (47%); It has not changed (29%); It has increased (24%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
-      "respondents": 680,
+      "responses": 680,
       "strength": "exact"
      },
      {
-      "text": "Pest management practice used, 682 surveyed households: I don't employ any of these practices (29%); Use traps, repellents, and natural pesticides (26%); Apply pesticide or kill pests only after identifying the pest and only at the best time in the pest’s life cycle to permanently reduce its population. (20%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Pest management practice used, 682 survey responses: I don't employ any of these practices (29%); Use traps, repellents, and natural pesticides (26%); Apply pesticide or kill pests only after identifying the pest and only at the best time in the pest’s life cycle to permanently reduce its population. (20%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
-      "respondents": 682,
+      "responses": 682,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 468 surveyed households: It takes less than 30 minutes (58%); Always available in my house (21%); I don't have access to drinking water (16%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Access to drinking water, 468 survey responses: It takes less than 30 minutes (58%); Always available in my house (21%); I don't have access to drinking water (16%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
-      "respondents": 468,
+      "responses": 468,
       "strength": "exact"
      },
      {
-      "text": "Reasons given for the change in harvest: Less land area under production (176 mentions); More land area under production (89 mentions); Climate change (29 mentions).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Reasons given for the change in harvest, 344 survey responses: Less land area under production (176 responses); More land area under production (89 responses); Climate change (29 responses).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2026",
-      "respondents": 344,
+      "responses": 344,
       "strength": "exact"
      }
     ],
@@ -1693,83 +1693,83 @@
     }
    ],
    "survey": {
-    "respondents": 314,
+    "responses": 314,
     "facts": [
      {
-      "text": "97% of 314 surveyed households use soil conservation practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "97% of 314 survey responses say they use soil conservation practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 314,
+      "responses": 314,
       "strength": "exact"
      },
      {
-      "text": "61% of 314 surveyed households use water conservation practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "61% of 314 survey responses say they use water conservation practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 314,
+      "responses": 314,
       "strength": "exact"
      },
      {
-      "text": "52% of 311 surveyed households take steps to prevent water contamination.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "52% of 311 survey responses say they take steps to prevent water contamination.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 311,
+      "responses": 311,
       "strength": "exact"
      },
      {
-      "text": "92% of 314 surveyed households use forest protection practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "92% of 314 survey responses say they use forest protection practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 314,
+      "responses": 314,
       "strength": "exact"
      },
      {
-      "text": "84% of 314 surveyed households have received fertilizer training.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "84% of 314 survey responses say they have received fertilizer training.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 314,
+      "responses": 314,
       "strength": "exact"
      },
      {
-      "text": "5% of 314 surveyed households have converted natural land to cropland.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "5% of 314 survey responses say they have converted natural land to cropland.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 314,
+      "responses": 314,
       "strength": "exact"
      },
      {
-      "text": "98% of 314 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "98% of 314 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 314,
+      "responses": 314,
       "strength": "exact"
      },
      {
-      "text": "How the harvest has changed, 312 surveyed households: It has decreased (45%); It has increased (29%); It has not changed (27%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "How the harvest has changed, 312 survey responses: It has decreased (45%); It has increased (29%); It has not changed (27%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 312,
+      "responses": 312,
       "strength": "exact"
      },
      {
-      "text": "Pest management practice used, 314 surveyed households: Use traps, repellents, and natural pesticides (74%); I don't employ any of these practices (13%); Plant or preserve species that repel pests of the coffee (4%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Pest management practice used, 314 survey responses: Use traps, repellents, and natural pesticides (74%); I don't employ any of these practices (13%); Plant or preserve species that repel pests of the coffee (4%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 314,
+      "responses": 314,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 87 surveyed households: It takes less than 30 minutes (97%); It takes more than 30 minutes (3%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Access to drinking water, 87 survey responses: It takes less than 30 minutes (97%); It takes more than 30 minutes (3%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 87,
+      "responses": 87,
       "strength": "exact"
      },
      {
-      "text": "Reasons given for the change in harvest: Damaged by natural disasters (77 mentions); Better inputs from FT (34 mentions); More land area under production (31 mentions).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Reasons given for the change in harvest, 195 survey responses: Damaged by natural disasters (77 responses); Better inputs from FT (34 responses); More land area under production (31 responses).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 195,
+      "responses": 195,
       "strength": "exact"
      }
     ],
@@ -1829,7 +1829,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -1874,7 +1874,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -1919,7 +1919,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -1964,7 +1964,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -1996,7 +1996,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2028,7 +2028,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2073,9 +2073,9 @@
     }
    ],
    "survey": {
-    "respondents": 1,
+    "responses": 1,
     "facts": [],
-    "note": "Fewer than 5 households answered each survey question, so nothing is summarized."
+    "note": "Fewer than 5 survey responses answered each question, so nothing is summarized."
    }
   },
   "0090D8D7C58033D4D06FEACC582C020D": {
@@ -2105,7 +2105,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2137,7 +2137,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2169,7 +2169,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2201,7 +2201,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2233,7 +2233,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2317,7 +2317,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2388,7 +2388,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2537,7 +2537,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2569,7 +2569,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2614,7 +2614,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2646,7 +2646,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2704,7 +2704,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2731,8 +2731,8 @@
      "challenge": "This program is one of the most significant projects in helping Organic/Fair Trade Farmers not only in terms of incentive they received, but the fact that their family will benefit from it for the next generation.",
      "intended_outcome": "The goal of this project is to have a continuity of the supply of coconuts that will provide sufficient number of volumes needed by the company to produce more finished products that may generate more premiums.",
      "status": "In Progress",
-     "start_date": "2023-01-01",
-     "end_date": "2025-12-31"
+     "start_date": "2015-12-09",
+     "end_date": null
     },
     {
      "project_ref": "PROJ-8FBC2317",
@@ -2762,9 +2762,9 @@
     }
    ],
    "survey": {
-    "respondents": 1,
+    "responses": 1,
     "facts": [],
-    "note": "Fewer than 5 households answered each survey question, so nothing is summarized."
+    "note": "Fewer than 5 survey responses answered each question, so nothing is summarized."
    }
   },
   "58999B983CFCFF1CBC9D4A5CB0BE359B": {
@@ -2859,7 +2859,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2904,7 +2904,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2936,7 +2936,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -2981,7 +2981,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3013,7 +3013,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3045,7 +3045,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3077,7 +3077,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3109,7 +3109,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3141,7 +3141,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3238,7 +3238,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3296,7 +3296,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3328,7 +3328,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3373,34 +3373,34 @@
     }
    ],
    "survey": {
-    "respondents": 102,
+    "responses": 102,
     "facts": [
      {
-      "text": "60% of 62 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2024",
-      "respondents": 62,
+      "text": "60% of 62 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2024",
+      "responses": 62,
       "strength": "exact"
      },
      {
-      "text": "How the harvest has changed, 101 surveyed households: It has increased (53%); It has decreased (46%); It has not changed (1%).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2024",
-      "respondents": 101,
+      "text": "How the harvest has changed, 101 survey responses: It has increased (53%); It has decreased (46%); It has not changed (1%).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2021-2024",
+      "responses": 101,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 39 surveyed households: Always available in my house (49%); It takes less than 30 minutes (38%); It takes more than 30 minutes (13%).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2024",
-      "respondents": 39,
+      "text": "Access to drinking water, 39 survey responses: Always available in my house (49%); It takes less than 30 minutes (38%); It takes more than 30 minutes (13%).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2021",
+      "responses": 39,
       "strength": "exact"
      },
      {
-      "text": "Reasons given for the change in harvest: Climate change (43 mentions); Better inputs from FT (10 mentions); Diseases (Swollen shoot etc.) (6 mentions).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2024",
-      "respondents": 60,
+      "text": "Reasons given for the change in harvest, 56 survey responses: Climate change (43 responses); Better inputs from FT (10 responses); Diseases (Swollen shoot etc.) (6 responses).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2024",
+      "responses": 56,
       "strength": "exact"
      }
     ],
@@ -3447,7 +3447,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3518,34 +3518,34 @@
     }
    ],
    "survey": {
-    "respondents": 223,
+    "responses": 223,
     "facts": [
      {
-      "text": "58% of 180 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2024",
-      "respondents": 180,
+      "text": "58% of 180 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2024",
+      "responses": 180,
       "strength": "exact"
      },
      {
-      "text": "How the harvest has changed, 219 surveyed households: It has decreased (56%); It has increased (43%); It has not changed (1%).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2024",
-      "respondents": 219,
+      "text": "How the harvest has changed, 219 survey responses: It has decreased (56%); It has increased (43%); It has not changed (1%).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2021-2024",
+      "responses": 219,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 46 surveyed households: It takes less than 30 minutes (52%); Always available in my house (39%); It takes more than 30 minutes (9%).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2024",
-      "respondents": 46,
+      "text": "Access to drinking water, 46 survey responses: It takes less than 30 minutes (52%); Always available in my house (39%); It takes more than 30 minutes (9%).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2021-2024",
+      "responses": 46,
       "strength": "exact"
      },
      {
-      "text": "Reasons given for the change in harvest: Climate change (124 mentions); Better inputs from FT (37 mentions); Diseases (Swollen shoot etc.) (17 mentions).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2024",
-      "respondents": 186,
+      "text": "Reasons given for the change in harvest, 167 survey responses: Climate change (124 responses); Better inputs from FT (37 responses); Diseases (Swollen shoot etc.) (17 responses).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2024",
+      "responses": 167,
       "strength": "exact"
      }
     ],
@@ -3631,7 +3631,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3663,7 +3663,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3747,27 +3747,20 @@
     }
    ],
    "survey": {
-    "respondents": 217,
+    "responses": 217,
     "facts": [
      {
-      "text": "How the harvest has changed, 209 surveyed households: It has increased (37%); It has decreased (36%); It has not changed (27%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "How the harvest has changed, 209 survey responses: It has increased (37%); It has decreased (36%); It has not changed (27%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2022",
-      "respondents": 209,
+      "responses": 209,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 216 surveyed households: Always available in my house (71%); It takes less than 30 minutes (20%); It takes more than 30 minutes (7%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Access to drinking water, 216 survey responses: Always available in my house (71%); It takes less than 30 minutes (20%); It takes more than 30 minutes (7%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2022",
-      "respondents": 216,
-      "strength": "exact"
-     },
-     {
-      "text": "Reasons given for the change in harvest: Climate change (2 mentions); Water pollution (1 mentions); Non adult shrimp fishing (1 mentions).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2022",
-      "respondents": 5,
+      "responses": 216,
       "strength": "exact"
      }
     ],
@@ -3814,7 +3807,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3885,7 +3878,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3930,7 +3923,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -3962,7 +3955,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4072,7 +4065,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4104,7 +4097,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4136,7 +4129,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4168,7 +4161,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4265,7 +4258,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4297,7 +4290,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4329,9 +4322,9 @@
     }
    ],
    "survey": {
-    "respondents": 1,
+    "responses": 1,
     "facts": [],
-    "note": "Fewer than 5 households answered each survey question, so nothing is summarized."
+    "note": "Fewer than 5 survey responses answered each question, so nothing is summarized."
    }
   },
   "FA9ADCCE1553D4FADD64C87CA6219F97": {
@@ -4374,34 +4367,34 @@
     }
    ],
    "survey": {
-    "respondents": 86,
+    "responses": 86,
     "facts": [
      {
-      "text": "40% of 86 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "40% of 86 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 86,
+      "responses": 86,
       "strength": "exact"
      },
      {
-      "text": "How the harvest has changed, 86 surveyed households: It has decreased (78%); It has increased (21%); It has not changed (1%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "How the harvest has changed, 86 survey responses: It has decreased (78%); It has increased (21%); It has not changed (1%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 86,
+      "responses": 86,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 13 surveyed households: It takes less than 30 minutes (62%); It takes more than 30 minutes (38%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Access to drinking water, 13 survey responses: It takes less than 30 minutes (62%); It takes more than 30 minutes (38%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 13,
+      "responses": 13,
       "strength": "exact"
      },
      {
-      "text": "Reasons given for the change in harvest: Climate change (38 mentions); Diseases (Swollen shoot etc.) (25 mentions); Better inputs from FT (11 mentions).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Reasons given for the change in harvest, 70 survey responses: Climate change (38 responses); Diseases (Swollen shoot etc.) (25 responses); Better inputs from FT (11 responses).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 78,
+      "responses": 70,
       "strength": "exact"
      }
     ],
@@ -4435,9 +4428,9 @@
     }
    ],
    "survey": {
-    "respondents": 2,
+    "responses": 2,
     "facts": [],
-    "note": "Fewer than 5 households answered each survey question, so nothing is summarized."
+    "note": "Fewer than 5 survey responses answered each question, so nothing is summarized."
    }
   },
   "043647BA42F03E2C3E862AF7F37DEAE7": {
@@ -4467,7 +4460,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4499,7 +4492,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4544,7 +4537,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4576,7 +4569,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4608,7 +4601,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4640,7 +4633,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4672,7 +4665,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4730,7 +4723,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4762,7 +4755,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4807,7 +4800,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4839,7 +4832,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4871,7 +4864,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4903,7 +4896,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -4974,7 +4967,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5188,27 +5181,27 @@
     }
    ],
    "survey": {
-    "respondents": 145,
+    "responses": 145,
     "facts": [
      {
-      "text": "96% of 145 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "96% of 145 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2022",
-      "respondents": 145,
+      "responses": 145,
       "strength": "exact"
      },
      {
-      "text": "How the harvest has changed, 145 surveyed households: It has not changed (39%); It has decreased (31%); It has increased (30%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "How the harvest has changed, 145 survey responses: It has not changed (39%); It has decreased (31%); It has increased (30%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2022",
-      "respondents": 145,
+      "responses": 145,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 135 surveyed households: It takes less than 30 minutes (78%); It takes more than 30 minutes (22%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Access to drinking water, 135 survey responses: It takes less than 30 minutes (78%); It takes more than 30 minutes (22%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2022",
-      "respondents": 135,
+      "responses": 135,
       "strength": "exact"
      }
     ],
@@ -5241,8 +5234,8 @@
      "end_date": null
     },
     {
-     "project_ref": "PROJ-C13F2AE6",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-C13F2AE6",
+     "project_ref": "PROJ-FF3E8BBD",
+     "source": "FTUSA Premium project (sample data, own record) PROJ-FF3E8BBD",
      "challenge_tag": "biodiversity and conservation",
      "subcategory": "Sustainability efforts",
      "name": "Environmental projects",
@@ -5250,8 +5243,8 @@
      "challenge": "They allow the environment to be more pleasant and sustainable for a better quality of life.",
      "intended_outcome": "climate change; water preservation; alternative transportation; reducing the emission of pollutants; recycling policies.",
      "status": "In Progress",
-     "start_date": "2022-01-01",
-     "end_date": null
+     "start_date": "2023-01-01",
+     "end_date": "2023-12-31"
     },
     {
      "project_ref": "PROJ-F2BAABE6",
@@ -5268,7 +5261,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5286,24 +5279,24 @@
    },
    "premium_projects": [
     {
-     "project_ref": "PROJ-348446EA",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-348446EA",
-     "challenge_tag": "biodiversity and conservation",
-     "subcategory": null,
-     "name": "Socio-Cultural-Environmental Impact Projects 2022",
-     "action": "In the Urabá region, given the history that its inhabitants have had to live and the little investment in the most vulnerable communities, the initiative was born to carry out projects with a positive social impact on them, which is why the Genesis Banana Corporation, through the resources of the Fairtrade bonus, is convinced that through the union and teamwork with public and private entities, it will be possible to carry out projects that generate greater impact and improve the quality of life of the most vulnerable communities in the Urabá region.",
-     "challenge": "Despite the fact that state and governmental institutions are present in the Urabá area; the Genesis Banana Corporation evidenced gaps, social problems and deficiencies in communities, for this reason, as a Social Corporation and through the resources of Prima Fairtrade, it considered it pertinent to contribute to the construction and development of communities with a higher quality of life, through support and intervention in some specific areas and populations, in accordance with the needs identified and the approaches that the Prime Committee Fairtrade determines.",
-     "intended_outcome": "GENERAL OBJECTIVE To contribute to the improvement of the quality of life of the communities that are part of the territory in which the Corporation is located, thus contributing to the development and consolidation of a more just society, which prioritizes well-being, health, education and environmental sustainability. SPECIFIC OBJECTIVES • Provide basic and timely care to vulnerable communities facing an emergency situation, especially those located in the Urabá subregion. • Promote safe and comfortable educational spaces for the development of training activities. • Build or participate in social and environmental projects aimed at improving the quality of life of vulnerable communities, through strategic alliances or agreements, through which greater resources can be captured and a greater impact can be generated significant.",
-     "status": "In Progress",
-     "start_date": "2022-01-01",
-     "end_date": "2022-12-31"
-    },
-    {
      "project_ref": "PROJ-A3105A0F",
      "source": "FTUSA Premium project (sample data, own record) PROJ-A3105A0F",
      "challenge_tag": "biodiversity and conservation",
      "subcategory": "Sustainability efforts",
      "name": "Socio-Cultural-Environmental Impact Projects",
+     "action": "In the Urabá region, given the history that its inhabitants have had to live and the little investment in the most vulnerable communities, the initiative was born to carry out projects with a positive social impact on them, which is why the Genesis Banana Corporation, through the resources of the Fairtrade bonus, is convinced that through the union and teamwork with public and private entities, it will be possible to carry out projects that generate greater impact and improve the quality of life of the most vulnerable communities in the Urabá region.",
+     "challenge": "Despite the fact that state and governmental institutions are present in the Urabá area; the Genesis Banana Corporation evidenced gaps, social problems and deficiencies in communities, for this reason, as a Social Corporation and through the resources of Prima Fairtrade, it considered it pertinent to contribute to the construction and development of communities with a higher quality of life, through support and intervention in some specific areas and populations, in accordance with the needs identified and the approaches that the Prime Committee Fairtrade determines.",
+     "intended_outcome": "GENERAL OBJECTIVE To contribute to the improvement of the quality of life of the communities that are part of the territory in which the Corporation is located, thus contributing to the development and consolidation of a more just society, which prioritizes well-being, health, education and environmental sustainability. SPECIFIC OBJECTIVES • Provide basic and timely care to vulnerable communities facing an emergency situation, especially those located in the Urabá subregion. • Promote safe and comfortable educational spaces for the development of training activities. • Build or participate in social and environmental projects aimed at improving the quality of life of vulnerable communities, through strategic alliances or agreements, through which greater resources can be captured and a greater impact can be generated significant.",
+     "status": "In Progress",
+     "start_date": "2021-06-01",
+     "end_date": null
+    },
+    {
+     "project_ref": "PROJ-348446EA",
+     "source": "FTUSA Premium project (sample data, own record) PROJ-348446EA",
+     "challenge_tag": "biodiversity and conservation",
+     "subcategory": null,
+     "name": "Socio-Cultural-Environmental Impact Projects 2022",
      "action": "In the Urabá region, given the history that its inhabitants have had to live and the little investment in the most vulnerable communities, the initiative was born to carry out projects with a positive social impact on them, which is why the Genesis Banana Corporation, through the resources of the Fairtrade bonus, is convinced that through the union and teamwork with public and private entities, it will be possible to carry out projects that generate greater impact and improve the quality of life of the most vulnerable communities in the Urabá region.",
      "challenge": "Despite the fact that state and governmental institutions are present in the Urabá area; the Genesis Banana Corporation evidenced gaps, social problems and deficiencies in communities, for this reason, as a Social Corporation and through the resources of Prima Fairtrade, it considered it pertinent to contribute to the construction and development of communities with a higher quality of life, through support and intervention in some specific areas and populations, in accordance with the needs identified and the approaches that the Prime Committee Fairtrade determines.",
      "intended_outcome": "GENERAL OBJECTIVE To contribute to the improvement of the quality of life of the communities that are part of the territory in which the Corporation is located, thus contributing to the development and consolidation of a more just society, which prioritizes well-being, health, education and environmental sustainability. SPECIFIC OBJECTIVES • Provide basic and timely care to vulnerable communities facing an emergency situation, especially those located in the Urabá subregion. • Promote safe and comfortable educational spaces for the development of training activities. • Build or participate in social and environmental projects aimed at improving the quality of life of vulnerable communities, through strategic alliances or agreements, through which greater resources can be captured and a greater impact can be generated significant.",
@@ -5326,7 +5319,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5371,7 +5364,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5403,7 +5396,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5435,7 +5428,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5467,7 +5460,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5499,7 +5492,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5531,7 +5524,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5576,7 +5569,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5608,7 +5601,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5653,20 +5646,20 @@
     }
    ],
    "survey": {
-    "respondents": 156,
+    "responses": 156,
     "facts": [
      {
-      "text": "88% of 156 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "88% of 156 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 156,
+      "responses": 156,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 59 surveyed households: It takes less than 30 minutes (93%); It takes more than 30 minutes (7%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Access to drinking water, 59 survey responses: It takes less than 30 minutes (93%); It takes more than 30 minutes (7%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 59,
+      "responses": 59,
       "strength": "exact"
      }
     ],
@@ -5713,7 +5706,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5745,7 +5738,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5803,7 +5796,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5835,7 +5828,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5867,7 +5860,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5938,7 +5931,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -5983,7 +5976,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6041,7 +6034,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6073,7 +6066,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6105,9 +6098,9 @@
     }
    ],
    "survey": {
-    "respondents": 3,
+    "responses": 3,
     "facts": [],
-    "note": "Fewer than 5 households answered each survey question, so nothing is summarized."
+    "note": "Fewer than 5 survey responses answered each question, so nothing is summarized."
    }
   },
   "F8E015C0849709B87021F179EB5B7B11": {
@@ -6137,7 +6130,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6169,7 +6162,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6201,7 +6194,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6259,7 +6252,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6291,83 +6284,83 @@
     }
    ],
    "survey": {
-    "respondents": 150,
+    "responses": 150,
     "facts": [
      {
-      "text": "99% of 150 surveyed households use soil conservation practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "99% of 150 survey responses say they use soil conservation practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 150,
+      "responses": 150,
       "strength": "exact"
      },
      {
-      "text": "100% of 150 surveyed households use water conservation practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "100% of 150 survey responses say they use water conservation practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 150,
+      "responses": 150,
       "strength": "exact"
      },
      {
-      "text": "99% of 150 surveyed households take steps to prevent water contamination.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "99% of 150 survey responses say they take steps to prevent water contamination.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 150,
+      "responses": 150,
       "strength": "exact"
      },
      {
-      "text": "99% of 150 surveyed households use forest protection practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "99% of 150 survey responses say they use forest protection practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 150,
+      "responses": 150,
       "strength": "exact"
      },
      {
-      "text": "97% of 148 surveyed households have received fertilizer training.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "97% of 148 survey responses say they have received fertilizer training.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 148,
+      "responses": 148,
       "strength": "exact"
      },
      {
-      "text": "0% of 148 surveyed households have converted natural land to cropland.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "0% of 148 survey responses say they have converted natural land to cropland.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 148,
+      "responses": 148,
       "strength": "exact"
      },
      {
-      "text": "93% of 150 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "93% of 150 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 150,
+      "responses": 150,
       "strength": "exact"
      },
      {
-      "text": "How the harvest has changed, 149 surveyed households: It has increased (48%); It has not changed (41%); It has decreased (11%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "How the harvest has changed, 149 survey responses: It has increased (48%); It has not changed (41%); It has decreased (11%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 149,
+      "responses": 149,
       "strength": "exact"
      },
      {
-      "text": "Pest management practice used, 149 surveyed households: Use traps, repellents, and natural pesticides (79%); Conduct regular visual examinations of the coffee to detect pests and/or diseases (8%); Maintain written record of pest infestation, treatments, and results (5%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Pest management practice used, 149 survey responses: Use traps, repellents, and natural pesticides (79%); Conduct regular visual examinations of the coffee to detect pests and/or diseases (8%); Maintain written record of pest infestation, treatments, and results (5%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 149,
+      "responses": 149,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 31 surveyed households: It takes less than 30 minutes (97%); It takes more than 30 minutes (3%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Access to drinking water, 31 survey responses: It takes less than 30 minutes (97%); It takes more than 30 minutes (3%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 31,
+      "responses": 31,
       "strength": "exact"
      },
      {
-      "text": "Reasons given for the change in harvest: Better inputs from FT (7 mentions); More land area under production (5 mentions); Climate change (1 mentions).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Reasons given for the change in harvest, 14 survey responses: Better inputs from FT (7 responses); More land area under production (5 responses).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2024",
-      "respondents": 14,
+      "responses": 14,
       "strength": "exact"
      }
     ],
@@ -6401,7 +6394,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6433,34 +6426,34 @@
     }
    ],
    "survey": {
-    "respondents": 134,
+    "responses": 134,
     "facts": [
      {
-      "text": "87% of 134 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "87% of 134 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 134,
+      "responses": 134,
       "strength": "exact"
      },
      {
-      "text": "How the harvest has changed, 134 surveyed households: It has decreased (38%); It has not changed (31%); It has increased (31%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "How the harvest has changed, 134 survey responses: It has decreased (38%); It has not changed (31%); It has increased (31%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 134,
+      "responses": 134,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 92 surveyed households: It takes less than 30 minutes (85%); It takes more than 30 minutes (15%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Access to drinking water, 92 survey responses: It takes less than 30 minutes (85%); It takes more than 30 minutes (15%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 92,
+      "responses": 92,
       "strength": "exact"
      },
      {
-      "text": "Reasons given for the change in harvest: Damaged by natural disasters (32 mentions); Young trees (19 mentions); Old trees (16 mentions).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Reasons given for the change in harvest, 83 survey responses: Damaged by natural disasters (32 responses); Young trees (19 responses); Old trees (16 responses).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2023",
-      "respondents": 132,
+      "responses": 83,
       "strength": "exact"
      }
     ],
@@ -6494,20 +6487,20 @@
     }
    ],
    "survey": {
-    "respondents": 50,
+    "responses": 50,
     "facts": [
      {
-      "text": "96% of 49 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2021-2022",
-      "respondents": 49,
+      "text": "96% of 49 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2022",
+      "responses": 49,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 29 surveyed households: It takes less than 30 minutes (97%); It takes more than 30 minutes (3%).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2021-2022",
-      "respondents": 29,
+      "text": "Access to drinking water, 29 survey responses: It takes less than 30 minutes (97%); It takes more than 30 minutes (3%).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2022",
+      "responses": 29,
       "strength": "exact"
      }
     ],
@@ -6567,7 +6560,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6638,7 +6631,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6696,34 +6689,34 @@
     }
    ],
    "survey": {
-    "respondents": 227,
+    "responses": 227,
     "facts": [
      {
-      "text": "80% of 225 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2023",
-      "respondents": 225,
+      "text": "80% of 225 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2023",
+      "responses": 225,
       "strength": "exact"
      },
      {
-      "text": "How the harvest has changed, 225 surveyed households: It has decreased (55%); It has increased (25%); It has not changed (20%).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2023",
-      "respondents": 225,
+      "text": "How the harvest has changed, 225 survey responses: It has decreased (55%); It has increased (25%); It has not changed (20%).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2023",
+      "responses": 225,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 186 surveyed households: It takes less than 30 minutes (86%); It takes more than 30 minutes (14%).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2023",
-      "respondents": 186,
+      "text": "Access to drinking water, 186 survey responses: It takes less than 30 minutes (86%); It takes more than 30 minutes (14%).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2023",
+      "responses": 186,
       "strength": "exact"
      },
      {
-      "text": "Reasons given for the change in harvest: Damaged by natural disasters (67 mentions); Old trees (44 mentions); Sufficient rainfall (38 mentions).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2020-2023",
-      "respondents": 266,
+      "text": "Reasons given for the change in harvest, 155 survey responses: Damaged by natural disasters (67 responses); Old trees (44 responses); Sufficient rainfall (38 responses).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2023",
+      "responses": 155,
       "strength": "exact"
      }
     ],
@@ -6757,7 +6750,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6783,26 +6776,26 @@
      "action": "Lack of community rubbish bins to contain household waste. Those that do not have access to company arranged bins, tend to burn, or throw household waste in the sea or in the bushy areas or just beside the road. Aside from household waste there is also biodegradable waste that is being created in volumes from grass cuttings off the main Noro road, and also from the town market. All this biodegradable waste is currently disposed of at the local dumpsite taking up unnecessary space not to mention naturally composting but not able to be used. This project looks various activities that address the environmental issue of waste management, and also looks at opportunities that can arise out of the projects.",
      "challenge": "From the needs assessment survey, highlighted as one of several environmental concerns was Waste and Trash. Healthcare was one of the highest concerns and getting rid of unsanitary trash piles would be a way of preventing disease and illness due to poor sanitation.",
      "intended_outcome": "Help residential communities to have proper disposal of household rubbish/Trash, so that household areas can be clean and free from problems of unmanaged rubbish disposal.",
-     "status": "Completed",
-     "start_date": "2022-07-04",
-     "end_date": "2022-07-13"
+     "status": null,
+     "start_date": null,
+     "end_date": null
     },
     {
-     "project_ref": "PROJ-49A89CB7",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-49A89CB7",
+     "project_ref": "PROJ-6165949F",
+     "source": "FTUSA Premium project (sample data, own record) PROJ-6165949F",
      "challenge_tag": "biodiversity and conservation",
      "subcategory": "Waste management (Trash collection, recycling facilities etc.)",
      "name": "Biodegradable waste management/composting (Tuna Park)",
      "action": "Lack of community rubbish bins to contain household waste. Those that do not have access to company arranged bins, tend to burn, or throw household waste in the sea or in the bushy areas or just beside the road. Aside from household waste there is also biodegradable waste that is being created in volumes from grass cuttings off the main Noro road, and also from the town market. All this biodegradable waste is currently disposed of at the local dumpsite taking up unnecessary space not to mention naturally composting but not able to be used. This project looks various activities that address the environmental issue of waste management, and also looks at opportunities that can arise out of the projects.",
      "challenge": "From the needs assessment survey, highlighted as one of several environmental concerns was Waste and Trash. Healthcare was one of the highest concerns and getting rid of unsanitary trash piles would be a way of preventing disease and illness due to poor sanitation.",
      "intended_outcome": "Help residential communities to have proper disposal of household rubbish/Trash, so that household areas can be clean and free from problems of unmanaged rubbish disposal.",
-     "status": "Completed",
-     "start_date": "2022-07-04",
-     "end_date": "2022-07-13"
+     "status": null,
+     "start_date": null,
+     "end_date": null
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6834,7 +6827,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6866,7 +6859,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -6950,83 +6943,83 @@
     }
    ],
    "survey": {
-    "respondents": 574,
+    "responses": 574,
     "facts": [
      {
-      "text": "86% of 567 surveyed households use soil conservation practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "86% of 567 survey responses say they use soil conservation practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2023",
-      "respondents": 567,
+      "responses": 567,
       "strength": "exact"
      },
      {
-      "text": "73% of 569 surveyed households use water conservation practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "73% of 569 survey responses say they use water conservation practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2023",
-      "respondents": 569,
+      "responses": 569,
       "strength": "exact"
      },
      {
-      "text": "88% of 565 surveyed households take steps to prevent water contamination.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "88% of 565 survey responses say they take steps to prevent water contamination.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2023",
-      "respondents": 565,
+      "responses": 565,
       "strength": "exact"
      },
      {
-      "text": "89% of 569 surveyed households use forest protection practices.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "89% of 569 survey responses say they use forest protection practices.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2023",
-      "respondents": 569,
+      "responses": 569,
       "strength": "exact"
      },
      {
-      "text": "93% of 568 surveyed households have received fertilizer training.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "93% of 568 survey responses say they have received fertilizer training.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2023",
-      "respondents": 568,
+      "responses": 568,
       "strength": "exact"
      },
      {
-      "text": "3% of 568 surveyed households have converted natural land to cropland.",
-      "source": "FTUSA household survey (sample data)",
+      "text": "3% of 568 survey responses say they have converted natural land to cropland.",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2023",
-      "respondents": 568,
+      "responses": 568,
       "strength": "exact"
      },
      {
-      "text": "97% of 402 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2021-2023",
-      "respondents": 402,
+      "text": "97% of 402 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2023",
+      "responses": 402,
       "strength": "exact"
      },
      {
-      "text": "How the harvest has changed, 566 surveyed households: It has decreased (56%); It has not changed (23%); It has increased (20%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "How the harvest has changed, 566 survey responses: It has decreased (56%); It has not changed (23%); It has increased (20%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2023",
-      "respondents": 566,
+      "responses": 566,
       "strength": "exact"
      },
      {
-      "text": "Pest management practice used, 563 surveyed households: Use traps, repellents, and natural pesticides (27%); Conduct regular visual examinations of the coffee to detect pests and/or diseases (18%); Create or preserve places (including plant species) for beneficial predators of pests to live (14%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Pest management practice used, 563 survey responses: Use traps, repellents, and natural pesticides (27%); Conduct regular visual examinations of the coffee to detect pests and/or diseases (18%); Create or preserve places (including plant species) for beneficial predators of pests to live (14%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2023",
-      "respondents": 563,
+      "responses": 563,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 198 surveyed households: Always available in my house (64%); It takes less than 30 minutes (19%); I don't have access to drinking water (10%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Access to drinking water, 198 survey responses: Always available in my house (64%); It takes less than 30 minutes (19%); I don't have access to drinking water (10%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2023",
-      "respondents": 198,
+      "responses": 198,
       "strength": "exact"
      },
      {
-      "text": "Reasons given for the change in harvest: Better inputs from FT (54 mentions); Less land area under production (45 mentions); Climate change (42 mentions).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2021-2023",
-      "respondents": 182,
+      "text": "Reasons given for the change in harvest, 182 survey responses: Better inputs from FT (54 responses); Less land area under production (45 responses); Climate change (42 responses).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2022-2023",
+      "responses": 182,
       "strength": "exact"
      }
     ],
@@ -7054,9 +7047,9 @@
      "action": "This project covers the different needs, as soon as the environmental pollution caused by these substances and wastes may arise, which generate multiple problems for nature and for all living beings.",
      "challenge": "In this way, environmental advertising campaigns in Colombia have been developing with greater growth, encouraging each individual and company to become aware and begin to carry out activities in favor of the environment.",
      "intended_outcome": "The purpose of this project is to be able to develop a social campaign aimed at the community in order to make them aware of the current environmental situation and encourage the recycling and rational use of waste and how to provide them with good knowledge about caring for the environment.",
-     "status": "Completed",
-     "start_date": "2022-01-01",
-     "end_date": "2022-12-31"
+     "status": null,
+     "start_date": null,
+     "end_date": null
     },
     {
      "project_ref": "PROJ-FB472C83",
@@ -7067,9 +7060,9 @@
      "action": "This project covers the different needs, as soon as the environmental pollution caused by these substances and wastes may arise, which generate multiple problems for nature and for all living beings.",
      "challenge": "In this way, environmental advertising campaigns in Colombia have been developing with greater growth, encouraging each individual and company to become aware and begin to carry out activities in favor of the environment.",
      "intended_outcome": "The purpose of this project is to be able to develop a social campaign aimed at the community in order to make them aware of the current environmental situation and to encourage the recycling and rational use of waste and to provide them with good knowledge about caring for the environment.",
-     "status": "Completed",
-     "start_date": "2022-01-01",
-     "end_date": "2022-12-31"
+     "status": null,
+     "start_date": null,
+     "end_date": null
     },
     {
      "project_ref": "PROJ-8F137B21",
@@ -7086,7 +7079,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7118,7 +7111,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7150,7 +7143,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7167,6 +7160,32 @@
     "source": "FTUSA producer account (sample data)"
    },
    "premium_projects": [
+    {
+     "project_ref": "PROJ-4DCC6147",
+     "source": "FTUSA Premium project (sample data, own record) PROJ-4DCC6147",
+     "challenge_tag": "biodiversity and conservation",
+     "subcategory": "Waste Disposal / Recycling",
+     "name": "Day: collection of empty pesticide containers throughout the Cooperative's range of action",
+     "action": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
+     "challenge": "The inadequate disposal of post-consumer pesticide waste in open fields, water sources, for burning and/or reuse, violates the International Code of Conduct for the Distribution and Use of Pesticides. To avoid this, the Campo Limpio corporation has in our area two collection sites for pesticide containers located in Bolombolo and Urrao, places that many coffee growers cannot easily reach, but through container collection days, significant volumes can be collected and contamination avoided",
+     "intended_outcome": "Farms free of post-consumer pesticide residues, proper management and correct final disposal of these",
+     "status": null,
+     "start_date": null,
+     "end_date": null
+    },
+    {
+     "project_ref": "PROJ-FFA14ED1",
+     "source": "FTUSA Premium project (sample data, own record) PROJ-FFA14ED1",
+     "challenge_tag": "biodiversity and conservation",
+     "subcategory": "Waste Disposal / Recycling",
+     "name": "Day: collection of empty pesticide containers throughout the Cooperative's range of action",
+     "action": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
+     "challenge": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
+     "intended_outcome": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
+     "status": null,
+     "start_date": null,
+     "end_date": null
+    },
     {
      "project_ref": "PROJ-3764552B",
      "source": "FTUSA Premium project (sample data, own record) PROJ-3764552B",
@@ -7218,36 +7237,10 @@
      "status": "Completed",
      "start_date": "2024-01-03",
      "end_date": null
-    },
-    {
-     "project_ref": "PROJ-4DCC6147",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-4DCC6147",
-     "challenge_tag": "biodiversity and conservation",
-     "subcategory": "Waste Disposal / Recycling",
-     "name": "Day: collection of empty pesticide containers throughout the Cooperative's range of action",
-     "action": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
-     "challenge": "The inadequate disposal of post-consumer pesticide waste in open fields, water sources, for burning and/or reuse, violates the International Code of Conduct for the Distribution and Use of Pesticides. To avoid this, the Campo Limpio corporation has in our area two collection sites for pesticide containers located in Bolombolo and Urrao, places that many coffee growers cannot easily reach, but through container collection days, significant volumes can be collected and contamination avoided",
-     "intended_outcome": "Farms free of post-consumer pesticide residues, proper management and correct final disposal of these",
-     "status": "Completed",
-     "start_date": "2024-01-03",
-     "end_date": null
-    },
-    {
-     "project_ref": "PROJ-4DCC6147",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-4DCC6147",
-     "challenge_tag": "biodiversity and conservation",
-     "subcategory": "Waste Disposal / Recycling",
-     "name": "Day: collection of empty pesticide containers throughout the Cooperative's range of action",
-     "action": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
-     "challenge": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
-     "intended_outcome": "Carry out the campaign to collect agrochemical containers, in order to contribute every day to the improvement of the environment, collecting these hazardous wastes that are in the field.",
-     "status": "Completed",
-     "start_date": "2024-01-03",
-     "end_date": null
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7279,7 +7272,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7311,7 +7304,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7356,7 +7349,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7388,7 +7381,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7420,7 +7413,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7465,7 +7458,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7497,7 +7490,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7529,7 +7522,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7561,7 +7554,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7606,7 +7599,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7690,7 +7683,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7735,55 +7728,55 @@
     }
    ],
    "survey": {
-    "respondents": 523,
+    "responses": 523,
     "facts": [
      {
-      "text": "94% of 240 surveyed households have running water at home.",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2021-2025",
-      "respondents": 240,
+      "text": "94% of 240 survey responses say they have running water at home.",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2025",
+      "responses": 240,
       "strength": "exact"
      },
      {
-      "text": "94% of 237 surveyed households have noticed changes in fishing.",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2021-2025",
-      "respondents": 237,
+      "text": "94% of 237 survey responses say they have noticed changes in fishing.",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2025",
+      "responses": 237,
       "strength": "exact"
      },
      {
-      "text": "How the harvest has changed, 522 surveyed households: It has decreased (76%); It has increased (14%); It has not changed (10%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "How the harvest has changed, 522 survey responses: It has decreased (76%); It has increased (14%); It has not changed (10%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2025",
-      "respondents": 522,
+      "responses": 522,
       "strength": "exact"
      },
      {
-      "text": "Access to drinking water, 410 surveyed households: Always available in my house (58%); It takes less than 30 minutes (36%); It takes more than 30 minutes (3%).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Access to drinking water, 410 survey responses: Always available in my house (58%); It takes less than 30 minutes (36%); It takes more than 30 minutes (3%).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2025",
-      "respondents": 410,
+      "responses": 410,
       "strength": "exact"
      },
      {
-      "text": "How fishers have adapted, 201 surveyed households: I changed my fishing grounds or fishing methods (32%); I diversified my income sources (23%); I changed my fishing schedule or the time of year I fish (20%).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2021-2025",
-      "respondents": 201,
+      "text": "How fishers have adapted, 201 survey responses: I changed my fishing grounds or fishing methods (32%); I diversified my income sources (23%); I changed my fishing schedule or the time of year I fish (20%).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2025",
+      "responses": 201,
       "strength": "exact"
      },
      {
-      "text": "Main concern for the future of fishing, 239 surveyed households: Unregulated use of FAD's (fish aggregation device) (46%); Overfishing from illegal and unregulated fishing (16%); Climate change (rising temperatures, disrupted migration patterns etc.) (10%).",
-      "source": "FTUSA household survey (sample data)",
-      "period": "2021-2025",
-      "respondents": 239,
+      "text": "Main concern for the future of fishing, 239 survey responses: Unregulated use of FAD's (fish aggregation device) (46%); Overfishing from illegal and unregulated fishing (16%); Climate change (rising temperatures, disrupted migration patterns etc.) (10%).",
+      "source": "FTUSA survey responses (sample data)",
+      "period": "2025",
+      "responses": 239,
       "strength": "exact"
      },
      {
-      "text": "Reasons given for the change in harvest: Fishing season(s) changing and unpredictable (119 mentions); Changed number of fishers (41 mentions); Changed market demand (20 mentions).",
-      "source": "FTUSA household survey (sample data)",
+      "text": "Reasons given for the change in harvest, 180 survey responses: Fishing season(s) changing and unpredictable (119 responses); Changed number of fishers (41 responses); Changed market demand (20 responses).",
+      "source": "FTUSA survey responses (sample data)",
       "period": "2021-2025",
-      "respondents": 180,
+      "responses": 180,
       "strength": "exact"
      }
     ],
@@ -7817,7 +7810,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }
@@ -7848,32 +7841,6 @@
      "end_date": null
     },
     {
-     "project_ref": "PROJ-C37C43B3",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-C37C43B3",
-     "challenge_tag": "biodiversity and conservation",
-     "subcategory": "Sustainability efforts",
-     "name": "Test field changes 2022",
-     "action": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur fringilla ultricies urna, sit amet accumsan massa efficitur at. Suspend elementum id risus eget lobortis. Mauris Nisl Sapien, Dictum eu Leo Non, Egestas Sagittis Justo. Nam Sodales Quam ut Ante Mollis, Eget Feugiat Libero Accumsan. Nam commodo, tortor sit amet venenatis vestibulum, eros turpis finibus ex, et laoreet mi arcu non magna. Suspendisse imperdiet purus lacus, et viverra arcu tincidunt lobortis.",
-     "challenge": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur fringilla ultricies urna, sit amet accumsan massa efficitur at. Suspend elementum id risus eget lobortis. Mauris Nisl Sapien, Dictum eu Leo Non, Egestas Sagittis Justo. Nam Sodales Quam ut Ante Mollis, Eget Feugiat Libero Accumsan. Nam commodo, tortor sit amet venenatis vestibulum, eros turpis finibus ex, et laoreet mi arcu non magna. Suspendisse imperdiet purus lacus, et viverra arcu tincidunt lobortis.",
-     "intended_outcome": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur fringilla ultricies urna, sit amet accumsan massa efficitur at. Suspend elementum id risus eget lobortis. Mauris Nisl Sapien, Dictum eu Leo Non, Egestas Sagittis Justo. Nam Sodales Quam ut Ante Mollis, Eget Feugiat Libero Accumsan. Nam commodo, tortor sit amet venenatis vestibulum, eros turpis finibus ex, et laoreet mi arcu non magna. Suspendisse imperdiet purus lacus, et viverra arcu tincidunt lobortis.",
-     "status": "Completed",
-     "start_date": "2022-12-01",
-     "end_date": "2022-12-31"
-    },
-    {
-     "project_ref": "PROJ-EF233B6C",
-     "source": "FTUSA Premium project (sample data, own record) PROJ-EF233B6C",
-     "challenge_tag": "soil and land",
-     "subcategory": "Crop Diversification",
-     "name": "ttt",
-     "action": "Lorem Lipsum Pain Sits Amet, Conecteur adipiscing Elite. Phasellus pellentesque magna tortor, and ultresses magna mattis dapibus. Priin solicitudin ariscipit is, quis sagittis orci dignissim id. Nam eu elit sed color consecteur fermentum. Nunc vehicle here with its convenient facilities. Nullam augue odio, mollis at pulvinar sit amet, bibendum non nibh. Tempo Nils Conector Convallis Ultractive Suspenders I am ornate turpis se interdum tincidunt.",
-     "challenge": "Lorem Lipsum Pain Sits Amet, Conecteur adipiscing Elite. Phasellus pellentesque magna tortor, and ultresses magna mattis dapibus. Priin solicitudin ariscipit is, quis sagittis orci dignissim id. Nam eu elit sed color consecteur fermentum. Nunc vehicle here with its convenient facilities. Nullam augue odio, mollis at pulvinar sit amet, bibendum non nibh. Tempo Nils Conector Convallis Ultractive Suspenders I am ornate turpis se interdum tincidunt.",
-     "intended_outcome": "Lorem Lipsum Pain Sits Amet, Conecteur adipiscing Elite. Phasellus pellentesque magna tortor, and ultresses magna mattis dapibus. Priin solicitudin ariscipit is, quis sagittis orci dignissim id. Nam eu elit sed color consecteur fermentum. Nunc vehicle here with its convenient facilities. Nullam augue odio, mollis at pulvinar sit amet, bibendum non nibh. Tempo Nils Conector Convallis Ultractive Suspenders I am ornate turpis se interdum tincidunt.",
-     "status": "Completed",
-     "start_date": "2023-01-04",
-     "end_date": "2023-01-12"
-    },
-    {
      "project_ref": "PROJ-2E54C093",
      "source": "FTUSA Premium project (sample data, own record) PROJ-2E54C093",
      "challenge_tag": "water",
@@ -7888,7 +7855,7 @@
     }
    ],
    "survey": {
-    "respondents": 0,
+    "responses": 0,
     "facts": [],
     "note": "No survey responses on record for this producer."
    }

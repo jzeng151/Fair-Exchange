@@ -20,7 +20,7 @@ def get_producer_record(tool_context: ToolContext) -> dict:
     Returns `found`, then:
       - profile: country, region, crop, entity_type, certification_status, certification_scope, source
       - premium_projects: their own projects (name, challenge, action, intended_outcome, status, dates, source)
-      - survey: respondents, facts (each with text, source, period, respondents), and a note when
+      - survey: responses, facts (each with text, source, period, responses), and a note when
         there is nothing to summarize. No survey data is normal; say so rather than guess.
     Cite each item's `source`.
     """

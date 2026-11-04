@@ -8,7 +8,7 @@ from fex.tools.producer_record import get_producer_record
 
 RECORDS = ProducerRecords.load()._records
 WITH_SURVEY = next(pid for pid, r in RECORDS.items() if r["survey"]["facts"])
-NO_SURVEY = next(pid for pid, r in RECORDS.items() if r["survey"]["respondents"] == 0)
+NO_SURVEY = next(pid for pid, r in RECORDS.items() if r["survey"]["responses"] == 0)
 
 
 def test_model_cannot_set_any_parameter():

@@ -28,16 +28,16 @@ Each fact and peer example has a `source` string. That is the value the citation
   "premium_projects": [{"project_ref": "PROJ-…", "source": "FTUSA Premium project (sample data, own record) PROJ-…",
                         "challenge_tag": "water", "name": "…", "challenge": "…", "action": "…",
                         "intended_outcome": "…", "status": "Completed", "start_date": "…", "end_date": "…"}],
-  "survey": {"respondents": 683,
-             "facts": [{"text": "96% of 676 surveyed households use soil conservation practices.",
-                        "source": "FTUSA household survey (sample data)", "period": "2021-2026",
-                        "respondents": 676, "strength": "exact"}],
+  "survey": {"responses": 683,
+             "facts": [{"text": "96% of 676 survey responses say they use soil conservation practices.",
+                        "source": "FTUSA survey responses (sample data)", "period": "2021-2026",
+                        "responses": 676, "strength": "exact"}],
              "note": null}
 }
 ```
 
-- The producer's own projects keep their real names and text; it is their own record.
-- **Survey answers are summarized, never returned row by row**, and only from an allowlist of farming, water and practice questions (`fx_data.records`). Harassment, borrowing, medical access, child schooling, committees and income questions are never read. A share needs at least 5 answers.
+- The producer's own projects keep their real names and text; it is their own record. Sample placeholder rows (lorem ipsum) are left out. `project_ref` is unique per project and is the same ref the peer table uses. `status` and dates are `null` where the sample cannot tell similar projects apart.
+- **Survey answers are summarized, never returned row by row**, and only from an allowlist of farming, water and practice questions (`fx_data.records`). Harassment, borrowing, medical access, child schooling, committees and income questions are never read. A share needs at least 5 **distinct survey responses** (a response that picks several options counts once), and a reason is only named if at least 5 responses gave it. Each fact's `period` is the years of the responses behind that fact. Facts say "survey responses", not "households": about half the sample's survey rows are not household surveys.
 - 22 of the 146 sample producers have survey responses; 14 have enough to summarize. Otherwise `survey.facts` is empty and `survey.note` says why.
 - Unknown producer: `{"found": false, "note": "No record on file for this producer."}`
 

@@ -2,10 +2,12 @@
 
     PYTHONPATH=src uv run python -m fx_data.records   # offline: writes producer_records.json
 
-Survey answers are reduced to shares of households, from an ALLOWLIST of farming, water and
+Survey answers are reduced to shares of survey responses, from an ALLOWLIST of farming, water and
 practice questions. Every other question (harassment, borrowing, medical access, child schooling,
 committees, income, ...) is never read into the output. A share is only reported when at least
-MIN_RESPONSES households answered, so no single household's answer can be picked out.
+MIN_RESPONSES distinct survey responses answered, so no single response can be picked out. (Not
+"households": about half of the sample's survey rows are not household surveys.) Each fact's period
+comes from the responses behind that fact.
 """
 from __future__ import annotations
 
@@ -15,19 +17,20 @@ import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from fx_data.peers import (ACCOUNTS_CSV, LINKED_DIR, PROJECTS_CSV, STATUS_CSV, _ref, build_profiles,
-                           tag_for)
+from fx_data.peers import (ACCOUNTS_CSV, LINKED_DIR, PROJECTS_CSV, _PLACEHOLDER, build_profiles,
+                           build_status_index, resolve_status, tag_for, unique_project_ref)
 
 HERE = Path(__file__).parent
 RECORDS_PATH = HERE / "producer_records.json"
 SINGLE_CSV = LINKED_DIR / "Survey Response Questions Single Choice.csv"
 MULTI_CSV = LINKED_DIR / "Survey Response Questions Multiple Choice.csv"
+HEADER_CSV = LINKED_DIR / "Survey Response Header.csv"  # dates for the multiple-choice answers
 
 MIN_RESPONSES = 5
 
 SOURCE_ACCOUNT = "FTUSA producer account (sample data)"
 SOURCE_PROJECT = "FTUSA Premium project (sample data, own record)"
-SOURCE_SURVEY = "FTUSA household survey (sample data)"
+SOURCE_SURVEY = "FTUSA survey responses (sample data)"
 
 # Answers that are not an answer. Left out of every share.
 NON_ANSWERS = {"", "refused", "don't know", "don’t know", "i don't know", "none of the above applies"}
@@ -72,48 +75,60 @@ def _years(dates: list[str]) -> str:
     return years[0] if len(years) == 1 else f"{years[0]}-{years[-1]}" if years else "date unknown"
 
 
-def _fact(text: str, period: str, n: int) -> dict:
-    return {"text": text, "source": SOURCE_SURVEY, "period": period, "respondents": n,
+def _fact(text: str, dates: list[str], n: int) -> dict:
+    """`dates` are those of the responses behind this fact; `n` is how many distinct responses."""
+    return {"text": text, "source": SOURCE_SURVEY, "period": _years(dates), "responses": n,
             "strength": "exact"}
 
 
-def _survey_facts(rows: list[dict], reasons: list[str]) -> list[dict]:
-    period = _years([r["response_date"] for r in rows])
+def _survey_facts(rows: list[dict], reasons: list[dict]) -> list[dict]:
+    """`rows`: one dict per survey response. `reasons`: one dict per selected reason
+    ({"response": id, "choice": text, "date": text}); a response can select several."""
     facts = []
     for field, phrase in YES_NO_FIELDS.items():
-        answers = [a for a in (_answer(r[field]) for r in rows) if a]
-        if len(answers) >= MIN_RESPONSES:
-            yes = sum(a.lower() == "yes" for a in answers) / len(answers)
-            facts.append(_fact(f"{yes:.0%} of {len(answers)} surveyed households {phrase}.", period,
-                               len(answers)))
+        answered = [(r, a) for r in rows if (a := _answer(r[field]))]
+        if len(answered) >= MIN_RESPONSES:
+            yes = sum(a.lower() == "yes" for _, a in answered) / len(answered)
+            facts.append(_fact(f"{yes:.0%} of {len(answered)} survey responses say they {phrase}.",
+                               [r["response_date"] for r, _ in answered], len(answered)))
     for field, question in CHOICE_FIELDS.items():
-        answers = [a for a in (_answer(r[field]) for r in rows) if a]
-        if len(answers) >= MIN_RESPONSES:
-            top = Counter(answers).most_common(3)
-            shares = "; ".join(f"{a} ({n / len(answers):.0%})" for a, n in top)
-            facts.append(_fact(f"{question}, {len(answers)} surveyed households: {shares}.", period,
-                               len(answers)))
+        answered = [(r, a) for r in rows if (a := _answer(r[field]))]
+        if len(answered) >= MIN_RESPONSES:
+            top = Counter(a for _, a in answered).most_common(3)
+            shares = "; ".join(f"{a} ({n / len(answered):.0%})" for a, n in top)
+            facts.append(_fact(f"{question}, {len(answered)} survey responses: {shares}.",
+                               [r["response_date"] for r, _ in answered], len(answered)))
     for label, question in MULTI_FIELDS.items():
-        answers = [a for a in (_answer(x) for x in reasons) if a and a.lower() != "other"]
-        if len(answers) >= MIN_RESPONSES:
-            top = Counter(answers).most_common(3)
-            shares = "; ".join(f"{a} ({n} mentions)" for a, n in top)
-            facts.append(_fact(f"{question}: {shares}.", period, len(answers)))
+        picked = [x for x in reasons if (a := _answer(x["choice"])) and a.lower() != "other"]
+        responses = {x["response"] for x in picked}  # distinct responses, not selections
+        if len(responses) >= MIN_RESPONSES:
+            by_choice: dict[str, set[str]] = defaultdict(set)
+            for x in picked:
+                by_choice[x["choice"].strip()].add(x["response"])
+            # Name a reason only if at least MIN_RESPONSES distinct responses gave it.
+            top = [(c, len(s)) for c, s in sorted(by_choice.items(), key=lambda kv: (-len(kv[1]), kv[0]))
+                   if len(s) >= MIN_RESPONSES][:3]
+            if top:
+                shares = "; ".join(f"{c} ({n} responses)" for c, n in top)
+                facts.append(_fact(f"{question}, {len(responses)} survey responses: {shares}.",
+                                   [x["date"] for x in picked], len(responses)))
     return facts
 
 
 def build_records() -> dict:
     accounts = {r["account_sk"]: r for r in _read(ACCOUNTS_CSV)}
     profiles = build_profiles()["profiles"]
-    status_by_key = {(r["account_sk"], r["project_description_txt"].strip()): r for r in _read(STATUS_CSV)}
-
+    status_index = build_status_index()
+    seen_refs: Counter = Counter()
     projects: dict[str, list[dict]] = defaultdict(list)
     for row in _read(PROJECTS_CSV):
         texts = [row[f] for f in ("translated_project_name", "translated_project_description_txt",
                                   "translated_project_reason_txt", "translated_primary_goal_txt")]
-        status = status_by_key.get((row["account_sk"], row["translated_project_description_txt"].strip()), {})
-        ref = _ref("PROJ", row["account_sk"], row["translated_project_name"],
-                   row["translated_project_description_txt"])
+        if any(_PLACEHOLDER.search(x or "") for x in texts):
+            continue  # lorem-ipsum test rows are not evidence (same rule as the peer table)
+        status = resolve_status(status_index, row)
+        ref = unique_project_ref(seen_refs, row["account_sk"], row["translated_project_name"],
+                                 row["translated_project_description_txt"])
         projects[row["account_sk"]].append({
             "project_ref": ref, "source": f"{SOURCE_PROJECT} {ref}",
             "challenge_tag": tag_for(row["subcategory"], *texts), "subcategory": row["subcategory"] or None,
@@ -126,11 +141,16 @@ def build_records() -> dict:
     survey_rows: dict[str, list[dict]] = defaultdict(list)
     for row in _read(SINGLE_CSV):
         if row["account_sk"] in accounts:
-            survey_rows[row["account_sk"]].append({k: row[k] for k in ALLOWED_FIELDS | {"response_date"}})
-    reasons: dict[str, list[str]] = defaultdict(list)
+            survey_rows[row["account_sk"]].append(
+                {k: row[k] for k in ALLOWED_FIELDS | {"response_date"}} | {"response": row["survey_response_sk"]})
+    response_dates = {r["survey_response_sk"]: r["recorded_date"] or r["end_date"] or r["start_date"]
+                      for r in _read(HEADER_CSV)}
+    reasons: dict[str, list[dict]] = defaultdict(list)
     for row in _read(MULTI_CSV):
         if row["account_sk"] in accounts and row["question_label_txt"] in MULTI_FIELDS:
-            reasons[row["account_sk"]].append(row["question_choice_txt"])
+            reasons[row["account_sk"]].append({"response": row["survey_response_sk"],
+                                               "choice": row["question_choice_txt"],
+                                               "date": response_dates.get(row["survey_response_sk"], "")})
 
     records = {}
     for pid, account in accounts.items():
@@ -139,7 +159,7 @@ def build_records() -> dict:
         if facts:
             note = None
         elif rows:
-            note = f"Fewer than {MIN_RESPONSES} households answered each survey question, so nothing is summarized."
+            note = f"Fewer than {MIN_RESPONSES} survey responses answered each question, so nothing is summarized."
         else:
             note = "No survey responses on record for this producer."
         records[pid] = {
@@ -151,10 +171,10 @@ def build_records() -> dict:
                 "source": SOURCE_ACCOUNT,
             },
             "premium_projects": sorted(projects.get(pid, []), key=lambda p: p["start_date"] or ""),
-            "survey": {"respondents": len(rows), "facts": facts, "note": note},
+            "survey": {"responses": len(rows), "facts": facts, "note": note},
         }
     return {"description": "Each sample producer's own record: profile, Premium projects and survey summary "
-                           f"(allowlisted fields only, at least {MIN_RESPONSES} answers per share).",
+                           f"(allowlisted fields only, at least {MIN_RESPONSES} distinct survey responses per share).",
             "records": records}
 
 
@@ -177,7 +197,7 @@ def main() -> None:
     print(f"wrote {RECORDS_PATH}: {len(table['records'])} producers, "
           f"{sum(bool(r['premium_projects']) for r in recs)} with projects, "
           f"{sum(bool(r['survey']['facts']) for r in recs)} with survey facts, "
-          f"{sum(r['survey']['respondents'] > 0 for r in recs)} with any survey responses", file=sys.stderr)
+          f"{sum(r['survey']['responses'] > 0 for r in recs)} with any survey responses", file=sys.stderr)
 
 
 if __name__ == "__main__":
