@@ -63,6 +63,23 @@ def guardrail_config() -> dict[str, Any]:
             "guardrail_redact_input": False, "guardrail_redact_output": False}
 
 
+def output_check(client: Any = None):
+    """The Guardrail check of FEX's own words (ApplyGuardrail, output mode), or None without a Guardrail (#12).
+
+    Needed because FEX's replies, playback and claims are structured output (tool-call input), which Bedrock
+    does not assess with the Guardrail attached to the model call.
+    """
+    config = guardrail_config()
+    if not config:
+        return None
+    from fex.conversation.guardrail import ApplyGuardrailCheck
+
+    if client is None:
+        import boto3
+        client = boto3.client("bedrock-runtime")
+    return ApplyGuardrailCheck(client, config["guardrail_id"], config["guardrail_version"])
+
+
 def record_store():
     """The records table from configuration, or None when FEX_RECORDS_TABLE is unset (local runs)."""
     name = os.environ.get("FEX_RECORDS_TABLE")
@@ -82,7 +99,8 @@ def default_engine() -> ConversationEngine:
     small, large = model_ids()
     guardrail = guardrail_config()  # the same Guardrail on every model call
     return ConversationEngine(store=InMemoryStateStore(), small_model=BedrockModel(model_id=small, **guardrail),
-                              large_model=BedrockModel(model_id=large, **guardrail), records=record_store())
+                              large_model=BedrockModel(model_id=large, **guardrail), records=record_store(),
+                              output_check=output_check())
 
 
 def invoke(payload: dict[str, Any], engine: ConversationEngine | None = None) -> dict[str, Any]:

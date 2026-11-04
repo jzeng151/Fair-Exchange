@@ -102,7 +102,13 @@ Every Bedrock model call carries the FEX Guardrail when `FEX_GUARDRAIL_ID` and `
 alters what a producer wrote). The Guardrail itself (`infra/lib/guardrail-stack.ts`) is in detect mode: every
 action is `NONE`. `conversation/guardrail.py` wraps each model per conversation and logs detected findings to the
 `fex.guardrail` logger as JSON: conversation ID, input/output, policy type and topic or category. `runtime.configure_logging()`
-(called when the AgentCore app starts) sets that logger to INFO and writes it to stdout, which AgentCore ships to CloudWatch. **Never text**,
+(called when the AgentCore app starts) sets that logger to INFO and writes it to stdout, which AgentCore ships to CloudWatch.
+**Two layers, because of how structured output works:** the Guardrail attached to the model call assesses what the
+producer typed, but FEX's own replies, playback and claims come back as structured output (tool-call input), which
+Bedrock does not assess. So the engine collects the producer-facing words the model wrote each turn and checks them
+with `ApplyGuardrail` in output mode (`ApplyGuardrailCheck`, one call per turn), logging findings the same way.
+Detect only: a failed check is logged and never affects the conversation. The runtime role needs
+`bedrock:ApplyGuardrail` on the FEX Guardrail (#13 spec, agent runtime permissions). **Never text**,
 and never written to the record. See [`docs/specs/12-guardrail.md`](../docs/specs/12-guardrail.md).
 
 ## Write-back (issue #26)

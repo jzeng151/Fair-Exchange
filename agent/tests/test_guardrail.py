@@ -153,3 +153,97 @@ def test_configuring_logging_twice_adds_one_handler(default_logging):
     runtime.configure_logging()
     runtime.configure_logging()
     assert len(default_logging.handlers) == 1
+
+
+# ---------------------------------------------------------------- review fix 2 (Codex on #80): FEX's own words
+# Structured outputs come back as tool-call input, which Bedrock does not assess with an attached Guardrail.
+# So the engine explicitly checks the producer-facing text the model wrote (ApplyGuardrail, output mode).
+
+class RecordingCheck:
+    def __init__(self, fail=False):
+        self.calls, self.fail = [], fail
+
+    def __call__(self, texts, conversation_id):
+        self.calls.append((list(texts), conversation_id))
+        if self.fail:
+            raise RuntimeError("guardrail service unavailable")
+
+
+def test_fexs_replies_and_playback_are_checked_as_output():
+    check = RecordingCheck()
+    r = Run(output_check=check)
+    r.to_playback()
+    checked = [t for texts, _ in check.calls for t in texts]
+    assert "¿Qué ha sido difícil?" in checked  # the opening
+    assert any("la lluvia bajó" in t for t in checked)  # the playback
+    assert {cid for _, cid in check.calls} == {r.conversation_id}
+
+
+def test_every_claim_shown_is_checked_as_output():
+    from tests.conversation_harness import RETRIEVE, summary
+    check = RecordingCheck()
+    r = Run(output_check=check)
+    r.to_playback()
+    r.small.add(summary())
+    r.large.add(*RETRIEVE, r.good_answer())
+    r.action("confirm_playback")
+    checked = [t for texts, _ in check.calls for t in texts]
+    assert "Rainfall fell." in checked and "A peer built tanks." in checked
+
+
+def test_fixed_text_and_producer_words_are_not_sent_as_output():
+    check = RecordingCheck()
+    r = Run(output_check=check)
+    r.to_playback()
+    checked = " ".join(t for texts, _ in check.calls for t in texts)
+    assert "La lluvia bajó mucho y la cosecha cayó." not in checked  # the producer's message is input, not output
+
+
+def test_a_failing_output_check_never_changes_the_conversation():
+    r = Run(output_check=RecordingCheck(fail=True))
+    events = r.to_playback()
+    assert r.state().step == "playback" and not of(events, "error")
+
+
+class FakeBedrockRuntime:
+    def __init__(self, assessments):
+        self.assessments, self.requests = assessments, []
+
+    def apply_guardrail(self, **kwargs):
+        self.requests.append(kwargs)
+        return {"action": "NONE", "outputs": [], "assessments": self.assessments}
+
+
+def test_apply_guardrail_check_logs_output_findings_without_text(caplog):
+    from fex.conversation.guardrail import ApplyGuardrailCheck
+    assessment = {"topicPolicy": {"topics": [{"name": "Certification status and audit results", "type": "DENY",
+                                              "action": "NONE", "detected": True}]},
+                  "wordPolicy": {"customWords": [{"match": SECRET, "action": "NONE", "detected": True}]}}
+    client = FakeBedrockRuntime([assessment])
+    check = ApplyGuardrailCheck(client, "gr-123", "1")
+    with caplog.at_level(logging.INFO, logger="fex.guardrail"):
+        check(["Su certificación fue aprobada.", SECRET], "conv-7")
+    request = client.requests[0]
+    assert (request["guardrailIdentifier"], request["guardrailVersion"], request["source"]) == ("gr-123", "1", "OUTPUT")
+    assert [c["text"]["text"] for c in request["content"]] == ["Su certificación fue aprobada.", SECRET]
+    logged = [json.loads(rec.getMessage()) for rec in caplog.records if rec.name == "fex.guardrail"]
+    assert {"conversation_id": "conv-7", "source": "output", "policy": "topicPolicy",
+            "name": "Certification status and audit results"} in logged
+    assert SECRET not in " ".join(rec.getMessage() for rec in caplog.records)
+
+
+def test_apply_guardrail_check_skips_empty_text():
+    from fex.conversation.guardrail import ApplyGuardrailCheck
+    client = FakeBedrockRuntime([])
+    ApplyGuardrailCheck(client, "gr-123", "1")(["", "  "], "conv-7")
+    assert client.requests == []
+
+
+def test_runtime_builds_the_output_check_only_when_a_guardrail_is_configured(monkeypatch):
+    monkeypatch.delenv("FEX_GUARDRAIL_ID", raising=False)
+    monkeypatch.delenv("FEX_GUARDRAIL_VERSION", raising=False)
+    assert runtime.output_check(client=FakeBedrockRuntime([])) is None
+    monkeypatch.setenv("FEX_GUARDRAIL_ID", "gr-123")
+    monkeypatch.setenv("FEX_GUARDRAIL_VERSION", "1")
+    check = runtime.output_check(client=FakeBedrockRuntime([]))
+    assert (check.guardrail_id, check.version) == ("gr-123", "1")

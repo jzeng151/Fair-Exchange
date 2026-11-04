@@ -182,6 +182,7 @@ class _Turn:
         self.spoken: list[str] = []
         self.excluded = False  # an out-of-scope exchange (#21): kept in history, hidden from models
         self.loaded_revision: int | None = None  # the state revision this request started from
+        self.model_texts: list[str] = []  # producer-facing words the model wrote this turn (Guardrail output check)
 
     def emit(self, type_: str, **fields) -> None:
         event = _EVENT.validate_python({"type": type_, "seq": len(self.events) + 1, **fields})
@@ -206,7 +207,8 @@ class ConversationEngine:
     def __init__(self, *, store: StateStore, small_model: Any, large_model: Any, standards: Standards | None = None,
                  profiles: Callable[[str], Profile | None] | None = None, tools: list | None = None,
                  clock: Callable[[], datetime] | None = None, max_retries: int = 2,
-                 records: Any = None, scope_check: ScopeCheck | None = None) -> None:
+                 records: Any = None, scope_check: ScopeCheck | None = None,
+                 output_check: Callable[[list[str], str], None] | None = None) -> None:
         self.store = store
         self.small_model, self.large_model = small_model, large_model
         self.standards = standards or Standards.load()
@@ -216,6 +218,7 @@ class ConversationEngine:
         self.max_retries = max_retries
         self.records = records  # a fex.records.RecordStore; None = records are not saved (#26)
         self.scope_check = scope_check or always_in_scope  # how it decides is "Not decided" (#21)
+        self.output_check = output_check  # checks FEX's own words with the Guardrail (#12); None = not configured
 
     # ------------------------------------------------------------------ entrypoint
 
@@ -241,6 +244,7 @@ class ConversationEngine:
                     self._transcript(state) + f"\n\nStart the conversation with an open question, written in the "
                     f"language with ISO 639-1 code '{state.language}'.", IntakeTurn)
                 turn.say(opening.reply)
+                turn.model_texts.append(opening.reply)
             return self._finish(state, turn, step_changed=True)
 
         if state is None:
@@ -275,6 +279,7 @@ class ConversationEngine:
         else:  # respond, consent, feedback: a short reply that changes nothing
             reply = self._structured(state, self.small_model, SHORT_REPLY_SYSTEM, self._transcript(state), ShortReply)
             turn.say(reply.reply)
+            turn.model_texts.append(reply.reply)
         return self._finish(state, turn, step_changed=state.step != before)
 
     def _action(self, state: ConversationState, turn: _Turn, name: str, args: dict):
@@ -361,6 +366,7 @@ class ConversationEngine:
             self._playback(state, turn)
         else:
             turn.say(result.reply)
+            turn.model_texts.append(result.reply)
 
     def _playback(self, state: ConversationState, turn: _Turn, correction: str | None = None) -> None:
         prompt = self._transcript(state) + (f"\n\nThe producer corrected the playback: {correction}" if correction else "")
@@ -371,6 +377,7 @@ class ConversationEngine:
             state.entity_type = None if draft.entity_type == state.profile.entity_type else draft.entity_type
         state.step = "playback"
         turn.say(draft.text)
+        turn.model_texts.append(draft.text)
         if draft.location_disputed:
             state.location_note = "The producer says the location on file is wrong; the location on file was kept."
             place = ", ".join(p for p in (state.profile.region, state.profile.country) if p) or "?"
@@ -443,6 +450,7 @@ class ConversationEngine:
                         continue
                     getattr(state.partial, section).append(claim)
                     turn.emit("claim", section=section, claim=claim.model_dump())
+                    turn.model_texts.append(claim.text)
                 if not failed:
                     break
                 if attempt == self.max_retries:
@@ -561,7 +569,16 @@ class ConversationEngine:
                           message="This conversation changed while I was answering. Please reload it.")
         return self._events(turn, state)
 
-    @staticmethod
-    def _events(turn: _Turn, state: ConversationState | None) -> list:
+    def _check_output(self, turn: _Turn, state: ConversationState | None) -> None:
+        """Guardrail check of what the model said to the producer this turn (#12). Never affects the turn."""
+        if not (self.output_check and state and turn.model_texts):
+            return
+        try:
+            self.output_check(list(turn.model_texts), state.conversation_id)
+        except Exception:  # noqa: BLE001 - detect-only: a failed check is logged, the conversation goes on
+            log.exception("Guardrail output check failed for conversation %s", state.conversation_id)
+
+    def _events(self, turn: _Turn, state: ConversationState | None) -> list:
+        self._check_output(turn, state)
         turn.emit("done")
         return list(turn.events)

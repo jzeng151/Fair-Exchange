@@ -83,3 +83,23 @@ class GuardrailObserved(Model):
                 except Exception:  # noqa: BLE001 - logging must never affect the conversation
                     logging.getLogger(__name__).exception("could not read a Guardrail trace")
             yield event
+
+
+class ApplyGuardrailCheck:
+    """Checks FEX's own producer-facing words with the Guardrail (ApplyGuardrail, source OUTPUT) and logs findings.
+
+    Needed because FEX's replies, playback and claims come back as structured output, i.e. tool-call input,
+    which Bedrock does not assess with an attached Guardrail. Detect only: it never changes what was shown,
+    and a failed check is logged, never raised.
+    """
+
+    def __init__(self, client: Any, guardrail_id: str, version: str) -> None:
+        self.client, self.guardrail_id, self.version = client, guardrail_id, version
+
+    def __call__(self, texts: list[str], conversation_id: str) -> None:
+        content = [{"text": {"text": t}} for t in texts if t and t.strip()]
+        if not content:
+            return
+        response = self.client.apply_guardrail(guardrailIdentifier=self.guardrail_id,
+                                               guardrailVersion=self.version, source="OUTPUT", content=content)
+        log_findings({"outputAssessments": {self.guardrail_id: response.get("assessments", [])}}, conversation_id)
