@@ -84,6 +84,14 @@
         ]
       },
       "properties": {
+        "ai_usage": {
+          "description": "Tokens per model for this conversation (AI footprint)",
+          "items": {
+            "$ref": "#/$defs/ModelUsage"
+          },
+          "title": "Ai Usage",
+          "type": "array"
+        },
         "closed_at": {
           "anyOf": [
             {
@@ -432,6 +440,14 @@
       "additionalProperties": false,
       "description": "The producer declined. Only identifiers, status and time are kept: no narrative content.",
       "properties": {
+        "ai_usage": {
+          "description": "Tokens per model for this conversation (AI footprint)",
+          "items": {
+            "$ref": "#/$defs/ModelUsage"
+          },
+          "title": "Ai Usage",
+          "type": "array"
+        },
         "closed_at": {
           "anyOf": [
             {
@@ -564,6 +580,34 @@
         "reason"
       ],
       "title": "EarlierAnswer",
+      "type": "object"
+    },
+    "ModelUsage": {
+      "additionalProperties": false,
+      "description": "Tokens one model used in this conversation, for the AI footprint (#26, #29). Non-narrative.",
+      "properties": {
+        "input_tokens": {
+          "minimum": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "model_id": {
+          "minLength": 1,
+          "title": "Model Id",
+          "type": "string"
+        },
+        "output_tokens": {
+          "minimum": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "model_id",
+        "input_tokens",
+        "output_tokens"
+      ],
+      "title": "ModelUsage",
       "type": "object"
     },
     "StoredConsent": {

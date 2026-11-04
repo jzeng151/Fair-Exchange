@@ -1,12 +1,19 @@
 // GENERATED FILE. Do not edit by hand.
 // Source: agent/src/fex/models.py  ->  agent/scripts/generate_types.py
-// schema-sha256: c284675744ec3db2711335ba461c075f321cdadbbdd000f31da1d6d2141990aa
-// body-sha256: 5ec5345a13493f0482edab75141e5c7a7e1a4eea7154f0009e057a4cb549ce65
+// schema-sha256: be8f98dad8c03dad644969727195154b9cd044ceb72be9e5f805106d0ec8616c
+// body-sha256: 2cbe4f3667595644d0ad94af5a05cc6d3dd936053cc5836fa33998b0c7a2a529
 // end-of-banner
 /**
  * One record per Fair Exchange conversation. Generated from agent/src/fex/models.py; do not edit by hand.
  */
 export type ConversationRecord = CompletedRecord | DeclinedRecord;
+export type InputTokens = number;
+export type ModelId = string;
+export type OutputTokens = number;
+/**
+ * Tokens per model for this conversation (AI footprint)
+ */
+export type AiUsage = ModelUsage[];
 /**
  * Set when the conversation closes. Records are reviewable only when set.
  */
@@ -166,6 +173,10 @@ export type UpdatedAt = string;
  */
 export type Version = number;
 /**
+ * Tokens per model for this conversation (AI footprint)
+ */
+export type AiUsage1 = ModelUsage[];
+/**
  * Set when the conversation closes. Records are reviewable only when set.
  */
 export type ClosedAt1 = string | null;
@@ -199,6 +210,7 @@ export type Version1 = number;
  * A conversation the producer agreed to save.
  */
 export interface CompletedRecord {
+  ai_usage?: AiUsage;
   closed_at?: ClosedAt;
   consent: StoredConsent;
   consent_history?: ConsentHistory;
@@ -226,6 +238,14 @@ export interface CompletedRecord {
   tags: Tags;
   updated_at: UpdatedAt;
   version: Version;
+}
+/**
+ * Tokens one model used in this conversation, for the AI footprint (#26, #29). Non-narrative.
+ */
+export interface ModelUsage {
+  input_tokens: InputTokens;
+  model_id: ModelId;
+  output_tokens: OutputTokens;
 }
 /**
  * The producer agreed to store the conversation. Consent is a scope, not a yes/no:
@@ -277,6 +297,7 @@ export interface Citation {
  * The producer declined. Only identifiers, status and time are kept: no narrative content.
  */
 export interface DeclinedRecord {
+  ai_usage?: AiUsage1;
   closed_at?: ClosedAt1;
   consent: DeclinedConsent;
   consent_history?: ConsentHistory1;

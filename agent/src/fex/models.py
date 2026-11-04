@@ -67,6 +67,16 @@ class ConsentChoice(BaseModel):
     recorded_at: datetime
 
 
+class ModelUsage(BaseModel):
+    """Tokens one model used in this conversation, for the AI footprint (#26, #29). Non-narrative."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    model_id: str = Field(min_length=1)
+    input_tokens: int = Field(ge=0)
+    output_tokens: int = Field(ge=0)
+
+
 class EarlierAnswer(BaseModel):
     """An answer shown to the producer and later replaced (#26).
 
@@ -101,6 +111,8 @@ class _RecordBase(BaseModel):
         default=None, description="Set when the conversation closes. Records are reviewable only when set.")
     consent_history: list[ConsentChoice] = Field(
         default_factory=list, description="The producer's distinct consent choices, in order")
+    ai_usage: list[ModelUsage] = Field(
+        default_factory=list, description="Tokens per model for this conversation (AI footprint)")
 
 
 # Cross-field rule the JSON Schema must carry too (TypeScript cannot express it)
