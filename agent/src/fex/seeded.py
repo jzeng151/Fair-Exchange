@@ -54,6 +54,13 @@ def upload_seeded_records(s3, bucket: str, records: list[dict] | None = None) ->
     wanted = set(keys)
     stale = [o["Key"] for page in s3.get_paginator("list_objects_v2").paginate(Bucket=bucket, Prefix=SEEDED_PREFIX)
              for o in page.get("Contents", []) if o["Key"] not in wanted]
+    refused = []
     for i in range(0, len(stale), 1000):  # delete_objects takes at most 1000 keys
-        s3.delete_objects(Bucket=bucket, Delete={"Objects": [{"Key": k} for k in stale[i:i + 1000]], "Quiet": True})
+        response = s3.delete_objects(Bucket=bucket,
+                                     Delete={"Objects": [{"Key": k} for k in stale[i:i + 1000]], "Quiet": True})
+        # S3 reports per-object failures inside a successful response, not as an exception
+        refused += [f"{e.get('Key')} ({e.get('Code')})" for e in response.get("Errors", [])]
+    if refused:
+        raise RuntimeError(f"seeded set not replaced: S3 refused to delete {len(refused)} stale object(s): "
+                           + ", ".join(refused[:10]))
     return UploadResult(written=len(keys), deleted=len(stale))

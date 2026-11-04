@@ -85,3 +85,26 @@ def test_an_invalid_record_writes_nothing(s3):
         upload_seeded_records(s3, BUCKET, records=records)
     after = {k: s3.get_object(Bucket=BUCKET, Key=k)["Body"].read() for k in _keys(s3)}
     assert after == before
+
+
+# ---------------------------------------------------------------- review fix (Codex on #82)
+
+class RejectingDeletes:
+    """Wraps a real (moto) S3 client. delete_objects answers HTTP 200 but lists every key under `Errors`,
+    which S3 does for per-object failures (e.g. AccessDenied) instead of raising."""
+
+    def __init__(self, s3):
+        self._s3 = s3
+
+    def __getattr__(self, name):
+        return getattr(self._s3, name)
+
+    def delete_objects(self, Bucket, Delete):  # noqa: N803 - boto3's parameter names
+        return {"Errors": [{"Key": o["Key"], "Code": "AccessDenied", "Message": "Access Denied"}
+                           for o in Delete["Objects"]]}
+
+
+def test_a_stale_object_that_s3_refuses_to_delete_fails_the_load(s3):
+    s3.put_object(Bucket=BUCKET, Key=f"{SEEDED_PREFIX}SEED-STALE.json", Body=b"{}")
+    with pytest.raises(RuntimeError, match="SEED-STALE"):
+        upload_seeded_records(RejectingDeletes(s3), BUCKET, _small_set())
