@@ -20,8 +20,9 @@ from dataclasses import dataclass, field
 from fx_data.standards import Standards
 from pydantic import BaseModel, ConfigDict, ValidationError
 
+from fex.conversation import copy
 from fex.models import Claim
-from fex.verifier import SessionEvidence, verify
+from fex.verifier import SessionEvidence, check_claim
 
 SECTIONS = ("insights", "peer_examples")
 SECTION_LIMIT = 3
@@ -65,15 +66,11 @@ def parse_claim_line(line: str) -> ClaimLine | None:
 
 def default_check(claim: Claim, section: str, evidence: SessionEvidence,
                   standards: Standards) -> list[str]:
-    """Check one claim with the merged verifier (#17). Returns reason codes for failures.
-
-    The approved #17 spec adds per-claim reasons (clause set, source kind, directive
-    language) to the verifier. When those land, this adapter is replaced by that
-    per-claim function; every caller here only needs 'callable -> list of reasons'.
+    """Check one claim with the #17 per-claim check. Returns the failures' reason codes
+    (e.g. `unknown_source`, `clause_not_retrieved`, `directive_language`), the same codes as `malformed`,
+    so a follow-up call receives the failed lines with their reason codes ([#18 spec]).
     """
-    insights = [claim] if section == "insights" else []
-    peers = [claim] if section == "peer_examples" else []
-    return [p.reason for p in verify(insights, peers, evidence, standards).problems]
+    return [p.code for p in check_claim(section, claim, evidence, standards)]
 
 
 # --- Streaming writer -----------------------------------------------------------
@@ -283,22 +280,12 @@ def respond_prompt(playback: str, profile: list[str], tool_items: list, language
 
 # --- Fixed text ([#13 spec](13-conversation-steps.md)) ----------------------------
 
-FIXED_TEXT: dict[str, dict[str, str]] = {
-    "en": {
-        "opening": "Here is what the data shows, and what other producers have tried.",
-        "limited_insights": "I don't have solid regional data for your situation yet.",
-        "limited_peer_examples": "I don't have examples from comparable producers for this yet.",
-        "closing": "You and your committee know your situation best.",
-    },
-    "es": {
-        "opening": "Esto es lo que muestran los datos, y lo que otros productores han probado.",
-        "limited_insights": "Todavía no tengo datos regionales sólidos para tu situación.",
-        "limited_peer_examples": "Todavía no tengo ejemplos de productores comparables para esto.",
-        "closing": "Ustedes y su comité conocen su situación mejor que nadie.",
-    },
-}
+# One source for what FEX says: the conversation copy (#13), in every language it supports.
+FIXED_KEYS = {"opening": "respond_opening", "limited_insights": "no_insights",
+              "limited_peer_examples": "no_peers", "closing": "hand_back"}
 
 
 def fixed_text(language: str) -> dict[str, str]:
     """Fixed opening, limited-evidence notices and closing hand-back, in the conversation language."""
-    return FIXED_TEXT.get(language) or FIXED_TEXT["en"]
+    lang = language if language in copy.COPY else "en"
+    return {name: copy.text(lang, key) for name, key in FIXED_KEYS.items()}
