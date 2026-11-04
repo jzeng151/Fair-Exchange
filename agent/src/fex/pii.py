@@ -34,7 +34,11 @@ _COMPREHEND_TO_OURS = {
 }
 
 #: Conversations in these languages are scanned; anything else is unsupported_language.
-SCAN_LANGUAGES: tuple[str, ...] = ("en", "es")
+#: en/es go through Comprehend; fr goes through the Guardrail (#24), which Comprehend doesn't cover.
+SCAN_LANGUAGES: tuple[str, ...] = ("en", "es", "fr")
+
+#: Comprehend handles these; the scanner seam decides per language. fr uses the Guardrail instead.
+COMPREHEND_LANGUAGES: tuple[str, ...] = ("en", "es")
 
 DEFAULT_THRESHOLD = 0.8
 
@@ -98,6 +102,31 @@ def default_comprehend(region_name: str = "us-west-2") -> Callable[[str, str], l
         return list(resp["Entities"])
 
     return scan
+
+
+def language_aware_scanner(
+    comprehend: Callable[[str, str], list[dict]],
+    guardrail: Callable[[str, str], list[dict]],
+) -> Callable[[str, str], list[dict]]:
+    """One scanner seam that routes by language (#24): Comprehend for en/es, the Guardrail for fr.
+
+    Both sides return the same Comprehend-shaped entity dicts, so `scan_texts` treats them alike. The
+    Guardrail carries no confidence score, so its scanner reports Score 1.0 (every detection counts);
+    the 0.8 threshold only ever filters Comprehend's scores.
+    """
+
+    def scan(text: str, language: str) -> list[dict]:
+        return guardrail(text, language) if language == "fr" else comprehend(text, language)
+
+    return scan
+
+
+def default_pii_scanner(region_name: str = "us-west-2") -> Callable[[str, str], list[dict]]:
+    """Production scanner: Comprehend for en/es, the FEX Guardrail for fr (#24). Imported lazily so
+    tests stay credential-free."""
+    from fex.guardrail import guardrail_pii_scanner
+
+    return language_aware_scanner(default_comprehend(region_name), guardrail_pii_scanner())
 
 
 def context_window(text: str, begin: int, end: int, words: int = 10) -> str:

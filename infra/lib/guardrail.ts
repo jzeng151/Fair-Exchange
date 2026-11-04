@@ -8,9 +8,10 @@ import { Construct } from 'constructs';
  *
  * Every policy action is NONE for input and output: the Guardrail flags and never blocks or masks,
  * so the producer's words reach FEX as written. The agent logs each finding to CloudWatch
- * (agent/src/fex/guardrail.py). Not configured, per the spec: sensitive information filters
- * (PII is Comprehend's job, #20; French PII comes with #24) and the contextual grounding check
- * (the citation verifier covers grounding).
+ * (agent/src/fex/guardrail.py). The sensitive-information filter detects NAME, PHONE, EMAIL and
+ * ADDRESS in detect mode (action NONE); it is how French PII is flagged (#24), since Comprehend has
+ * no French PII detection (#20). Not configured, per the spec: the contextual grounding check (the
+ * citation verifier covers grounding).
  */
 
 const DETECT = { inputAction: 'NONE', outputAction: 'NONE', inputEnabled: true, outputEnabled: true } as const;
@@ -55,6 +56,13 @@ const CONTENT_FILTERS: bedrock.CfnGuardrail.ContentFilterConfigProperty[] = [
   { type: 'PROMPT_ATTACK', inputStrength: 'MEDIUM', outputStrength: 'NONE', ...DETECT, outputEnabled: false },
 ];
 
+// Sensitive information, detect only (#24). NONE means the entity is flagged, never masked or blocked,
+// so the producer's words reach FEX and the record unchanged; the agent reads these findings to fill the
+// record's PII fields for French conversations (agent/src/fex/guardrail.py, GuardrailPiiScanner).
+const PII_ENTITIES: bedrock.CfnGuardrail.PiiEntityConfigProperty[] = ['NAME', 'PHONE', 'EMAIL', 'ADDRESS'].map(
+  (type) => ({ type, action: 'NONE', inputAction: 'NONE', outputAction: 'NONE', inputEnabled: true, outputEnabled: true }),
+);
+
 /** Environment variable names the agent reads (agent/src/fex/guardrail.py). */
 export const GUARDRAIL_ENV = { id: 'FEX_GUARDRAIL_ID', version: 'FEX_GUARDRAIL_VERSION' } as const;
 
@@ -67,12 +75,14 @@ export class FexGuardrail extends Construct {
 
     const topicPolicyConfig = { topicsConfig: DENIED_TOPICS };
     const contentPolicyConfig = { filtersConfig: CONTENT_FILTERS };
+    const sensitiveInformationPolicyConfig = { piiEntitiesConfig: PII_ENTITIES };
 
     this.guardrail = new bedrock.CfnGuardrail(this, 'Guardrail', {
       name: 'fair-exchange-fex-detect',
       description: 'FEX responsible-AI layer in detect mode: flags, never blocks (#12)',
       topicPolicyConfig,
       contentPolicyConfig,
+      sensitiveInformationPolicyConfig,
       // Required by Bedrock. Never shown: no policy blocks, and the agent turns redaction off.
       blockedInputMessaging: 'This message could not be processed.',
       blockedOutputsMessaging: 'This response could not be shown.',
@@ -81,7 +91,7 @@ export class FexGuardrail extends Construct {
     // A version snapshots the Guardrail when it is created. Tie it to the configuration so that any
     // policy change creates a new version and the agent picks it up on the next deploy.
     const configHash = createHash('sha256')
-      .update(JSON.stringify({ topicPolicyConfig, contentPolicyConfig }))
+      .update(JSON.stringify({ topicPolicyConfig, contentPolicyConfig, sensitiveInformationPolicyConfig }))
       .digest('hex')
       .slice(0, 12);
     this.version = new bedrock.CfnGuardrailVersion(this, 'Version', {

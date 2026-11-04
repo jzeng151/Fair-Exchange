@@ -103,9 +103,10 @@ def test_other_comprehend_types_are_ignored():
 
 
 def test_unsupported_language_flags_without_scanning():
+    # en/es/fr are supported (#24: fr through the Guardrail); any other language flags without scanning.
     client = SpyClient()
-    texts = [message("Bonjour, la récolte est difficile.")]
-    result = scan_texts(texts, "fr", client)
+    texts = [message("Olá, a colheita está difícil.")]
+    result = scan_texts(texts, "pt", client)
     assert result.flag is True
     assert result.check == "unsupported_language"
     assert client.calls == [] and result.matches == []
@@ -304,7 +305,8 @@ def test_declined_conversations_are_not_scanned():
 
 
 def test_unsupported_language_flags_at_the_save_seam():
-    state = _state([_spoken(NAME_TEXT)], language="fr", consent="internal")
+    # A language that is neither en, es nor fr flags the record without scanning (#20, #24).
+    state = _state([_spoken(NAME_TEXT)], language="pt", consent="internal")
     scanner = SpyClient(NAME_ENTITIES)
     run_pii_scan(state, scanner)
     assert scanner.calls == []
