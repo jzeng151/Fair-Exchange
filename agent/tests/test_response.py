@@ -99,7 +99,7 @@ def test_unverifiable_source_fails_but_a_later_rewrite_is_emitted(evidence, stan
     w = GroundedResponseWriter(evidence, standards, emit)
     invented = ("insights", "Prices will double.", "Made-up forecast", GOOD_CLAUSE)
     assert w.feed(line(*invented)).status == "failed"
-    assert "Made-up forecast" in w.failed[0]["reasons"][0]
+    assert w.failed[0]["reasons"] == ["unknown_source"]  # reason codes, as the spec's follow-up needs
     assert w.feed(line(*GOOD_INSIGHT)).status == "emitted"
     assert [text for _, _, text in seen] == [GOOD_INSIGHT[1]]
 
@@ -140,7 +140,7 @@ def test_followup_receives_failed_lines_and_emitted(evidence, standards):
     assert isinstance(followup, Followup)
     assert followup.open_slots == {"insights": 2, "peer_examples": 3}
     assert len(followup.failed_lines) == 1
-    assert "Made-up forecast" in followup.failed_lines[0]["reasons"][0]
+    assert followup.failed_lines[0]["reasons"] == ["unknown_source"]
     assert [c.text for c in followup.emitted["insights"]] == [GOOD_INSIGHT[1]]
 
     assert result.attempts == 2  # the repeated claim was dropped; the two passing lines emitted
@@ -230,12 +230,21 @@ def test_run_respond_keeps_stored_equal_to_shown_when_emission_fails(evidence, s
 
 # --- Fixed text and prompt ------------------------------------------------------
 
-def test_fixed_text_in_both_languages():
-    for lang in ("en", "es"):
+def test_fixed_text_is_the_conversation_copy_in_every_language():
+    # One source for what FEX says (#13 copy), so the answer and the rest of the conversation match.
+    from fex.conversation import copy
+    for lang in copy.COPY:
         text = fixed_text(lang)
-        assert set(text) >= {"opening", "limited_insights", "limited_peer_examples", "closing"}
-    assert "committee" in fixed_text("en")["closing"] and "comité" in fixed_text("es")["closing"]
+        assert text == {"opening": copy.text(lang, "respond_opening"), "limited_insights": copy.text(lang, "no_insights"),
+                        "limited_peer_examples": copy.text(lang, "no_peers"), "closing": copy.text(lang, "hand_back")}
+    assert "fr" in copy.COPY and "comité" in fixed_text("fr")["closing"]
     assert fixed_text("pt") == fixed_text("en")  # unknown language falls back to English
+
+
+def test_directive_language_fails_with_its_code(evidence, standards):
+    w = GroundedResponseWriter(evidence, standards, emit_recorder()[1])
+    w.feed(line("insights", "You should irrigate more.", CHIRPS, GOOD_CLAUSE))
+    assert w.failed[0]["reasons"] == ["directive_language"]
 
 
 def test_prompt_carries_playback_profile_tools_and_rules():
