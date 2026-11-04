@@ -48,3 +48,10 @@ A PR is done when:
 ## Commit and PR text
 
 Do not add AI attribution anywhere in git-visible text. That means no `Co-Authored-By` lines for AI tools, no "Generated with ..." footers, and no mention of AI assistants in commit messages, PR titles or PR descriptions.
+
+## Keeping `main` green
+
+- **Merge `main` into your branch right before merging**, and let CI pass on that. Two PRs that each pass on their own can still break `main` together.
+- **Changed `agent/src/fex/models.py` or `conversation/contract.py`?** Run `cd agent && uv run python scripts/generate_types.py` after merging `main`, and commit the result. CI's "Generated files are up to date" step fails otherwise.
+- **New package with tests?** Add a CI step with its `working-directory`. The "Repo guard" step (`scripts/ci/check_repo.py`) fails if a package's tests aren't run, if a JSON file has a duplicate key, or if an iCloud-style duplicate (`name 2.py`) is committed.
+- **If `main` fails CI**, a "main is failing CI" issue is opened automatically. Fix forward before merging anything else.
