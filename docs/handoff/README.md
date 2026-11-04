@@ -25,6 +25,8 @@ Spec: [docs/specs/39-handoff.md](../specs/39-handoff.md).
 - [Tool contracts](tool-contracts.md) — the full input/output/guarantee contract for every data tool.
 - [Sandbox deployment](sandbox-deployment.md) — how the sandbox was deployed, and the full-stack
   deployment checklist for #5.
+- [Tutorial](../tutorial.md) — a contributor-facing guided run of the platform on one machine:
+  start the chain, walk a full conversation, read the saved record.
 
 ## Keeping it current
 
