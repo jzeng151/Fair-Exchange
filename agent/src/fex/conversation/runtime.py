@@ -103,9 +103,24 @@ def stream(payload: dict[str, Any], engine: ConversationEngine | None = None) ->
     if "exception" in outcome:
         raise outcome["exception"]
     if "error" in outcome:
-        yield {"error": outcome["error"]}
+        # Contract-shaped events, so the chat API passes them on like any other turn (#89)
+        yield {"type": "error", "seq": 1, "code": "agent_failed",
+               "message": f"Invalid request: {outcome['error']['message']}"}
+        yield {"type": "done", "seq": 2}
     elif isinstance(outcome.get("result"), ResumeResponse):
         yield {"resume": outcome["result"].model_dump(mode="json")}
+
+
+def respond(payload: dict[str, Any], engine: ConversationEngine | None = None):
+    """What the AgentCore entrypoint returns (#89). The SDK sends a dict as `application/json` and streams a
+    generator as Server-Sent Events (`data: <json>`), so:
+      - `resume` returns the resume object itself (step, allowed, answer, history) as plain JSON;
+      - every other request returns the event generator, streamed as SSE.
+    """
+    if payload.get("kind") == "resume":
+        out = invoke(payload, engine=engine)
+        return out["resume"] if "resume" in out else out
+    return stream(payload, engine=engine)
 
 
 def create_app():  # pragma: no cover - exercised when deployed
@@ -115,7 +130,7 @@ def create_app():  # pragma: no cover - exercised when deployed
 
     @app.entrypoint
     def entry(payload: dict[str, Any], context: Any = None):
-        # A generator: AgentCore streams each yielded event to the caller as it is produced
-        yield from stream(payload)
+        # Not a generator itself: returns a dict (resume, sent as JSON) or a generator (events, streamed as SSE)
+        return respond(payload)
 
     return app
