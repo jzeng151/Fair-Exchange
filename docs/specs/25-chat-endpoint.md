@@ -99,9 +99,9 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 
 - **Schedule:** a scheduled Lambda runs every 15 minutes.
 - **What it does:**
-  - It finds open conversations whose `last_activity_at` is older than the inactivity period.
-  - For each one, it takes the turn lock and re-checks that the conversation is still idle.
-  - It then sends an `inactivity_close` request ([#13 spec](13-conversation-steps.md)), which is valid in every open step, and marks the conversation closed when the stream reports `step: closed`.
+  - It finds open conversations whose `last_activity_at` is older than the inactivity period, or whose `created_at` is older than the maximum conversation lifetime.
+  - For each one, it takes the turn lock and re-checks the condition.
+  - It then sends an `auto_close` request ([#13 spec](13-conversation-steps.md)) with reason `inactivity` or `max_lifetime`, and marks the conversation closed when the stream reports `step: closed`.
 - **Reconciliation:** for open conversations that are not idle, the sweep sends `resume`. If the agent reports step `closed` (for example, because a stream was cut off after the agent closed the conversation), the sweep marks the conversation closed.
 
 ### Logging
@@ -121,7 +121,7 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
     - a mid-stream failure ending with `error` then `done`;
     - `step: closed` marking the conversation closed;
     - the list returning only the caller's conversations;
-    - the sweep closing only idle open conversations, and skipping one that became active before it took the lock;
+    - the sweep closing idle conversations and conversations past the maximum lifetime (even if active), and skipping an idle one that became active before it took the lock;
     - the sweep marking a conversation closed when `resume` reports `closed`;
     - `GET` routes leaving `last_activity_at` unchanged;
     - `claim` events passed through as they arrive;
@@ -138,6 +138,6 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 
 ### Not decided (do not build or assume)
 
-- The inactivity period
+- The inactivity period and the maximum conversation lifetime
 - The Node.js runtime version. The technical environment document says Node 20.x, which Lambda has deprecated.
 - The deployed sign-in stand-in ([#11 spec](11-identity.md))

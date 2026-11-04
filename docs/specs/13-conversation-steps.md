@@ -13,7 +13,7 @@ Code holds the conversation's current step and decides when it changes. The mode
 - **Buttons are actions.** Button choices arrive as structured actions, not chat text.
 - **Tools are gated.** Data tools refuse to run outside the step where retrieval is allowed.
 - **Only verified claims are shown.** The answer streams claim by claim, and each claim appears only after it passes the citation check.
-- **Closing.** A conversation closes only when the producer ends it or it goes idle. Until then, any button choice can be changed.
+- **Closing.** A conversation closes only when the producer ends it, it goes idle, or it reaches the maximum conversation lifetime. Until then, any button choice can be changed.
 
 ## User Stories
 
@@ -71,7 +71,7 @@ The current step is kept in the conversation state (below), which is persisted i
 - **Failing claims** are never shown. After the first pass, failed claims are rewritten and checked again, up to the verifier's retry limit, and passing rewrites are sent as `claim` events. Claims that still fail are dropped and logged.
 - **No unchecked model text.** In `respond`, the only model-written text shown is checked claims. The opening line, the limited-evidence notice and the closing hand-back ("you and your committee know your situation best") are fixed text in the producer's language, written in code.
 - **Limited evidence (decided 2026-11-04).** If the finished answer has no insights or no peer examples, FEX shows the fixed limited-evidence notice for what is missing (e.g., "I don't have rainfall or labor data for your region yet") and still moves to `consent`. The `answer` event and the record carry `evidence: "limited"` ([#26 spec](26-write-back.md)). Otherwise `evidence` is `"full"`.
-- **Failures.** If the model call or a tool fails in `respond`, FEX sends an `error` event and stays in `respond`. The `retry_answer` action re-runs retrieval and the answer.
+- **Failures.** If the model call or a tool fails in `respond`, FEX sends an `error` event and stays in `respond`. The `retry_answer` action re-runs retrieval and the answer. Any claims already shown in the failed attempt first move to earlier answers with reason `interrupted`, so the record keeps everything the producer saw.
 
 ### Conversation state (shared contract owned here)
 
@@ -97,8 +97,8 @@ Buttons send structured actions. Actions never carry a producer ID or conversati
 |---|---|---|---|
 | `confirm_playback` | none | `playback` | Generates summaries and tags; moves to `respond` |
 | `correct_playback` | `text`, 1 to 1,000 characters | `playback` | Re-runs playback with the correction |
-| `reopen_playback` | none | `respond`, `consent`, `feedback` | Back to `playback`. The current answer moves to earlier answers. Consent and feedback are cleared and asked again. |
-| `retry_answer` | none | `respond`, after an `error` | Re-runs retrieval and the answer |
+| `reopen_playback` | none | `respond`, `consent`, `feedback` | Back to `playback`. The current answer moves to earlier answers (reason `reopened`). Consent and feedback are cleared and asked again. |
+| `retry_answer` | none | `respond`, after an `error` | Moves any claims already shown to earlier answers (reason `interrupted`), then re-runs retrieval and the answer |
 | `set_consent` | `scope`: `internal`, `internal_and_outward` or `declined` | `consent`, `feedback` | Defined in the [#19 spec](19-consent-and-decline.md) |
 | `set_feedback` | `value`: `yes`, `somewhat` or `no` | `feedback` | Defined in the [#23 spec](23-feedback-capture.md) |
 | `end` | none | every step except `closed` | Closes the conversation, keeping the latest consent and feedback, if any. The client confirms with the producer before sending it. It may be labeled "Stop" before consent and "End conversation" after. |
@@ -108,8 +108,12 @@ Buttons send structured actions. Actions never carry a producer ID or conversati
 
 ### Closing rules (shared contract owned here)
 
-- Only `end` and inactivity close a conversation. Every other choice stays changeable while it is open.
-- **Inactivity.** The chat API's sweep ([#25 spec](25-chat-endpoint.md)) sends an `inactivity_close` request. It is valid in every open step and closes the conversation exactly as `end` does.
+- Only `end` and automatic closing close a conversation. Every other choice stays changeable while it is open.
+- **Automatic closing.** The chat API's sweep ([#25 spec](25-chat-endpoint.md)) sends an `auto_close` request with a `reason`:
+  - `inactivity`: idle longer than the inactivity period;
+  - `max_lifetime`: open longer than the maximum conversation lifetime, however active it is.
+
+  `auto_close` is valid in every open step and closes the conversation exactly as `end` does. The maximum lifetime stops an active conversation outliving its stored messages ([memory spec](memory.md)).
 - Once `closed`, nothing changes from the chat.
 
 ### Requests, actions and events (shared contract owned here)
@@ -124,7 +128,7 @@ These are defined as Pydantic models in the agent package, the same way as the r
 | `message` | `text`, 1 to 4,000 characters | Chat API |
 | `action` | `action`: `{ name, args }` per the action table | Chat API |
 | `resume` | none | Chat API |
-| `inactivity_close` | none | Inactivity sweep only |
+| `auto_close` | `reason`: `inactivity` or `max_lifetime` | Sweep only |
 
 **Events.** Every event has `type` and `seq` (an increasing integer within the turn):
 
@@ -155,9 +159,9 @@ Seam 1 (agent entrypoint), per the [specs README](README.md). Cases:
 - claim events containing only claims that pass the check;
 - a failing claim never emitted, and a passing rewrite emitted later;
 - an answer with no verified insights producing the limited-evidence notice, `evidence: "limited"`, and the move to `consent`;
-- a model failure in `respond` followed by `retry_answer`;
+- a model failure after at least one `claim` event, followed by `retry_answer`, with the shown claims kept in earlier answers with reason `interrupted`;
 - `end` from every step;
-- `inactivity_close` from every step;
+- `auto_close` with each reason from every step;
 - repeated identical actions adding no history;
 - the profile location used by tools even after the producer disputes it.
 
@@ -175,5 +179,5 @@ Seam 3 covers one scripted conversation through all steps, plus one limited-evid
 
 ### Not decided (do not build or assume)
 
-- The inactivity period
-- What outcome and record a conversation gets when it closes (by `end` or inactivity) without any consent choice. This covers leaving before the consent question and leaving after only an out-of-scope request.
+- The inactivity period and the maximum conversation lifetime
+- What outcome and record a conversation gets when it closes (by `end` or automatic closing) without any consent choice. This covers leaving before the consent question and leaving after only an out-of-scope request.

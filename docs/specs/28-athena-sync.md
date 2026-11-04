@@ -13,7 +13,7 @@ Three things can make Athena drift from the real record:
 
 ## Solution
 
-DynamoDB is the only place code writes records. A DynamoDB Streams consumer treats each event only as a signal that a record changed. It re-reads the record's current state from DynamoDB and writes that to one S3 object per record, or deletes the object if the record is gone. Old or replayed events therefore always converge on the current state.
+DynamoDB is the only place code writes records. A DynamoDB Streams consumer treats each event only as a signal that a record changed. It re-reads the record's current state from DynamoDB and writes that to one S3 object per record, or deletes the object if the record is gone. Old or replayed events therefore always converge on the current state. Every S3 write goes through one publish function that writes only if the object holds an older record version, so the stream consumer and the resync command can never overwrite a newer version with an older one.
 
 A Glue table defined in CDK lets Athena query the objects. A resync command rebuilds S3 from DynamoDB if anything is ever missed.
 
@@ -32,12 +32,18 @@ A Glue table defined in CDK lets Athena query the objects. A resync command rebu
 - **Trigger.** A Python Lambda consumes the records table stream ([#26 spec](26-write-back.md)), with keys-only stream records.
 - **Re-read, don't trust the event.**
   - For each changed `record_id`, the Lambda does a strongly consistent read of the current item.
-  - If the item exists, it writes it as plain JSON (unmarshalled, not DynamoDB-typed) to a fixed key per record: a `records/` prefix plus `record_id`. This overwrites the previous object.
+  - If the item exists, it publishes it (below) as plain JSON (unmarshalled, not DynamoDB-typed) at a fixed key per record: a `records/` prefix plus `record_id`.
   - If the item no longer exists, it deletes the object.
 - **Failures.**
   - The Lambda uses partial batch failure reporting and bisect on error.
   - Its on-failure destination is an S3 bucket, so failed batches are kept beyond the stream's 24-hour retention. Confirm in the #4 spike that the kept batch includes the record keys.
-- **Resync command.** A script scans the records table, rewrites every object, and deletes objects whose record no longer exists. It is the repair path for anything the stream missed.
+- **Publish function (shared by the stream consumer and resync).**
+  - Each object carries the record's `version` in its metadata.
+  - To publish, the function reads the current object's version and ETag. If the object's version is the same or newer, it does nothing.
+  - Otherwise it writes with an S3 conditional write: `If-Match` on the ETag it read, or `If-None-Match: *` if there was no object.
+  - If the condition fails because another writer got there first, it re-reads the record and the object and tries again.
+- **Resync command.** A script scans the records table for record IDs. For each ID it does a fresh consistent read and calls the publish function; it never publishes the scanned copy. It also deletes objects whose record no longer exists. It is the repair path for anything the stream missed.
+- **Record deletion.** No code path deletes records yet, because retention is not decided. When one is added, how deletion and resync interact must be specified with it. A resync that read a record just before its deletion could otherwise write it back.
 - **Bucket.** KMS-encrypted, public access blocked, separate from the web bucket.
 - **Glue and Athena.**
   - A Glue database and records table are defined in CDK over the `records/` prefix with a JSON SerDe. Columns mirror the record, with structs and arrays for nested fields. No crawlers.
@@ -56,6 +62,7 @@ A Glue table defined in CDK lets Athena query the objects. A resync command rebu
   - an old event for a record that has since changed writing the current state, not the old one;
   - an event for a deleted record deleting the object;
   - a failure on one record reported as a batch item failure without blocking the rest.
+- **Publish function** against moto: an older version never overwrites a newer one, including when resync holds version N while the stream consumer publishes N+1 (for example, a consent change to declined); a failed write condition is retried with a fresh read.
 - **Resync command** against moto: an orphaned object deleted and a missing object written.
 - **Seam 3 (deployed smoke test):** after a scripted conversation, an Athena query returns the record with the right status and consent. After a consent change, it returns the new value.
 

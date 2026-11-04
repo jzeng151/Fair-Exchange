@@ -43,7 +43,7 @@ Recall of earlier conversations goes through one eligibility function. Recall st
   - When switched on, recalled context feeds intake and playback only. It is never a citable source; insights and peer examples come only from the data tools and the citation check.
 - **Retention.**
   - The short-term event expiry and any long-term record expiry are configuration values. AgentCore allows 3 to 365 days for events. Long-term records do not expire unless a time-to-live of at least 31 days is set.
-  - Whatever values are chosen, the event expiry must be longer than the inactivity period ([#13 spec](13-conversation-steps.md)), so that an open conversation can always be resumed and its record rebuilt.
+  - Whatever values are chosen, the event expiry must be longer than the maximum conversation lifetime ([#13 spec](13-conversation-steps.md)). The lifetime counts from the conversation's start, so every message of an open conversation survives until it closes, however active it stays. The agent refuses to start if the configuration breaks this rule.
 - **Deletion function.**
   - It deletes one conversation's short-term events.
   - Whether long-term records can be traced to a single conversation, given that long-term memory consolidates across conversations, is a spike check (below). Until that check passes, the function covers short-term events only, and this spec makes no promise about long-term records.
@@ -56,7 +56,8 @@ Seam 1 (agent entrypoint), per the [specs README](README.md), with an in-memory 
 - resume after the agent object is discarded, returning the same history, step, allowed actions and state;
 - a long-term read for producer A never returning producer B's memories, even when B's text mentions A;
 - the eligibility function returning nothing while recall is switched off;
-- the deletion function removing one conversation's short-term events and no other conversation's.
+- the deletion function removing one conversation's short-term events and no other conversation's;
+- a configuration whose event expiry is not longer than the maximum conversation lifetime rejected at startup.
 
 Evals run against real AgentCore Memory.
 

@@ -43,7 +43,7 @@ The record carries its own history:
   - `set_consent`
   - `set_feedback`
   - `end`
-  - `inactivity_close`
+  - `auto_close`
 - **Unchanged saves.** A save that would change nothing (e.g., a repeated identical action) writes nothing.
 - **After a reopened playback.** The reopen and the new answer reach the record at the next save point.
 - **Event.** Each save emits a `record_saved` event ([#13 spec](13-conversation-steps.md)).
@@ -71,7 +71,7 @@ Changes go in the Pydantic record models. JSON Schema and TypeScript types are r
 | `closed_at` | both | datetime or null | Set when the conversation closes. Records are reviewable only when set. |
 | `consent_history` | both | list of `{scope, recorded_at}` | The producer's distinct consent choices, in order (`internal`, `internal_and_outward`, `declined`). Non-narrative, so allowed on declined records. |
 | `evidence` | completed | `full` or `limited` | `limited` when the shown answer had no insights or no peer examples |
-| `earlier_answers` | completed | list of `{given_at, insights, peer_examples, evidence}` | Answers shown before a reopened playback, oldest first |
+| `earlier_answers` | completed | list of `{given_at, reason, insights, peer_examples, evidence}` | Earlier answers, oldest first. `reason` is `reopened` (the full answer shown before a reopened playback) or `interrupted` (only the claims shown before a failed answer was retried). |
 | `reviewer_tags` | completed | list of challenge tags, or null | Reviewer's corrected tags |
 | `reviewer_summary_original` | completed | string or null | Reviewer's corrected summary in the producer's language |
 | `reviewer_summary_english` | completed | string or null | Reviewer's corrected English summary |
@@ -100,7 +100,8 @@ Changes go in the Pydantic record models. JSON Schema and TypeScript types are r
   - narrative fields absent on declined records;
   - `evidence: "limited"` on a limited-evidence conversation;
   - summaries and tags unchanged by later saves until a re-confirm;
-  - `closed_at` set on `end` and on `inactivity_close`.
+  - claims shown before a failed answer kept in `earlier_answers` with reason `interrupted`;
+  - `closed_at` set on `end` and on `auto_close`.
 - **Schema tests:** extend the existing record schema, schema parity and generated-types tests for the new fields.
 
 ## Out of Scope

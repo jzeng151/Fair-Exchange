@@ -41,7 +41,7 @@ Consent is a button choice between three values. The producer can change it unti
 - **Same choice again.** Choosing the same scope as the current one changes nothing and adds no history entry.
 - **Typed text** never sets or changes consent ([#13 spec](13-conversation-steps.md)).
 - **A reopened playback** clears consent, which is asked again after the new answer.
-- **Closing.** `end` and inactivity close the conversation, keeping the latest consent choice.
+- **Closing.** `end` and automatic closing ([#13 spec](13-conversation-steps.md)) close the conversation, keeping the latest consent choice.
 
 ### Declined record
 
