@@ -24,17 +24,22 @@ export class MemoryStore implements ConversationStore {
   async listByProducer(producerId: string) {
     return [...this.items.values()].filter((c) => c.producerId === producerId).map((c) => ({ ...c }));
   }
-  async acquireLock(id: string, now: number, exp: number, touch: boolean) {
+  async acquireLock(id: string, now: number, exp: number, touch: boolean, token: string) {
     const c = this.items.get(id);
     if (!c || c.status !== 'open') return false;
-    if (c.lockExpiresAt !== undefined && c.lockExpiresAt >= now) return false;
+    // Same condition as DynamoDB: free only when no lock or `lock_expires_at < now`.
+    if (c.lockExpiresAt !== undefined && !(c.lockExpiresAt < now)) return false;
     c.lockExpiresAt = exp;
+    c.lockToken = token;
     if (touch) c.lastActivityAt = now;
     return true;
   }
-  async releaseLock(id: string) {
+  async releaseLock(id: string, token: string) {
     const c = this.items.get(id);
-    if (c) delete c.lockExpiresAt;
+    if (c && c.lockToken === token) {
+      delete c.lockExpiresAt;
+      delete c.lockToken;
+    }
   }
   async markClosed(id: string, now: number) {
     const c = this.items.get(id);
@@ -48,19 +53,33 @@ export class MemoryStore implements ConversationStore {
   }
 }
 
+/** Script entry that never yields again until the call is aborted. */
+export const HANG = Symbol('hang');
+
 /** Replays scripted events and records every request it receives. */
 export class ScriptedAgent implements AgentClient {
   requests: AgentRequest[] = [];
   /** Events for each stream call, consumed in order. An Error entry is thrown mid-stream. */
-  script: Array<Array<AgentEvent | Error>> = [];
+  script: Array<Array<AgentEvent | Error | typeof HANG>> = [];
+  /** Signals passed to each stream call, in order. */
+  signals: Array<AbortSignal | undefined> = [];
   resumeResult: Record<string, unknown> & { step?: string } = { step: 'intake' };
   /** Called at the start of each stream call (lets tests act "during" a turn). */
   onStream?: () => Promise<void> | void;
 
-  async *stream(request: AgentRequest): AsyncGenerator<AgentEvent> {
+  async *stream(request: AgentRequest, signal?: AbortSignal): AsyncGenerator<AgentEvent> {
     this.requests.push(request);
+    this.signals.push(signal);
     await this.onStream?.();
     for (const e of this.script.shift() ?? [{ type: 'done' }]) {
+      if (e === HANG) {
+        // Like a stalled network call: settles only when aborted.
+        await new Promise<void>((resolve) => {
+          if (signal?.aborted) return resolve();
+          signal?.addEventListener('abort', () => resolve());
+        });
+        throw new Error('aborted');
+      }
       if (e instanceof Error) throw e;
       yield e;
     }
@@ -104,6 +123,7 @@ export function makeDeps(overrides: Partial<Deps> = {}) {
     log,
     now: () => clock.t,
     newId: () => `00000000-0000-4000-8000-${String(++n).padStart(12, '0')}`,
+    turnTimeoutMs: 290_000,
     lockTtlMs: 330_000,
     ...overrides,
   };

@@ -1,4 +1,4 @@
-import type { AgentRequest, Conversation, Deps } from './types.js';
+import type { AgentEvent, AgentRequest, Conversation, Deps } from './types.js';
 import { writeErrorThenDone, writeEvent, type Sink } from './stream.js';
 
 export class Conflict extends Error {
@@ -15,6 +15,19 @@ export class NotFound extends Error {
   }
 }
 
+export class TurnTimeout extends Error {
+  constructor() {
+    super('Turn exceeded its time limit');
+    this.name = 'TurnTimeout';
+  }
+}
+
+/** Proof of holding a conversation's turn lock. Only the holder's token can release it. */
+export interface Lease {
+  conversationId: string;
+  token: string;
+}
+
 /** Loads the conversation and checks ownership. A wrong owner looks exactly like a missing ID. */
 export async function loadOwned(
   deps: Deps,
@@ -27,33 +40,82 @@ export async function loadOwned(
 }
 
 /**
- * Runs one streaming turn against an existing conversation: takes the lock, streams
- * the agent's events through unchanged, closes on `step: closed`, and always releases
- * the lock. A conflicting turn or a closed conversation (for message/action) throws
- * before anything is written, so the handler can map it to a plain status code.
+ * Takes the turn lock for a new turn. Runs during planning, before any response is
+ * chosen, so a closed conversation or a busy lock becomes a plain 409.
+ *
+ * @param touchActivity true for turns a producer started (start, message, action)
  */
-export async function runTurn(
+export async function beginTurn(
   deps: Deps,
-  sink: Sink,
   conversation: Conversation,
-  request: AgentRequest,
-  options: { requireOpen: boolean },
-): Promise<void> {
-  if (options.requireOpen && conversation.status === 'closed') {
-    throw new Conflict('Conversation is closed');
-  }
+  touchActivity: boolean,
+): Promise<Lease> {
+  if (conversation.status === 'closed') throw new Conflict('Conversation is closed');
+  const token = deps.newId();
   const now = deps.now();
   const got = await deps.store.acquireLock(
     conversation.conversationId,
     now,
     now + deps.lockTtlMs,
-    /* touchActivity */ request.kind !== 'resume' && request.kind !== 'inactivity_close',
+    touchActivity,
+    token,
   );
-  if (!got) throw new Conflict('A turn is already in progress');
+  if (!got) {
+    // The lock update also fails if the conversation closed after it was loaded.
+    const fresh = await deps.store.get(conversation.conversationId);
+    if (fresh?.status === 'closed') throw new Conflict('Conversation is closed');
+    throw new Conflict('A turn is already in progress');
+  }
+  return { conversationId: conversation.conversationId, token };
+}
 
+export const endTurn = (deps: Deps, lease: Lease): Promise<void> =>
+  deps.store.releaseLock(lease.conversationId, lease.token);
+
+/**
+ * Streams the agent's events, aborting the call once the turn time limit passes.
+ * The limit is shorter than the lock lease, so a turn never outlives its lock.
+ */
+export async function* boundedStream(deps: Deps, request: AgentRequest): AsyncGenerator<AgentEvent> {
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const expired = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new TurnTimeout());
+    }, deps.turnTimeoutMs);
+  });
+  expired.catch(() => undefined);
+  const iterator = deps.agent.stream(request, controller.signal)[Symbol.asyncIterator]();
+  try {
+    while (true) {
+      const next = await Promise.race([iterator.next(), expired]);
+      if (next.done) return;
+      yield next.value;
+    }
+  } finally {
+    clearTimeout(timer);
+    controller.abort();
+    // Close the agent stream without waiting on it: a hung stream may never settle.
+    void iterator.return?.(undefined)?.catch?.(() => undefined);
+  }
+}
+
+/**
+ * Runs a turn whose lock is already held: streams the agent's events through unchanged,
+ * marks the conversation closed on `step: closed`, and releases the lock with its token.
+ * Never throws; failures end the stream with `error` then `done`.
+ */
+export async function streamTurn(
+  deps: Deps,
+  sink: Sink,
+  conversation: Conversation,
+  request: AgentRequest,
+  lease: Lease,
+): Promise<void> {
   let doneSent = false;
   try {
-    for await (const event of deps.agent.stream(request)) {
+    for await (const event of boundedStream(deps, request)) {
       writeEvent(sink, event);
       if (event.type === 'done') doneSent = true;
       if (event.type === 'step' && event.step === 'closed') {
@@ -61,15 +123,21 @@ export async function runTurn(
       }
     }
     sink.end();
-  } catch {
+  } catch (err) {
     deps.log.error('agent stream failed', {
       conversationId: conversation.conversationId,
       producerId: conversation.producerId,
       kind: request.kind,
+      reason: err instanceof TurnTimeout ? 'timeout' : 'error',
     });
     if (doneSent) sink.end();
     else writeErrorThenDone(sink, 'agent_failed', 'The agent call failed.');
   } finally {
-    await deps.store.releaseLock(conversation.conversationId);
+    try {
+      await endTurn(deps, lease);
+    } catch {
+      // The lease expiry frees the lock if release fails.
+      deps.log.error('lock release failed', { conversationId: conversation.conversationId });
+    }
   }
 }

@@ -11,7 +11,7 @@ import {
   type StreamPlan,
 } from './routes.js';
 import { runSweep } from './sweep.js';
-import { CaptureSink, makeDeps, makeEvent } from './testing.js';
+import { CaptureSink, HANG, makeDeps, makeEvent } from './testing.js';
 
 /** Fake resolver (#11 spec): returns the producer the test event carries in its authorizer. */
 const resolve: IdentityResolver = resolveCaller;
@@ -25,19 +25,23 @@ async function startConversation(t: ReturnType<typeof makeDeps>, producerId = 'p
   return { id: plan.conversationId!, sink };
 }
 
-/** Runs a plan, or maps its error to the HTTP result the handler would send. */
+/**
+ * Mirrors the Lambda handler: only planning errors become status codes. Once a plan
+ * exists the 200 stream is open, so `run` must never throw (the test fails if it does).
+ */
 async function call(
   t: ReturnType<typeof makeDeps>,
   fn: () => Promise<StreamPlan>,
 ): Promise<{ result?: JsonResult; sink: CaptureSink }> {
   const sink = new CaptureSink();
+  let plan: StreamPlan;
   try {
-    const plan = await fn();
-    await plan.run(sink);
-    return { sink };
+    plan = await fn();
   } catch (err) {
     return { result: toErrorResult(err, t.deps, 'test'), sink };
   }
+  await plan.run(sink);
+  return { sink };
 }
 
 describe('identity', () => {
@@ -346,5 +350,97 @@ describe('inactivity sweep', () => {
     const r = await runSweep(t.deps, IDLE);
     expect(r.closedIdle).toBe(0);
     expect((await t.store.get(id))?.status).toBe('open');
+  });
+});
+
+describe('review fixes', () => {
+  it('rejects closed and busy turns during planning, before the agent is called', async () => {
+    const t = makeDeps();
+    const { id } = await startConversation(t);
+    const before = t.agent.requests.length;
+
+    t.store.items.get(id)!.lockExpiresAt = t.clock.t + 60_000;
+    t.store.items.get(id)!.lockToken = 'someone-else';
+    await expect(planMessage(t.deps, resolve, makeEvent({ id, body: { text: 'hi' } }))).rejects.toMatchObject({
+      name: 'Conflict',
+      message: 'A turn is already in progress',
+    });
+
+    await t.store.markClosed(id, t.clock.t);
+    await expect(planAction(t.deps, resolve, makeEvent({ id, body: { action: 'end' } }))).rejects.toMatchObject({
+      name: 'Conflict',
+      message: 'Conversation is closed',
+    });
+    expect(t.agent.requests.length).toBe(before);
+  });
+
+  it('reports "closed" when the conversation closes between load and lock', async () => {
+    const t = makeDeps();
+    const { id } = await startConversation(t);
+    const realAcquire = t.store.acquireLock.bind(t.store);
+    t.store.acquireLock = async (...args) => {
+      await t.store.markClosed(id, t.clock.t);
+      return realAcquire(...args);
+    };
+    await expect(planMessage(t.deps, resolve, makeEvent({ id, body: { text: 'hi' } }))).rejects.toMatchObject({
+      message: 'Conversation is closed',
+    });
+  });
+
+  it("does not let an expired turn release the lock of the turn that replaced it", async () => {
+    const t = makeDeps();
+    const { id } = await startConversation(t);
+
+    // Turn 1 is held open until we let it finish.
+    let finishFirst!: () => void;
+    t.agent.onStream = () => new Promise<void>((r) => (finishFirst = r));
+    const first = await planMessage(t.deps, resolve, makeEvent({ id, body: { text: 'one' } }));
+    const firstRun = first.run(new CaptureSink());
+    await Promise.resolve();
+
+    // Its lease expires, and turn 2 takes the lock.
+    t.clock.t += t.deps.lockTtlMs + 1;
+    t.agent.onStream = undefined;
+    const second = await planMessage(t.deps, resolve, makeEvent({ id, body: { text: 'two' } }));
+    const secondToken = t.store.items.get(id)!.lockToken;
+
+    // Turn 1 finishes. Turn 2's lock must survive.
+    finishFirst();
+    await firstRun;
+    expect(t.store.items.get(id)!.lockToken).toBe(secondToken);
+    const third = await call(t, () => planMessage(t.deps, resolve, makeEvent({ id, body: { text: 'three' } })));
+    expect(third.result?.statusCode).toBe(409);
+
+    await second.run(new CaptureSink());
+    expect(t.store.items.get(id)!.lockToken).toBeUndefined();
+  });
+
+  it('aborts an agent call that passes the turn time limit, then frees the lock', async () => {
+    const t = makeDeps({ turnTimeoutMs: 20 });
+    const { id } = await startConversation(t);
+    t.agent.script.push([{ type: 'text', seq: 1, text: 'partial' }, HANG]);
+    const r = await call(t, () => planMessage(t.deps, resolve, makeEvent({ id, body: { text: 'hi' } })));
+    expect(r.sink.events.map((e) => e.type)).toEqual(['text', 'error', 'done']);
+    expect(r.sink.ended).toBe(true);
+    expect(t.agent.signals.at(-1)?.aborted).toBe(true);
+    expect(t.store.items.get(id)!.lockExpiresAt).toBeUndefined();
+    expect(t.log.lines.join('\n')).toContain('timeout');
+  });
+
+  it('keeps the turn limit inside the lock lease and the Lambda timeout', async () => {
+    const { TURN_TIMEOUT_MS, DEFAULT_LOCK_TTL_MS, LAMBDA_TIMEOUT_MS } = await import('./types.js');
+    expect(TURN_TIMEOUT_MS).toBeLessThan(LAMBDA_TIMEOUT_MS);
+    expect(DEFAULT_LOCK_TTL_MS).toBeGreaterThan(LAMBDA_TIMEOUT_MS);
+  });
+
+  it('bounds the sweep\'s inactivity_close call too', async () => {
+    const t = makeDeps({ turnTimeoutMs: 20 });
+    const { id } = await startConversation(t);
+    t.clock.t += 31 * 60 * 1000;
+    t.agent.script.push([HANG]);
+    const r = await runSweep(t.deps, 30 * 60 * 1000);
+    expect(r.skipped).toBe(1);
+    expect((await t.store.get(id))?.status).toBe('open');
+    expect(t.store.items.get(id)!.lockExpiresAt).toBeUndefined();
   });
 });

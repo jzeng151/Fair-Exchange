@@ -22,6 +22,7 @@ const toConversation = (item: Item): Conversation => ({
   closedAt: item.closed_at ? Number(item.closed_at.N) : undefined,
   lastActivityAt: Number(item.last_activity_at!.N),
   lockExpiresAt: item.lock_expires_at ? Number(item.lock_expires_at.N) : undefined,
+  lockToken: item.lock_token?.S,
 });
 
 const num = (n: number): AttributeValue => ({ N: String(n) });
@@ -88,6 +89,7 @@ export class DynamoConversationStore implements ConversationStore {
     now: number,
     lockExpiresAt: number,
     touchActivity: boolean,
+    token: string,
   ): Promise<boolean> {
     try {
       await this.client.send(
@@ -95,8 +97,8 @@ export class DynamoConversationStore implements ConversationStore {
           TableName: this.table,
           Key: { conversation_id: { S: conversationId } },
           UpdateExpression: touchActivity
-            ? 'SET lock_expires_at = :exp, last_activity_at = :now'
-            : 'SET lock_expires_at = :exp',
+            ? 'SET lock_expires_at = :exp, lock_token = :token, last_activity_at = :now'
+            : 'SET lock_expires_at = :exp, lock_token = :token',
           ConditionExpression:
             'attribute_exists(conversation_id) AND #status = :open AND ' +
             '(attribute_not_exists(lock_expires_at) OR lock_expires_at < :now)',
@@ -105,6 +107,7 @@ export class DynamoConversationStore implements ConversationStore {
             ':exp': num(lockExpiresAt),
             ':now': num(now),
             ':open': { S: 'open' },
+            ':token': { S: token },
           },
         }),
       );
@@ -115,14 +118,22 @@ export class DynamoConversationStore implements ConversationStore {
     }
   }
 
-  async releaseLock(conversationId: string): Promise<void> {
-    await this.client.send(
-      new UpdateItemCommand({
-        TableName: this.table,
-        Key: { conversation_id: { S: conversationId } },
-        UpdateExpression: 'REMOVE lock_expires_at',
-      }),
-    );
+  async releaseLock(conversationId: string, token: string): Promise<void> {
+    try {
+      await this.client.send(
+        new UpdateItemCommand({
+          TableName: this.table,
+          Key: { conversation_id: { S: conversationId } },
+          UpdateExpression: 'REMOVE lock_expires_at, lock_token',
+          ConditionExpression: 'lock_token = :token',
+          ExpressionAttributeValues: { ':token': { S: token } },
+        }),
+      );
+    } catch (err) {
+      // Another turn took over after this lease expired. Its lock is not ours to remove.
+      if (err instanceof ConditionalCheckFailedException) return;
+      throw err;
+    }
   }
 
   async markClosed(conversationId: string, now: number): Promise<void> {

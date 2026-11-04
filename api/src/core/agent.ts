@@ -28,7 +28,7 @@ export class AgentCoreClient implements AgentClient {
     private readonly client: BedrockAgentCoreClient = new BedrockAgentCoreClient({}),
   ) {}
 
-  private invoke(request: AgentRequest, accept: string) {
+  private invoke(request: AgentRequest, accept: string, signal?: AbortSignal) {
     return this.client.send(
       new InvokeAgentRuntimeCommand({
         agentRuntimeArn: this.runtimeArn,
@@ -37,11 +37,12 @@ export class AgentCoreClient implements AgentClient {
         accept,
         payload: new TextEncoder().encode(JSON.stringify(request)),
       }),
+      { abortSignal: signal },
     );
   }
 
-  async *stream(request: AgentRequest): AsyncGenerator<AgentEvent> {
-    const out = await this.invoke(request, 'application/x-ndjson');
+  async *stream(request: AgentRequest, signal?: AbortSignal): AsyncGenerator<AgentEvent> {
+    const out = await this.invoke(request, 'application/x-ndjson', signal);
     if (!out.response) throw new Error('Agent returned no response body');
     yield* parseNdjson(out.response as unknown as AsyncIterable<Uint8Array>);
   }

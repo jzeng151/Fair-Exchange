@@ -1,7 +1,7 @@
 import type { APIGatewayProxyEvent } from 'aws-lambda';
 import { Unauthorized, type IdentityResolver } from './identity.js';
 import { writeEvent, type Sink } from './stream.js';
-import { Conflict, NotFound, loadOwned, runTurn } from './turn.js';
+import { Conflict, NotFound, beginTurn, endTurn, loadOwned, streamTurn } from './turn.js';
 import type { Conversation, Deps } from './types.js';
 import {
   BadRequest,
@@ -30,12 +30,14 @@ export function toErrorResult(err: unknown, deps: Deps, route: string): JsonResu
 }
 
 /**
- * A prepared streaming route. `run` writes to the sink and must be called exactly once;
- * everything that can fail with a plain status code has already happened by then.
+ * A prepared streaming route. Planning has already done everything that can fail with a
+ * plain status code, including taking the turn lock. The caller must then call exactly
+ * one of `run` (streams, never throws, releases the lock) or `abandon` (releases the lock).
  */
 export interface StreamPlan {
-  conversationId?: string;
+  conversationId: string;
   run(sink: Sink): Promise<void>;
+  abandon(): Promise<void>;
 }
 
 const pathId = (event: APIGatewayProxyEvent): string => {
@@ -65,15 +67,15 @@ export async function planStart(
   };
   await deps.store.create(conversation);
   deps.log.info('conversation created', { conversationId, producerId, route: 'start' });
+  const lease = await beginTurn(deps, conversation, true);
 
   return {
     conversationId,
     async run(sink) {
       writeEvent(sink, { type: 'conversation', conversationId });
-      await runTurn(deps, sink, conversation, { kind: 'start', producerId, conversationId }, {
-        requireOpen: true,
-      });
+      await streamTurn(deps, sink, conversation, { kind: 'start', producerId, conversationId }, lease);
     },
+    abandon: () => endTurn(deps, lease),
   };
 }
 
@@ -87,12 +89,12 @@ export async function planMessage(
   const conversationId = pathId(event);
   const conversation = await loadOwned(deps, conversationId, producerId);
   const { text } = parseMessageBody(event.body);
+  const lease = await beginTurn(deps, conversation, true);
   return {
     conversationId,
     run: (sink) =>
-      runTurn(deps, sink, conversation, { kind: 'message', producerId, conversationId, text }, {
-        requireOpen: true,
-      }),
+      streamTurn(deps, sink, conversation, { kind: 'message', producerId, conversationId, text }, lease),
+    abandon: () => endTurn(deps, lease),
   };
 }
 
@@ -106,12 +108,12 @@ export async function planAction(
   const conversationId = pathId(event);
   const conversation = await loadOwned(deps, conversationId, producerId);
   const action = parseActionBody(event.body);
+  const lease = await beginTurn(deps, conversation, true);
   return {
     conversationId,
     run: (sink) =>
-      runTurn(deps, sink, conversation, { kind: 'action', producerId, conversationId, action }, {
-        requireOpen: true,
-      }),
+      streamTurn(deps, sink, conversation, { kind: 'action', producerId, conversationId, action }, lease),
+    abandon: () => endTurn(deps, lease),
   };
 }
 

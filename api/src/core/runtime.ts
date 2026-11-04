@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { Logger } from '@aws-lambda-powertools/logger';
 import { AgentCoreClient } from './agent.js';
 import { DynamoConversationStore } from './store.js';
-import { DEFAULT_LOCK_TTL_MS, type Deps, type Log } from './types.js';
+import { DEFAULT_LOCK_TTL_MS, TURN_TIMEOUT_MS, type Deps, type Log } from './types.js';
 
 const required = (name: string): string => {
   const value = process.env[name];
@@ -25,6 +25,7 @@ export function buildDeps(): Deps {
     log,
     now: () => Date.now(),
     newId: () => randomUUID(),
+    turnTimeoutMs: TURN_TIMEOUT_MS,
     lockTtlMs: DEFAULT_LOCK_TTL_MS,
   };
 }

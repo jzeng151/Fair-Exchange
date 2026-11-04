@@ -1,3 +1,4 @@
+import { Conflict, beginTurn, boundedStream, endTurn } from './turn.js';
 import type { Deps, Conversation } from './types.js';
 
 export interface SweepResult {
@@ -45,19 +46,22 @@ async function closeIfStillIdle(
   candidate: Conversation,
   inactivityMs: number,
 ): Promise<'closed' | 'skipped' | 'open'> {
-  const now = deps.now();
   // The lock is taken without touching activity, so the sweep never makes a conversation look active.
-  if (!(await deps.store.acquireLock(candidate.conversationId, now, now + deps.lockTtlMs, false))) {
-    return 'skipped';
+  let lease;
+  try {
+    lease = await beginTurn(deps, candidate, false);
+  } catch (err) {
+    if (err instanceof Conflict) return 'skipped';
+    throw err;
   }
   try {
     // Re-check under the lock: a turn may have been accepted since the scan.
     const fresh = await deps.store.get(candidate.conversationId);
-    if (!fresh || fresh.status !== 'open' || now - fresh.lastActivityAt < inactivityMs) {
+    if (!fresh || fresh.status !== 'open' || deps.now() - fresh.lastActivityAt < inactivityMs) {
       return 'skipped';
     }
     let closed = false;
-    for await (const event of deps.agent.stream({
+    for await (const event of boundedStream(deps, {
       kind: 'inactivity_close',
       producerId: fresh.producerId,
       conversationId: fresh.conversationId,
@@ -68,7 +72,7 @@ async function closeIfStillIdle(
     await deps.store.markClosed(fresh.conversationId, deps.now());
     return 'closed';
   } finally {
-    await deps.store.releaseLock(candidate.conversationId);
+    await endTurn(deps, lease);
   }
 }
 
