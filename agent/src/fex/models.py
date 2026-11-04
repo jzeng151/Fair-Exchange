@@ -193,6 +193,9 @@ class CompletedRecord(_RecordBase):
     pii_check: Literal["done", "failed", "unsupported_language"] | None = Field(
         default=None, description="Scan result: None until the first scan ran; unsupported_language covers languages other than en and es")
     pii_flag: bool = Field(default=False, description="Personal information flagged for human review; never redacted")
+    # The reviewer's decision on a PII flag (#27); the rest of the PII fields come with #20
+    pii_review: Literal["confirmed", "cleared"] | None = Field(
+        default=None, description="Reviewer decision on the PII flag")
     review_status: Literal["pending", "reviewed"] = "pending"
     reviewed_by: str | None = None
     reviewed_at: datetime | None = None
