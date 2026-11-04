@@ -97,10 +97,17 @@ def default_engine() -> ConversationEngine:
     from strands.models.bedrock import BedrockModel
 
     small, large = model_ids()
-    guardrail = guardrail_config()  # the same Guardrail on every model call
+    guardrail = guardrail_config()  # the same Guardrail on every model call (#12)
+    records = record_store()
+    # The Comprehend seam (#20): scans run only when records are configured — they are part of saving one.
+    pii_scanner = None
+    if records is not None:
+        from fex.pii import default_comprehend
+
+        pii_scanner = default_comprehend()
     return ConversationEngine(store=InMemoryStateStore(), small_model=BedrockModel(model_id=small, **guardrail),
-                              large_model=BedrockModel(model_id=large, **guardrail), records=record_store(),
-                              output_check=output_check())
+                              large_model=BedrockModel(model_id=large, **guardrail), records=records,
+                              output_check=output_check(), pii_scanner=pii_scanner)
 
 
 def invoke(payload: dict[str, Any], engine: ConversationEngine | None = None) -> dict[str, Any]:
