@@ -1,0 +1,2029 @@
+{
+ "description": "Pre-extracted regional facts for the regional-context tool. Built offline from regional_sources.json; never fetched at runtime.",
+ "sources_fetched_at": "2026-11-04",
+ "prices_updated": "Updated on November 03, 2026",
+ "regions": [
+  {
+   "country": "Brazil",
+   "region": "Amazonas",
+   "lat": -3.42,
+   "lon": -65.86,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Amazonas, Brazil averaged 2,619 mm a year in 2024-2025, 6.8% below the 2014-2023 average of 2,809 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -6.8,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Amazonas, Brazil is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Brazil",
+   "region": "Minas Gerais",
+   "lat": -18.51,
+   "lon": -44.56,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Minas Gerais, Brazil averaged 1,173 mm a year in 2024-2025, 10.1% above the 2014-2023 average of 1,065 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 10.1,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Minas Gerais, Brazil is low to medium (10-20%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 1.0287763193286548,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low to medium (10-20%) by 2030 and medium to high (20-40%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 2.153794049,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Brazil",
+   "region": "Piaui",
+   "lat": -7.72,
+   "lon": -42.73,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Piaui, Brazil averaged 719 mm a year in 2024-2025, 2.9% below the 2014-2023 average of 741 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -2.9,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Piaui, Brazil is arid and low water use.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 5,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be arid and low water use by 2030 and medium to high (20-40%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 2.988131876,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Brazil",
+   "region": "Sao Paulo",
+   "lat": -22.3,
+   "lon": -48.6,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Sao Paulo, Brazil averaged 1,007 mm a year in 2024-2025, 16.7% below the 2014-2023 average of 1,209 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -16.7,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Sao Paulo, Brazil is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Colombia",
+   "region": "Antioquia",
+   "lat": 6.55,
+   "lon": -75.83,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Antioquia, Colombia averaged 1,823 mm a year in 2024-2025, 13.3% above the 2014-2023 average of 1,609 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 13.3,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Antioquia, Colombia is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Colombia",
+   "region": "Caldas",
+   "lat": 5.3,
+   "lon": -75.27,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Caldas, Colombia averaged 2,707 mm a year in 2024-2025, 16.6% above the 2014-2023 average of 2,320 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 16.6,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Caldas, Colombia is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Colombia",
+   "region": "Cauca",
+   "lat": 2.44,
+   "lon": -76.61,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Cauca, Colombia averaged 1,861 mm a year in 2024-2025, 11.5% below the 2014-2023 average of 2,103 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -11.5,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Cauca, Colombia is low to medium (10-20%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 1.085506846511455,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low to medium (10-20%) by 2030 and low to medium (10-20%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 1.363201626,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Colombia",
+   "region": "Cesar",
+   "lat": 9.34,
+   "lon": -73.65,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Cesar, Colombia averaged 1,876 mm a year in 2024-2025, 11.2% above the 2014-2023 average of 1,686 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 11.2,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Cesar, Colombia is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0.298037761,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Colombia",
+   "region": "Huila",
+   "lat": 2.54,
+   "lon": -75.53,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Huila, Colombia averaged 1,763 mm a year in 2024-2025, 12.5% above the 2014-2023 average of 1,568 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 12.5,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Huila, Colombia is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0.111125444,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Colombia",
+   "region": "Norte de Santander",
+   "lat": 7.95,
+   "lon": -72.9,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Norte de Santander, Colombia averaged 1,503 mm a year in 2024-2025, 0.4% below the 2014-2023 average of 1,508 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -0.4,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Norte de Santander, Colombia is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Colombia",
+   "region": "Risaralda",
+   "lat": 5.31,
+   "lon": -75.99,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Risaralda, Colombia averaged 2,968 mm a year in 2024-2025, 10.3% above the 2014-2023 average of 2,690 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 10.3,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Risaralda, Colombia is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Colombia",
+   "region": "Tolima",
+   "lat": 4.09,
+   "lon": -75.15,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Tolima, Colombia averaged 1,725 mm a year in 2024-2025, 3.7% above the 2014-2023 average of 1,663 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 3.7,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Tolima, Colombia is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Colombia",
+   "region": "Valle del Cauca",
+   "lat": 3.8,
+   "lon": -76.52,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Valle del Cauca, Colombia averaged 1,100 mm a year in 2024-2025, 6.2% above the 2014-2023 average of 1,036 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 6.2,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Valle del Cauca, Colombia is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Costa Rica",
+   "region": "Alajuela",
+   "lat": 10.39,
+   "lon": -84.42,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Alajuela, Costa Rica averaged 4,795 mm a year in 2024-2025, 44.3% above the 2014-2023 average of 3,322 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 44.3,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Alajuela, Costa Rica is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Costa Rica",
+   "region": "San Jose",
+   "lat": 9.83,
+   "lon": -84.07,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of San Jose, Costa Rica averaged 2,471 mm a year in 2024-2025, 18.8% above the 2014-2023 average of 2,079 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 18.8,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of San Jose, Costa Rica is low to medium (10-20%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 1.0815437123813136,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low to medium (10-20%) by 2030 and low to medium (10-20%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 1.541027549,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Côte d'Ivoire",
+   "region": "Bas-Sassandra",
+   "lat": 5.47,
+   "lon": -6.62,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Bas-Sassandra, Côte d'Ivoire averaged 1,489 mm a year in 2024-2025, 10.6% below the 2014-2023 average of 1,664 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -10.6,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Bas-Sassandra, Côte d'Ivoire is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Côte d'Ivoire",
+   "region": "Goh-Djiboua",
+   "lat": 5.88,
+   "lon": -5.57,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Goh-Djiboua, Côte d'Ivoire averaged 1,534 mm a year in 2024-2025, 7.9% below the 2014-2023 average of 1,665 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -7.9,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Goh-Djiboua, Côte d'Ivoire is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Côte d'Ivoire",
+   "region": "Zanzan",
+   "lat": 8.6,
+   "lon": -3.2,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Zanzan, Côte d'Ivoire averaged 966 mm a year in 2024-2025, 3.0% below the 2014-2023 average of 996 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -3.0,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Zanzan, Côte d'Ivoire is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Ecuador",
+   "region": "Cotopaxi",
+   "lat": -0.84,
+   "lon": -78.66,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Cotopaxi, Ecuador averaged 650 mm a year in 2024-2025, 2.8% above the 2014-2023 average of 632 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 2.8,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Cotopaxi, Ecuador is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Ecuador",
+   "region": "El Oro",
+   "lat": -3.42,
+   "lon": -79.8,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of El Oro, Ecuador averaged 1,073 mm a year in 2024-2025, 6.2% below the 2014-2023 average of 1,144 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -6.2,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of El Oro, Ecuador is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0.9525144339049554,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low to medium (10-20%) by 2030 and low to medium (10-20%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 1.448635661,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Ethiopia",
+   "region": "YeDebub Biheroch Bihereseboch na Hizboch",
+   "lat": 6.5,
+   "lon": 37.0,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of YeDebub Biheroch Bihereseboch na Hizboch, Ethiopia averaged 2,050 mm a year in 2024-2025, 7.9% above the 2014-2023 average of 1,900 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 7.9,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of YeDebub Biheroch Bihereseboch na Hizboch, Ethiopia is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Guatemala",
+   "region": "Guatemala",
+   "lat": 14.63,
+   "lon": -90.51,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Guatemala, Guatemala averaged 1,206 mm a year in 2024-2025, 1.8% below the 2014-2023 average of 1,228 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -1.8,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Guatemala, Guatemala is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low to medium (10-20%) by 2030 and medium to high (20-40%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 2.16645552,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Guatemala",
+   "region": "Huehuetenango",
+   "lat": 15.32,
+   "lon": -91.47,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Huehuetenango, Guatemala averaged 943 mm a year in 2024-2025, 3.3% above the 2014-2023 average of 913 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 3.3,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Huehuetenango, Guatemala is low to medium (10-20%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 1.8277138426496933,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low to medium (10-20%) by 2030 and medium to high (20-40%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 2.116573355,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Guatemala",
+   "region": "Jalapa",
+   "lat": 14.63,
+   "lon": -89.99,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Jalapa, Guatemala averaged 1,416 mm a year in 2024-2025, 13.9% above the 2014-2023 average of 1,243 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 13.9,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Jalapa, Guatemala is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low to medium (10-20%) by 2030 and medium to high (20-40%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 2.16645552,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Guatemala",
+   "region": "Quiche",
+   "lat": 15.03,
+   "lon": -91.15,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Quiche, Guatemala averaged 959 mm a year in 2024-2025, 1.1% below the 2014-2023 average of 970 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -1.1,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Quiche, Guatemala is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Guatemala",
+   "region": "Solola",
+   "lat": 14.77,
+   "lon": -91.18,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Solola, Guatemala averaged 1,257 mm a year in 2024-2025, 13.4% below the 2014-2023 average of 1,452 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -13.4,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Solola, Guatemala is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Honduras",
+   "region": "Copan",
+   "lat": 14.85,
+   "lon": -88.9,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Copan, Honduras averaged 1,621 mm a year in 2024-2025, 2.4% below the 2014-2023 average of 1,660 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -2.4,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Copan, Honduras is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0.21451072,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Honduras",
+   "region": "Intibuca",
+   "lat": 14.32,
+   "lon": -88.17,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Intibuca, Honduras averaged 1,258 mm a year in 2024-2025, 0.1% below the 2014-2023 average of 1,259 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -0.1,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Intibuca, Honduras is low to medium (10-20%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 1.5870675902297675,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be medium to high (20-40%) by 2030 and medium to high (20-40%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 2.629282176,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Honduras",
+   "region": "La Paz",
+   "lat": 14.32,
+   "lon": -87.68,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of La Paz, Honduras averaged 1,072 mm a year in 2024-2025, 2.2% above the 2014-2023 average of 1,049 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 2.2,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of La Paz, Honduras is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0.21451072,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Honduras",
+   "region": "Lempira",
+   "lat": 14.59,
+   "lon": -88.57,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Lempira, Honduras averaged 1,487 mm a year in 2024-2025, 1.9% above the 2014-2023 average of 1,460 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 1.9,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Lempira, Honduras is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0.21451072,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Honduras",
+   "region": "Ocotepeque",
+   "lat": 14.43,
+   "lon": -89.18,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Ocotepeque, Honduras averaged 1,562 mm a year in 2024-2025, 1.1% below the 2014-2023 average of 1,579 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -1.1,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Ocotepeque, Honduras is low to medium (10-20%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 1.5870675902297675,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be medium to high (20-40%) by 2030 and medium to high (20-40%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 2.629282176,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "India",
+   "region": "Assam",
+   "lat": 26.2,
+   "lon": 92.94,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Assam, India averaged 2,062 mm a year in 2024-2025, 10.3% above the 2014-2023 average of 1,869 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 10.3,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Assam, India is low to medium (10-20%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 1.6810240019635176,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low to medium (10-20%) by 2030 and medium to high (20-40%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 2.395902807,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "India",
+   "region": "Kerala",
+   "lat": 10.85,
+   "lon": 76.27,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Kerala, India averaged 2,708 mm a year in 2024-2025, 2.6% below the 2014-2023 average of 2,780 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -2.6,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Kerala, India is high (40-80%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 3.57334979305539,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be high (40-80%) by 2030 and high (40-80%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 3.577016574,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "India",
+   "region": "Tamil Nadu",
+   "lat": 11.13,
+   "lon": 78.66,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Tamil Nadu, India averaged 1,190 mm a year in 2024-2025, 9.5% above the 2014-2023 average of 1,087 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 9.5,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Tamil Nadu, India is medium to high (20-40%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 2.387289319303638,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be medium to high (20-40%) by 2030 and high (40-80%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 3.08814436,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Indonesia",
+   "region": "Aceh",
+   "lat": 4.7,
+   "lon": 96.75,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Aceh, Indonesia averaged 1,771 mm a year in 2024-2025, 5.7% above the 2014-2023 average of 1,676 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 5.7,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Aceh, Indonesia is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0.3224146964623894,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0.278070165,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Indonesia",
+   "region": "Bali",
+   "lat": -8.34,
+   "lon": 115.09,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Bali, Indonesia averaged 3,014 mm a year in 2024-2025, 14.1% above the 2014-2023 average of 2,641 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 14.1,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Bali, Indonesia is extremely high (>80%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 4.036138519540426,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be high (40-80%) by 2030 and high (40-80%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 3.96639891,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Kenya",
+   "region": "Kericho",
+   "lat": -0.37,
+   "lon": 35.29,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Kericho, Kenya averaged 2,219 mm a year in 2024-2025, 5.0% above the 2014-2023 average of 2,113 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 5.0,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Kericho, Kenya is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Mexico",
+   "region": "Chiapas",
+   "lat": 16.75,
+   "lon": -92.63,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Chiapas, Mexico averaged 1,158 mm a year in 2024-2025, 9.0% above the 2014-2023 average of 1,062 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 9.0,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Chiapas, Mexico is low to medium (10-20%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 1.6995383206508503,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be medium to high (20-40%) by 2030 and medium to high (20-40%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 2.726356151,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Mexico",
+   "region": "Guanajuato",
+   "lat": 21.02,
+   "lon": -101.26,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Guanajuato, Mexico averaged 595 mm a year in 2024-2025, 11.3% below the 2014-2023 average of 670 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -11.3,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Guanajuato, Mexico is extremely high (>80%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 5,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be extremely high (>80%) by 2030 and extremely high (>80%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 5,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Mexico",
+   "region": "Michoacan de Ocampo",
+   "lat": 19.57,
+   "lon": -101.71,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Michoacan de Ocampo, Mexico averaged 983 mm a year in 2024-2025, 9.5% above the 2014-2023 average of 898 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 9.5,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Michoacan de Ocampo, Mexico is high (40-80%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 3.923892313939719,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be high (40-80%) by 2030 and extremely high (>80%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 4.269689877,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Mexico",
+   "region": "Sinaloa",
+   "lat": 24.8,
+   "lon": -107.4,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Sinaloa, Mexico averaged 508 mm a year in 2024-2025, 22.7% below the 2014-2023 average of 657 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -22.7,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Sinaloa, Mexico is extremely high (>80%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 4.353049930030603,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be extremely high (>80%) by 2030 and extremely high (>80%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 4.733887562,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Mexico",
+   "region": "Sonora",
+   "lat": 29.3,
+   "lon": -110.33,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Sonora, Mexico averaged 342 mm a year in 2024-2025, 25.9% below the 2014-2023 average of 461 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -25.9,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Sonora, Mexico is extremely high (>80%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 5,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be extremely high (>80%) by 2030 and extremely high (>80%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 5,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Nicaragua",
+   "region": "Boaco",
+   "lat": 12.47,
+   "lon": -85.66,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Boaco, Nicaragua averaged 1,505 mm a year in 2024-2025, 24.0% above the 2014-2023 average of 1,213 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 24.0,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Boaco, Nicaragua is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Nicaragua",
+   "region": "Jinotega",
+   "lat": 13.09,
+   "lon": -86.0,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Jinotega, Nicaragua averaged 1,665 mm a year in 2024-2025, 26.7% above the 2014-2023 average of 1,314 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 26.7,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Jinotega, Nicaragua is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Nicaragua",
+   "region": "Madriz",
+   "lat": 13.47,
+   "lon": -86.46,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Madriz, Nicaragua averaged 1,134 mm a year in 2024-2025, 27.7% above the 2014-2023 average of 888 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 27.7,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Madriz, Nicaragua is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low to medium (10-20%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 1.783609456,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Nicaragua",
+   "region": "Masaya",
+   "lat": 11.97,
+   "lon": -86.09,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Masaya, Nicaragua averaged 1,503 mm a year in 2024-2025, 27.5% above the 2014-2023 average of 1,178 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 27.5,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Masaya, Nicaragua is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Peru",
+   "region": "Amazonas",
+   "lat": -5.08,
+   "lon": -78.0,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Amazonas, Peru averaged 2,303 mm a year in 2024-2025, 13.3% below the 2014-2023 average of 2,656 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -13.3,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Amazonas, Peru is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Peru",
+   "region": "Ancash",
+   "lat": -9.53,
+   "lon": -77.53,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Ancash, Peru averaged 783 mm a year in 2024-2025, 4.0% below the 2014-2023 average of 816 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -4.0,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Ancash, Peru is medium to high (20-40%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 2.21671865474843,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be medium to high (20-40%) by 2030 and medium to high (20-40%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 2.357621776,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Peru",
+   "region": "Cajamarca",
+   "lat": -7.16,
+   "lon": -78.51,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Cajamarca, Peru averaged 732 mm a year in 2024-2025, 3.6% below the 2014-2023 average of 759 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -3.6,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Cajamarca, Peru is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Peru",
+   "region": "Junin",
+   "lat": -11.54,
+   "lon": -74.95,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Junin, Peru averaged 1,241 mm a year in 2024-2025, 7.0% above the 2014-2023 average of 1,160 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 7.0,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Junin, Peru is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Peru",
+   "region": "Lambayeque",
+   "lat": -6.37,
+   "lon": -79.84,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Lambayeque, Peru averaged 35 mm a year in 2024-2025, 10.0% above the 2014-2023 average of 32 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 10.0,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Lambayeque, Peru is extremely high (>80%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 4.982133946053635,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be extremely high (>80%) by 2030 and extremely high (>80%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 5,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Peru",
+   "region": "Pasco",
+   "lat": -10.36,
+   "lon": -75.35,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Pasco, Peru averaged 2,560 mm a year in 2024-2025, 2.2% below the 2014-2023 average of 2,616 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -2.2,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Pasco, Peru is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Peru",
+   "region": "San Martin",
+   "lat": -6.48,
+   "lon": -76.37,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of San Martin, Peru averaged 1,036 mm a year in 2024-2025, 11.6% below the 2014-2023 average of 1,172 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -11.6,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of San Martin, Peru is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low (<10%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Rwanda",
+   "region": "Nord",
+   "lat": -1.5,
+   "lon": 29.75,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Nord, Rwanda averaged 1,256 mm a year in 2024-2025, 1.1% above the 2014-2023 average of 1,243 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 1.1,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Nord, Rwanda is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low to medium (10-20%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 1.021920422,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Rwanda",
+   "region": "Ville de Kigali",
+   "lat": -1.95,
+   "lon": 30.06,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Ville de Kigali, Rwanda averaged 992 mm a year in 2024-2025, 4.0% below the 2014-2023 average of 1,033 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": -4.0,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Ville de Kigali, Rwanda is low (<10%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 0,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be low (<10%) by 2030 and low to medium (10-20%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 1.021920422,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  },
+  {
+   "country": "Sri Lanka",
+   "region": "Central Province",
+   "lat": 7.29,
+   "lon": 80.64,
+   "facts": [
+    {
+     "text": "Rainfall near the centre of Central Province, Sri Lanka averaged 2,278 mm a year in 2024-2025, 0.4% above the 2014-2023 average of 2,269 mm.",
+     "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+     "metric": "rainfall_change_pct",
+     "value": 0.4,
+     "unit": "%",
+     "period": "2014-2025",
+     "strength": "nearest"
+    },
+    {
+     "text": "Baseline water stress in the river basin near the centre of Central Province, Sri Lanka is medium to high (20-40%).",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "baseline_water_stress",
+     "value": 2.337081292646654,
+     "unit": "score 0-5",
+     "period": "1979-2019 baseline",
+     "strength": "nearest"
+    },
+    {
+     "text": "If current trends continue (business as usual), water stress there is projected to be medium to high (20-40%) by 2030 and medium to high (20-40%) by 2050.",
+     "source": "WRI Aqueduct 4.0 water risk atlas",
+     "metric": "projected_water_stress_2050",
+     "value": 2.173773303,
+     "unit": "score 0-5",
+     "period": "2030-2050 projection",
+     "strength": "nearest"
+    }
+   ]
+  }
+ ],
+ "prices": {
+  "coffee": [
+   {
+    "text": "The world benchmark price for coffee, arabica averaged US$ 7.40 per kg in October 2026, 16.9% lower than a year earlier. This is an international market price, not a farm-gate price.",
+    "source": "World Bank Commodity Price Data (Pink Sheet): Coffee, Arabica",
+    "metric": "benchmark_price_change_pct",
+    "value": -16.9,
+    "unit": "%",
+    "period": "October 2025 to October 2026",
+    "strength": "limited"
+   },
+   {
+    "text": "Over the past 5 years the coffee, arabica benchmark averaged US$ 6.28 per kg, so the latest price is 18% above that average.",
+    "source": "World Bank Commodity Price Data (Pink Sheet): Coffee, Arabica",
+    "metric": "benchmark_price_vs_5yr_avg_pct",
+    "value": 17.8,
+    "unit": "%",
+    "period": "October 2021 to October 2026",
+    "strength": "limited"
+   }
+  ],
+  "cocoa": [
+   {
+    "text": "The world benchmark price for cocoa averaged US$ 5.75 per kg in October 2026, 3.4% lower than a year earlier. This is an international market price, not a farm-gate price.",
+    "source": "World Bank Commodity Price Data (Pink Sheet): Cocoa",
+    "metric": "benchmark_price_change_pct",
+    "value": -3.4,
+    "unit": "%",
+    "period": "October 2025 to October 2026",
+    "strength": "limited"
+   },
+   {
+    "text": "Over the past 5 years the cocoa benchmark averaged US$ 5.02 per kg, so the latest price is 14% above that average.",
+    "source": "World Bank Commodity Price Data (Pink Sheet): Cocoa",
+    "metric": "benchmark_price_vs_5yr_avg_pct",
+    "value": 14.5,
+    "unit": "%",
+    "period": "October 2021 to October 2026",
+    "strength": "limited"
+   }
+  ],
+  "bananas": [
+   {
+    "text": "The world benchmark price for banana, us averaged US$ 1.18 per kg in October 2026, 4.4% higher than a year earlier. This is an international market price, not a farm-gate price.",
+    "source": "World Bank Commodity Price Data (Pink Sheet): Banana, US",
+    "metric": "benchmark_price_change_pct",
+    "value": 4.4,
+    "unit": "%",
+    "period": "October 2025 to October 2026",
+    "strength": "limited"
+   },
+   {
+    "text": "Over the past 5 years the banana, us benchmark averaged US$ 1.32 per kg, so the latest price is 10% below that average.",
+    "source": "World Bank Commodity Price Data (Pink Sheet): Banana, US",
+    "metric": "benchmark_price_vs_5yr_avg_pct",
+    "value": -10.3,
+    "unit": "%",
+    "period": "October 2021 to October 2026",
+    "strength": "limited"
+   }
+  ]
+ }
+}

@@ -1,0 +1,6632 @@
+{
+ "fetched_at": "2026-11-04",
+ "regions": [
+  {
+   "country": "Brazil",
+   "region": "Amazonas",
+   "lat": -3.42,
+   "lon": -65.86,
+   "chirps": {
+    "2014": {
+     "total_mm": 3145.2,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 2460.0,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 2714.5,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 2756.0,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 2837.7,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 2743.6,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2651.4,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 3249.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 2718.0,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2813.9,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 2198.5,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 3038.9,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 622956,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Brazil",
+   "region": "Minas Gerais",
+   "lat": -18.51,
+   "lon": -44.56,
+   "chirps": {
+    "2014": {
+     "total_mm": 597.5,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1054.0,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1050.3,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 819.7,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1275.9,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1155.0,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1435.6,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1194.5,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1161.7,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 910.0,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1322.0,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1024.4,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 634940,
+    "baseline_label": "Low - Medium (10-20%)",
+    "baseline_score": 1.0287763193286548,
+    "bau": {
+     "2030": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.935670577
+     },
+     "2050": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.153794049
+     },
+     "2080": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.950449109
+     }
+    }
+   }
+  },
+  {
+   "country": "Brazil",
+   "region": "Piaui",
+   "lat": -7.72,
+   "lon": -42.73,
+   "chirps": {
+    "2014": {
+     "total_mm": 807.1,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 522.9,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 823.2,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 615.8,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 891.9,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 721.8,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 906.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 704.6,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 734.8,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 677.2,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 866.7,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 572.0,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 632405,
+    "baseline_label": "Arid and Low Water Use",
+    "baseline_score": 5,
+    "bau": {
+     "2030": {
+      "label": "Arid and low water use",
+      "score": 5
+     },
+     "2050": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.988131876
+     },
+     "2080": {
+      "label": "Arid and low water use",
+      "score": 5
+     }
+    }
+   }
+  },
+  {
+   "country": "Brazil",
+   "region": "Sao Paulo",
+   "lat": -22.3,
+   "lon": -48.6,
+   "chirps": {
+    "2014": {
+     "total_mm": 1235.6,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1506.7,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1498.3,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1319.0,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1195.3,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1165.5,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1007.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 892.4,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1174.4,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1094.9,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1010.8,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1003.6,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 642785,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Colombia",
+   "region": "Antioquia",
+   "lat": 6.55,
+   "lon": -75.83,
+   "chirps": {
+    "2014": {
+     "total_mm": 1475.5,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1335.6,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1570.1,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1702.4,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1734.6,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1452.3,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1522.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1610.4,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1901.6,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1782.4,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1631.0,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 2015.6,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 612045,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Colombia",
+   "region": "Caldas",
+   "lat": 5.3,
+   "lon": -75.27,
+   "chirps": {
+    "2014": {
+     "total_mm": 1730.6,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1797.9,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 2089.5,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 2607.3,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 2613.8,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 2188.3,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2200.1,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 2256.8,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 3103.5,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2616.4,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 2407.1,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 3006.1,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 612095,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Colombia",
+   "region": "Cauca",
+   "lat": 2.44,
+   "lon": -76.61,
+   "chirps": {
+    "2014": {
+     "total_mm": 2229.2,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1755.8,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1809.0,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 2298.6,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1954.6,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1924.8,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1733.8,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 2236.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 2626.3,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2464.3,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1675.2,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 2047.6,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 612049,
+    "baseline_label": "Low - Medium (10-20%)",
+    "baseline_score": 1.085506846511455,
+    "bau": {
+     "2030": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.240922452
+     },
+     "2050": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.363201626
+     },
+     "2080": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.521829632
+     }
+    }
+   }
+  },
+  {
+   "country": "Colombia",
+   "region": "Cesar",
+   "lat": 9.34,
+   "lon": -73.65,
+   "chirps": {
+    "2014": {
+     "total_mm": 1665.2,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1345.8,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1679.4,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1691.0,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1647.3,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1441.6,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1713.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1494.1,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 2293.1,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1893.3,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1760.9,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1990.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 612060,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0.106923792
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0.298037761
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0.953025056
+     }
+    }
+   }
+  },
+  {
+   "country": "Colombia",
+   "region": "Huila",
+   "lat": 2.54,
+   "lon": -75.53,
+   "chirps": {
+    "2014": {
+     "total_mm": 1554.2,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 824.9,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1363.1,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1915.3,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1421.7,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1536.4,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1542.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1754.5,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1982.7,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1780.5,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1728.1,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1798.1,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 612099,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0.111125444
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0.355976825
+     }
+    }
+   }
+  },
+  {
+   "country": "Colombia",
+   "region": "Norte de Santander",
+   "lat": 7.95,
+   "lon": -72.9,
+   "chirps": {
+    "2014": {
+     "total_mm": 1211.6,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1123.7,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1449.6,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1637.2,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1643.0,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1378.0,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1497.6,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1443.9,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1841.2,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1857.2,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1460.1,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1545.8,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 613020,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Colombia",
+   "region": "Risaralda",
+   "lat": 5.31,
+   "lon": -75.99,
+   "chirps": {
+    "2014": {
+     "total_mm": 2431.3,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 2709.0,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 2456.6,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 2891.1,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 2671.8,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 2513.9,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2631.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 2663.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 3061.7,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2871.3,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 2669.6,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 3267.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 672080,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Colombia",
+   "region": "Tolima",
+   "lat": 4.09,
+   "lon": -75.15,
+   "chirps": {
+    "2014": {
+     "total_mm": 1603.9,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1013.8,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1470.9,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1755.9,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1618.8,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1493.5,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1482.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1783.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 2279.7,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2123.6,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1538.8,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1910.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 612098,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0.053314894
+     }
+    }
+   }
+  },
+  {
+   "country": "Colombia",
+   "region": "Valle del Cauca",
+   "lat": 3.8,
+   "lon": -76.52,
+   "chirps": {
+    "2014": {
+     "total_mm": 989.4,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 852.0,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1151.8,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1046.2,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1087.1,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1031.5,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 781.7,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1241.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1086.3,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1091.2,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 955.7,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1244.1,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 672070,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Costa Rica",
+   "region": "Alajuela",
+   "lat": 10.39,
+   "lon": -84.42,
+   "chirps": {
+    "2014": {
+     "total_mm": 3244.2,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 2849.4,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 3688.2,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 3892.0,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 2634.7,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 2648.9,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 3547.4,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 3536.3,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 3760.8,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 3420.6,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 5164.9,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 4424.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753804,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Costa Rica",
+   "region": "San Jose",
+   "lat": 9.83,
+   "lon": -84.07,
+   "chirps": {
+    "2014": {
+     "total_mm": 2094.8,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1908.8,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1945.3,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 2631.0,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1684.7,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1577.6,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2135.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 2220.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 2519.6,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2071.9,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 2524.5,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 2416.7,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 771115,
+    "baseline_label": "Low - Medium (10-20%)",
+    "baseline_score": 1.0815437123813136,
+    "bau": {
+     "2030": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.344529443
+     },
+     "2050": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.541027549
+     },
+     "2080": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.139207487
+     }
+    }
+   }
+  },
+  {
+   "country": "Côte d'Ivoire",
+   "region": "Bas-Sassandra",
+   "lat": 5.47,
+   "lon": -6.62,
+   "chirps": {
+    "2014": {
+     "total_mm": 1923.1,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1373.2,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1564.6,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1752.1,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1604.2,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1501.5,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1776.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1829.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1572.1,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1745.5,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1389.1,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1588.0,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 145601,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Côte d'Ivoire",
+   "region": "Goh-Djiboua",
+   "lat": 5.88,
+   "lon": -5.57,
+   "chirps": {
+    "2014": {
+     "total_mm": 1832.2,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1299.1,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1496.7,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1665.6,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1703.1,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1680.7,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1788.0,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1890.2,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1535.7,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1760.0,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1305.1,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1763.4,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 145500,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Côte d'Ivoire",
+   "region": "Zanzan",
+   "lat": 8.6,
+   "lon": -3.2,
+   "chirps": {
+    "2014": {
+     "total_mm": 942.1,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 791.0,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 933.9,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 863.3,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1111.7,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1090.5,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 813.5,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1203.1,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1113.9,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1098.8,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 818.6,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1113.2,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 145205,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Ecuador",
+   "region": "Cotopaxi",
+   "lat": -0.84,
+   "lon": -78.66,
+   "chirps": {
+    "2014": {
+     "total_mm": 618.8,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 533.5,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 560.7,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 711.2,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 503.7,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 658.7,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 602.7,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 729.5,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 567.0,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 837.2,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 604.0,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 696.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 622986,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Ecuador",
+   "region": "El Oro",
+   "lat": -3.42,
+   "lon": -79.8,
+   "chirps": {
+    "2014": {
+     "total_mm": 1091.1,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1050.5,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 984.9,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1588.0,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 876.9,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1187.3,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 969.6,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 837.0,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 754.1,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2104.5,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1044.5,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1102.2,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 672010,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0.9525144339049554,
+    "bau": {
+     "2030": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.229563727
+     },
+     "2050": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.448635661
+     },
+     "2080": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.224327514
+     }
+    }
+   }
+  },
+  {
+   "country": "Ethiopia",
+   "region": "YeDebub Biheroch Bihereseboch na Hizboch",
+   "lat": 6.5,
+   "lon": 37.0,
+   "chirps": {
+    "2014": {
+     "total_mm": 1985.5,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1937.8,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1554.8,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1803.4,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1930.1,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 2502.3,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2216.4,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1409.1,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1361.2,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2297.4,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 2222.9,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1876.6,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 115459,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Guatemala",
+   "region": "Guatemala",
+   "lat": 14.63,
+   "lon": -90.51,
+   "chirps": {
+    "2014": {
+     "total_mm": 1386.5,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1143.0,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1033.6,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1151.0,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1077.1,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1280.8,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1412.6,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1137.0,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1571.5,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1091.6,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1275.7,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1136.0,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753718,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.096744292
+     },
+     "2050": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.16645552
+     },
+     "2080": {
+      "label": "High (40-80%)",
+      "score": 3.000852971
+     }
+    }
+   }
+  },
+  {
+   "country": "Guatemala",
+   "region": "Huehuetenango",
+   "lat": 15.32,
+   "lon": -91.47,
+   "chirps": {
+    "2014": {
+     "total_mm": 906.1,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 755.9,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 703.6,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 924.3,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 709.9,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 904.3,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1170.4,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1067.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1083.6,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 900.5,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1053.0,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 833.1,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753628,
+    "baseline_label": "Low - Medium (10-20%)",
+    "baseline_score": 1.8277138426496933,
+    "bau": {
+     "2030": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.999603453
+     },
+     "2050": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.116573355
+     },
+     "2080": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.707075921
+     }
+    }
+   }
+  },
+  {
+   "country": "Guatemala",
+   "region": "Jalapa",
+   "lat": 14.63,
+   "lon": -89.99,
+   "chirps": {
+    "2014": {
+     "total_mm": 1312.1,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1064.1,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1006.7,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1268.7,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 951.8,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1321.0,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1551.9,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1197.9,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1634.5,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1122.4,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1364.2,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1468.2,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753718,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.096744292
+     },
+     "2050": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.16645552
+     },
+     "2080": {
+      "label": "High (40-80%)",
+      "score": 3.000852971
+     }
+    }
+   }
+  },
+  {
+   "country": "Guatemala",
+   "region": "Quiche",
+   "lat": 15.03,
+   "lon": -91.15,
+   "chirps": {
+    "2014": {
+     "total_mm": 1150.6,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 906.8,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 894.5,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1062.1,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 861.0,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 857.2,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1055.8,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 953.9,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1031.9,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 924.6,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 968.7,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 949.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753690,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Guatemala",
+   "region": "Solola",
+   "lat": 14.77,
+   "lon": -91.18,
+   "chirps": {
+    "2014": {
+     "total_mm": 1825.7,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1458.8,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1465.8,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1591.7,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1445.4,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1261.8,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1456.0,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1390.0,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1455.0,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1171.5,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1245.1,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1269.6,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 771150,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0.42791882
+     }
+    }
+   }
+  },
+  {
+   "country": "Honduras",
+   "region": "Copan",
+   "lat": 14.85,
+   "lon": -88.9,
+   "chirps": {
+    "2014": {
+     "total_mm": 1840.7,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1345.4,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1316.8,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 2013.3,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1261.8,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1617.3,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2116.9,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1577.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 2211.3,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1301.4,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1491.4,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1750.2,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753720,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0.21451072
+     },
+     "2080": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.436154754
+     }
+    }
+   }
+  },
+  {
+   "country": "Honduras",
+   "region": "Intibuca",
+   "lat": 14.32,
+   "lon": -88.17,
+   "chirps": {
+    "2014": {
+     "total_mm": 1225.5,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1184.8,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1122.9,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1416.4,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1027.0,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1139.2,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1934.7,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1050.2,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1379.9,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1113.2,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1236.2,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1279.8,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 771140,
+    "baseline_label": "Low - Medium (10-20%)",
+    "baseline_score": 1.5870675902297675,
+    "bau": {
+     "2030": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.091773883
+     },
+     "2050": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.629282176
+     },
+     "2080": {
+      "label": "High (40-80%)",
+      "score": 3.311060923
+     }
+    }
+   }
+  },
+  {
+   "country": "Honduras",
+   "region": "La Paz",
+   "lat": 14.32,
+   "lon": -87.68,
+   "chirps": {
+    "2014": {
+     "total_mm": 914.8,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 946.9,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 981.3,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1115.9,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 895.1,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 932.7,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1894.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 779.9,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1033.2,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 996.2,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1013.6,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1130.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753720,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0.21451072
+     },
+     "2080": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.436154754
+     }
+    }
+   }
+  },
+  {
+   "country": "Honduras",
+   "region": "Lempira",
+   "lat": 14.59,
+   "lon": -88.57,
+   "chirps": {
+    "2014": {
+     "total_mm": 1538.5,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1297.7,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1184.1,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1749.4,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1137.9,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1465.5,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1864.3,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1365.4,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1864.2,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1136.1,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1449.5,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1525.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753720,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0.21451072
+     },
+     "2080": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.436154754
+     }
+    }
+   }
+  },
+  {
+   "country": "Honduras",
+   "region": "Ocotepeque",
+   "lat": 14.43,
+   "lon": -89.18,
+   "chirps": {
+    "2014": {
+     "total_mm": 1593.0,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1433.6,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1319.1,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1804.5,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1370.2,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1616.2,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1830.1,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1576.6,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1927.2,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1322.4,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1429.6,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1695.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 771140,
+    "baseline_label": "Low - Medium (10-20%)",
+    "baseline_score": 1.5870675902297675,
+    "bau": {
+     "2030": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.091773883
+     },
+     "2050": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.629282176
+     },
+     "2080": {
+      "label": "High (40-80%)",
+      "score": 3.311060923
+     }
+    }
+   }
+  },
+  {
+   "country": "India",
+   "region": "Assam",
+   "lat": 26.2,
+   "lon": 92.94,
+   "chirps": {
+    "2014": {
+     "total_mm": 1978.4,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1913.0,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 2097.6,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 2080.1,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1781.3,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1812.0,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1835.3,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1637.2,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1863.5,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1687.2,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1871.4,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 2251.6,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 452580,
+    "baseline_label": "Low - Medium (10-20%)",
+    "baseline_score": 1.6810240019635176,
+    "bau": {
+     "2030": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.810806359
+     },
+     "2050": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.395902807
+     },
+     "2080": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.326909044
+     }
+    }
+   }
+  },
+  {
+   "country": "India",
+   "region": "Kerala",
+   "lat": 10.85,
+   "lon": 76.27,
+   "chirps": {
+    "2014": {
+     "total_mm": 2809.8,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 2288.0,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1820.7,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 3018.4,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 3458.7,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 3006.0,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2667.9,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 3147.0,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 3388.4,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2192.4,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 3000.1,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 2416.4,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 454032,
+    "baseline_label": "High (40-80%)",
+    "baseline_score": 3.57334979305539,
+    "bau": {
+     "2030": {
+      "label": "High (40-80%)",
+      "score": 3.560343849
+     },
+     "2050": {
+      "label": "High (40-80%)",
+      "score": 3.577016574
+     },
+     "2080": {
+      "label": "High (40-80%)",
+      "score": 3.484988821
+     }
+    }
+   }
+  },
+  {
+   "country": "India",
+   "region": "Tamil Nadu",
+   "lat": 11.13,
+   "lon": 78.66,
+   "chirps": {
+    "2014": {
+     "total_mm": 1017.4,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1345.6,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 755.1,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1001.8,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1047.3,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1005.3,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 957.6,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1478.0,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1102.4,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1157.6,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1291.9,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1087.4,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 453801,
+    "baseline_label": "Medium - High (20-40%)",
+    "baseline_score": 2.387289319303638,
+    "bau": {
+     "2030": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.344344878
+     },
+     "2050": {
+      "label": "High (40-80%)",
+      "score": 3.08814436
+     },
+     "2080": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.932469707
+     }
+    }
+   }
+  },
+  {
+   "country": "Indonesia",
+   "region": "Aceh",
+   "lat": 4.7,
+   "lon": 96.75,
+   "chirps": {
+    "2014": {
+     "total_mm": 1741.0,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1404.5,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1702.8,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1711.3,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1575.8,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1295.5,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1819.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1757.5,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 2019.0,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1728.7,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1470.5,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 2070.8,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 511153,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0.3224146964623894,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0.260148568
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0.278070165
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0.222670212
+     }
+    }
+   }
+  },
+  {
+   "country": "Indonesia",
+   "region": "Bali",
+   "lat": -8.34,
+   "lon": 115.09,
+   "chirps": {
+    "2014": {
+     "total_mm": 2184.9,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 2059.9,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 3546.0,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 3004.7,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 2144.2,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1933.1,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2517.5,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 3551.1,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 3344.5,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2123.8,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 2780.1,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 3247.5,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 515020,
+    "baseline_label": "Extremely High (>80%)",
+    "baseline_score": 4.036138519540426,
+    "bau": {
+     "2030": {
+      "label": "High (40-80%)",
+      "score": 3.80894497
+     },
+     "2050": {
+      "label": "High (40-80%)",
+      "score": 3.96639891
+     },
+     "2080": {
+      "label": "Extremely high (>80%)",
+      "score": 4.253875339
+     }
+    }
+   }
+  },
+  {
+   "country": "Kenya",
+   "region": "Kericho",
+   "lat": -0.37,
+   "lon": 35.29,
+   "chirps": {
+    "2014": {
+     "total_mm": 1719.4,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1851.5,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1780.1,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1921.5,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 2260.7,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 2147.0,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2735.6,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 2050.9,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 2482.8,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2180.7,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 2148.7,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 2289.8,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 172976,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Mexico",
+   "region": "Chiapas",
+   "lat": 16.75,
+   "lon": -92.63,
+   "chirps": {
+    "2014": {
+     "total_mm": 1161.9,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 950.2,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 880.3,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1084.2,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 945.4,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1039.3,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1199.5,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1138.9,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1243.8,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 980.1,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1188.8,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1126.5,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753620,
+    "baseline_label": "Low - Medium (10-20%)",
+    "baseline_score": 1.6995383206508503,
+    "bau": {
+     "2030": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.208508327
+     },
+     "2050": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.726356151
+     },
+     "2080": {
+      "label": "High (40-80%)",
+      "score": 3.649337713
+     }
+    }
+   }
+  },
+  {
+   "country": "Mexico",
+   "region": "Guanajuato",
+   "lat": 21.02,
+   "lon": -101.26,
+   "chirps": {
+    "2014": {
+     "total_mm": 715.0,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 779.0,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 700.7,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 585.8,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 980.5,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 643.0,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 534.7,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 853.4,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 502.9,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 408.0,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 512.0,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 677.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 771470,
+    "baseline_label": "Extremely High (>80%)",
+    "baseline_score": 5,
+    "bau": {
+     "2030": {
+      "label": "Extremely high (>80%)",
+      "score": 5
+     },
+     "2050": {
+      "label": "Extremely high (>80%)",
+      "score": 5
+     },
+     "2080": {
+      "label": "Extremely high (>80%)",
+      "score": 5
+     }
+    }
+   }
+  },
+  {
+   "country": "Mexico",
+   "region": "Michoacan de Ocampo",
+   "lat": 19.57,
+   "lon": -101.71,
+   "chirps": {
+    "2014": {
+     "total_mm": 988.8,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 952.6,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 699.9,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 842.2,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1347.4,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 910.4,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 729.7,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 936.8,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 853.6,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 720.8,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 976.4,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 989.9,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 771490,
+    "baseline_label": "High (40-80%)",
+    "baseline_score": 3.923892313939719,
+    "bau": {
+     "2030": {
+      "label": "High (40-80%)",
+      "score": 3.981917068
+     },
+     "2050": {
+      "label": "Extremely high (>80%)",
+      "score": 4.269689877
+     },
+     "2080": {
+      "label": "Extremely high (>80%)",
+      "score": 5
+     }
+    }
+   }
+  },
+  {
+   "country": "Mexico",
+   "region": "Sinaloa",
+   "lat": 24.8,
+   "lon": -107.4,
+   "chirps": {
+    "2014": {
+     "total_mm": 694.3,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 901.8,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 687.6,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 477.6,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 841.6,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 738.2,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 394.3,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 580.0,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 728.2,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 522.3,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 443.3,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 572.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 771560,
+    "baseline_label": "Extremely High (>80%)",
+    "baseline_score": 4.353049930030603,
+    "bau": {
+     "2030": {
+      "label": "Extremely high (>80%)",
+      "score": 4.116258205
+     },
+     "2050": {
+      "label": "Extremely high (>80%)",
+      "score": 4.733887562
+     },
+     "2080": {
+      "label": "Extremely high (>80%)",
+      "score": 4.950932104
+     }
+    }
+   }
+  },
+  {
+   "country": "Mexico",
+   "region": "Sonora",
+   "lat": 29.3,
+   "lon": -110.33,
+   "chirps": {
+    "2014": {
+     "total_mm": 433.5,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 637.6,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 477.0,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 446.5,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 514.5,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 553.6,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 316.1,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 444.2,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 590.3,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 196.9,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 272.0,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 411.6,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 771920,
+    "baseline_label": "Extremely High (>80%)",
+    "baseline_score": 5,
+    "bau": {
+     "2030": {
+      "label": "Extremely high (>80%)",
+      "score": 5
+     },
+     "2050": {
+      "label": "Extremely high (>80%)",
+      "score": 5
+     },
+     "2080": {
+      "label": "Extremely high (>80%)",
+      "score": 5
+     }
+    }
+   }
+  },
+  {
+   "country": "Nicaragua",
+   "region": "Boaco",
+   "lat": 12.47,
+   "lon": -85.66,
+   "chirps": {
+    "2014": {
+     "total_mm": 921.0,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 922.3,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1229.1,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1684.0,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1139.9,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1101.7,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1482.3,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1103.4,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1376.0,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1175.2,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1678.0,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1331.1,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753809,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Nicaragua",
+   "region": "Jinotega",
+   "lat": 13.09,
+   "lon": -86.0,
+   "chirps": {
+    "2014": {
+     "total_mm": 1046.0,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 886.3,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1254.7,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1569.1,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1366.6,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1028.2,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1939.1,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1260.5,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1405.8,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1386.1,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 2069.0,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1260.1,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753780,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0.333418138
+     }
+    }
+   }
+  },
+  {
+   "country": "Nicaragua",
+   "region": "Madriz",
+   "lat": 13.47,
+   "lon": -86.46,
+   "chirps": {
+    "2014": {
+     "total_mm": 704.3,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 660.3,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 815.5,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 990.2,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 927.8,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 588.2,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1742.5,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 735.8,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 976.0,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 738.9,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1178.1,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1089.9,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753760,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.783609456
+     },
+     "2080": {
+      "label": "High (40-80%)",
+      "score": 3.60633695
+     }
+    }
+   }
+  },
+  {
+   "country": "Nicaragua",
+   "region": "Masaya",
+   "lat": 11.97,
+   "lon": -86.09,
+   "chirps": {
+    "2014": {
+     "total_mm": 1008.3,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 835.3,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1148.1,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1435.0,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1126.8,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1051.9,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1472.7,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1132.9,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1397.4,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1175.6,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1795.1,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1210.6,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 753809,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Peru",
+   "region": "Amazonas",
+   "lat": -5.08,
+   "lon": -78.0,
+   "chirps": {
+    "2014": {
+     "total_mm": 2494.9,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 2017.2,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 2312.0,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 3337.2,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 2656.9,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 2455.7,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2607.9,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 2506.4,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 2854.8,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 3319.6,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 2177.2,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 2428.9,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 622989,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Peru",
+   "region": "Ancash",
+   "lat": -9.53,
+   "lon": -77.53,
+   "chirps": {
+    "2014": {
+     "total_mm": 763.7,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 715.0,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 627.3,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 887.4,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1004.1,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 794.0,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 711.3,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 871.1,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 837.7,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 944.9,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 717.7,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 848.4,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 671076,
+    "baseline_label": "Medium - High (20-40%)",
+    "baseline_score": 2.21671865474843,
+    "bau": {
+     "2030": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.477074437
+     },
+     "2050": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.357621776
+     },
+     "2080": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.444014636
+     }
+    }
+   }
+  },
+  {
+   "country": "Peru",
+   "region": "Cajamarca",
+   "lat": -7.16,
+   "lon": -78.51,
+   "chirps": {
+    "2014": {
+     "total_mm": 595.6,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 678.9,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 563.4,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 867.3,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 823.8,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 750.6,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 650.3,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 727.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 779.8,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1157.0,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 577.7,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 886.8,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 622989,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Peru",
+   "region": "Junin",
+   "lat": -11.54,
+   "lon": -74.95,
+   "chirps": {
+    "2014": {
+     "total_mm": 1162.9,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1114.8,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1090.0,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1239.7,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1133.0,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1187.6,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1058.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1319.9,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1120.2,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1174.0,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1251.0,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1231.7,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 622997,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Peru",
+   "region": "Lambayeque",
+   "lat": -6.37,
+   "lon": -79.84,
+   "chirps": {
+    "2014": {
+     "total_mm": 21.1,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 16.5,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 29.3,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 37.7,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 32.5,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 33.6,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 29.0,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 29.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 39.1,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 49.3,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 33.4,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 36.5,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 671077,
+    "baseline_label": "Extremely High (>80%)",
+    "baseline_score": 4.982133946053635,
+    "bau": {
+     "2030": {
+      "label": "Extremely high (>80%)",
+      "score": 5
+     },
+     "2050": {
+      "label": "Extremely high (>80%)",
+      "score": 5
+     },
+     "2080": {
+      "label": "Extremely high (>80%)",
+      "score": 5
+     }
+    }
+   }
+  },
+  {
+   "country": "Peru",
+   "region": "Pasco",
+   "lat": -10.36,
+   "lon": -75.35,
+   "chirps": {
+    "2014": {
+     "total_mm": 2559.3,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 2095.9,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 2270.4,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 3455.4,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 3055.3,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 2735.8,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2487.3,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 2364.4,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 2655.2,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2484.0,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 2320.8,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 2798.5,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 622994,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Peru",
+   "region": "San Martin",
+   "lat": -6.48,
+   "lon": -76.37,
+   "chirps": {
+    "2014": {
+     "total_mm": 1085.1,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1072.6,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1037.7,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1465.8,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1330.5,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1160.2,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1239.9,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1021.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1321.5,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 988.4,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 878.9,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1193.6,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 622984,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2080": {
+      "label": "Low (<10%)",
+      "score": 0
+     }
+    }
+   }
+  },
+  {
+   "country": "Rwanda",
+   "region": "Nord",
+   "lat": -1.5,
+   "lon": 29.75,
+   "chirps": {
+    "2014": {
+     "total_mm": 1122.7,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 1190.3,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1320.3,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 1115.4,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1434.1,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1162.1,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1253.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1181.7,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1354.9,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 1297.0,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1247.7,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1265.3,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 172999,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.021920422
+     },
+     "2080": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.388751592
+     }
+    }
+   }
+  },
+  {
+   "country": "Rwanda",
+   "region": "Ville de Kigali",
+   "lat": -1.95,
+   "lon": 30.06,
+   "chirps": {
+    "2014": {
+     "total_mm": 838.4,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 899.5,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 992.7,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 970.2,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 1281.8,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 1020.1,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 1170.5,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 1118.4,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 1077.2,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 963.4,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 980.4,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 1002.9,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 172999,
+    "baseline_label": "Low (<10%)",
+    "baseline_score": 0,
+    "bau": {
+     "2030": {
+      "label": "Low (<10%)",
+      "score": 0
+     },
+     "2050": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.021920422
+     },
+     "2080": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.388751592
+     }
+    }
+   }
+  },
+  {
+   "country": "Sri Lanka",
+   "region": "Central Province",
+   "lat": 7.29,
+   "lon": 80.64,
+   "chirps": {
+    "2014": {
+     "total_mm": 2449.0,
+     "days": 365
+    },
+    "2015": {
+     "total_mm": 2120.3,
+     "days": 365
+    },
+    "2016": {
+     "total_mm": 1613.3,
+     "days": 366
+    },
+    "2017": {
+     "total_mm": 2353.2,
+     "days": 365
+    },
+    "2018": {
+     "total_mm": 2238.1,
+     "days": 365
+    },
+    "2019": {
+     "total_mm": 2243.6,
+     "days": 365
+    },
+    "2020": {
+     "total_mm": 2010.2,
+     "days": 366
+    },
+    "2021": {
+     "total_mm": 2567.6,
+     "days": 365
+    },
+    "2022": {
+     "total_mm": 2269.6,
+     "days": 365
+    },
+    "2023": {
+     "total_mm": 2825.1,
+     "days": 365
+    },
+    "2024": {
+     "total_mm": 1955.7,
+     "days": 366
+    },
+    "2025": {
+     "total_mm": 2600.1,
+     "days": 365
+    }
+   },
+   "aqueduct": {
+    "basin_id": 458001,
+    "baseline_label": "Medium - High (20-40%)",
+    "baseline_score": 2.337081292646654,
+    "bau": {
+     "2030": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.303026706
+     },
+     "2050": {
+      "label": "Medium-high (20-40%)",
+      "score": 2.173773303
+     },
+     "2080": {
+      "label": "Low-medium (10-20%)",
+      "score": 1.953037731
+     }
+    }
+   }
+  }
+ ],
+ "prices": {
+  "updated": "Updated on November 03, 2026",
+  "url": "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx",
+  "series": {
+   "Coffee, Arabica": {
+    "unit": "$/kg",
+    "monthly": {
+     "1960M01": 0.94,
+     "1960M02": 0.95,
+     "1960M03": 0.93,
+     "1960M04": 0.93,
+     "1960M05": 0.92,
+     "1960M06": 0.91,
+     "1960M07": 0.92,
+     "1960M08": 0.93,
+     "1960M09": 0.92,
+     "1960M10": 0.92,
+     "1960M11": 0.91,
+     "1960M12": 0.9,
+     "1961M01": 0.91,
+     "1961M02": 0.92,
+     "1961M03": 0.91,
+     "1961M04": 0.9,
+     "1961M05": 0.89,
+     "1961M06": 0.89,
+     "1961M07": 0.89,
+     "1961M08": 0.89,
+     "1961M09": 0.89,
+     "1961M10": 0.89,
+     "1961M11": 0.88,
+     "1961M12": 0.88,
+     "1962M01": 0.88,
+     "1962M02": 0.88,
+     "1962M03": 0.86,
+     "1962M04": 0.85,
+     "1962M05": 0.83,
+     "1962M06": 0.8,
+     "1962M07": 0.81,
+     "1962M08": 0.82,
+     "1962M09": 0.83,
+     "1962M10": 0.81,
+     "1962M11": 0.81,
+     "1962M12": 0.82,
+     "1963M01": 0.83,
+     "1963M02": 0.8,
+     "1963M03": 0.81,
+     "1963M04": 0.81,
+     "1963M05": 0.8,
+     "1963M06": 0.8,
+     "1963M07": 0.81,
+     "1963M08": 0.8,
+     "1963M09": 0.8,
+     "1963M10": 0.8,
+     "1963M11": 0.81,
+     "1963M12": 0.8,
+     "1964M01": 0.93,
+     "1964M02": 0.94,
+     "1964M03": 1.04,
+     "1964M04": 1.0,
+     "1964M05": 1.02,
+     "1964M06": 1.01,
+     "1964M07": 1.02,
+     "1964M08": 1.05,
+     "1964M09": 1.04,
+     "1964M10": 1.04,
+     "1964M11": 1.03,
+     "1964M12": 1.01,
+     "1965M01": 1.01,
+     "1965M02": 1.04,
+     "1965M03": 0.99,
+     "1965M04": 0.97,
+     "1965M05": 0.96,
+     "1965M06": 0.98,
+     "1965M07": 0.98,
+     "1965M08": 1.0,
+     "1965M09": 1.0,
+     "1965M10": 1.01,
+     "1965M11": 1.03,
+     "1965M12": 1.03,
+     "1966M01": 1.01,
+     "1966M02": 0.97,
+     "1966M03": 0.95,
+     "1966M04": 0.95,
+     "1966M05": 0.95,
+     "1966M06": 0.92,
+     "1966M07": 0.92,
+     "1966M08": 0.92,
+     "1966M09": 0.9,
+     "1966M10": 0.89,
+     "1966M11": 0.89,
+     "1966M12": 0.87,
+     "1967M01": 0.85,
+     "1967M02": 0.84,
+     "1967M03": 0.82,
+     "1967M04": 0.85,
+     "1967M05": 0.89,
+     "1967M06": 0.91,
+     "1967M07": 0.9,
+     "1967M08": 0.88,
+     "1967M09": 0.86,
+     "1967M10": 0.85,
+     "1967M11": 0.87,
+     "1967M12": 0.85,
+     "1968M01": 0.87,
+     "1968M02": 0.87,
+     "1968M03": 0.88,
+     "1968M04": 0.89,
+     "1968M05": 0.88,
+     "1968M06": 0.89,
+     "1968M07": 0.88,
+     "1968M08": 0.87,
+     "1968M09": 0.85,
+     "1968M10": 0.85,
+     "1968M11": 0.85,
+     "1968M12": 0.83,
+     "1969M01": 0.83,
+     "1969M02": 0.84,
+     "1969M03": 0.83,
+     "1969M04": 0.81,
+     "1969M05": 0.81,
+     "1969M06": 0.8,
+     "1969M07": 0.78,
+     "1969M08": 0.81,
+     "1969M09": 0.9,
+     "1969M10": 1.04,
+     "1969M11": 1.02,
+     "1969M12": 1.05,
+     "1970M01": 1.14,
+     "1970M02": 1.15,
+     "1970M03": 1.17,
+     "1970M04": 1.2,
+     "1970M05": 1.22,
+     "1970M06": 1.21,
+     "1970M07": 1.21,
+     "1970M08": 1.18,
+     "1970M09": 1.16,
+     "1970M10": 1.12,
+     "1970M11": 1.03,
+     "1970M12": 0.98,
+     "1971M01": 1.0,
+     "1971M02": 0.98,
+     "1971M03": 1.01,
+     "1971M04": 0.99,
+     "1971M05": 1.02,
+     "1971M06": 1.0,
+     "1971M07": 0.99,
+     "1971M08": 1.01,
+     "1971M09": 0.96,
+     "1971M10": 0.94,
+     "1971M11": 0.97,
+     "1971M12": 1.02,
+     "1972M01": 0.99,
+     "1972M02": 1.0,
+     "1972M03": 1.02,
+     "1972M04": 1.01,
+     "1972M05": 1.04,
+     "1972M06": 1.07,
+     "1972M07": 1.24,
+     "1972M08": 1.2,
+     "1972M09": 1.17,
+     "1972M10": 1.18,
+     "1972M11": 1.19,
+     "1972M12": 1.22,
+     "1973M01": 1.28,
+     "1973M02": 1.45,
+     "1973M03": 1.42,
+     "1973M04": 1.29,
+     "1973M05": 1.42,
+     "1973M06": 1.41,
+     "1973M07": 1.36,
+     "1973M08": 1.33,
+     "1973M09": 1.33,
+     "1973M10": 1.38,
+     "1973M11": 1.39,
+     "1973M12": 1.42,
+     "1974M01": 1.53,
+     "1974M02": 1.65,
+     "1974M03": 1.58,
+     "1974M04": 1.55,
+     "1974M05": 1.57,
+     "1974M06": 1.59,
+     "1974M07": 1.52,
+     "1974M08": 1.38,
+     "1974M09": 1.2,
+     "1974M10": 1.25,
+     "1974M11": 1.31,
+     "1974M12": 1.3,
+     "1975M01": 1.23,
+     "1975M02": 1.18,
+     "1975M03": 1.1,
+     "1975M04": 1.05,
+     "1975M05": 1.12,
+     "1975M06": 1.23,
+     "1975M07": 1.45,
+     "1975M08": 1.84,
+     "1975M09": 1.78,
+     "1975M10": 1.77,
+     "1975M11": 1.71,
+     "1975M12": 1.84,
+     "1976M01": 2.05,
+     "1976M02": 2.19,
+     "1976M03": 2.2,
+     "1976M04": 2.7,
+     "1976M05": 2.99,
+     "1976M06": 3.3,
+     "1976M07": 3.03,
+     "1976M08": 3.38,
+     "1976M09": 3.51,
+     "1976M10": 3.82,
+     "1976M11": 4.03,
+     "1976M12": 4.57,
+     "1977M01": 4.83,
+     "1977M02": 5.41,
+     "1977M03": 6.71,
+     "1977M04": 7.0,
+     "1977M05": 6.29,
+     "1977M06": 5.78,
+     "1977M07": 4.85,
+     "1977M08": 4.4,
+     "1977M09": 4.18,
+     "1977M10": 3.77,
+     "1977M11": 4.35,
+     "1977M12": 4.47,
+     "1978M01": 4.55,
+     "1978M02": 4.36,
+     "1978M03": 3.86,
+     "1978M04": 3.94,
+     "1978M05": 3.74,
+     "1978M06": 3.71,
+     "1978M07": 2.95,
+     "1978M08": 3.05,
+     "1978M09": 3.42,
+     "1978M10": 3.4,
+     "1978M11": 3.22,
+     "1978M12": 2.89,
+     "1979M01": 2.83,
+     "1979M02": 2.71,
+     "1979M03": 2.87,
+     "1979M04": 3.06,
+     "1979M05": 3.3,
+     "1979M06": 4.26,
+     "1979M07": 4.49,
+     "1979M08": 4.35,
+     "1979M09": 4.57,
+     "1979M10": 4.62,
+     "1979M11": 4.56,
+     "1979M12": 4.28,
+     "1980M01": 3.81,
+     "1980M02": 3.71,
+     "1980M03": 4.12,
+     "1980M04": 4.05,
+     "1980M05": 4.23,
+     "1980M06": 4.05,
+     "1980M07": 3.52,
+     "1980M08": 3.1,
+     "1980M09": 2.86,
+     "1980M10": 2.84,
+     "1980M11": 2.6,
+     "1980M12": 2.72,
+     "1981M01": 2.89,
+     "1981M02": 2.85,
+     "1981M03": 2.86,
+     "1981M04": 2.89,
+     "1981M05": 2.83,
+     "1981M06": 2.51,
+     "1981M07": 2.67,
+     "1981M08": 2.78,
+     "1981M09": 2.8,
+     "1981M10": 3.02,
+     "1981M11": 3.18,
+     "1981M12": 3.13,
+     "1982M01": 3.18,
+     "1982M02": 3.4,
+     "1982M03": 3.22,
+     "1982M04": 3.12,
+     "1982M05": 3.03,
+     "1982M06": 3.1,
+     "1982M07": 2.94,
+     "1982M08": 2.93,
+     "1982M09": 3.0,
+     "1982M10": 3.1,
+     "1982M11": 3.05,
+     "1982M12": 2.97,
+     "1983M01": 2.87,
+     "1983M02": 2.8,
+     "1983M03": 2.76,
+     "1983M04": 2.75,
+     "1983M05": 2.83,
+     "1983M06": 2.81,
+     "1983M07": 2.83,
+     "1983M08": 2.86,
+     "1983M09": 2.92,
+     "1983M10": 3.1,
+     "1983M11": 3.19,
+     "1983M12": 3.23,
+     "1984M01": 3.17,
+     "1984M02": 3.22,
+     "1984M03": 3.27,
+     "1984M04": 3.31,
+     "1984M05": 3.31,
+     "1984M06": 3.25,
+     "1984M07": 3.18,
+     "1984M08": 3.21,
+     "1984M09": 3.14,
+     "1984M10": 3.02,
+     "1984M11": 3.09,
+     "1984M12": 3.1,
+     "1985M01": 3.21,
+     "1985M02": 3.18,
+     "1985M03": 3.26,
+     "1985M04": 3.12,
+     "1985M05": 3.15,
+     "1985M06": 3.13,
+     "1985M07": 2.98,
+     "1985M08": 2.94,
+     "1985M09": 2.94,
+     "1985M10": 3.1,
+     "1985M11": 3.43,
+     "1985M12": 4.34,
+     "1986M01": 5.24,
+     "1986M02": 5.03,
+     "1986M03": 5.28,
+     "1986M04": 4.98,
+     "1986M05": 4.66,
+     "1986M06": 3.9,
+     "1986M07": 3.8,
+     "1986M08": 3.83,
+     "1986M09": 4.4,
+     "1986M10": 3.92,
+     "1986M11": 3.45,
+     "1986M12": 3.0,
+     "1987M01": 2.72,
+     "1987M02": 2.66,
+     "1987M03": 2.29,
+     "1987M04": 2.37,
+     "1987M05": 2.59,
+     "1987M06": 2.32,
+     "1987M07": 2.2,
+     "1987M08": 2.25,
+     "1987M09": 2.44,
+     "1987M10": 2.63,
+     "1987M11": 2.79,
+     "1987M12": 2.8,
+     "1988M01": 2.82,
+     "1988M02": 3.05,
+     "1988M03": 3.01,
+     "1988M04": 3.01,
+     "1988M05": 3.06,
+     "1988M06": 3.17,
+     "1988M07": 3.13,
+     "1988M08": 2.92,
+     "1988M09": 3.04,
+     "1988M10": 2.95,
+     "1988M11": 2.98,
+     "1988M12": 3.25,
+     "1989M01": 3.36,
+     "1989M02": 3.09,
+     "1989M03": 3.1,
+     "1989M04": 3.17,
+     "1989M05": 3.1,
+     "1989M06": 2.76,
+     "1989M07": 1.94,
+     "1989M08": 1.73,
+     "1989M09": 1.73,
+     "1989M10": 1.51,
+     "1989M11": 1.56,
+     "1989M12": 1.6,
+     "1990M01": 1.68,
+     "1990M02": 1.85,
+     "1990M03": 2.09,
+     "1990M04": 2.09,
+     "1990M05": 2.05,
+     "1990M06": 1.97,
+     "1990M07": 1.91,
+     "1990M08": 2.08,
+     "1990M09": 2.1,
+     "1990M10": 2.02,
+     "1990M11": 1.87,
+     "1990M12": 1.97,
+     "1991M01": 1.89,
+     "1991M02": 1.97,
+     "1991M03": 2.06,
+     "1991M04": 2.03,
+     "1991M05": 1.94,
+     "1991M06": 1.89,
+     "1991M07": 1.84,
+     "1991M08": 1.8,
+     "1991M09": 1.92,
+     "1991M10": 1.76,
+     "1991M11": 1.72,
+     "1991M12": 1.66,
+     "1992M01": 1.62,
+     "1992M02": 1.51,
+     "1992M03": 1.55,
+     "1992M04": 1.45,
+     "1992M05": 1.34,
+     "1992M06": 1.3,
+     "1992M07": 1.28,
+     "1992M08": 1.17,
+     "1992M09": 1.17,
+     "1992M10": 1.36,
+     "1992M11": 1.48,
+     "1992M12": 1.7,
+     "1993M01": 1.53,
+     "1993M02": 1.49,
+     "1993M03": 1.4,
+     "1993M04": 1.28,
+     "1993M05": 1.37,
+     "1993M06": 1.38,
+     "1993M07": 1.58,
+     "1993M08": 1.7,
+     "1993M09": 1.78,
+     "1993M10": 1.69,
+     "1993M11": 1.73,
+     "1993M12": 1.79,
+     "1994M01": 1.74,
+     "1994M02": 1.85,
+     "1994M03": 1.92,
+     "1994M04": 2.0,
+     "1994M05": 2.69,
+     "1994M06": 3.16,
+     "1994M07": 4.83,
+     "1994M08": 4.42,
+     "1994M09": 4.89,
+     "1994M10": 4.45,
+     "1994M11": 4.03,
+     "1994M12": 3.72,
+     "1995M01": 3.81,
+     "1995M02": 3.74,
+     "1995M03": 3.96,
+     "1995M04": 3.84,
+     "1995M05": 3.77,
+     "1995M06": 3.41,
+     "1995M07": 3.21,
+     "1995M08": 3.38,
+     "1995M09": 2.96,
+     "1995M10": 2.81,
+     "1995M11": 2.76,
+     "1995M12": 2.34,
+     "1996M01": 2.44,
+     "1996M02": 2.74,
+     "1996M03": 2.66,
+     "1996M04": 2.72,
+     "1996M05": 2.85,
+     "1996M06": 2.77,
+     "1996M07": 2.7,
+     "1996M08": 2.78,
+     "1996M09": 2.62,
+     "1996M10": 2.74,
+     "1996M11": 2.74,
+     "1996M12": 2.58,
+     "1997M01": 2.93,
+     "1997M02": 3.71,
+     "1997M03": 4.29,
+     "1997M04": 4.56,
+     "1997M05": 5.89,
+     "1997M06": 4.89,
+     "1997M07": 4.2,
+     "1997M08": 4.21,
+     "1997M09": 4.19,
+     "1997M10": 3.7,
+     "1997M11": 3.53,
+     "1997M12": 3.91,
+     "1998M01": 3.92,
+     "1998M02": 3.93,
+     "1998M03": 3.48,
+     "1998M04": 3.31,
+     "1998M05": 3.04,
+     "1998M06": 2.75,
+     "1998M07": 2.59,
+     "1998M08": 2.72,
+     "1998M09": 2.47,
+     "1998M10": 2.42,
+     "1998M11": 2.57,
+     "1998M12": 2.59,
+     "1999M01": 2.49,
+     "1999M02": 2.33,
+     "1999M03": 2.32,
+     "1999M04": 2.25,
+     "1999M05": 2.45,
+     "1999M06": 2.36,
+     "1999M07": 2.09,
+     "1999M08": 2.01,
+     "1999M09": 1.86,
+     "1999M10": 2.08,
+     "1999M11": 2.5,
+     "1999M12": 2.74,
+     "2000M01": 2.45,
+     "2000M02": 2.28,
+     "2000M03": 2.22,
+     "2000M04": 2.09,
+     "2000M05": 2.08,
+     "2000M06": 1.91,
+     "2000M07": 1.93,
+     "2000M08": 1.7,
+     "2000M09": 1.67,
+     "2000M10": 1.69,
+     "2000M11": 1.58,
+     "2000M12": 1.46,
+     "2001M01": 1.45,
+     "2001M02": 1.48,
+     "2001M03": 1.47,
+     "2001M04": 1.46,
+     "2001M05": 1.53,
+     "2001M06": 1.41,
+     "2001M07": 1.29,
+     "2001M08": 1.32,
+     "2001M09": 1.28,
+     "2001M10": 1.24,
+     "2001M11": 1.3,
+     "2001M12": 1.25,
+     "2002M01": 1.28,
+     "2002M02": 1.3,
+     "2002M03": 1.42,
+     "2002M04": 1.44,
+     "2002M05": 1.35,
+     "2002M06": 1.29,
+     "2002M07": 1.25,
+     "2002M08": 1.2,
+     "2002M09": 1.34,
+     "2002M10": 1.45,
+     "2002M11": 1.54,
+     "2002M12": 1.41,
+     "2003M01": 1.45,
+     "2003M02": 1.46,
+     "2003M03": 1.36,
+     "2003M04": 1.43,
+     "2003M05": 1.46,
+     "2003M06": 1.35,
+     "2003M07": 1.39,
+     "2003M08": 1.41,
+     "2003M09": 1.46,
+     "2003M10": 1.42,
+     "2003M11": 1.37,
+     "2003M12": 1.43,
+     "2004M01": 1.6,
+     "2004M02": 1.68,
+     "2004M03": 1.72,
+     "2004M04": 1.66,
+     "2004M05": 1.7,
+     "2004M06": 1.81,
+     "2004M07": 1.65,
+     "2004M08": 1.62,
+     "2004M09": 1.77,
+     "2004M10": 1.78,
+     "2004M11": 1.99,
+     "2004M12": 2.3,
+     "2005M01": 2.36,
+     "2005M02": 2.66,
+     "2005M03": 2.98,
+     "2005M04": 2.86,
+     "2005M05": 2.83,
+     "2005M06": 2.67,
+     "2005M07": 2.42,
+     "2005M08": 2.39,
+     "2005M09": 2.19,
+     "2005M10": 2.32,
+     "2005M11": 2.38,
+     "2005M12": 2.33,
+     "2006M01": 2.74,
+     "2006M02": 2.63,
+     "2006M03": 2.51,
+     "2006M04": 2.54,
+     "2006M05": 2.41,
+     "2006M06": 2.27,
+     "2006M07": 2.31,
+     "2006M08": 2.46,
+     "2006M09": 2.42,
+     "2006M10": 2.44,
+     "2006M11": 2.7,
+     "2006M12": 2.83,
+     "2007M01": 2.75,
+     "2007M02": 2.69,
+     "2007M03": 2.58,
+     "2007M04": 2.53,
+     "2007M05": 2.5,
+     "2007M06": 2.63,
+     "2007M07": 2.59,
+     "2007M08": 2.72,
+     "2007M09": 2.82,
+     "2007M10": 2.96,
+     "2007M11": 2.89,
+     "2007M12": 3.03,
+     "2008M01": 3.08,
+     "2008M02": 3.47,
+     "2008M03": 3.3,
+     "2008M04": 3.1,
+     "2008M05": 3.13,
+     "2008M06": 3.22,
+     "2008M07": 3.25,
+     "2008M08": 3.23,
+     "2008M09": 3.16,
+     "2008M10": 2.72,
+     "2008M11": 2.69,
+     "2008M12": 2.62,
+     "2009M01": 2.83,
+     "2009M02": 2.85,
+     "2009M03": 2.83,
+     "2009M04": 2.97,
+     "2009M05": 3.33,
+     "2009M06": 3.3,
+     "2009M07": 3.11,
+     "2009M08": 3.3,
+     "2009M09": 3.27,
+     "2009M10": 3.41,
+     "2009M11": 3.36,
+     "2009M12": 3.49,
+     "2010M01": 3.5,
+     "2010M02": 3.48,
+     "2010M03": 3.63,
+     "2010M04": 3.73,
+     "2010M05": 3.82,
+     "2010M06": 4.21,
+     "2010M07": 4.48,
+     "2010M08": 4.66,
+     "2010M09": 4.91,
+     "2010M10": 4.8,
+     "2010M11": 5.15,
+     "2010M12": 5.47,
+     "2011M01": 5.82,
+     "2011M02": 6.35,
+     "2011M03": 6.44,
+     "2011M04": 6.62,
+     "2011M05": 6.42,
+     "2011M06": 6.06,
+     "2011M07": 5.91,
+     "2011M08": 5.96,
+     "2011M09": 6.06,
+     "2011M10": 5.46,
+     "2011M11": 5.4,
+     "2011M12": 5.22,
+     "2012M01": 5.23,
+     "2012M02": 4.94,
+     "2012M03": 4.44,
+     "2012M04": 4.22,
+     "2012M05": 4.07,
+     "2012M06": 3.72,
+     "2012M07": 4.2,
+     "2012M08": 3.85,
+     "2012M09": 3.95,
+     "2012M10": 3.82,
+     "2012M11": 3.53,
+     "2012M12": 3.37,
+     "2013M01": 3.47,
+     "2013M02": 3.3,
+     "2013M03": 3.3,
+     "2013M04": 3.3,
+     "2013M05": 3.24,
+     "2013M06": 3.05,
+     "2013M07": 3.05,
+     "2013M08": 2.98,
+     "2013M09": 2.92,
+     "2013M10": 2.84,
+     "2013M11": 2.69,
+     "2013M12": 2.78,
+     "2014M01": 2.93,
+     "2014M02": 3.83,
+     "2014M03": 4.72,
+     "2014M04": 4.93,
+     "2014M05": 4.72,
+     "2014M06": 4.36,
+     "2014M07": 4.34,
+     "2014M08": 4.7,
+     "2014M09": 4.64,
+     "2014M10": 4.97,
+     "2014M11": 4.62,
+     "2014M12": 4.34,
+     "2015M01": 4.19,
+     "2015M02": 3.94,
+     "2015M03": 3.54,
+     "2015M04": 3.62,
+     "2015M05": 3.49,
+     "2015M06": 3.52,
+     "2015M07": 3.41,
+     "2015M08": 3.46,
+     "2015M09": 3.22,
+     "2015M10": 3.38,
+     "2015M11": 3.26,
+     "2015M12": 3.28,
+     "2016M01": 3.2,
+     "2016M02": 3.26,
+     "2016M03": 3.47,
+     "2016M04": 3.4,
+     "2016M05": 3.42,
+     "2016M06": 3.65,
+     "2016M07": 3.79,
+     "2016M08": 3.69,
+     "2016M09": 3.89,
+     "2016M10": 3.95,
+     "2016M11": 4.06,
+     "2016M12": 3.57,
+     "2017M01": 3.72,
+     "2017M02": 3.67,
+     "2017M03": 3.53,
+     "2017M04": 3.43,
+     "2017M05": 3.31,
+     "2017M06": 3.16,
+     "2017M07": 3.3,
+     "2017M08": 3.3,
+     "2017M09": 3.23,
+     "2017M10": 3.1,
+     "2017M11": 3.11,
+     "2017M12": 3.03,
+     "2018M01": 3.06,
+     "2018M02": 3.0,
+     "2018M03": 2.98,
+     "2018M04": 2.96,
+     "2018M05": 2.99,
+     "2018M06": 2.95,
+     "2018M07": 2.88,
+     "2018M08": 2.76,
+     "2018M09": 2.67,
+     "2018M10": 3.03,
+     "2018M11": 3.02,
+     "2018M12": 2.8,
+     "2019M01": 2.83,
+     "2019M02": 2.83,
+     "2019M03": 2.73,
+     "2019M04": 2.67,
+     "2019M05": 2.66,
+     "2019M06": 2.86,
+     "2019M07": 2.99,
+     "2019M08": 2.78,
+     "2019M09": 2.84,
+     "2019M10": 2.8,
+     "2019M11": 3.11,
+     "2019M12": 3.46,
+     "2020M01": 3.13,
+     "2020M02": 2.99,
+     "2020M03": 3.27,
+     "2020M04": 3.41,
+     "2020M05": 3.3,
+     "2020M06": 3.12,
+     "2020M07": 3.24,
+     "2020M08": 3.6,
+     "2020M09": 3.67,
+     "2020M10": 3.35,
+     "2020M11": 3.32,
+     "2020M12": 3.48,
+     "2021M01": 3.54,
+     "2021M02": 3.67,
+     "2021M03": 3.68,
+     "2021M04": 3.72,
+     "2021M05": 4.11,
+     "2021M06": 4.24,
+     "2021M07": 4.5,
+     "2021M08": 4.77,
+     "2021M09": 4.97,
+     "2021M10": 5.31,
+     "2021M11": 5.71,
+     "2021M12": 5.91,
+     "2022M01": 5.98,
+     "2022M02": 6.17,
+     "2022M03": 5.7,
+     "2022M04": 5.85,
+     "2022M05": 5.74,
+     "2022M06": 6.03,
+     "2022M07": 5.64,
+     "2022M08": 5.92,
+     "2022M09": 5.9,
+     "2022M10": 5.29,
+     "2022M11": 4.72,
+     "2022M12": 4.63,
+     "2023M01": 4.56,
+     "2023M02": 5.06,
+     "2023M03": 4.9,
+     "2023M04": 5.06,
+     "2023M05": 4.85,
+     "2023M06": 4.57,
+     "2023M07": 4.27,
+     "2023M08": 4.12,
+     "2023M09": 4.05,
+     "2023M10": 4.05,
+     "2023M11": 4.35,
+     "2023M12": 4.65,
+     "2024M01": 4.47,
+     "2024M02": 4.6,
+     "2024M03": 4.61,
+     "2024M04": 5.27,
+     "2024M05": 5.08,
+     "2024M06": 5.48,
+     "2024M07": 5.67,
+     "2024M08": 5.76,
+     "2024M09": 6.12,
+     "2024M10": 6.1,
+     "2024M11": 6.72,
+     "2024M12": 7.57,
+     "2025M01": 7.81,
+     "2025M02": 9.05,
+     "2025M03": 8.92,
+     "2025M04": 8.64,
+     "2025M05": 8.77,
+     "2025M06": 8.01,
+     "2025M07": 7.18,
+     "2025M08": 8.08,
+     "2025M09": 8.83,
+     "2025M10": 8.9,
+     "2025M11": 9.05,
+     "2025M12": 8.4,
+     "2026M01": 8.02,
+     "2026M02": 7.08,
+     "2026M03": 7.37,
+     "2026M04": 7.3,
+     "2026M05": 6.95,
+     "2026M06": 6.79,
+     "2026M07": 7.91,
+     "2026M08": 7.97,
+     "2026M09": 7.26,
+     "2026M10": 7.4
+    }
+   },
+   "Cocoa": {
+    "unit": "$/kg",
+    "monthly": {
+     "1960M01": 0.63,
+     "1960M02": 0.61,
+     "1960M03": 0.58,
+     "1960M04": 0.6,
+     "1960M05": 0.6,
+     "1960M06": 0.59,
+     "1960M07": 0.6,
+     "1960M08": 0.59,
+     "1960M09": 0.58,
+     "1960M10": 0.59,
+     "1960M11": 0.57,
+     "1960M12": 0.52,
+     "1961M01": 0.49,
+     "1961M02": 0.49,
+     "1961M03": 0.46,
+     "1961M04": 0.44,
+     "1961M05": 0.48,
+     "1961M06": 0.49,
+     "1961M07": 0.48,
+     "1961M08": 0.48,
+     "1961M09": 0.47,
+     "1961M10": 0.46,
+     "1961M11": 0.48,
+     "1961M12": 0.54,
+     "1962M01": 0.46,
+     "1962M02": 0.49,
+     "1962M03": 0.44,
+     "1962M04": 0.46,
+     "1962M05": 0.47,
+     "1962M06": 0.47,
+     "1962M07": 0.46,
+     "1962M08": 0.46,
+     "1962M09": 0.45,
+     "1962M10": 0.44,
+     "1962M11": 0.44,
+     "1962M12": 0.45,
+     "1963M01": 0.5,
+     "1963M02": 0.54,
+     "1963M03": 0.53,
+     "1963M04": 0.56,
+     "1963M05": 0.61,
+     "1963M06": 0.56,
+     "1963M07": 0.52,
+     "1963M08": 0.52,
+     "1963M09": 0.55,
+     "1963M10": 0.58,
+     "1963M11": 0.57,
+     "1963M12": 0.57,
+     "1964M01": 0.55,
+     "1964M02": 0.51,
+     "1964M03": 0.51,
+     "1964M04": 0.48,
+     "1964M05": 0.48,
+     "1964M06": 0.5,
+     "1964M07": 0.51,
+     "1964M08": 0.5,
+     "1964M09": 0.51,
+     "1964M10": 0.51,
+     "1964M11": 0.52,
+     "1964M12": 0.5,
+     "1965M01": 0.47,
+     "1965M02": 0.42,
+     "1965M03": 0.35,
+     "1965M04": 0.35,
+     "1965M05": 0.33,
+     "1965M06": 0.29,
+     "1965M07": 0.26,
+     "1965M08": 0.33,
+     "1965M09": 0.36,
+     "1965M10": 0.37,
+     "1965M11": 0.4,
+     "1965M12": 0.46,
+     "1966M01": 0.47,
+     "1966M02": 0.47,
+     "1966M03": 0.49,
+     "1966M04": 0.53,
+     "1966M05": 0.51,
+     "1966M06": 0.53,
+     "1966M07": 0.58,
+     "1966M08": 0.57,
+     "1966M09": 0.5,
+     "1966M10": 0.51,
+     "1966M11": 0.5,
+     "1966M12": 0.55,
+     "1967M01": 0.57,
+     "1967M02": 0.61,
+     "1967M03": 0.6,
+     "1967M04": 0.58,
+     "1967M05": 0.57,
+     "1967M06": 0.58,
+     "1967M07": 0.57,
+     "1967M08": 0.59,
+     "1967M09": 0.62,
+     "1967M10": 0.61,
+     "1967M11": 0.64,
+     "1967M12": 0.65,
+     "1968M01": 0.65,
+     "1968M02": 0.63,
+     "1968M03": 0.62,
+     "1968M04": 0.63,
+     "1968M05": 0.62,
+     "1968M06": 0.61,
+     "1968M07": 0.63,
+     "1968M08": 0.65,
+     "1968M09": 0.77,
+     "1968M10": 0.83,
+     "1968M11": 0.97,
+     "1968M12": 1.02,
+     "1969M01": 0.94,
+     "1969M02": 0.91,
+     "1969M03": 0.9,
+     "1969M04": 0.88,
+     "1969M05": 0.81,
+     "1969M06": 0.89,
+     "1969M07": 0.93,
+     "1969M08": 0.91,
+     "1969M09": 0.9,
+     "1969M10": 0.92,
+     "1969M11": 0.93,
+     "1969M12": 0.85,
+     "1970M01": 0.68,
+     "1970M02": 0.68,
+     "1970M03": 0.68,
+     "1970M04": 0.68,
+     "1970M05": 0.68,
+     "1970M06": 0.68,
+     "1970M07": 0.68,
+     "1970M08": 0.68,
+     "1970M09": 0.68,
+     "1970M10": 0.68,
+     "1970M11": 0.68,
+     "1970M12": 0.68,
+     "1971M01": 0.54,
+     "1971M02": 0.54,
+     "1971M03": 0.54,
+     "1971M04": 0.54,
+     "1971M05": 0.54,
+     "1971M06": 0.54,
+     "1971M07": 0.54,
+     "1971M08": 0.54,
+     "1971M09": 0.54,
+     "1971M10": 0.54,
+     "1971M11": 0.54,
+     "1971M12": 0.54,
+     "1972M01": 0.64,
+     "1972M02": 0.64,
+     "1972M03": 0.64,
+     "1972M04": 0.64,
+     "1972M05": 0.64,
+     "1972M06": 0.64,
+     "1972M07": 0.64,
+     "1972M08": 0.64,
+     "1972M09": 0.64,
+     "1972M10": 0.64,
+     "1972M11": 0.64,
+     "1972M12": 0.64,
+     "1973M01": 1.13,
+     "1973M02": 1.13,
+     "1973M03": 1.13,
+     "1973M04": 1.13,
+     "1973M05": 1.13,
+     "1973M06": 1.13,
+     "1973M07": 1.13,
+     "1973M08": 1.13,
+     "1973M09": 1.13,
+     "1973M10": 1.13,
+     "1973M11": 1.13,
+     "1973M12": 1.13,
+     "1974M01": 1.56,
+     "1974M02": 1.56,
+     "1974M03": 1.56,
+     "1974M04": 1.56,
+     "1974M05": 1.56,
+     "1974M06": 1.56,
+     "1974M07": 1.56,
+     "1974M08": 1.56,
+     "1974M09": 1.56,
+     "1974M10": 1.56,
+     "1974M11": 1.56,
+     "1974M12": 1.56,
+     "1975M01": 1.25,
+     "1975M02": 1.25,
+     "1975M03": 1.25,
+     "1975M04": 1.25,
+     "1975M05": 1.25,
+     "1975M06": 1.25,
+     "1975M07": 1.25,
+     "1975M08": 1.25,
+     "1975M09": 1.25,
+     "1975M10": 1.25,
+     "1975M11": 1.25,
+     "1975M12": 1.25,
+     "1976M01": 1.4,
+     "1976M02": 1.43,
+     "1976M03": 1.42,
+     "1976M04": 1.64,
+     "1976M05": 1.77,
+     "1976M06": 1.92,
+     "1976M07": 1.96,
+     "1976M08": 2.12,
+     "1976M09": 2.39,
+     "1976M10": 2.59,
+     "1976M11": 2.93,
+     "1976M12": 2.98,
+     "1977M01": 3.45,
+     "1977M02": 3.82,
+     "1977M03": 4.03,
+     "1977M04": 3.59,
+     "1977M05": 3.78,
+     "1977M06": 4.25,
+     "1977M07": 4.36,
+     "1977M08": 3.97,
+     "1977M09": 3.85,
+     "1977M10": 3.69,
+     "1977M11": 3.48,
+     "1977M12": 3.19,
+     "1978M01": 2.98,
+     "1978M02": 2.83,
+     "1978M03": 3.38,
+     "1978M04": 3.44,
+     "1978M05": 3.14,
+     "1978M06": 2.99,
+     "1978M07": 3.16,
+     "1978M08": 3.36,
+     "1978M09": 3.75,
+     "1978M10": 3.83,
+     "1978M11": 4.03,
+     "1978M12": 3.95,
+     "1979M01": 3.66,
+     "1979M02": 3.5,
+     "1979M03": 3.4,
+     "1979M04": 3.25,
+     "1979M05": 3.36,
+     "1979M06": 3.48,
+     "1979M07": 3.25,
+     "1979M08": 3.14,
+     "1979M09": 3.22,
+     "1979M10": 3.06,
+     "1979M11": 3.02,
+     "1979M12": 3.19,
+     "1980M01": 3.17,
+     "1980M02": 3.24,
+     "1980M03": 3.09,
+     "1980M04": 2.91,
+     "1980M05": 2.59,
+     "1980M06": 2.5,
+     "1980M07": 2.46,
+     "1980M08": 2.31,
+     "1980M09": 2.39,
+     "1980M10": 2.31,
+     "1980M11": 2.17,
+     "1980M12": 2.11,
+     "1981M01": 2.09,
+     "1981M02": 2.04,
+     "1981M03": 2.12,
+     "1981M04": 2.11,
+     "1981M05": 1.93,
+     "1981M06": 1.66,
+     "1981M07": 2.05,
+     "1981M08": 2.25,
+     "1981M09": 2.36,
+     "1981M10": 2.17,
+     "1981M11": 2.06,
+     "1981M12": 2.11,
+     "1982M01": 2.19,
+     "1982M02": 2.09,
+     "1982M03": 1.95,
+     "1982M04": 1.74,
+     "1982M05": 1.72,
+     "1982M06": 1.55,
+     "1982M07": 1.56,
+     "1982M08": 1.55,
+     "1982M09": 1.69,
+     "1982M10": 1.63,
+     "1982M11": 1.54,
+     "1982M12": 1.63,
+     "1983M01": 1.78,
+     "1983M02": 1.94,
+     "1983M03": 1.87,
+     "1983M04": 1.88,
+     "1983M05": 2.07,
+     "1983M06": 2.3,
+     "1983M07": 2.3,
+     "1983M08": 2.3,
+     "1983M09": 2.15,
+     "1983M10": 2.1,
+     "1983M11": 2.22,
+     "1983M12": 2.54,
+     "1984M01": 2.62,
+     "1984M02": 2.5,
+     "1984M03": 2.53,
+     "1984M04": 2.54,
+     "1984M05": 2.68,
+     "1984M06": 2.49,
+     "1984M07": 2.21,
+     "1984M08": 2.21,
+     "1984M09": 2.31,
+     "1984M10": 2.26,
+     "1984M11": 2.26,
+     "1984M12": 2.14,
+     "1985M01": 2.22,
+     "1985M02": 2.27,
+     "1985M03": 2.23,
+     "1985M04": 2.24,
+     "1985M05": 2.13,
+     "1985M06": 2.09,
+     "1985M07": 2.21,
+     "1985M08": 2.27,
+     "1985M09": 2.35,
+     "1985M10": 2.36,
+     "1985M11": 2.3,
+     "1985M12": 2.38,
+     "1986M01": 2.32,
+     "1986M02": 2.23,
+     "1986M03": 2.11,
+     "1986M04": 1.99,
+     "1986M05": 1.91,
+     "1986M06": 1.91,
+     "1986M07": 2.02,
+     "1986M08": 2.07,
+     "1986M09": 2.21,
+     "1986M10": 2.07,
+     "1986M11": 2.02,
+     "1986M12": 1.98,
+     "1987M01": 1.97,
+     "1987M02": 1.96,
+     "1987M03": 2.01,
+     "1987M04": 2.07,
+     "1987M05": 2.07,
+     "1987M06": 2.0,
+     "1987M07": 2.12,
+     "1987M08": 2.02,
+     "1987M09": 1.99,
+     "1987M10": 1.91,
+     "1987M11": 1.93,
+     "1987M12": 1.9,
+     "1988M01": 1.97,
+     "1988M02": 1.8,
+     "1988M03": 1.69,
+     "1988M04": 1.65,
+     "1988M05": 1.71,
+     "1988M06": 1.62,
+     "1988M07": 1.61,
+     "1988M08": 1.45,
+     "1988M09": 1.24,
+     "1988M10": 1.3,
+     "1988M11": 1.47,
+     "1988M12": 1.5,
+     "1989M01": 1.43,
+     "1989M02": 1.48,
+     "1989M03": 1.41,
+     "1989M04": 1.29,
+     "1989M05": 1.21,
+     "1989M06": 1.25,
+     "1989M07": 1.35,
+     "1989M08": 1.29,
+     "1989M09": 1.14,
+     "1989M10": 1.06,
+     "1989M11": 1.01,
+     "1989M12": 0.97,
+     "1990M01": 0.99,
+     "1990M02": 1.03,
+     "1990M03": 1.13,
+     "1990M04": 1.33,
+     "1990M05": 1.44,
+     "1990M06": 1.32,
+     "1990M07": 1.35,
+     "1990M08": 1.29,
+     "1990M09": 1.37,
+     "1990M10": 1.31,
+     "1990M11": 1.35,
+     "1990M12": 1.3,
+     "1991M01": 1.24,
+     "1991M02": 1.21,
+     "1991M03": 1.21,
+     "1991M04": 1.15,
+     "1991M05": 1.06,
+     "1991M06": 1.04,
+     "1991M07": 1.03,
+     "1991M08": 1.14,
+     "1991M09": 1.27,
+     "1991M10": 1.3,
+     "1991M11": 1.31,
+     "1991M12": 1.37,
+     "1992M01": 1.28,
+     "1992M02": 1.19,
+     "1992M03": 1.13,
+     "1992M04": 1.04,
+     "1992M05": 0.99,
+     "1992M06": 0.97,
+     "1992M07": 1.1,
+     "1992M08": 1.18,
+     "1992M09": 1.13,
+     "1992M10": 1.07,
+     "1992M11": 1.08,
+     "1992M12": 1.03,
+     "1993M01": 1.04,
+     "1993M02": 1.0,
+     "1993M03": 0.98,
+     "1993M04": 1.01,
+     "1993M05": 1.0,
+     "1993M06": 0.99,
+     "1993M07": 1.06,
+     "1993M08": 1.1,
+     "1993M09": 1.27,
+     "1993M10": 1.29,
+     "1993M11": 1.32,
+     "1993M12": 1.36,
+     "1994M01": 1.26,
+     "1994M02": 1.23,
+     "1994M03": 1.31,
+     "1994M04": 1.24,
+     "1994M05": 1.38,
+     "1994M06": 1.46,
+     "1994M07": 1.55,
+     "1994M08": 1.55,
+     "1994M09": 1.49,
+     "1994M10": 1.45,
+     "1994M11": 1.44,
+     "1994M12": 1.4,
+     "1995M01": 1.47,
+     "1995M02": 1.51,
+     "1995M03": 1.49,
+     "1995M04": 1.46,
+     "1995M05": 1.45,
+     "1995M06": 1.44,
+     "1995M07": 1.36,
+     "1995M08": 1.41,
+     "1995M09": 1.4,
+     "1995M10": 1.39,
+     "1995M11": 1.44,
+     "1995M12": 1.38,
+     "1996M01": 1.35,
+     "1996M02": 1.37,
+     "1996M03": 1.34,
+     "1996M04": 1.46,
+     "1996M05": 1.52,
+     "1996M06": 1.54,
+     "1996M07": 1.5,
+     "1996M08": 1.5,
+     "1996M09": 1.48,
+     "1996M10": 1.48,
+     "1996M11": 1.47,
+     "1996M12": 1.47,
+     "1997M01": 1.43,
+     "1997M02": 1.37,
+     "1997M03": 1.52,
+     "1997M04": 1.57,
+     "1997M05": 1.57,
+     "1997M06": 1.69,
+     "1997M07": 1.68,
+     "1997M08": 1.65,
+     "1997M09": 1.77,
+     "1997M10": 1.74,
+     "1997M11": 1.7,
+     "1997M12": 1.74,
+     "1998M01": 1.67,
+     "1998M02": 1.64,
+     "1998M03": 1.72,
+     "1998M04": 1.72,
+     "1998M05": 1.78,
+     "1998M06": 1.72,
+     "1998M07": 1.72,
+     "1998M08": 1.68,
+     "1998M09": 1.69,
+     "1998M10": 1.65,
+     "1998M11": 1.6,
+     "1998M12": 1.52,
+     "1999M01": 1.46,
+     "1999M02": 1.41,
+     "1999M03": 1.31,
+     "1999M04": 1.18,
+     "1999M05": 1.07,
+     "1999M06": 1.16,
+     "1999M07": 1.11,
+     "1999M08": 1.0,
+     "1999M09": 1.06,
+     "1999M10": 1.02,
+     "1999M11": 0.92,
+     "1999M12": 0.92,
+     "2000M01": 0.92,
+     "2000M02": 0.86,
+     "2000M03": 0.93,
+     "2000M04": 0.91,
+     "2000M05": 0.92,
+     "2000M06": 0.95,
+     "2000M07": 0.97,
+     "2000M08": 0.89,
+     "2000M09": 0.88,
+     "2000M10": 0.88,
+     "2000M11": 0.88,
+     "2000M12": 0.89,
+     "2001M01": 1.0,
+     "2001M02": 0.89,
+     "2001M03": 1.12,
+     "2001M04": 1.08,
+     "2001M05": 1.08,
+     "2001M06": 0.97,
+     "2001M07": 0.97,
+     "2001M08": 1.03,
+     "2001M09": 1.02,
+     "2001M10": 1.08,
+     "2001M11": 1.23,
+     "2001M12": 1.34,
+     "2002M01": 1.39,
+     "2002M02": 1.49,
+     "2002M03": 1.59,
+     "2002M04": 1.57,
+     "2002M05": 1.6,
+     "2002M06": 1.66,
+     "2002M07": 1.87,
+     "2002M08": 1.96,
+     "2002M09": 2.16,
+     "2002M10": 2.2,
+     "2002M11": 1.81,
+     "2002M12": 2.03,
+     "2003M01": 2.18,
+     "2003M02": 2.28,
+     "2003M03": 1.95,
+     "2003M04": 1.92,
+     "2003M05": 1.74,
+     "2003M06": 1.57,
+     "2003M07": 1.56,
+     "2003M08": 1.55,
+     "2003M09": 1.64,
+     "2003M10": 1.48,
+     "2003M11": 1.51,
+     "2003M12": 1.63,
+     "2004M01": 1.63,
+     "2004M02": 1.57,
+     "2004M03": 1.5,
+     "2004M04": 1.44,
+     "2004M05": 1.42,
+     "2004M06": 1.4,
+     "2004M07": 1.56,
+     "2004M08": 1.73,
+     "2004M09": 1.55,
+     "2004M10": 1.48,
+     "2004M11": 1.66,
+     "2004M12": 1.66,
+     "2005M01": 1.55,
+     "2005M02": 1.63,
+     "2005M03": 1.76,
+     "2005M04": 1.59,
+     "2005M05": 1.51,
+     "2005M06": 1.54,
+     "2005M07": 1.49,
+     "2005M08": 1.48,
+     "2005M09": 1.5,
+     "2005M10": 1.46,
+     "2005M11": 1.44,
+     "2005M12": 1.51,
+     "2006M01": 1.57,
+     "2006M02": 1.55,
+     "2006M03": 1.55,
+     "2006M04": 1.55,
+     "2006M05": 1.6,
+     "2006M06": 1.61,
+     "2006M07": 1.68,
+     "2006M08": 1.62,
+     "2006M09": 1.57,
+     "2006M10": 1.53,
+     "2006M11": 1.58,
+     "2006M12": 1.71,
+     "2007M01": 1.7,
+     "2007M02": 1.82,
+     "2007M03": 1.92,
+     "2007M04": 1.98,
+     "2007M05": 2.0,
+     "2007M06": 2.02,
+     "2007M07": 2.16,
+     "2007M08": 1.91,
+     "2007M09": 1.93,
+     "2007M10": 1.91,
+     "2007M11": 1.97,
+     "2007M12": 2.11,
+     "2008M01": 2.2,
+     "2008M02": 2.5,
+     "2008M03": 2.73,
+     "2008M04": 2.61,
+     "2008M05": 2.68,
+     "2008M06": 3.0,
+     "2008M07": 2.97,
+     "2008M08": 2.82,
+     "2008M09": 2.7,
+     "2008M10": 2.27,
+     "2008M11": 2.05,
+     "2008M12": 2.39,
+     "2009M01": 2.63,
+     "2009M02": 2.65,
+     "2009M03": 2.51,
+     "2009M04": 2.56,
+     "2009M05": 2.48,
+     "2009M06": 2.7,
+     "2009M07": 2.79,
+     "2009M08": 2.96,
+     "2009M09": 3.14,
+     "2009M10": 3.37,
+     "2009M11": 3.38,
+     "2009M12": 3.5,
+     "2010M01": 3.53,
+     "2010M02": 3.28,
+     "2010M03": 3.09,
+     "2010M04": 3.22,
+     "2010M05": 3.18,
+     "2010M06": 3.23,
+     "2010M07": 3.23,
+     "2010M08": 3.07,
+     "2010M09": 2.88,
+     "2010M10": 2.93,
+     "2010M11": 2.91,
+     "2010M12": 3.06,
+     "2011M01": 3.16,
+     "2011M02": 3.47,
+     "2011M03": 3.39,
+     "2011M04": 3.13,
+     "2011M05": 3.07,
+     "2011M06": 3.02,
+     "2011M07": 3.17,
+     "2011M08": 3.06,
+     "2011M09": 2.87,
+     "2011M10": 2.68,
+     "2011M11": 2.53,
+     "2011M12": 2.2,
+     "2012M01": 2.31,
+     "2012M02": 2.36,
+     "2012M03": 2.36,
+     "2012M04": 2.27,
+     "2012M05": 2.31,
+     "2012M06": 2.26,
+     "2012M07": 2.35,
+     "2012M08": 2.51,
+     "2012M09": 2.62,
+     "2012M10": 2.46,
+     "2012M11": 2.48,
+     "2012M12": 2.41,
+     "2013M01": 2.28,
+     "2013M02": 2.2,
+     "2013M03": 2.15,
+     "2013M04": 2.29,
+     "2013M05": 2.34,
+     "2013M06": 2.28,
+     "2013M07": 2.31,
+     "2013M08": 2.48,
+     "2013M09": 2.62,
+     "2013M10": 2.73,
+     "2013M11": 2.76,
+     "2013M12": 2.82,
+     "2014M01": 2.82,
+     "2014M02": 2.99,
+     "2014M03": 3.04,
+     "2014M04": 3.05,
+     "2014M05": 3.03,
+     "2014M06": 3.17,
+     "2014M07": 3.2,
+     "2014M08": 3.27,
+     "2014M09": 3.21,
+     "2014M10": 3.1,
+     "2014M11": 2.91,
+     "2014M12": 2.95,
+     "2015M01": 2.92,
+     "2015M02": 2.96,
+     "2015M03": 2.88,
+     "2015M04": 2.87,
+     "2015M05": 3.1,
+     "2015M06": 3.24,
+     "2015M07": 3.33,
+     "2015M08": 3.15,
+     "2015M09": 3.28,
+     "2015M10": 3.2,
+     "2015M11": 3.36,
+     "2015M12": 3.35,
+     "2016M01": 2.95,
+     "2016M02": 2.92,
+     "2016M03": 3.07,
+     "2016M04": 3.08,
+     "2016M05": 3.1,
+     "2016M06": 3.12,
+     "2016M07": 3.05,
+     "2016M08": 3.03,
+     "2016M09": 2.88,
+     "2016M10": 2.71,
+     "2016M11": 2.48,
+     "2016M12": 2.3,
+     "2017M01": 2.19,
+     "2017M02": 2.03,
+     "2017M03": 2.06,
+     "2017M04": 1.96,
+     "2017M05": 1.98,
+     "2017M06": 2.0,
+     "2017M07": 1.99,
+     "2017M08": 1.99,
+     "2017M09": 2.0,
+     "2017M10": 2.1,
+     "2017M11": 2.13,
+     "2017M12": 1.92,
+     "2018M01": 1.95,
+     "2018M02": 2.12,
+     "2018M03": 2.5,
+     "2018M04": 2.62,
+     "2018M05": 2.66,
+     "2018M06": 2.41,
+     "2018M07": 2.36,
+     "2018M08": 2.17,
+     "2018M09": 2.19,
+     "2018M10": 2.13,
+     "2018M11": 2.19,
+     "2018M12": 2.21,
+     "2019M01": 2.26,
+     "2019M02": 2.26,
+     "2019M03": 2.2,
+     "2019M04": 2.33,
+     "2019M05": 2.32,
+     "2019M06": 2.41,
+     "2019M07": 2.42,
+     "2019M08": 2.19,
+     "2019M09": 2.31,
+     "2019M10": 2.44,
+     "2019M11": 2.52,
+     "2019M12": 2.44,
+     "2020M01": 2.6,
+     "2020M02": 2.72,
+     "2020M03": 2.34,
+     "2020M04": 2.27,
+     "2020M05": 2.32,
+     "2020M06": 2.23,
+     "2020M07": 2.1,
+     "2020M08": 2.35,
+     "2020M09": 2.46,
+     "2020M10": 2.29,
+     "2020M11": 2.36,
+     "2020M12": 2.41,
+     "2021M01": 2.39,
+     "2021M02": 2.41,
+     "2021M03": 2.46,
+     "2021M04": 2.37,
+     "2021M05": 2.41,
+     "2021M06": 2.37,
+     "2021M07": 2.33,
+     "2021M08": 2.48,
+     "2021M09": 2.56,
+     "2021M10": 2.57,
+     "2021M11": 2.39,
+     "2021M12": 2.38,
+     "2022M01": 2.47,
+     "2022M02": 2.55,
+     "2022M03": 2.46,
+     "2022M04": 2.46,
+     "2022M05": 2.37,
+     "2022M06": 2.32,
+     "2022M07": 2.24,
+     "2022M08": 2.32,
+     "2022M09": 2.3,
+     "2022M10": 2.31,
+     "2022M11": 2.41,
+     "2022M12": 2.51,
+     "2023M01": 2.62,
+     "2023M02": 2.65,
+     "2023M03": 2.75,
+     "2023M04": 2.88,
+     "2023M05": 2.96,
+     "2023M06": 3.17,
+     "2023M07": 3.39,
+     "2023M08": 3.46,
+     "2023M09": 3.61,
+     "2023M10": 3.63,
+     "2023M11": 4.03,
+     "2023M12": 4.21,
+     "2024M01": 4.4,
+     "2024M02": 5.56,
+     "2024M03": 7.09,
+     "2024M04": 9.74,
+     "2024M05": 7.54,
+     "2024M06": 8.27,
+     "2024M07": 7.09,
+     "2024M08": 6.88,
+     "2024M09": 6.52,
+     "2024M10": 6.66,
+     "2024M11": 7.89,
+     "2024M12": 10.32,
+     "2025M01": 10.75,
+     "2025M02": 9.86,
+     "2025M03": 8.08,
+     "2025M04": 8.15,
+     "2025M05": 8.99,
+     "2025M06": 8.4,
+     "2025M07": 7.37,
+     "2025M08": 7.6,
+     "2025M09": 7.03,
+     "2025M10": 5.95,
+     "2025M11": 5.61,
+     "2025M12": 5.78,
+     "2026M01": 4.97,
+     "2026M02": 3.59,
+     "2026M03": 3.24,
+     "2026M04": 3.4,
+     "2026M05": 4.16,
+     "2026M06": 4.4,
+     "2026M07": 5.61,
+     "2026M08": 5.95,
+     "2026M09": 5.92,
+     "2026M10": 5.75
+    }
+   },
+   "Banana, US": {
+    "unit": "$/kg",
+    "monthly": {
+     "1960M01": 0.14,
+     "1960M02": 0.14,
+     "1960M03": 0.14,
+     "1960M04": 0.14,
+     "1960M05": 0.15,
+     "1960M06": 0.15,
+     "1960M07": 0.15,
+     "1960M08": 0.13,
+     "1960M09": 0.14,
+     "1960M10": 0.15,
+     "1960M11": 0.13,
+     "1960M12": 0.15,
+     "1961M01": 0.13,
+     "1961M02": 0.13,
+     "1961M03": 0.14,
+     "1961M04": 0.14,
+     "1961M05": 0.13,
+     "1961M06": 0.12,
+     "1961M07": 0.13,
+     "1961M08": 0.13,
+     "1961M09": 0.15,
+     "1961M10": 0.13,
+     "1961M11": 0.15,
+     "1961M12": 0.14,
+     "1962M01": 0.13,
+     "1962M02": 0.14,
+     "1962M03": 0.15,
+     "1962M04": 0.15,
+     "1962M05": 0.14,
+     "1962M06": 0.12,
+     "1962M07": 0.12,
+     "1962M08": 0.12,
+     "1962M09": 0.12,
+     "1962M10": 0.12,
+     "1962M11": 0.15,
+     "1962M12": 0.13,
+     "1963M01": 0.13,
+     "1963M02": 0.13,
+     "1963M03": 0.13,
+     "1963M04": 0.13,
+     "1963M05": 0.13,
+     "1963M06": 0.13,
+     "1963M07": 0.13,
+     "1963M08": 0.17,
+     "1963M09": 0.16,
+     "1963M10": 0.18,
+     "1963M11": 0.15,
+     "1963M12": 0.16,
+     "1964M01": 0.15,
+     "1964M02": 0.16,
+     "1964M03": 0.16,
+     "1964M04": 0.2,
+     "1964M05": 0.21,
+     "1964M06": 0.21,
+     "1964M07": 0.17,
+     "1964M08": 0.16,
+     "1964M09": 0.18,
+     "1964M10": 0.16,
+     "1964M11": 0.16,
+     "1964M12": 0.13,
+     "1965M01": 0.13,
+     "1965M02": 0.16,
+     "1965M03": 0.15,
+     "1965M04": 0.16,
+     "1965M05": 0.15,
+     "1965M06": 0.17,
+     "1965M07": 0.18,
+     "1965M08": 0.17,
+     "1965M09": 0.18,
+     "1965M10": 0.19,
+     "1965M11": 0.15,
+     "1965M12": 0.13,
+     "1966M01": 0.13,
+     "1966M02": 0.14,
+     "1966M03": 0.17,
+     "1966M04": 0.19,
+     "1966M05": 0.18,
+     "1966M06": 0.18,
+     "1966M07": 0.14,
+     "1966M08": 0.16,
+     "1966M09": 0.14,
+     "1966M10": 0.13,
+     "1966M11": 0.14,
+     "1966M12": 0.14,
+     "1967M01": 0.16,
+     "1967M02": 0.14,
+     "1967M03": 0.16,
+     "1967M04": 0.16,
+     "1967M05": 0.15,
+     "1967M06": 0.16,
+     "1967M07": 0.16,
+     "1967M08": 0.15,
+     "1967M09": 0.18,
+     "1967M10": 0.18,
+     "1967M11": 0.16,
+     "1967M12": 0.13,
+     "1968M01": 0.11,
+     "1968M02": 0.17,
+     "1968M03": 0.16,
+     "1968M04": 0.17,
+     "1968M05": 0.18,
+     "1968M06": 0.15,
+     "1968M07": 0.16,
+     "1968M08": 0.14,
+     "1968M09": 0.16,
+     "1968M10": 0.15,
+     "1968M11": 0.14,
+     "1968M12": 0.13,
+     "1969M01": 0.14,
+     "1969M02": 0.14,
+     "1969M03": 0.15,
+     "1969M04": 0.15,
+     "1969M05": 0.17,
+     "1969M06": 0.16,
+     "1969M07": 0.15,
+     "1969M08": 0.17,
+     "1969M09": 0.18,
+     "1969M10": 0.17,
+     "1969M11": 0.16,
+     "1969M12": 0.16,
+     "1970M01": 0.17,
+     "1970M02": 0.17,
+     "1970M03": 0.19,
+     "1970M04": 0.17,
+     "1970M05": 0.19,
+     "1970M06": 0.18,
+     "1970M07": 0.15,
+     "1970M08": 0.16,
+     "1970M09": 0.16,
+     "1970M10": 0.17,
+     "1970M11": 0.15,
+     "1970M12": 0.13,
+     "1971M01": 0.14,
+     "1971M02": 0.14,
+     "1971M03": 0.14,
+     "1971M04": 0.14,
+     "1971M05": 0.14,
+     "1971M06": 0.14,
+     "1971M07": 0.14,
+     "1971M08": 0.15,
+     "1971M09": 0.15,
+     "1971M10": 0.14,
+     "1971M11": 0.14,
+     "1971M12": 0.14,
+     "1972M01": 0.13,
+     "1972M02": 0.14,
+     "1972M03": 0.13,
+     "1972M04": 0.14,
+     "1972M05": 0.14,
+     "1972M06": 0.14,
+     "1972M07": 0.13,
+     "1972M08": 0.14,
+     "1972M09": 0.13,
+     "1972M10": 0.14,
+     "1972M11": 0.14,
+     "1972M12": 0.13,
+     "1973M01": 0.14,
+     "1973M02": 0.14,
+     "1973M03": 0.14,
+     "1973M04": 0.15,
+     "1973M05": 0.16,
+     "1973M06": 0.16,
+     "1973M07": 0.15,
+     "1973M08": 0.15,
+     "1973M09": 0.14,
+     "1973M10": 0.15,
+     "1973M11": 0.14,
+     "1973M12": 0.13,
+     "1974M01": 0.17,
+     "1974M02": 0.16,
+     "1974M03": 0.14,
+     "1974M04": 0.16,
+     "1974M05": 0.21,
+     "1974M06": 0.19,
+     "1974M07": 0.22,
+     "1974M08": 0.19,
+     "1974M09": 0.22,
+     "1974M10": 0.19,
+     "1974M11": 0.17,
+     "1974M12": 0.17,
+     "1975M01": 0.22,
+     "1975M02": 0.24,
+     "1975M03": 0.25,
+     "1975M04": 0.25,
+     "1975M05": 0.25,
+     "1975M06": 0.24,
+     "1975M07": 0.17,
+     "1975M08": 0.2,
+     "1975M09": 0.22,
+     "1975M10": 0.19,
+     "1975M11": 0.2,
+     "1975M12": 0.19,
+     "1976M01": 0.24,
+     "1976M02": 0.26,
+     "1976M03": 0.27,
+     "1976M04": 0.27,
+     "1976M05": 0.28,
+     "1976M06": 0.27,
+     "1976M07": 0.26,
+     "1976M08": 0.27,
+     "1976M09": 0.26,
+     "1976M10": 0.27,
+     "1976M11": 0.23,
+     "1976M12": 0.24,
+     "1977M01": 0.24,
+     "1977M02": 0.3,
+     "1977M03": 0.33,
+     "1977M04": 0.3,
+     "1977M05": 0.32,
+     "1977M06": 0.29,
+     "1977M07": 0.23,
+     "1977M08": 0.24,
+     "1977M09": 0.25,
+     "1977M10": 0.26,
+     "1977M11": 0.26,
+     "1977M12": 0.26,
+     "1978M01": 0.26,
+     "1978M02": 0.3,
+     "1978M03": 0.35,
+     "1978M04": 0.36,
+     "1978M05": 0.36,
+     "1978M06": 0.26,
+     "1978M07": 0.24,
+     "1978M08": 0.25,
+     "1978M09": 0.25,
+     "1978M10": 0.26,
+     "1978M11": 0.27,
+     "1978M12": 0.29,
+     "1979M01": 0.27,
+     "1979M02": 0.31,
+     "1979M03": 0.32,
+     "1979M04": 0.37,
+     "1979M05": 0.37,
+     "1979M06": 0.38,
+     "1979M07": 0.34,
+     "1979M08": 0.3,
+     "1979M09": 0.3,
+     "1979M10": 0.31,
+     "1979M11": 0.31,
+     "1979M12": 0.34,
+     "1980M01": 0.4,
+     "1980M02": 0.37,
+     "1980M03": 0.42,
+     "1980M04": 0.4,
+     "1980M05": 0.44,
+     "1980M06": 0.34,
+     "1980M07": 0.35,
+     "1980M08": 0.34,
+     "1980M09": 0.35,
+     "1980M10": 0.35,
+     "1980M11": 0.38,
+     "1980M12": 0.37,
+     "1981M01": 0.39,
+     "1981M02": 0.44,
+     "1981M03": 0.46,
+     "1981M04": 0.43,
+     "1981M05": 0.45,
+     "1981M06": 0.39,
+     "1981M07": 0.33,
+     "1981M08": 0.31,
+     "1981M09": 0.44,
+     "1981M10": 0.39,
+     "1981M11": 0.4,
+     "1981M12": 0.42,
+     "1982M01": 0.42,
+     "1982M02": 0.38,
+     "1982M03": 0.42,
+     "1982M04": 0.48,
+     "1982M05": 0.44,
+     "1982M06": 0.4,
+     "1982M07": 0.33,
+     "1982M08": 0.3,
+     "1982M09": 0.35,
+     "1982M10": 0.29,
+     "1982M11": 0.33,
+     "1982M12": 0.34,
+     "1983M01": 0.34,
+     "1983M02": 0.38,
+     "1983M03": 0.41,
+     "1983M04": 0.48,
+     "1983M05": 0.55,
+     "1983M06": 0.5,
+     "1983M07": 0.5,
+     "1983M08": 0.46,
+     "1983M09": 0.42,
+     "1983M10": 0.41,
+     "1983M11": 0.34,
+     "1983M12": 0.34,
+     "1984M01": 0.34,
+     "1984M02": 0.42,
+     "1984M03": 0.41,
+     "1984M04": 0.41,
+     "1984M05": 0.43,
+     "1984M06": 0.46,
+     "1984M07": 0.37,
+     "1984M08": 0.34,
+     "1984M09": 0.38,
+     "1984M10": 0.31,
+     "1984M11": 0.27,
+     "1984M12": 0.3,
+     "1985M01": 0.38,
+     "1985M02": 0.44,
+     "1985M03": 0.45,
+     "1985M04": 0.48,
+     "1985M05": 0.46,
+     "1985M06": 0.38,
+     "1985M07": 0.32,
+     "1985M08": 0.42,
+     "1985M09": 0.36,
+     "1985M10": 0.28,
+     "1985M11": 0.28,
+     "1985M12": 0.28,
+     "1986M01": 0.33,
+     "1986M02": 0.39,
+     "1986M03": 0.5,
+     "1986M04": 0.58,
+     "1986M05": 0.39,
+     "1986M06": 0.35,
+     "1986M07": 0.33,
+     "1986M08": 0.32,
+     "1986M09": 0.42,
+     "1986M10": 0.37,
+     "1986M11": 0.29,
+     "1986M12": 0.31,
+     "1987M01": 0.42,
+     "1987M02": 0.46,
+     "1987M03": 0.45,
+     "1987M04": 0.35,
+     "1987M05": 0.45,
+     "1987M06": 0.38,
+     "1987M07": 0.44,
+     "1987M08": 0.34,
+     "1987M09": 0.35,
+     "1987M10": 0.27,
+     "1987M11": 0.41,
+     "1987M12": 0.39,
+     "1988M01": 0.45,
+     "1988M02": 0.49,
+     "1988M03": 0.53,
+     "1988M04": 0.48,
+     "1988M05": 0.56,
+     "1988M06": 0.6,
+     "1988M07": 0.42,
+     "1988M08": 0.36,
+     "1988M09": 0.53,
+     "1988M10": 0.42,
+     "1988M11": 0.41,
+     "1988M12": 0.5,
+     "1989M01": 0.43,
+     "1989M02": 0.49,
+     "1989M03": 0.7,
+     "1989M04": 0.72,
+     "1989M05": 0.66,
+     "1989M06": 0.53,
+     "1989M07": 0.45,
+     "1989M08": 0.51,
+     "1989M09": 0.52,
+     "1989M10": 0.55,
+     "1989M11": 0.51,
+     "1989M12": 0.5,
+     "1990M01": 0.59,
+     "1990M02": 0.64,
+     "1990M03": 0.54,
+     "1990M04": 0.58,
+     "1990M05": 0.49,
+     "1990M06": 0.53,
+     "1990M07": 0.63,
+     "1990M08": 0.55,
+     "1990M09": 0.52,
+     "1990M10": 0.49,
+     "1990M11": 0.43,
+     "1990M12": 0.5,
+     "1991M01": 0.6,
+     "1991M02": 0.69,
+     "1991M03": 0.84,
+     "1991M04": 0.78,
+     "1991M05": 0.63,
+     "1991M06": 0.63,
+     "1991M07": 0.4,
+     "1991M08": 0.48,
+     "1991M09": 0.37,
+     "1991M10": 0.45,
+     "1991M11": 0.44,
+     "1991M12": 0.4,
+     "1992M01": 0.57,
+     "1992M02": 0.61,
+     "1992M03": 0.61,
+     "1992M04": 0.42,
+     "1992M05": 0.43,
+     "1992M06": 0.4,
+     "1992M07": 0.43,
+     "1992M08": 0.62,
+     "1992M09": 0.51,
+     "1992M10": 0.39,
+     "1992M11": 0.38,
+     "1992M12": 0.31,
+     "1993M01": 0.52,
+     "1993M02": 0.59,
+     "1993M03": 0.66,
+     "1993M04": 0.56,
+     "1993M05": 0.46,
+     "1993M06": 0.39,
+     "1993M07": 0.35,
+     "1993M08": 0.32,
+     "1993M09": 0.35,
+     "1993M10": 0.33,
+     "1993M11": 0.37,
+     "1993M12": 0.41,
+     "1994M01": 0.53,
+     "1994M02": 0.67,
+     "1994M03": 0.51,
+     "1994M04": 0.5,
+     "1994M05": 0.38,
+     "1994M06": 0.25,
+     "1994M07": 0.45,
+     "1994M08": 0.41,
+     "1994M09": 0.44,
+     "1994M10": 0.32,
+     "1994M11": 0.3,
+     "1994M12": 0.54,
+     "1995M01": 0.36,
+     "1995M02": 0.58,
+     "1995M03": 0.4,
+     "1995M04": 0.39,
+     "1995M05": 0.39,
+     "1995M06": 0.37,
+     "1995M07": 0.54,
+     "1995M08": 0.52,
+     "1995M09": 0.52,
+     "1995M10": 0.43,
+     "1995M11": 0.44,
+     "1995M12": 0.41,
+     "1996M01": 0.41,
+     "1996M02": 0.59,
+     "1996M03": 0.5,
+     "1996M04": 0.61,
+     "1996M05": 0.54,
+     "1996M06": 0.48,
+     "1996M07": 0.43,
+     "1996M08": 0.41,
+     "1996M09": 0.4,
+     "1996M10": 0.38,
+     "1996M11": 0.43,
+     "1996M12": 0.48,
+     "1997M01": 0.67,
+     "1997M02": 0.79,
+     "1997M03": 0.76,
+     "1997M04": 0.59,
+     "1997M05": 0.39,
+     "1997M06": 0.47,
+     "1997M07": 0.44,
+     "1997M08": 0.42,
+     "1997M09": 0.45,
+     "1997M10": 0.38,
+     "1997M11": 0.43,
+     "1997M12": 0.42,
+     "1998M01": 0.46,
+     "1998M02": 0.44,
+     "1998M03": 0.45,
+     "1998M04": 0.77,
+     "1998M05": 0.66,
+     "1998M06": 0.66,
+     "1998M07": 0.46,
+     "1998M08": 0.35,
+     "1998M09": 0.35,
+     "1998M10": 0.33,
+     "1998M11": 0.56,
+     "1998M12": 0.38,
+     "1999M01": 0.49,
+     "1999M02": 0.45,
+     "1999M03": 0.45,
+     "1999M04": 0.42,
+     "1999M05": 0.33,
+     "1999M06": 0.29,
+     "1999M07": 0.35,
+     "1999M08": 0.35,
+     "1999M09": 0.35,
+     "1999M10": 0.33,
+     "1999M11": 0.33,
+     "1999M12": 0.35,
+     "2000M01": 0.48,
+     "2000M02": 0.58,
+     "2000M03": 0.48,
+     "2000M04": 0.48,
+     "2000M05": 0.42,
+     "2000M06": 0.39,
+     "2000M07": 0.31,
+     "2000M08": 0.33,
+     "2000M09": 0.42,
+     "2000M10": 0.38,
+     "2000M11": 0.37,
+     "2000M12": 0.45,
+     "2001M01": 0.53,
+     "2001M02": 0.69,
+     "2001M03": 0.54,
+     "2001M04": 0.55,
+     "2001M05": 0.64,
+     "2001M06": 0.61,
+     "2001M07": 0.7,
+     "2001M08": 0.68,
+     "2001M09": 0.57,
+     "2001M10": 0.48,
+     "2001M11": 0.5,
+     "2001M12": 0.51,
+     "2002M01": 0.43,
+     "2002M02": 0.52,
+     "2002M03": 0.57,
+     "2002M04": 0.54,
+     "2002M05": 0.63,
+     "2002M06": 0.65,
+     "2002M07": 0.54,
+     "2002M08": 0.42,
+     "2002M09": 0.49,
+     "2002M10": 0.54,
+     "2002M11": 0.4,
+     "2002M12": 0.63,
+     "2003M01": 0.56,
+     "2003M02": 0.46,
+     "2003M03": 0.49,
+     "2003M04": 0.38,
+     "2003M05": 0.3,
+     "2003M06": 0.31,
+     "2003M07": 0.3,
+     "2003M08": 0.29,
+     "2003M09": 0.31,
+     "2003M10": 0.33,
+     "2003M11": 0.41,
+     "2003M12": 0.37,
+     "2004M01": 0.43,
+     "2004M02": 0.5,
+     "2004M03": 0.51,
+     "2004M04": 0.53,
+     "2004M05": 0.56,
+     "2004M06": 0.6,
+     "2004M07": 0.6,
+     "2004M08": 0.55,
+     "2004M09": 0.54,
+     "2004M10": 0.5,
+     "2004M11": 0.49,
+     "2004M12": 0.5,
+     "2005M01": 0.59,
+     "2005M02": 0.89,
+     "2005M03": 0.79,
+     "2005M04": 0.59,
+     "2005M05": 0.62,
+     "2005M06": 0.49,
+     "2005M07": 0.4,
+     "2005M08": 0.4,
+     "2005M09": 0.59,
+     "2005M10": 0.63,
+     "2005M11": 0.59,
+     "2005M12": 0.65,
+     "2006M01": 0.69,
+     "2006M02": 0.85,
+     "2006M03": 0.83,
+     "2006M04": 0.73,
+     "2006M05": 0.93,
+     "2006M06": 0.65,
+     "2006M07": 0.56,
+     "2006M08": 0.54,
+     "2006M09": 0.54,
+     "2006M10": 0.55,
+     "2006M11": 0.6,
+     "2006M12": 0.66,
+     "2007M01": 0.64,
+     "2007M02": 0.65,
+     "2007M03": 0.65,
+     "2007M04": 0.65,
+     "2007M05": 0.69,
+     "2007M06": 0.78,
+     "2007M07": 0.73,
+     "2007M08": 0.7,
+     "2007M09": 0.66,
+     "2007M10": 0.66,
+     "2007M11": 0.65,
+     "2007M12": 0.65,
+     "2008M01": 0.69,
+     "2008M02": 0.79,
+     "2008M03": 1.03,
+     "2008M04": 0.97,
+     "2008M05": 0.92,
+     "2008M06": 0.87,
+     "2008M07": 0.72,
+     "2008M08": 0.8,
+     "2008M09": 0.8,
+     "2008M10": 0.81,
+     "2008M11": 0.9,
+     "2008M12": 0.83,
+     "2009M01": 0.82,
+     "2009M02": 0.94,
+     "2009M03": 0.91,
+     "2009M04": 0.89,
+     "2009M05": 0.83,
+     "2009M06": 0.85,
+     "2009M07": 0.83,
+     "2009M08": 0.83,
+     "2009M09": 0.82,
+     "2009M10": 0.81,
+     "2009M11": 0.83,
+     "2009M12": 0.8,
+     "2010M01": 0.79,
+     "2010M02": 0.72,
+     "2010M03": 0.84,
+     "2010M04": 0.83,
+     "2010M05": 0.8,
+     "2010M06": 0.96,
+     "2010M07": 0.99,
+     "2010M08": 0.9,
+     "2010M09": 0.88,
+     "2010M10": 0.92,
+     "2010M11": 0.91,
+     "2010M12": 0.9,
+     "2011M01": 0.89,
+     "2011M02": 1.0,
+     "2011M03": 1.0,
+     "2011M04": 1.03,
+     "2011M05": 1.01,
+     "2011M06": 0.98,
+     "2011M07": 0.96,
+     "2011M08": 0.95,
+     "2011M09": 0.95,
+     "2011M10": 0.95,
+     "2011M11": 0.96,
+     "2011M12": 0.94,
+     "2012M01": 0.95,
+     "2012M02": 1.07,
+     "2012M03": 1.14,
+     "2012M04": 1.03,
+     "2012M05": 0.95,
+     "2012M06": 0.95,
+     "2012M07": 0.96,
+     "2012M08": 0.95,
+     "2012M09": 0.96,
+     "2012M10": 0.96,
+     "2012M11": 0.93,
+     "2012M12": 0.94,
+     "2013M01": 0.93,
+     "2013M02": 0.92,
+     "2013M03": 0.94,
+     "2013M04": 0.9,
+     "2013M05": 0.91,
+     "2013M06": 0.91,
+     "2013M07": 0.92,
+     "2013M08": 0.94,
+     "2013M09": 0.94,
+     "2013M10": 0.93,
+     "2013M11": 0.92,
+     "2013M12": 0.92,
+     "2014M01": 0.93,
+     "2014M02": 0.95,
+     "2014M03": 0.96,
+     "2014M04": 0.93,
+     "2014M05": 0.91,
+     "2014M06": 0.93,
+     "2014M07": 0.93,
+     "2014M08": 0.96,
+     "2014M09": 0.92,
+     "2014M10": 0.9,
+     "2014M11": 0.9,
+     "2014M12": 0.91,
+     "2015M01": 0.91,
+     "2015M02": 1.0,
+     "2015M03": 1.04,
+     "2015M04": 1.03,
+     "2015M05": 0.94,
+     "2015M06": 0.92,
+     "2015M07": 0.94,
+     "2015M08": 0.96,
+     "2015M09": 0.95,
+     "2015M10": 0.93,
+     "2015M11": 0.93,
+     "2015M12": 0.93,
+     "2016M01": 1.04,
+     "2016M02": 1.05,
+     "2016M03": 1.01,
+     "2016M04": 0.99,
+     "2016M05": 0.99,
+     "2016M06": 0.99,
+     "2016M07": 1.01,
+     "2016M08": 1.04,
+     "2016M09": 1.0,
+     "2016M10": 0.97,
+     "2016M11": 0.96,
+     "2016M12": 0.96,
+     "2017M01": 1.0,
+     "2017M02": 1.05,
+     "2017M03": 1.07,
+     "2017M04": 1.06,
+     "2017M05": 1.09,
+     "2017M06": 1.1,
+     "2017M07": 1.1,
+     "2017M08": 1.1,
+     "2017M09": 1.1,
+     "2017M10": 1.08,
+     "2017M11": 1.08,
+     "2017M12": 1.1,
+     "2018M01": 1.13,
+     "2018M02": 1.27,
+     "2018M03": 1.16,
+     "2018M04": 1.16,
+     "2018M05": 1.15,
+     "2018M06": 1.16,
+     "2018M07": 1.14,
+     "2018M08": 1.11,
+     "2018M09": 1.11,
+     "2018M10": 1.12,
+     "2018M11": 1.12,
+     "2018M12": 1.13,
+     "2019M01": 1.14,
+     "2019M02": 1.16,
+     "2019M03": 1.18,
+     "2019M04": 1.16,
+     "2019M05": 1.12,
+     "2019M06": 1.13,
+     "2019M07": 1.13,
+     "2019M08": 1.12,
+     "2019M09": 1.15,
+     "2019M10": 1.13,
+     "2019M11": 1.13,
+     "2019M12": 1.14,
+     "2020M01": 1.17,
+     "2020M02": 1.18,
+     "2020M03": 1.2,
+     "2020M04": 1.28,
+     "2020M05": 1.3,
+     "2020M06": 1.3,
+     "2020M07": 1.27,
+     "2020M08": 1.25,
+     "2020M09": 1.24,
+     "2020M10": 1.13,
+     "2020M11": 1.13,
+     "2020M12": 1.15,
+     "2021M01": 1.24,
+     "2021M02": 1.22,
+     "2021M03": 1.23,
+     "2021M04": 1.23,
+     "2021M05": 1.23,
+     "2021M06": 1.23,
+     "2021M07": 1.23,
+     "2021M08": 1.23,
+     "2021M09": 1.18,
+     "2021M10": 1.15,
+     "2021M11": 1.14,
+     "2021M12": 1.16,
+     "2022M01": 1.16,
+     "2022M02": 1.24,
+     "2022M03": 1.39,
+     "2022M04": 1.46,
+     "2022M05": 1.46,
+     "2022M06": 1.44,
+     "2022M07": 1.53,
+     "2022M08": 1.67,
+     "2022M09": 1.62,
+     "2022M10": 1.57,
+     "2022M11": 1.65,
+     "2022M12": 1.68,
+     "2023M01": 1.68,
+     "2023M02": 1.66,
+     "2023M03": 1.6,
+     "2023M04": 1.65,
+     "2023M05": 1.61,
+     "2023M06": 1.59,
+     "2023M07": 1.55,
+     "2023M08": 1.56,
+     "2023M09": 1.56,
+     "2023M10": 1.57,
+     "2023M11": 1.55,
+     "2023M12": 1.57,
+     "2024M01": 1.61,
+     "2024M02": 1.57,
+     "2024M03": 1.64,
+     "2024M04": 1.63,
+     "2024M05": 1.42,
+     "2024M06": 1.09,
+     "2024M07": 1.03,
+     "2024M08": 1.01,
+     "2024M09": 1.03,
+     "2024M10": 1.03,
+     "2024M11": 0.91,
+     "2024M12": 0.83,
+     "2025M01": 1.11,
+     "2025M02": 1.25,
+     "2025M03": 1.18,
+     "2025M04": 1.1,
+     "2025M05": 1.09,
+     "2025M06": 0.92,
+     "2025M07": 1.01,
+     "2025M08": 1.02,
+     "2025M09": 1.02,
+     "2025M10": 1.13,
+     "2025M11": 1.16,
+     "2025M12": 1.16,
+     "2026M01": 1.2,
+     "2026M02": 1.21,
+     "2026M03": 1.21,
+     "2026M04": 1.15,
+     "2026M05": 1.12,
+     "2026M06": 1.18,
+     "2026M07": 1.17,
+     "2026M08": 1.1,
+     "2026M09": 1.12,
+     "2026M10": 1.18
+    }
+   }
+  }
+ }
+}
