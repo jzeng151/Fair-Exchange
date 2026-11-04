@@ -7,9 +7,12 @@ French conversation's PII goes through the FEX Guardrail (#12) instead.
 import boto3
 import pytest
 from moto import mock_aws
-from tests.conversation_harness import RETRIEVE, Run, intake, of, playback, summary
+from tests.conversation_harness import RETRIEVE, Run, answer, claim, intake, of, playback, summary
+from tests.tool_harness import call_tool
 
 from fex.conversation.state import Profile
+from fex.tools.peer_examples import find_peer_examples
+from fex.tools.regional_context import get_regional_context
 from fex.guardrail import GuardrailPiiScanner
 from fex.pii import PiiText, language_aware_scanner, scan_texts
 from fex.records import DynamoRecordStore
@@ -31,10 +34,26 @@ def fr_playback():
                                      "tried": "Rien encore", "entity_type": None, "location_disputed": False})
 
 
+FR_TAGS = ["climate and weather"]
+
+
 def fr_summary():
     return ("out", "RecordSummary", {"summary_original": "La récolte de cacao a baissé.",
                                      "summary_english": "The cocoa harvest fell.",
-                                     "tags": ["climate and weather"]})
+                                     "tags": FR_TAGS})
+
+
+def fr_answer(producer_id: str) -> tuple:
+    """A scripted answer citing sources the data tools actually return for this run's French tags.
+
+    The claims must cite sources present in the session evidence, or the citation check drops them and
+    the engine rewrites (extra model calls the test does not script). Retrieval is driven by the
+    confirmed tags, so this uses FR_TAGS, the same tags fr_summary() confirms."""
+    state = {"producer_id": producer_id, "step": "respond", "tags": FR_TAGS}
+    _, regional = call_tool(get_regional_context, {}, state)
+    _, peers = call_tool(find_peer_examples, {}, state)
+    return answer([claim("La pluie a baissé.", regional[0]["source"])],
+                  [claim("Un pair a construit des bassins.", peers[0]["source"])])
 
 
 def langs(events) -> set[str]:
@@ -67,7 +86,7 @@ def test_fixed_answer_text_is_in_french():
     r.send("start")
     r.send("message", text=FR_NAME_TEXT)
     r.small.add(fr_summary())
-    r.large.add(*RETRIEVE, r.good_answer())
+    r.large.add(*RETRIEVE, fr_answer(r.producer_id))
     events = r.action("confirm_playback")
     text = "".join(e.text for e in of(events, "text"))
     assert "Voici ce que j'ai trouvé" in text
@@ -171,7 +190,7 @@ def test_the_french_record_has_both_summaries_and_is_pii_flagged(table):
     r.send("start")
     r.send("message", text=FR_NAME_TEXT)
     r.small.add(fr_summary())
-    r.large.add(*RETRIEVE, r.good_answer())
+    r.large.add(*RETRIEVE, fr_answer(r.producer_id))
     r.action("confirm_playback")
     r.action("set_consent", scope="internal")
 
