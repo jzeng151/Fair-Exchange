@@ -7,6 +7,7 @@ Deploy pattern: docs/adr/0002-agentcore-runtime-spike.md.
 
 State: in-memory per runtime session until AgentCore Memory (docs/specs/memory.md) replaces the store.
 Records (#26): saved to the DynamoDB table named by FEX_RECORDS_TABLE; not saved when it is unset.
+Guardrail (#12): attached to both models from FEX_GUARDRAIL_ID and FEX_GUARDRAIL_VERSION, in detect mode.
 """
 import os
 import queue
@@ -29,10 +30,21 @@ def model_ids() -> tuple[str, str]:
     return os.environ.get("FEX_SMALL_MODEL", DEFAULT_SMALL), os.environ.get("FEX_LARGE_MODEL", DEFAULT_LARGE)
 
 
+def demo_models() -> bool:
+    """FEX_DEMO_MODELS=1: the deterministic demo model instead of Bedrock (#101). No AWS, no cost."""
+    return os.environ.get("FEX_DEMO_MODELS") == "1"
+
+
 def record_store():
-    """The records table from configuration, or None when FEX_RECORDS_TABLE is unset (local runs)."""
+    """Where records are saved: the DynamoDB table named by FEX_RECORDS_TABLE, local JSON files in
+    FEX_LOCAL_RECORDS_DIR (local runs, #101), or None (not saved)."""
     name = os.environ.get("FEX_RECORDS_TABLE")
     if not name:
+        local = os.environ.get("FEX_LOCAL_RECORDS_DIR")
+        if local:
+            from fex.records.local import FileRecordStore
+
+            return FileRecordStore(local)
         return None
     import boto3
 
@@ -43,11 +55,29 @@ def record_store():
 
 @lru_cache(maxsize=1)
 def default_engine() -> ConversationEngine:
-    from strands.models.bedrock import BedrockModel
+    from fex.guardrail import OutputAssessor, guarded_bedrock_model
 
+    records = record_store()
+    if demo_models():  # local runs (#101): no Bedrock, no Comprehend, no AWS at all
+        from fex.conversation.demo_model import DemoModel
+
+        from fex.tools.standards import LocalClauseRetriever
+
+        demo = DemoModel()
+        return ConversationEngine(store=InMemoryStateStore(), small_model=demo, large_model=demo, records=records,
+                                  retriever=LocalClauseRetriever())
     small, large = model_ids()
-    return ConversationEngine(store=InMemoryStateStore(), small_model=BedrockModel(model_id=small),
-                              large_model=BedrockModel(model_id=large), records=record_store())
+    # The PII seam (#20, #24): scans run only when records are configured — they are part of saving one.
+    # Comprehend handles en/es; the Guardrail handles fr, which Comprehend can't.
+    pii_scanner = None
+    if records is not None:
+        from fex.pii import default_pii_scanner
+
+        pii_scanner = default_pii_scanner()
+    # Both models carry the detect-mode Guardrail (#12), and their structured output is assessed too.
+    return ConversationEngine(store=InMemoryStateStore(), small_model=guarded_bedrock_model(small),
+                              large_model=guarded_bedrock_model(large), records=records,
+                              pii_scanner=pii_scanner, output_assessor=OutputAssessor())
 
 
 def invoke(payload: dict[str, Any], engine: ConversationEngine | None = None) -> dict[str, Any]:
@@ -93,9 +123,24 @@ def stream(payload: dict[str, Any], engine: ConversationEngine | None = None) ->
     if "exception" in outcome:
         raise outcome["exception"]
     if "error" in outcome:
-        yield {"error": outcome["error"]}
+        # Contract-shaped events, so the chat API passes them on like any other turn (#89)
+        yield {"type": "error", "seq": 1, "code": "agent_failed",
+               "message": f"Invalid request: {outcome['error']['message']}"}
+        yield {"type": "done", "seq": 2}
     elif isinstance(outcome.get("result"), ResumeResponse):
         yield {"resume": outcome["result"].model_dump(mode="json")}
+
+
+def respond(payload: dict[str, Any], engine: ConversationEngine | None = None):
+    """What the AgentCore entrypoint returns (#89). The SDK sends a dict as `application/json` and streams a
+    generator as Server-Sent Events (`data: <json>`), so:
+      - `resume` returns the resume object itself (step, allowed, answer, history) as plain JSON;
+      - every other request returns the event generator, streamed as SSE.
+    """
+    if payload.get("kind") == "resume":
+        out = invoke(payload, engine=engine)
+        return out["resume"] if "resume" in out else out
+    return stream(payload, engine=engine)
 
 
 def create_app():  # pragma: no cover - exercised when deployed
@@ -105,7 +150,7 @@ def create_app():  # pragma: no cover - exercised when deployed
 
     @app.entrypoint
     def entry(payload: dict[str, Any], context: Any = None):
-        # A generator: AgentCore streams each yielded event to the caller as it is produced
-        yield from stream(payload)
+        # Not a generator itself: returns a dict (resume, sent as JSON) or a generator (events, streamed as SSE)
+        return respond(payload)
 
     return app

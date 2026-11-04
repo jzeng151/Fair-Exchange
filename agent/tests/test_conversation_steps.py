@@ -7,13 +7,13 @@ from dataclasses import replace
 import pytest
 from fx_data.peers import PeerProjects, ProducerProfiles
 from tests.conversation_harness import (
-    RETRIEVE, Run, allowed, answer, cauca_producer, claim, intake, last_step, of, playback, short_reply, summary, types,
+    RETRIEVE, FakeRetriever, Run, allowed, answer, cauca_producer, claim, intake, last_step, of, playback, short_reply, summary, types,
 )
 from tests.tool_harness import call_tool
 
 from fex.conversation.state import StateConflict
+from fex.tools import ALL_TOOLS
 from fex.tools.peer_examples import find_peer_examples
-from fex.tools.regional_context import get_regional_context
 
 STEPS = ["intake", "playback", "respond", "consent", "feedback", "closed"]
 ACTIONS = {
@@ -151,10 +151,11 @@ def test_every_invalid_action_is_rejected_in_every_step(step, name):
 # ---------------------------------------------------------------- tool gating
 
 @pytest.mark.parametrize("step", ["intake", "playback", "consent", "feedback", "closed", None])
-@pytest.mark.parametrize("tool,args", [(get_regional_context, {}), (find_peer_examples, {"challenge": "water"})])
-def test_data_tools_refuse_outside_respond(step, tool, args):
-    state = {"producer_id": cauca_producer(), "step": step}  # step=None sends no step at all
-    status, result = call_tool(tool, args, state)
+@pytest.mark.parametrize("tool", ALL_TOOLS)
+def test_data_tools_refuse_outside_respond(step, tool):
+    state = {"producer_id": cauca_producer(), "step": step, "tags": ["water"],  # step=None sends no step at all
+             "summary_original": "Rain fell.", "clause_retriever": FakeRetriever()}
+    status, result = call_tool(tool, {}, state)
     assert status == "success"
     assert result == {"refused": True, "reason": "Data tools run only after the producer confirms the playback."}
 
@@ -162,7 +163,7 @@ def test_data_tools_refuse_outside_respond(step, tool, args):
 def test_the_engine_only_offers_data_tools_in_respond():
     r = Run()
     r.to_consent()
-    data_tools = {"get_regional_context", "find_peer_examples"}
+    data_tools = {t.tool_name for t in ALL_TOOLS}
     small_offered = {name for call in r.small.calls for name in call}
     assert not small_offered & data_tools
     assert data_tools <= {name for call in r.large.calls for name in call}
@@ -216,12 +217,14 @@ def test_entity_type_correction_is_kept_and_used_for_peer_matching():
     r.send("message", text="Somos una finca, no una cooperativa.")
     assert r.state().entity_type == "estate"
     profile = ProducerProfiles.load().get(r.producer_id)
-    status, peers = call_tool(find_peer_examples, {"challenge": "water"},
-                              {"producer_id": r.producer_id, "step": "respond", "entity_type": "estate"})
+    status, peers = call_tool(find_peer_examples, {},
+                              {"producer_id": r.producer_id, "step": "respond", "entity_type": "estate",
+                               "tags": ["water"]})
     assert status == "success" and peers
     projects = {p["project_ref"]: p for p in PeerProjects.load()._projects}
     corrected = replace(profile, entity_type="estate")
-    assert [p["match_score"] for p in peers] == [PeerProjects.score(projects[p["project_ref"]], corrected) for p in peers]
+    assert [p["data"]["match_score"] for p in peers] == [
+        PeerProjects.score(projects[p["data"]["project_ref"]], corrected) for p in peers]
 
 
 def test_disputed_location_is_noted_and_the_location_on_file_is_kept():
@@ -445,9 +448,9 @@ def test_a_failing_data_tool_is_an_answer_failure_with_retry():
     r = Run()
     r.to_playback()
     r.small.add(summary())
-    # an invalid tool input makes Strands return a toolResult with status "error" (no exception raised)
-    # The answer needs no rewrite, so only the tool error can make this fail
-    r.large.add(("tool", "find_peer_examples", {"challenge": "not-a-tag"}), answer([], []))
+    # a failing Knowledge Base makes Strands return a toolResult with status "error" (no exception raised)
+    r.retriever.fail = RuntimeError("Knowledge Base unavailable")
+    r.large.add(("tool", "find_standards", {}), ("text", "done"))
     events = r.action("confirm_playback")
     assert of(events, "error")[0].code == "agent_failed"
     assert of(events, "claim") == [] and of(events, "answer") == []
@@ -476,8 +479,9 @@ def test_events_are_delivered_as_they_happen_not_after_the_turn():
     r.large.add(*RETRIEVE, answer([bad], [claim("Peer.", r.peers[0]["source"])]), answer([], []), answer([], []))
     r.engine.handle({"kind": "action", "producerId": r.producer_id, "conversationId": r.conversation_id,
                      "action": {"name": "confirm_playback", "args": {}}}, on_event=delivered.append)
-    # the 4th large-model call is the first rewrite: the passing claim was already delivered by then
-    assert "claim" in seen_before_rewrite[3]
+    # after the retrieval calls and the first answer, the next large-model call is the first rewrite:
+    # the passing claim was already delivered by then
+    assert "claim" in seen_before_rewrite[len(RETRIEVE) + 1]
     assert [e.type for e in delivered][-1] == "done"
     assert [e.seq for e in delivered] == list(range(1, len(delivered) + 1))
 

@@ -143,14 +143,26 @@ export function makeDeps(overrides: Partial<Deps> = {}) {
 
 export function makeEvent(opts: {
   producerId?: string | null;
+  roles?: string[] | string;
+  userId?: string;
   id?: string;
   body?: unknown;
 }): APIGatewayProxyEvent {
+  // Default: a producer (back-compatible with the chat tests). producerId: null with no roles/userId
+  // makes an unidentified caller. roles/userId let the resolver tests build reviewer/admin callers.
+  let authorizer: Record<string, unknown> | undefined;
+  if (opts.producerId === null && opts.roles === undefined && opts.userId === undefined) {
+    authorizer = undefined;
+  } else {
+    authorizer = {};
+    const producerId = opts.producerId === undefined ? 'producer-a' : opts.producerId;
+    if (producerId) authorizer.producerId = producerId;
+    if (opts.roles !== undefined) authorizer.roles = Array.isArray(opts.roles) ? opts.roles.join(',') : opts.roles;
+    if (opts.userId !== undefined) authorizer.userId = opts.userId;
+  }
   return {
     body: opts.body === undefined ? null : typeof opts.body === 'string' ? opts.body : JSON.stringify(opts.body),
     pathParameters: opts.id ? { id: opts.id } : null,
-    requestContext: {
-      authorizer: opts.producerId === null ? undefined : { producerId: opts.producerId ?? 'producer-a' },
-    },
+    requestContext: { authorizer },
   } as unknown as APIGatewayProxyEvent;
 }

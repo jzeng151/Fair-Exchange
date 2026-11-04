@@ -28,3 +28,49 @@ export const resolveCaller: IdentityResolver = (event) => {
   }
   return producerId;
 };
+
+export type Role = 'producer' | 'reviewer' | 'admin';
+
+/** The caller as the identity-resolution function returns it (#11 spec). */
+export interface Identity {
+  userId: string;
+  roles: Role[];
+  /** Present only with the `producer` role. */
+  producerId?: string;
+}
+
+/** Thrown when the caller is identified but lacks the route's role. Handlers return 403. */
+export class Forbidden extends Error {
+  constructor() {
+    super('Forbidden');
+    this.name = 'Forbidden';
+  }
+}
+
+export type IdentityFullResolver = (event: APIGatewayProxyEvent) => Promise<Identity> | Identity;
+
+const ROLES: readonly string[] = ['producer', 'reviewer', 'admin'];
+
+/**
+ * Placeholder, like `resolveCaller`: reads `userId`, `roles` (comma separated) and `producerId` from the
+ * API Gateway authorizer context, never from the request. Replace it when the sign-in method is chosen.
+ */
+export const resolveIdentity: IdentityFullResolver = (event) => {
+  const ctx = event.requestContext?.authorizer;
+  const userId = ctx?.userId;
+  if (typeof userId !== 'string' || userId.length === 0) throw new Unauthorized();
+  const roles = (typeof ctx?.roles === 'string' ? ctx.roles.split(',') : [])
+    .map((r: string) => r.trim())
+    .filter((r: string): r is Role => ROLES.includes(r));
+  const identity: Identity = { userId, roles };
+  if (roles.includes('producer') && typeof ctx?.producerId === 'string' && ctx.producerId.length > 0) {
+    identity.producerId = ctx.producerId;
+  }
+  return identity;
+};
+
+/** Returns the identity if it has the role, otherwise throws Forbidden. */
+export function requireRole(identity: Identity, role: Role): Identity {
+  if (!identity.roles.includes(role)) throw new Forbidden();
+  return identity;
+}

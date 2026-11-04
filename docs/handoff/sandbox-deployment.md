@@ -83,12 +83,13 @@ website publishing satisfies only the hosting portion. As of November 4, 2026:
   the separate hello-world spike. Include reproducible ARM64 dependency packaging,
   artifact upload, runtime configuration, and outputs consumed by the API.
 - [ ] Add the resources needed by the MVP features as they land: authenticated API
-  routes and Lambdas, records storage, data/query resources and loading, guardrails,
+  routes and Lambdas, records storage, data/query resources and loading, guardrails (defined: `FexGuardrail`, #12; wire it to the FEX runtime),
   and frontend configuration. Package the chosen retrieval implementation; managed
   Knowledge Bases are not required if the approved embedded approach is retained.
 - [ ] Provide one documented command that builds, provisions, loads required data,
-  and publishes the full application in dependency order. Today `deploy-web.sh`
-  deploys hosting only, and the AgentCore spike has its own command. Document account
+  and publishes the full application in dependency order. `infra/deploy.sh` now does this
+  for hosting and the standards Knowledge Base (#17), using a `FairExchangeArtifacts` stack for
+  files the main stack reads; the AgentCore spike still has its own command. Document account
   prerequisites and avoid dependencies on existing sandbox resource IDs.
 - [ ] Apply KMS encryption and least-privilege service roles to the added resources.
   The spike code bucket uses S3-managed encryption and must change for this baseline.

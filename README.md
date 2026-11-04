@@ -53,6 +53,18 @@ cd web   && npm ci && npm run dev           # web app
 cd infra && npm ci && npx cdk synth         # preview the stack; creates nothing
 ```
 
+### Run the whole chain locally (no AWS)
+
+```bash
+bash scripts/e2e/run_local.sh
+```
+
+This starts the real agent (`agent/scripts/serve_local.py`, served the way AgentCore runs it) and the real chat API
+route logic (`api/src/local/`), then holds one full Spanish conversation through the API: intake, playback,
+cited answer, consent, feedback, closing. It saves the record to a local folder. By default a deterministic demo
+model stands in for Claude (`FEX_DEMO_MODELS=1`: no AWS, no cost); `FEX_DEMO_MODELS=0` uses real Claude via
+Bedrock (needs AWS credentials). CI runs the same check on every PR.
+
 How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Docs

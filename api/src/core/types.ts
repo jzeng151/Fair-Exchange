@@ -18,7 +18,8 @@ export interface Conversation {
 
 /** What the agent runtime receives. producerId always comes from the resolved identity. */
 export type AgentRequest =
-  | { kind: 'start' | 'resume' | 'inactivity_close'; producerId: string; conversationId: string }
+  | { kind: 'start' | 'resume'; producerId: string; conversationId: string }
+  | { kind: 'auto_close'; reason: 'inactivity' | 'max_lifetime'; producerId: string; conversationId: string }
   | { kind: 'message'; producerId: string; conversationId: string; text: string }
   | {
       kind: 'action';
@@ -42,7 +43,7 @@ export type ResumeResult = Record<string, unknown> & { step?: string };
 
 export interface AgentClient {
   /**
-   * Streams the agent's events for start, message, action and inactivity_close.
+   * Streams the agent's events for start, message, action and auto_close.
    * Aborting `signal` must cancel the underlying call.
    */
   stream(request: AgentRequest, signal?: AbortSignal): AsyncIterable<AgentEvent>;

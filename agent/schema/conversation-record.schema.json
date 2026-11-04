@@ -84,6 +84,14 @@
         ]
       },
       "properties": {
+        "ai_usage": {
+          "description": "Tokens per model for this conversation (AI footprint)",
+          "items": {
+            "$ref": "#/$defs/ModelUsage"
+          },
+          "title": "Ai Usage",
+          "type": "array"
+        },
         "closed_at": {
           "anyOf": [
             {
@@ -177,11 +185,68 @@
           "title": "Peer Examples",
           "type": "array"
         },
+        "pii_check": {
+          "anyOf": [
+            {
+              "enum": [
+                "done",
+                "failed",
+                "unsupported_language"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Scan result: None until the first scan ran; unsupported_language covers languages other than en and es",
+          "title": "Pii Check"
+        },
+        "pii_entity_types": {
+          "description": "Types found across the conversation, in first-seen order",
+          "items": {
+            "enum": [
+              "NAME",
+              "PHONE",
+              "EMAIL",
+              "ADDRESS"
+            ],
+            "type": "string"
+          },
+          "title": "Pii Entity Types",
+          "type": "array"
+        },
         "pii_flag": {
           "default": false,
           "description": "Personal information flagged for human review; never redacted",
           "title": "Pii Flag",
           "type": "boolean"
+        },
+        "pii_matches": {
+          "description": "Every match found across scanned texts; matches are removed if the record turns declined",
+          "items": {
+            "$ref": "#/$defs/PiiMatch"
+          },
+          "title": "Pii Matches",
+          "type": "array"
+        },
+        "pii_review": {
+          "anyOf": [
+            {
+              "enum": [
+                "confirmed",
+                "cleared"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Reviewer decision on the PII flag",
+          "title": "Pii Review"
         },
         "producer_id": {
           "description": "Set from the session, never from the conversation",
@@ -432,6 +497,14 @@
       "additionalProperties": false,
       "description": "The producer declined. Only identifiers, status and time are kept: no narrative content.",
       "properties": {
+        "ai_usage": {
+          "description": "Tokens per model for this conversation (AI footprint)",
+          "items": {
+            "$ref": "#/$defs/ModelUsage"
+          },
+          "title": "Ai Usage",
+          "type": "array"
+        },
         "closed_at": {
           "anyOf": [
             {
@@ -564,6 +637,77 @@
         "reason"
       ],
       "title": "EarlierAnswer",
+      "type": "object"
+    },
+    "ModelUsage": {
+      "additionalProperties": false,
+      "description": "Tokens one model used in this conversation, for the AI footprint (#26, #29). Non-narrative.",
+      "properties": {
+        "input_tokens": {
+          "minimum": 0,
+          "title": "Input Tokens",
+          "type": "integer"
+        },
+        "model_id": {
+          "minLength": 1,
+          "title": "Model Id",
+          "type": "string"
+        },
+        "output_tokens": {
+          "minimum": 0,
+          "title": "Output Tokens",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "model_id",
+        "input_tokens",
+        "output_tokens"
+      ],
+      "title": "ModelUsage",
+      "type": "object"
+    },
+    "PiiMatch": {
+      "additionalProperties": false,
+      "description": "One personal-information match a scan found, kept for human review (issue #20).",
+      "properties": {
+        "context": {
+          "description": "Up to 10 words before and after the match",
+          "minLength": 1,
+          "title": "Context",
+          "type": "string"
+        },
+        "entity_type": {
+          "description": "Only these four types are looked for",
+          "enum": [
+            "NAME",
+            "PHONE",
+            "EMAIL",
+            "ADDRESS"
+          ],
+          "title": "Entity Type",
+          "type": "string"
+        },
+        "message_at": {
+          "description": "When the text containing the match was said",
+          "format": "date-time",
+          "title": "Message At",
+          "type": "string"
+        },
+        "text": {
+          "description": "The matched words; kept for review, never redacted or logged",
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entity_type",
+        "text",
+        "context",
+        "message_at"
+      ],
+      "title": "PiiMatch",
       "type": "object"
     },
     "StoredConsent": {

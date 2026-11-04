@@ -64,10 +64,11 @@ def test_stream_yields_every_event_in_order():
     assert any(e["type"] == "claim" for e in received)
 
 
-def test_stream_turns_a_malformed_request_into_one_error_item():
+def test_stream_turns_a_malformed_request_into_an_error_event_then_done():
     out = list(runtime.stream({"kind": "message", "producerId": "P", "conversationId": "c", "text": ""},
                               engine=Run().engine))
-    assert out == [{"error": {"code": "invalid_request", "message": out[0]["error"]["message"]}}]
+    assert [(e["type"], e["seq"]) for e in out] == [("error", 1), ("done", 2)]
+    assert out[0]["code"] == "agent_failed" and out[0]["message"].startswith("Invalid request")
 
 
 def test_stream_returns_resume_as_one_item():
@@ -76,3 +77,26 @@ def test_stream_returns_resume_as_one_item():
     runtime.invoke({"kind": "start", "producerId": r.producer_id, "conversationId": "c1"}, engine=r.engine)
     out = list(runtime.stream({"kind": "resume", "producerId": r.producer_id, "conversationId": "c1"}, engine=r.engine))
     assert len(out) == 1 and out[0]["resume"]["step"] == "intake"
+
+
+# ---------------------------------------------------------------- local runs (#101)
+
+def test_demo_models_are_used_when_asked(monkeypatch):
+    from fex.conversation.demo_model import DemoModel
+    monkeypatch.setenv("FEX_DEMO_MODELS", "1")
+    monkeypatch.delenv("FEX_GUARDRAIL_ID", raising=False)
+    monkeypatch.delenv("FEX_GUARDRAIL_VERSION", raising=False)
+    runtime.default_engine.cache_clear()
+    try:
+        eng = runtime.default_engine()
+        assert isinstance(eng.small_model, DemoModel) and isinstance(eng.large_model, DemoModel)
+    finally:
+        runtime.default_engine.cache_clear()
+
+
+def test_records_go_to_local_files_when_a_directory_is_set(monkeypatch, tmp_path):
+    from fex.records.local import FileRecordStore
+    monkeypatch.delenv("FEX_RECORDS_TABLE", raising=False)
+    monkeypatch.setenv("FEX_LOCAL_RECORDS_DIR", str(tmp_path))
+    store = runtime.record_store()
+    assert isinstance(store, FileRecordStore) and store.directory == tmp_path

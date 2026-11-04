@@ -14,9 +14,27 @@ from tests.tool_harness import call_tool
 from fex.conversation import ConversationEngine, InMemoryStateStore
 from fex.tools.peer_examples import find_peer_examples
 from fex.tools.regional_context import get_regional_context
+from fex.tools.standards import RetrievedClause
 
 STANDARDS = Standards.load()
 CLAUSE = "APS 1.1"
+TAGS = ["water", "climate and weather"]  # what summary() confirms
+
+
+class FakeRetriever:
+    """Stands in for the standards Knowledge Base behind the same ClauseRetriever interface."""
+
+    def __init__(self, clause_ids=(CLAUSE, "APS 3.6.1"), fail: Exception | None = None):
+        self.clause_ids = list(clause_ids)
+        self.fail = fail
+        self.queries = []
+
+    def retrieve(self, query: str, limit: int) -> list[RetrievedClause]:
+        self.queries.append(query)
+        if self.fail:
+            raise self.fail
+        return [RetrievedClause(clause_id=cid, standard=cid.split()[0], text=STANDARDS.get(cid)["text"]["en"])
+                for cid in self.clause_ids[:limit]]
 
 
 class ScriptedModel(Model):
@@ -73,10 +91,10 @@ def cauca_producer() -> str:
 
 def real_sources(producer_id: str) -> tuple[list[dict], list[dict]]:
     """What the real tools return for this producer, so scripted claims can cite real sources."""
-    state = {"producer_id": producer_id, "step": "respond"}
+    state = {"producer_id": producer_id, "step": "respond", "tags": TAGS}
     _, regional = call_tool(get_regional_context, {}, state)
-    _, peers = call_tool(find_peer_examples, {"challenge": "water"}, state)
-    return regional["facts"], peers
+    _, peers = call_tool(find_peer_examples, {}, state)
+    return regional, peers
 
 
 def claim(text: str, source: str, clause: str = CLAUSE) -> dict:
@@ -108,13 +126,16 @@ def answer(insights: list[dict], peers: list[dict]) -> tuple:
     return ("out", "AnswerDraft", {"insights": insights, "peer_examples": peers})
 
 
-RETRIEVE = (("tool", "get_regional_context", {}), ("tool", "find_peer_examples", {"challenge": "water"}))
+# The retrieval call: the model calls every data tool, then ends its turn. The claims come in a second call.
+RETRIEVE = (("tool", "get_producer_record", {}), ("tool", "get_regional_context", {}), ("tool", "find_peer_examples", {}),
+            ("tool", "find_standards", {}), ("text", "done"))
 
 
 class Run:
     """One conversation against a fresh engine."""
 
-    def __init__(self, producer_id: str | None = None, profiles=None, records=None, scope_check=None):
+    def __init__(self, producer_id: str | None = None, profiles=None, records=None, scope_check=None,
+                 pii_scanner=None, retriever=None):
         self.producer_id = producer_id or cauca_producer()
         self.conversation_id = "conv-1"
         self.small, self.large = ScriptedModel(), ScriptedModel()
@@ -125,8 +146,11 @@ class Run:
             kwargs["records"] = records
         if scope_check is not None:
             kwargs["scope_check"] = scope_check
+        if pii_scanner is not None:
+            kwargs["pii_scanner"] = pii_scanner
+        self.retriever = retriever or FakeRetriever()
         self.engine = ConversationEngine(store=self.store, small_model=self.small, large_model=self.large,
-                                         standards=STANDARDS, clock=self._clock, **kwargs)
+                                         standards=STANDARDS, retriever=self.retriever, clock=self._clock, **kwargs)
         self.regional, self.peers = real_sources(self.producer_id)
 
     def _clock(self):

@@ -68,6 +68,8 @@ ACCEPTED = {
     "completed English record without a second summary": completed(language="en", summary_english=None),
     "completed record with outward sharing": completed(consent={"scope": "internal_and_outward", "recorded_at": NOW}),
     "declined record": declined(),
+    "completed record with AI usage": completed(ai_usage=[{"model_id": "m-small", "input_tokens": 10, "output_tokens": 2}]),
+    "declined record with AI usage": declined(ai_usage=[{"model_id": "m-small", "input_tokens": 0, "output_tokens": 0}]),
 }
 
 
@@ -89,6 +91,14 @@ def test_json_schema_accepts_what_python_accepts(payload):
     pytest.param(lambda: completed(version=0), id="version-0"),
     pytest.param(lambda: completed(evidence="partial"), id="unknown-evidence"),
     pytest.param(lambda: {k: v for k, v in completed().items() if k != "version"}, id="missing-version"),
+    pytest.param(lambda: completed(ai_usage=[{"model_id": "m", "input_tokens": -1, "output_tokens": 0}]),
+                 id="ai-usage-negative-tokens"),
+    pytest.param(lambda: declined(ai_usage=[{"model_id": "m", "input_tokens": 1.5, "output_tokens": 0}]),
+                 id="ai-usage-fractional-tokens"),
+    pytest.param(lambda: completed(ai_usage=[{"model_id": "", "input_tokens": 1, "output_tokens": 0}]),
+                 id="ai-usage-empty-model-id"),
+    pytest.param(lambda: declined(ai_usage=[{"model_id": "m", "input_tokens": 1, "output_tokens": 0, "x": 1}]),
+                 id="ai-usage-extra-field"),
 ])
 def test_json_schema_rejects_what_the_models_reject_for_write_back_fields(bad):
     payload = bad()

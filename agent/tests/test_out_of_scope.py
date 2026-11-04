@@ -21,8 +21,8 @@ class FakeDetector:
 
     def __call__(self, text: str, step: str) -> ScopeVerdict:
         self.calls.append((text, step))
-        if text == MISDIRECTED:
-            return ScopeVerdict(in_scope=False, reason=self.reason)
+        if text == MISDIRECTED:  # a Spanish message: a real detector reports its language (#22 opening is English)
+            return ScopeVerdict(in_scope=False, reason=self.reason, language="es")
         return ScopeVerdict(in_scope=True)
 
 

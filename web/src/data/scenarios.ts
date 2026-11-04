@@ -3,7 +3,7 @@
 // if any cited clause doesn't exist. Clause choices are the team's mapping, for FTUSA to confirm.
 // When the chat API (#25) lands, answers come from the agent instead of this file.
 
-export interface Bilingual { en: string; es?: string }
+export interface Bilingual { en: string; es?: string; fr?: string }
 export interface Insight { text: Bilingual; source: string; period: string; strength: 'exact' | 'nearest' | 'limited'; clause: string }
 export interface Peer {
   text: Bilingual; org: string; place: string; coords: { lat: number; lon: number }
@@ -11,7 +11,7 @@ export interface Peer {
 }
 export interface ChartBar { label: Bilingual; value: number; ref?: boolean }
 export interface Scenario {
-  id: string; name: string; entityType: string; crop: string; region: string; language: 'en' | 'es'
+  id: string; name: string; entityType: string; crop: string; region: string; language: 'en' | 'es' | 'fr'
   scenario: string; summary: Bilingual; coords: { lat: number; lon: number }
   chart: { title: Bilingual; unit: string; source: string; bars: ChartBar[] }
   tags: [ChallengeTag, ...ChallengeTag[]]
@@ -39,17 +39,17 @@ export const scenarios: Scenario[] = [
     language: 'es',
     scenario: 'Drought',
     summary: {
-      en: 'Rainfall in Cauca has been about 22% below normal for the last two seasons, and water stress is expected to grow. Two cooperatives in similar conditions used Premium funds for rainwater collection and shade trees.',
-      es: 'La lluvia en Cauca ha estado cerca de un 22% por debajo de lo normal en las dos últimas temporadas, y se espera más estrés hídrico. Dos cooperativas en condiciones similares usaron fondos del Premium para captar agua lluvia y sembrar árboles de sombra.',
+      en: 'Rainfall near the centre of Cauca averaged 11.5% below the 10-year average over 2024 and 2025: 2024 was about 20% below, and 2025 was about 3% below. Water stress in the area is rated low to medium and is projected to stay in that band. Two cooperatives in similar conditions used Premium funds for rainwater collection and shade trees.',
+      es: 'La lluvia cerca del centro de Cauca estuvo en promedio un 11,5% por debajo del promedio de 10 años en 2024 y 2025: 2024 estuvo cerca de un 20% por debajo y 2025 cerca de un 3% por debajo. El estrés hídrico de la zona se califica de bajo a medio y se proyecta que siga en ese nivel. Dos cooperativas en condiciones similares usaron fondos del Premium para captar agua lluvia y sembrar árboles de sombra.',
     },
     coords: { lat: 2.45, lon: -76.6 },
     chart: {
-      title: { en: 'Rainfall in Cauca vs. 10-year average', es: 'Lluvia en Cauca vs. promedio de 10 años' },
-      unit: 'mm', source: 'CHIRPS rainfall (synthetic extract)',
+      title: { en: 'Annual rainfall in Cauca vs. 2014–2023 average', es: 'Lluvia anual en Cauca vs. promedio 2014–2023' },
+      unit: 'mm', source: 'CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)',
       bars: [
-        { label: { en: '10-yr avg', es: 'Prom. 10 años' }, value: 1950, ref: true },
-        { label: { en: '2024', es: '2024' }, value: 1530 },
-        { label: { en: '2025', es: '2025' }, value: 1510 },
+        { label: { en: '2014–23 avg', es: 'Prom. 2014–23' }, value: 2103, ref: true },
+        { label: { en: '2024', es: '2024' }, value: 1675 },
+        { label: { en: '2025', es: '2025' }, value: 2048 },
       ],
     },
     tags: ['climate and weather', 'water'],
@@ -67,13 +67,13 @@ export const scenarios: Scenario[] = [
     },
     insights: [
       {
-        text: { es: 'La lluvia en Cauca estuvo aproximadamente 22% por debajo del promedio de 10 años durante las dos últimas temporadas.', en: 'Rainfall in Cauca was about 22% below the 10-year average over the last two seasons.' },
-        source: 'CHIRPS rainfall (synthetic extract)', period: '2024–2025', strength: 'exact',
+        text: { es: 'La lluvia cerca del centro de Cauca promedió 1.861 mm al año en 2024–2025, un 11,5% por debajo del promedio de 2014–2023 (2.103 mm). 2024 estuvo cerca de un 20% por debajo y 2025 cerca de un 3% por debajo.', en: 'Rainfall near the centre of Cauca averaged 1,861 mm a year in 2024–2025, 11.5% below the 2014–2023 average of 2,103 mm. 2024 was about 20% below and 2025 about 3% below.' },
+        source: 'CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)', period: '2014–2025', strength: 'nearest',
         clause: 'APS 4.1.1',
       },
       {
-        text: { es: 'El índice Aqueduct proyecta un estrés hídrico creciente para su zona hacia 2030.', en: 'Aqueduct projects increasing water stress for your area toward 2030.' },
-        source: 'WRI Aqueduct Water Risk Atlas (synthetic extract)', period: 'Projection 2030', strength: 'nearest',
+        text: { es: 'WRI Aqueduct califica el estrés hídrico de la cuenca cerca del centro de Cauca como bajo a medio (10-20%) y proyecta que seguirá en ese nivel en 2030 y 2050, con un aumento leve del índice.', en: 'WRI Aqueduct rates water stress in the river basin near the centre of Cauca as low to medium (10-20%) and projects it stays in that band in 2030 and 2050, with the score rising slightly.' },
+        source: 'WRI Aqueduct 4.0 water risk atlas', period: '2030–2050 projection', strength: 'nearest',
         clause: 'APS 4.1.1',
       },
       {
@@ -106,19 +106,18 @@ export const scenarios: Scenario[] = [
     language: 'en',
     scenario: 'Price drop',
     summary: {
-      en: 'International arabica prices fell about 18% in the last six months. Other cooperatives have used Premium funds to add value, such as roasting their own coffee or improving quality to reach specialty buyers.',
+      en: 'The international arabica benchmark price was 16.9% lower in October 2026 than a year earlier, though still about 18% above its 5-year average. This is a world market price, not what a cooperative is paid. Other cooperatives have used Premium funds to add value, such as roasting their own coffee or improving quality to reach specialty buyers.',
     },
     coords: { lat: 17.06, lon: -96.72 },
     chart: {
-      title: { en: 'International arabica price, last 6 months', es: 'Precio internacional del arábica, últimos 6 meses' },
-      unit: 'US$/lb', source: 'World Bank commodity prices (synthetic extract)',
+      title: { en: 'International arabica benchmark price, past year', es: 'Precio internacional de referencia del arábica, último año' },
+      unit: 'US$/kg', source: 'World Bank Commodity Price Data (Pink Sheet): Coffee, Arabica',
       bars: [
-        { label: { en: 'May', es: 'May' }, value: 3.40, ref: true },
-        { label: { en: 'Jun', es: 'Jun' }, value: 3.30 },
-        { label: { en: 'Jul', es: 'Jul' }, value: 3.10 },
-        { label: { en: 'Aug', es: 'Ago' }, value: 2.95 },
-        { label: { en: 'Sep', es: 'Sep' }, value: 2.85 },
-        { label: { en: 'Oct', es: 'Oct' }, value: 2.79 },
+        { label: { en: 'Oct ’25', es: 'Oct ’25' }, value: 8.90, ref: true },
+        { label: { en: 'Jan', es: 'Ene' }, value: 8.02 },
+        { label: { en: 'Apr', es: 'Abr' }, value: 7.30 },
+        { label: { en: 'Jul', es: 'Jul' }, value: 7.91 },
+        { label: { en: 'Oct ’26', es: 'Oct ’26' }, value: 7.40 },
       ],
     },
     tags: ['market and price', 'financial and access to capital'],
@@ -136,8 +135,8 @@ export const scenarios: Scenario[] = [
     },
     insights: [
       {
-        text: { en: 'World Bank data shows international arabica prices fell about 18% over the last six months after a two-year high.' },
-        source: 'World Bank commodity prices (synthetic extract)', period: 'Last 6 months', strength: 'exact',
+        text: { en: 'World Bank data puts the international arabica benchmark at US$7.40 per kg in October 2026, 16.9% lower than a year earlier and 18% above its 5-year average. This is a world market price, not a farm-gate price.' },
+        source: 'World Bank Commodity Price Data (Pink Sheet): Coffee, Arabica', period: 'Oct 2025 – Oct 2026', strength: 'limited',
         clause: 'APS 5.2.3',
       },
       {
@@ -214,6 +213,67 @@ export const scenarios: Scenario[] = [
         text: { en: 'A cocoa group in Ghana used Premium to buy shared pod-breaking tools, reducing labor needed at harvest.' },
         org: 'Ejemplo Ashanti Cocoa Group (fictional)', place: 'Ashanti, Ghana', coords: { lat: 6.69, lon: -1.62 },
         tradeoff: { en: 'Tools need to be shared fairly and looked after by the group.' }, match: { crop: true, entity: true, country: false },
+        clause: 'APS 3.2.4',
+      },
+    ],
+  },
+  // S8 (#24): a French-speaking Côte d'Ivoire cocoa producer who names a person (PII) and consents internal.
+  {
+    id: 'P-008',
+    name: 'Coopérative Cacao Sud-Comoé',
+    entityType: 'smallholder',
+    crop: 'cocoa',
+    region: 'Sud-Comoé, Côte d’Ivoire',
+    language: 'fr',
+    scenario: 'Drought',
+    summary: {
+      en: 'Rainfall in your area has been below the recent average over the last two seasons, and your survey lists irregular rain as a growing concern. A cocoa group in similar conditions used Premium funds for shade trees to protect young plants.',
+      fr: 'Les pluies dans votre zone ont été inférieures à la moyenne récente sur les deux dernières saisons, et votre enquête cite la pluie irrégulière comme une préoccupation croissante. Un groupe de cacao dans des conditions semblables a utilisé des fonds du Premium pour planter des arbres d’ombrage afin de protéger les jeunes plants.',
+    },
+    coords: { lat: 5.5, lon: -3.2 },
+    chart: {
+      title: { en: 'Rainfall vs the recent average', es: 'Lluvia frente al promedio reciente', fr: 'Pluie par rapport à la moyenne récente' },
+      unit: '%', source: 'Regional rainfall fact table (hand-curated stand-in)',
+      bars: [
+        { label: { en: 'Average', fr: 'Moyenne' }, value: 100, ref: true },
+        { label: { en: '2024', fr: '2024' }, value: 82 },
+        { label: { en: '2025', fr: '2025' }, value: 88 },
+      ],
+    },
+    tags: ['climate and weather', 'water'],
+    premiumProjects: [
+      { year: 2023, project: 'Shade tree nursery', amount: 'US$7,500' },
+    ],
+    survey: { year: 2025, item: 'Top concern reported', value: 'Irregular rainfall' },
+    certification: { standard: 'APS', status: 'Certified', since: 2020 },
+    chips: {
+      open: [{ en: 'The rain has become irregular and the cocoa harvest has dropped.', fr: 'Je m’appelle Kouamé Konan et la pluie est devenue irrégulière, la récolte de cacao a baissé.' }],
+      timing: [{ en: 'It got worse over the last two seasons.', fr: 'Cela a empiré sur les deux dernières saisons.' }],
+      severity: [{ en: 'Some young plants did not survive.', fr: 'Certains jeunes plants n’ont pas survécu.' }],
+      tried: [{ en: 'We water by hand when we can, but it is not enough.', fr: 'Nous arrosons à la main quand nous pouvons, mais ce n’est pas suffisant.' }],
+    },
+    insights: [
+      {
+        text: {
+          en: 'Regional data suggests rainfall in your area has been below the recent average over the last two seasons.',
+          fr: 'Les données régionales suggèrent que la pluie dans votre zone a été inférieure à la moyenne récente sur les deux dernières saisons.',
+        },
+        source: 'Regional rainfall fact table (hand-curated stand-in)', period: '2024–2025', strength: 'nearest',
+        clause: 'APS 3.3.1',
+      },
+    ],
+    peers: [
+      {
+        text: {
+          en: 'A cocoa group in similar conditions used Premium funds to plant shade trees that protect young plants from heat and dry spells.',
+          fr: 'Un groupe de cacao dans des conditions semblables a utilisé des fonds du Premium pour planter des arbres d’ombrage qui protègent les jeunes plants de la chaleur et de la sécheresse.',
+        },
+        org: 'Exemple Groupe Cacao Indénié (fictif)', place: 'Comoé, Côte d’Ivoire', coords: { lat: 6.5, lon: -3.5 },
+        tradeoff: {
+          en: 'Shade trees take a few years to grow before they help.',
+          fr: 'Les arbres d’ombrage mettent quelques années à pousser avant d’être utiles.',
+        },
+        match: { crop: true, entity: true, country: true },
         clause: 'APS 3.2.4',
       },
     ],

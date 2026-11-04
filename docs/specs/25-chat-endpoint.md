@@ -55,8 +55,10 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 | `POST /conversations` | yes | Creates a conversation owned by the caller and streams the agent `start` turn |
 | `POST /conversations/{id}/messages` | yes | Body `{ "text": string }`, at most 4,000 characters (agent `message`) |
 | `POST /conversations/{id}/actions` | yes | Body `{ "action": string, "args": object }` (agent `action`); actions are defined in the [#13 spec](13-conversation-steps.md) |
+| Voice routes | no | Added by the [#41 spec](41-voice-notes.md) when built |
 | `GET /conversations/{id}` | no | History, current step and allowed actions (agent `resume`), for open or closed conversations |
 | `GET /conversations` | no | The caller's conversations, newest first: ID, created time, open or closed |
+| `GET /health` | no | No sign-in. Returns the deployed version, for the deploy smoke check ([#5 spec](05-cdk-stack.md)). |
 
 - **Identity:** every route resolves the caller first through the identity-resolution function ([#11 spec](11-identity.md)).
 - **Unknown fields:** bodies with unknown fields, including any producer ID or conversation ID, get 400.
@@ -83,7 +85,7 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 ### Calling the agent
 
 - **Invocation:** handlers call AgentCore `InvokeAgentRuntime` with the runtime session ID set to the conversation ID. The payload carries the request kind, `producerId`, `conversationId`, and the text or action.
-- **Restricted access:** only the chat handlers' role and the sweep's role may invoke the runtime.
+- **Restricted access:** only the chat handlers' role and the sweep's role may invoke the runtime. In stacks deployed with `evalAccess=true` ([#5 spec](05-cdk-stack.md)), the eval runner role may also invoke it.
 
 ### Turn lock (shared contract owned here)
 
@@ -131,7 +133,7 @@ An API Gateway REST API fronts TypeScript Lambda handlers.
 
 ## Out of Scope
 
-- Review, analytics and "your record" routes (later batch)
+- Review, analytics and "your record" routes ([#27](27-review-api.md), [#29](29-analytics-api.md), [#32](32-your-record.md))
 - The web UI beyond the routes and stream format
 - Production identity, WAF and rate limiting beyond API Gateway defaults
 

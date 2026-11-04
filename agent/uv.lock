@@ -303,7 +303,7 @@ dependencies = [
 dev = [
     { name = "bedrock-agentcore" },
     { name = "jsonschema" },
-    { name = "moto", extra = ["dynamodb"] },
+    { name = "moto", extra = ["dynamodb", "s3"] },
     { name = "pytest" },
     { name = "strands-agents" },
 ]
@@ -321,7 +321,7 @@ requires-dist = [
 dev = [
     { name = "bedrock-agentcore", specifier = "==1.25.3" },
     { name = "jsonschema", specifier = ">=4.23,<5" },
-    { name = "moto", extras = ["dynamodb"], specifier = ">=5,<6" },
+    { name = "moto", extras = ["dynamodb", "s3"], specifier = ">=5,<6" },
     { name = "pytest", specifier = ">=8,<9" },
     { name = "strands-agents", specifier = "==1.63.0" },
 ]
@@ -553,6 +553,10 @@ wheels = [
 dynamodb = [
     { name = "docker" },
     { name = "py-partiql-parser" },
+]
+s3 = [
+    { name = "py-partiql-parser" },
+    { name = "pyyaml" },
 ]
 
 [[package]]

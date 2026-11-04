@@ -25,6 +25,7 @@ OUTPUTS = [  # (export function, JSON Schema path, TypeScript path, Python sourc
 ]
 
 
+API_SCHEMA_COPY = REPO / "api" / "src" / "types" / "conversation-record.schema.json"
 def sha256(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
@@ -48,6 +49,9 @@ def main() -> None:
         ts_path.parent.mkdir(parents=True, exist_ok=True)
         ts_path.write_text(banner + body, encoding="utf-8")
         print(f"wrote {json_path.relative_to(REPO)} and {ts_path.relative_to(REPO)}")
+    # The review API validates writes against the record schema, so the API package carries a copy (#27)
+    API_SCHEMA_COPY.write_text(export_json_schema(), encoding="utf-8")
+    print(f"wrote {API_SCHEMA_COPY.relative_to(REPO)}")
 
 
 if __name__ == "__main__":

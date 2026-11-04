@@ -22,11 +22,11 @@ FEX identifies the producer's language during intake and replies in it for the w
 
 ### Language code rules (shared contract owned here)
 
-- **Identifying the language.** The conversation language is identified during intake and stored as an ISO 639-1 code (e.g., `es`, `en`). It is the language the producer writes in.
+- **Identifying the language.** The conversation language is identified during intake and stored as an ISO 639-1 code (`en`, `es`, and `fr` with [#24](24-french-exchange.md)). It is the language the producer writes in.
 - **Replies.** FEX replies in that language, including playback and the answer. Citations keep the source's original names.
 - **Opening language.** The opening question uses the language in the producer's profile if it has one, otherwise English. Once intake identifies the producer's language, FEX switches to it.
 - **Buttons.** The agent sends action names only. The client supplies labels in the producer's language, using the `language` field on `step` and `actions` events and on the resume response ([#13 spec](13-conversation-steps.md)).
-- **Fixed text.** The answer's opening line, limited-evidence notice and closing hand-back exist in English and Spanish ([#13 spec](13-conversation-steps.md)).
+- **Fixed text.** The answer's opening line, limited-evidence notice and closing hand-back exist in English, Spanish and French ([#13 spec](13-conversation-steps.md), [#24](24-french-exchange.md)).
 - **Record fields:**
   - `summary_original` is in the producer's language.
   - `summary_english` is required for any non-English conversation; the existing schema already enforces this.
@@ -47,5 +47,5 @@ FEX identifies the producer's language during intake and replies in it for the w
 
 ## Out of Scope
 
-- French (#24) and other languages
+- French, added by the [#24 spec](24-french-exchange.md) when built, and other languages
 - Translating the producer's own words inside `summary_original`

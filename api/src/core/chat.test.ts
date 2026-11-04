@@ -298,7 +298,9 @@ describe('inactivity sweep', () => {
     expect(r.closedIdle).toBe(1);
     expect((await t.store.get(idle.id))?.status).toBe('closed');
     expect((await t.store.get(active.id))?.status).toBe('open');
-    expect(t.agent.requests.filter((q) => q.kind === 'inactivity_close')).toHaveLength(1);
+    const closes = t.agent.requests.filter((q) => q.kind === 'auto_close');
+    expect(closes).toHaveLength(1);
+    expect(closes[0]).toMatchObject({ kind: 'auto_close', reason: 'inactivity' });
     // The sweep does not make anything look active, and releases its lock.
     expect((await t.store.get(idle.id))?.lockExpiresAt).toBeUndefined();
   });
@@ -433,7 +435,7 @@ describe('review fixes', () => {
     expect(DEFAULT_LOCK_TTL_MS).toBeGreaterThan(LAMBDA_TIMEOUT_MS);
   });
 
-  it('bounds the sweep\'s inactivity_close call too', async () => {
+  it('bounds the sweep\'s auto_close call too', async () => {
     const t = makeDeps({ turnTimeoutMs: 20 });
     const { id } = await startConversation(t);
     t.clock.t += 31 * 60 * 1000;
