@@ -460,3 +460,53 @@ def test_follow_up_questions_see_the_answer_that_was_shown():
     r.send("message", text="¿Qué significa el ejemplo que mostró?")
     prompt = r.small.prompts[-1]
     assert "Rainfall fell." in prompt and "A peer built tanks." in prompt
+
+
+# ---------------------------------------------------------------- review fixes, round 2 (Codex on #67)
+
+def test_events_are_delivered_as_they_happen_not_after_the_turn():
+    r = Run()
+    r.to_playback()
+    r.small.add(summary())
+    delivered = []
+    seen_before_rewrite = []
+    r.large.watch = lambda: seen_before_rewrite.append([e.type for e in delivered])
+    bad = claim("Invented.", "Made-up source")
+    r.large.add(*RETRIEVE, answer([bad], [claim("Peer.", r.peers[0]["source"])]), answer([], []), answer([], []))
+    r.engine.handle({"kind": "action", "producerId": r.producer_id, "conversationId": r.conversation_id,
+                     "action": {"name": "confirm_playback", "args": {}}}, on_event=delivered.append)
+    # the 4th large-model call is the first rewrite: the passing claim was already delivered by then
+    assert "claim" in seen_before_rewrite[3]
+    assert [e.type for e in delivered][-1] == "done"
+    assert [e.seq for e in delivered] == list(range(1, len(delivered) + 1))
+
+
+def test_handle_still_returns_every_event_when_streaming():
+    r = Run()
+    r.small.add(intake("Hola"))
+    delivered = []
+    returned = r.engine.handle({"kind": "start", "producerId": r.producer_id, "conversationId": "c9"},
+                               on_event=delivered.append)
+    assert returned == delivered
+
+
+def test_follow_up_questions_know_the_current_button_choices():
+    r = Run()
+    r.to_feedback()
+    r.action("set_feedback", value="somewhat")
+    r.small.add(short_reply("Sí, eligió compartirlo solo internamente."))
+    r.send("message", text="¿Acepté compartir esto afuera?")
+    prompt = r.small.prompts[-1]
+    assert "consent: internal" in prompt and "feedback: somewhat" in prompt
+
+
+def test_a_disputed_location_reaches_the_summary_model():
+    r = Run()
+    r.small.add(intake("Hola"), intake("", ready=True), playback(location_disputed=True))
+    r.send("start")
+    r.send("message", text="No estamos en Cauca.")
+    r.small.add(summary())
+    r.large.add(*RETRIEVE, r.good_answer())
+    r.action("confirm_playback")
+    summary_prompt = r.small.prompts[-1]
+    assert r.state().location_note in summary_prompt
