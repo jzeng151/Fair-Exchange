@@ -13,6 +13,7 @@ from tests.tool_harness import call_tool
 
 from fex.conversation.state import StateConflict
 from fex.tools.peer_examples import find_peer_examples
+from fex.tools.producer_record import get_producer_record
 from fex.tools.regional_context import get_regional_context
 
 STEPS = ["intake", "playback", "respond", "consent", "feedback", "closed"]
@@ -151,7 +152,8 @@ def test_every_invalid_action_is_rejected_in_every_step(step, name):
 # ---------------------------------------------------------------- tool gating
 
 @pytest.mark.parametrize("step", ["intake", "playback", "consent", "feedback", "closed", None])
-@pytest.mark.parametrize("tool,args", [(get_regional_context, {}), (find_peer_examples, {"challenge": "water"})])
+@pytest.mark.parametrize("tool,args", [(get_producer_record, {}), (get_regional_context, {}),
+                                       (find_peer_examples, {"challenge": "water"})])
 def test_data_tools_refuse_outside_respond(step, tool, args):
     state = {"producer_id": cauca_producer(), "step": step}  # step=None sends no step at all
     status, result = call_tool(tool, args, state)
