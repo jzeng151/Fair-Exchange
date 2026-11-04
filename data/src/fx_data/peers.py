@@ -357,6 +357,10 @@ class ProducerProfiles:
         row = self._profiles.get(producer_id)
         return ProducerProfile(producer_id, **row) if row else None
 
+    def ids(self) -> list[str]:
+        """Every producer ID in the table, sorted."""
+        return sorted(self._profiles)
+
 
 def _crops(crop: str | None) -> set[str]:
     return {normalize(p) for p in (crop or "").split(";") if p.strip()}

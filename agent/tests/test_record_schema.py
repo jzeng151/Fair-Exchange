@@ -204,3 +204,37 @@ def test_reviewer_corrections_sit_next_to_the_agent_values():
 def test_declined_record_rejects_the_new_narrative_fields(narrative_field, value):
     with pytest.raises(ValidationError):
         DeclinedRecord.model_validate(declined(**{narrative_field: value}))
+
+
+# ---------------------------------------------------------------- #26 ai_usage (AI footprint, #29)
+
+USAGE = [{"model_id": "us.anthropic.claude-haiku-5-5", "input_tokens": 1200, "output_tokens": 300},
+         {"model_id": "us.anthropic.claude-sonnet-5-5", "input_tokens": 4000, "output_tokens": 900}]
+
+
+def test_ai_usage_defaults_to_empty_on_both_record_types():
+    assert CompletedRecord.model_validate(completed()).ai_usage == []
+    assert DeclinedRecord.model_validate(declined()).ai_usage == []
+
+
+def test_ai_usage_holds_tokens_per_model_on_both_record_types():
+    r = CompletedRecord.model_validate(completed(ai_usage=USAGE))
+    assert [(u.model_id, u.input_tokens, u.output_tokens) for u in r.ai_usage] == [
+        ("us.anthropic.claude-haiku-5-5", 1200, 300), ("us.anthropic.claude-sonnet-5-5", 4000, 900)]
+    # Non-narrative, so a declined record may carry it
+    assert DeclinedRecord.model_validate(declined(ai_usage=USAGE)).ai_usage[1].output_tokens == 900
+
+
+@pytest.mark.parametrize("bad", [
+    {"model_id": "", "input_tokens": 1, "output_tokens": 1},
+    {"model_id": "m", "input_tokens": -1, "output_tokens": 1},
+    {"model_id": "m", "input_tokens": 1, "output_tokens": -5},
+    {"model_id": "m", "input_tokens": 1.5, "output_tokens": 1},
+    {"model_id": "m", "input_tokens": 1},
+    {"model_id": "m", "input_tokens": 1, "output_tokens": 1, "prompt": "free text"},
+])
+def test_ai_usage_rejects_bad_entries(bad):
+    with pytest.raises(ValidationError):
+        CompletedRecord.model_validate(completed(ai_usage=[bad]))
+    with pytest.raises(ValidationError):
+        DeclinedRecord.model_validate(declined(ai_usage=[bad]))
