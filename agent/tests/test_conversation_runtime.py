@@ -64,10 +64,11 @@ def test_stream_yields_every_event_in_order():
     assert any(e["type"] == "claim" for e in received)
 
 
-def test_stream_turns_a_malformed_request_into_one_error_item():
+def test_stream_turns_a_malformed_request_into_an_error_event_then_done():
     out = list(runtime.stream({"kind": "message", "producerId": "P", "conversationId": "c", "text": ""},
                               engine=Run().engine))
-    assert out == [{"error": {"code": "invalid_request", "message": out[0]["error"]["message"]}}]
+    assert [(e["type"], e["seq"]) for e in out] == [("error", 1), ("done", 2)]
+    assert out[0]["code"] == "agent_failed" and out[0]["message"].startswith("Invalid request")
 
 
 def test_stream_returns_resume_as_one_item():

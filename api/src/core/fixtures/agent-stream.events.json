@@ -1,0 +1,213 @@
+[
+  {
+    "seq": 1,
+    "type": "step",
+    "step": "respond",
+    "language": "es"
+  },
+  {
+    "seq": 2,
+    "type": "text",
+    "text": "Esto "
+  },
+  {
+    "seq": 3,
+    "type": "text",
+    "text": "es "
+  },
+  {
+    "seq": 4,
+    "type": "text",
+    "text": "lo "
+  },
+  {
+    "seq": 5,
+    "type": "text",
+    "text": "que "
+  },
+  {
+    "seq": 6,
+    "type": "text",
+    "text": "encontré. "
+  },
+  {
+    "seq": 7,
+    "type": "text",
+    "text": "Cada "
+  },
+  {
+    "seq": 8,
+    "type": "text",
+    "text": "punto "
+  },
+  {
+    "seq": 9,
+    "type": "text",
+    "text": "muestra "
+  },
+  {
+    "seq": 10,
+    "type": "text",
+    "text": "de "
+  },
+  {
+    "seq": 11,
+    "type": "text",
+    "text": "dónde "
+  },
+  {
+    "seq": 12,
+    "type": "text",
+    "text": "viene."
+  },
+  {
+    "seq": 13,
+    "type": "claim",
+    "section": "insights",
+    "claim": {
+      "text": "Rainfall fell.",
+      "citation": {
+        "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+        "standard_clause": "APS 1.1",
+        "period": null,
+        "strength": "exact"
+      }
+    }
+  },
+  {
+    "seq": 14,
+    "type": "claim",
+    "section": "peer_examples",
+    "claim": {
+      "text": "A peer built tanks.",
+      "citation": {
+        "source": "FTUSA Premium project (sample data, fictionalized) PROJ-6128A37C",
+        "standard_clause": "APS 1.1",
+        "period": null,
+        "strength": "exact"
+      }
+    }
+  },
+  {
+    "seq": 15,
+    "type": "text",
+    "text": "Esta "
+  },
+  {
+    "seq": 16,
+    "type": "text",
+    "text": "información "
+  },
+  {
+    "seq": 17,
+    "type": "text",
+    "text": "es "
+  },
+  {
+    "seq": 18,
+    "type": "text",
+    "text": "para "
+  },
+  {
+    "seq": 19,
+    "type": "text",
+    "text": "ayudarle "
+  },
+  {
+    "seq": 20,
+    "type": "text",
+    "text": "a "
+  },
+  {
+    "seq": 21,
+    "type": "text",
+    "text": "decidir. "
+  },
+  {
+    "seq": 22,
+    "type": "text",
+    "text": "Usted "
+  },
+  {
+    "seq": 23,
+    "type": "text",
+    "text": "y "
+  },
+  {
+    "seq": 24,
+    "type": "text",
+    "text": "su "
+  },
+  {
+    "seq": 25,
+    "type": "text",
+    "text": "comité "
+  },
+  {
+    "seq": 26,
+    "type": "text",
+    "text": "conocen "
+  },
+  {
+    "seq": 27,
+    "type": "text",
+    "text": "mejor "
+  },
+  {
+    "seq": 28,
+    "type": "text",
+    "text": "su "
+  },
+  {
+    "seq": 29,
+    "type": "text",
+    "text": "situación."
+  },
+  {
+    "seq": 30,
+    "type": "answer",
+    "insights": [
+      {
+        "text": "Rainfall fell.",
+        "citation": {
+          "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+          "standard_clause": "APS 1.1",
+          "period": null,
+          "strength": "exact"
+        }
+      }
+    ],
+    "peer_examples": [
+      {
+        "text": "A peer built tanks.",
+        "citation": {
+          "source": "FTUSA Premium project (sample data, fictionalized) PROJ-6128A37C",
+          "standard_clause": "APS 1.1",
+          "period": null,
+          "strength": "exact"
+        }
+      }
+    ],
+    "evidence": "full"
+  },
+  {
+    "seq": 31,
+    "type": "step",
+    "step": "consent",
+    "language": "es"
+  },
+  {
+    "seq": 32,
+    "type": "actions",
+    "allowed": [
+      "reopen_playback",
+      "set_consent",
+      "end"
+    ],
+    "language": "es"
+  },
+  {
+    "seq": 33,
+    "type": "done"
+  }
+]

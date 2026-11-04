@@ -8,7 +8,7 @@ export interface SweepResult {
 }
 
 /**
- * Inactivity sweep (#25 spec). Closes idle open conversations via `inactivity_close`,
+ * Inactivity sweep (#25 spec). Closes idle open conversations via `auto_close` (reason `inactivity`, #13 spec),
  * and reconciles open, non-idle ones whose agent state is already `closed`.
  * Never changes last_activity_at.
  *
@@ -62,7 +62,8 @@ async function closeIfStillIdle(
     }
     let closed = false;
     for await (const event of boundedStream(deps, {
-      kind: 'inactivity_close',
+      kind: 'auto_close',
+      reason: 'inactivity',
       producerId: fresh.producerId,
       conversationId: fresh.conversationId,
     })) {
