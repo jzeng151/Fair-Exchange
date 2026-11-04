@@ -162,6 +162,82 @@ class OutputAssessor:
                     {"event": "guardrail_finding", "conversation_id": conversation_id, **finding}))
 
 
+#: Guardrail PII entity type -> the four types the PII engine keeps (#20, #24). The Guardrail reports
+#: NAME, PHONE, EMAIL and ADDRESS directly; map the alternate spellings it may use too.
+_GUARDRAIL_PII_TO_OURS = {
+    "NAME": "NAME",
+    "PHONE": "PHONE",
+    "EMAIL": "EMAIL",
+    "ADDRESS": "ADDRESS",
+}
+
+
+class GuardrailPiiScanner:
+    """French PII via the Guardrail's sensitive-information filter in detect mode (#24).
+
+    Comprehend has no French PII detection, so for `fr` the producer's text is run through the FEX
+    Guardrail's ApplyGuardrail operation (INPUT source, detect only) and the detected PII entities are
+    returned in Comprehend's response shape, so the PII engine (#20) treats them the same way. Unlike the
+    OutputAssessor, this reads the matched text so the record can keep it for human review; nothing is
+    redacted and the conversation is unchanged.
+
+    The Guardrail carries no confidence score, so every NAME/PHONE/EMAIL/ADDRESS counts: each returned
+    entity reports Score 1.0, which clears the PII engine's threshold without a French-only branch there.
+    """
+
+    def __init__(self, client: Any | None = None, guardrail_id: str | None = None, version: str | None = None):
+        self._client = client
+        self._id = guardrail_id if guardrail_id is not None else os.environ.get(ENV_ID)
+        self._version = version if version is not None else os.environ.get(ENV_VERSION)
+
+    @property
+    def configured(self) -> bool:
+        return bool(self._id and self._version)
+
+    def _bedrock(self) -> Any:
+        if self._client is None:
+            import boto3
+
+            self._client = boto3.client("bedrock-runtime")
+        return self._client
+
+    def __call__(self, text: str, language: str) -> list[dict[str, Any]]:
+        if not text or not text.strip() or not self.configured:
+            return []
+        response = self._bedrock().apply_guardrail(
+            guardrailIdentifier=self._id, guardrailVersion=self._version,
+            source="INPUT", content=[{"text": {"text": text}}],
+        )
+        return self._entities(text, response)
+
+    @staticmethod
+    def _entities(text: str, response: dict[str, Any]) -> list[dict[str, Any]]:
+        """Pull PII detections out of an ApplyGuardrail response, as Comprehend-shaped dicts.
+
+        Offsets are found by locating the matched text in the source, so `context_window` works
+        unchanged. An entity whose match can't be located is skipped rather than guessed at.
+        """
+        out: list[dict[str, Any]] = []
+        for assessment in response.get("assessments") or []:
+            for entry in (assessment.get("sensitiveInformationPolicy") or {}).get("piiEntities") or []:
+                if not isinstance(entry, dict) or entry.get("detected", True) is False:
+                    continue
+                ours = _GUARDRAIL_PII_TO_OURS.get(str(entry.get("type", "")).upper())
+                match = entry.get("match")
+                if ours is None or not match:
+                    continue
+                begin = text.find(match)
+                if begin < 0:
+                    continue
+                out.append({"Type": ours, "Score": 1.0, "BeginOffset": begin, "EndOffset": begin + len(match)})
+        return out
+
+
+def guardrail_pii_scanner() -> GuardrailPiiScanner:
+    """The French PII scanner seam, reading the Guardrail id/version from the environment (#24)."""
+    return GuardrailPiiScanner()
+
+
 #: Narrative text to assess, per structured-output model. Only free text a producer could see; never tags,
 #: booleans, citations or source identifiers.
 def narrative_texts(output: Any) -> list[str]:

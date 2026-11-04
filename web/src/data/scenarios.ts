@@ -3,7 +3,7 @@
 // if any cited clause doesn't exist. Clause choices are the team's mapping, for FTUSA to confirm.
 // When the chat API (#25) lands, answers come from the agent instead of this file.
 
-export interface Bilingual { en: string; es?: string }
+export interface Bilingual { en: string; es?: string; fr?: string }
 export interface Insight { text: Bilingual; source: string; period: string; strength: 'exact' | 'nearest' | 'limited'; clause: string }
 export interface Peer {
   text: Bilingual; org: string; place: string; coords: { lat: number; lon: number }
@@ -11,7 +11,7 @@ export interface Peer {
 }
 export interface ChartBar { label: Bilingual; value: number; ref?: boolean }
 export interface Scenario {
-  id: string; name: string; entityType: string; crop: string; region: string; language: 'en' | 'es'
+  id: string; name: string; entityType: string; crop: string; region: string; language: 'en' | 'es' | 'fr'
   scenario: string; summary: Bilingual; coords: { lat: number; lon: number }
   chart: { title: Bilingual; unit: string; source: string; bars: ChartBar[] }
   tags: [ChallengeTag, ...ChallengeTag[]]
@@ -213,6 +213,67 @@ export const scenarios: Scenario[] = [
         text: { en: 'A cocoa group in Ghana used Premium to buy shared pod-breaking tools, reducing labor needed at harvest.' },
         org: 'Ejemplo Ashanti Cocoa Group (fictional)', place: 'Ashanti, Ghana', coords: { lat: 6.69, lon: -1.62 },
         tradeoff: { en: 'Tools need to be shared fairly and looked after by the group.' }, match: { crop: true, entity: true, country: false },
+        clause: 'APS 3.2.4',
+      },
+    ],
+  },
+  // S8 (#24): a French-speaking Côte d'Ivoire cocoa producer who names a person (PII) and consents internal.
+  {
+    id: 'P-008',
+    name: 'Coopérative Cacao Sud-Comoé',
+    entityType: 'smallholder',
+    crop: 'cocoa',
+    region: 'Sud-Comoé, Côte d’Ivoire',
+    language: 'fr',
+    scenario: 'Drought',
+    summary: {
+      en: 'Rainfall in your area has been below the recent average over the last two seasons, and your survey lists irregular rain as a growing concern. A cocoa group in similar conditions used Premium funds for shade trees to protect young plants.',
+      fr: 'Les pluies dans votre zone ont été inférieures à la moyenne récente sur les deux dernières saisons, et votre enquête cite la pluie irrégulière comme une préoccupation croissante. Un groupe de cacao dans des conditions semblables a utilisé des fonds du Premium pour planter des arbres d’ombrage afin de protéger les jeunes plants.',
+    },
+    coords: { lat: 5.5, lon: -3.2 },
+    chart: {
+      title: { en: 'Rainfall vs the recent average', es: 'Lluvia frente al promedio reciente', fr: 'Pluie par rapport à la moyenne récente' },
+      unit: '%', source: 'Regional rainfall fact table (hand-curated stand-in)',
+      bars: [
+        { label: { en: 'Average', fr: 'Moyenne' }, value: 100, ref: true },
+        { label: { en: '2024', fr: '2024' }, value: 82 },
+        { label: { en: '2025', fr: '2025' }, value: 88 },
+      ],
+    },
+    tags: ['climate and weather', 'water'],
+    premiumProjects: [
+      { year: 2023, project: 'Shade tree nursery', amount: 'US$7,500' },
+    ],
+    survey: { year: 2025, item: 'Top concern reported', value: 'Irregular rainfall' },
+    certification: { standard: 'APS', status: 'Certified', since: 2020 },
+    chips: {
+      open: [{ en: 'The rain has become irregular and the cocoa harvest has dropped.', fr: 'Je m’appelle Kouamé Konan et la pluie est devenue irrégulière, la récolte de cacao a baissé.' }],
+      timing: [{ en: 'It got worse over the last two seasons.', fr: 'Cela a empiré sur les deux dernières saisons.' }],
+      severity: [{ en: 'Some young plants did not survive.', fr: 'Certains jeunes plants n’ont pas survécu.' }],
+      tried: [{ en: 'We water by hand when we can, but it is not enough.', fr: 'Nous arrosons à la main quand nous pouvons, mais ce n’est pas suffisant.' }],
+    },
+    insights: [
+      {
+        text: {
+          en: 'Regional data suggests rainfall in your area has been below the recent average over the last two seasons.',
+          fr: 'Les données régionales suggèrent que la pluie dans votre zone a été inférieure à la moyenne récente sur les deux dernières saisons.',
+        },
+        source: 'Regional rainfall fact table (hand-curated stand-in)', period: '2024–2025', strength: 'nearest',
+        clause: 'APS 3.3.1',
+      },
+    ],
+    peers: [
+      {
+        text: {
+          en: 'A cocoa group in similar conditions used Premium funds to plant shade trees that protect young plants from heat and dry spells.',
+          fr: 'Un groupe de cacao dans des conditions semblables a utilisé des fonds du Premium pour planter des arbres d’ombrage qui protègent les jeunes plants de la chaleur et de la sécheresse.',
+        },
+        org: 'Exemple Groupe Cacao Indénié (fictif)', place: 'Comoé, Côte d’Ivoire', coords: { lat: 6.5, lon: -3.5 },
+        tradeoff: {
+          en: 'Shade trees take a few years to grow before they help.',
+          fr: 'Les arbres d’ombrage mettent quelques années à pousser avant d’être utiles.',
+        },
+        match: { crop: true, entity: true, country: true },
         clause: 'APS 3.2.4',
       },
     ],

@@ -8,6 +8,10 @@ dependencies = [
     "strands-agents>=1.60,<2",
     "fx-data",
     "boto3>=1.34,<2",
+    "amazon-transcribe>=0.6,<0.7",
+    # AgentCore Memory client (docs/specs/memory.md, #59). Pinned: the memory client and the matching
+    # CDK construct are alpha, so the version is held steady across the agent and the infra.
+    "bedrock-agentcore==1.25.3",
 ]
 
 [tool.uv.sources]

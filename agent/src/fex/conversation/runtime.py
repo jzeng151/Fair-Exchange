@@ -5,7 +5,8 @@ Model IDs are configuration (ADR 0001): a small model for intake, playback and t
 for the grounded answer. Defaults are US inference profiles so processing stays in US regions.
 Deploy pattern: docs/adr/0002-agentcore-runtime-spike.md.
 
-State: in-memory per runtime session until AgentCore Memory (docs/specs/memory.md) replaces the store.
+State: AgentCore Memory (docs/specs/memory.md) when FEX_MEMORY_ID is set, so a conversation survives a
+recycled runtime and can be resumed; an in-process store otherwise, for local runs.
 Records (#26): saved to the DynamoDB table named by FEX_RECORDS_TABLE; not saved when it is unset.
 Guardrail (#12): attached to both models from FEX_GUARDRAIL_ID and FEX_GUARDRAIL_VERSION, in detect mode.
 """
@@ -20,7 +21,8 @@ from pydantic import ValidationError
 
 from fex.conversation.contract import ResumeResponse
 from fex.conversation.engine import ConversationEngine
-from fex.conversation.state import InMemoryStateStore
+from fex.conversation.memory import AgentCoreMemoryStateStore, RetentionConfig
+from fex.conversation.state import InMemoryStateStore, StateStore
 
 DEFAULT_SMALL = "us.anthropic.claude-haiku-5-5"
 DEFAULT_LARGE = "us.anthropic.claude-sonnet-5-5"
@@ -33,6 +35,27 @@ def model_ids() -> tuple[str, str]:
 def demo_models() -> bool:
     """FEX_DEMO_MODELS=1: the deterministic demo model instead of Bedrock (#101). No AWS, no cost."""
     return os.environ.get("FEX_DEMO_MODELS") == "1"
+
+
+def state_store() -> StateStore:
+    """AgentCore Memory (resume across a recycled runtime) when FEX_MEMORY_ID is set; otherwise an
+    in-process store for local runs.
+
+    When memory is configured, the retention rule is checked before the store is built: the agent
+    refuses to start unless the short-term event expiry is longer than the maximum conversation
+    lifetime (memory spec). Both are configuration values with no invented defaults.
+    """
+    memory_id = os.environ.get("FEX_MEMORY_ID")
+    if not memory_id:
+        return InMemoryStateStore()
+    # Rejects at startup if event expiry is not longer than the maximum conversation lifetime, or is unset.
+    if RetentionConfig.from_env() is None:
+        raise RuntimeError(
+            "FEX_MEMORY_ID is set but FEX_EVENT_EXPIRY_DAYS / FEX_MAX_LIFETIME_MINUTES are not; "
+            "both are required so retention can be checked against the conversation lifetime")
+    from bedrock_agentcore.memory import MemoryClient
+
+    return AgentCoreMemoryStateStore(memory_id, MemoryClient(region_name=os.environ.get("AWS_REGION")))
 
 
 def record_store():
@@ -67,14 +90,16 @@ def default_engine() -> ConversationEngine:
         return ConversationEngine(store=InMemoryStateStore(), small_model=demo, large_model=demo, records=records,
                                   retriever=LocalClauseRetriever())
     small, large = model_ids()
-    # The Comprehend seam (#20): scans run only when records are configured — they are part of saving one.
+    # The PII seam (#20, #24): scans run only when records are configured — they are part of saving one.
+    # Comprehend handles en/es; the Guardrail handles fr, which Comprehend can't.
     pii_scanner = None
     if records is not None:
-        from fex.pii import default_comprehend
+        from fex.pii import default_pii_scanner
 
-        pii_scanner = default_comprehend()
+        pii_scanner = default_pii_scanner()
+    # State: AgentCore Memory when FEX_MEMORY_ID is set (resume across a recycled runtime), else in-process.
     # Both models carry the detect-mode Guardrail (#12), and their structured output is assessed too.
-    return ConversationEngine(store=InMemoryStateStore(), small_model=guarded_bedrock_model(small),
+    return ConversationEngine(store=state_store(), small_model=guarded_bedrock_model(small),
                               large_model=guarded_bedrock_model(large), records=records,
                               pii_scanner=pii_scanner, output_assessor=OutputAssessor())
 
