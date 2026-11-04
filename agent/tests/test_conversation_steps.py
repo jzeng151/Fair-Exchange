@@ -2,16 +2,16 @@
 
 Spec: docs/specs/13-conversation-steps.md. One test per case in its "Testing Decisions".
 """
-from dataclasses import replace
 
 import pytest
-from fx_data.peers import PeerProjects, ProducerProfiles
+from fx_data.peers import PeerProjects, ProducerProfiles, crop_set
 from tests.conversation_harness import (
     RETRIEVE, Run, allowed, answer, cauca_producer, claim, intake, last_step, of, playback, short_reply, summary, types,
 )
 from tests.tool_harness import call_tool
 
 from fex.conversation.state import StateConflict
+from fex.tools import peer_examples
 from fex.tools.peer_examples import find_peer_examples
 from fex.tools.producer_record import get_producer_record
 from fex.tools.regional_context import get_regional_context
@@ -153,7 +153,7 @@ def test_every_invalid_action_is_rejected_in_every_step(step, name):
 
 @pytest.mark.parametrize("step", ["intake", "playback", "consent", "feedback", "closed", None])
 @pytest.mark.parametrize("tool,args", [(get_producer_record, {}), (get_regional_context, {}),
-                                       (find_peer_examples, {"challenge": "water"})])
+                                       (find_peer_examples, {})])
 def test_data_tools_refuse_outside_respond(step, tool, args):
     state = {"producer_id": cauca_producer(), "step": step}  # step=None sends no step at all
     status, result = call_tool(tool, args, state)
@@ -218,12 +218,12 @@ def test_entity_type_correction_is_kept_and_used_for_peer_matching():
     r.send("message", text="Somos una finca, no una cooperativa.")
     assert r.state().entity_type == "estate"
     profile = ProducerProfiles.load().get(r.producer_id)
-    status, peers = call_tool(find_peer_examples, {"challenge": "water"},
-                              {"producer_id": r.producer_id, "step": "respond", "entity_type": "estate"})
+    status, peers = call_tool(find_peer_examples, {},
+                              {"producer_id": r.producer_id, "step": "respond", "entity_type": "estate",
+                               "tags": ["water"]})
     assert status == "success" and peers
-    projects = {p["project_ref"]: p for p in PeerProjects.load()._projects}
-    corrected = replace(profile, entity_type="estate")
-    assert [p["match_score"] for p in peers] == [PeerProjects.score(projects[p["project_ref"]], corrected) for p in peers]
+    expected = PeerProjects.load().find(r.producer_id, {"water"}, crop_set(profile.crop), "estate")
+    assert peers == expected
 
 
 def test_disputed_location_is_noted_and_the_location_on_file_is_kept():
@@ -443,13 +443,16 @@ def test_entity_type_can_be_corrected_back_to_the_value_on_file():
     assert r.state().entity_type is None  # back to the profile value: no override left
 
 
-def test_a_failing_data_tool_is_an_answer_failure_with_retry():
+def test_a_failing_data_tool_is_an_answer_failure_with_retry(monkeypatch):
     r = Run()
     r.to_playback()
     r.small.add(summary())
-    # an invalid tool input makes Strands return a toolResult with status "error" (no exception raised)
-    # The answer needs no rewrite, so only the tool error can make this fail
-    r.large.add(("tool", "find_peer_examples", {"challenge": "not-a-tag"}), answer([], []))
+    # A tool that raises makes Strands return a toolResult with status "error" (no exception raised).
+    # The answer needs no rewrite, so only the tool error can make this fail.
+    def broken():
+        raise RuntimeError("peer catalog unavailable")
+    monkeypatch.setattr(peer_examples, "_tables", broken)
+    r.large.add(("tool", "find_peer_examples", {}), answer([], []))
     events = r.action("confirm_playback")
     assert of(events, "error")[0].code == "agent_failed"
     assert of(events, "claim") == [] and of(events, "answer") == []

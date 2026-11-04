@@ -487,6 +487,7 @@ class ConversationEngine:
     def _retrieve_and_write(self, state: ConversationState, prompt: str) -> tuple[AnswerDraft, list[str]]:
         invocation_state = {"producer_id": state.producer_id, "step": "respond",
                             "entity_type": state.effective_entity_type,
+                            "tags": list(state.playback.tags) if state.playback else [],  # confirmed tags
                             CONVERSATION_KEY: state.conversation_id}  # for Guardrail findings (#12)
         try:
             agent = Agent(model=self.large_model, system_prompt=ANSWER_SYSTEM, tools=list(self.tools),

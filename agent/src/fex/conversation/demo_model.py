@@ -151,14 +151,14 @@ class DemoModel(Model):
         if "get_regional_context" not in results:
             return "get_regional_context", {}
         if "find_peer_examples" not in results:
-            return "find_peer_examples", {"challenge": tag}
+            return "find_peer_examples", {}
         clause = CLAUSES.get(tag, DEFAULT_CLAUSE)
-        regional, peers = results["get_regional_context"] or {}, results["find_peer_examples"] or []
-        facts = regional.get("facts", []) if isinstance(regional, dict) else []
+        facts, peers = (r if isinstance(r := results[name], list) else []  # a refusal is a dict
+                        for name in ("get_regional_context", "find_peer_examples"))
         insights = [{"text": f["text"], "citation": {"source": f["source"], "standard_clause": clause,
                                                      "period": f.get("period"), "strength": f.get("strength", "exact")}}
                     for f in facts[:2]]
-        examples = [{"text": f"{p['action']} Intended outcome: {p['intended_outcome']}",
-                     "citation": {"source": p["source"], "standard_clause": clause, "strength": "nearest"}}
-                    for p in (peers if isinstance(peers, list) else [])[:2]]
+        examples = [{"text": p["text"], "citation": {"source": p["source"], "standard_clause": clause,
+                                                     "period": p.get("period"), "strength": p["strength"]}}
+                    for p in peers[:2]]
         return "AnswerDraft", {"insights": insights, "peer_examples": examples}

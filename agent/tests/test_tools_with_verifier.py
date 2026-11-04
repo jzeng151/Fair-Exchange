@@ -5,6 +5,7 @@ from tests.tool_harness import call_tool
 
 from fex.models import Citation, Claim
 from fex.tools.peer_examples import find_peer_examples
+from fex.tools.producer_record import get_producer_record
 from fex.tools.regional_context import get_regional_context
 from fex.verifier import SessionEvidence, verify
 
@@ -17,30 +18,32 @@ def _session_producer() -> str:
     return next(pid for pid, p in profiles.items() if p["region"] == "Cauca")
 
 
+STATE = {"tags": ["water", "climate and weather"]}
+
+
 def _claim(item: dict) -> Claim:
-    text = item.get("text") or item["action"]
-    period = item.get("period") or item.get("start_date")
-    return Claim(text=text, citation=Citation(source=item["source"], standard_clause=CLAUSE,
-                                              period=period, strength=item.get("strength", "exact")))
+    return Claim(text=item["text"], citation=Citation(source=item["source"], standard_clause=CLAUSE,
+                                                      period=item["period"], strength=item["strength"]))
 
 
 def test_claims_built_from_tool_results_pass_the_verifier():
-    state = {"producer_id": _session_producer()}
+    state = {"producer_id": _session_producer(), **STATE}
+    _, record = call_tool(get_producer_record, {}, state)
     _, regional = call_tool(get_regional_context, {}, state)
-    _, peers = call_tool(find_peer_examples, {"challenge": "water"}, state)
-    assert regional["facts"] and peers
+    _, peers = call_tool(find_peer_examples, {}, state)
+    assert record and regional and peers
 
     evidence = SessionEvidence()
-    evidence.record_tool_result(regional["facts"])
-    evidence.record_tool_result(peers)
+    for items in (record, regional, peers):
+        evidence.record_tool_result(items)
 
-    result = verify([_claim(f) for f in regional["facts"]], [_claim(p) for p in peers], evidence, STANDARDS)
+    result = verify([_claim(i) for i in record + regional], [_claim(p) for p in peers], evidence, STANDARDS)
     assert result.ok, result.problems
 
 
 def test_a_source_no_tool_returned_is_caught():
     evidence = SessionEvidence()
-    _, peers = call_tool(find_peer_examples, {"challenge": "water"}, {"producer_id": _session_producer()})
+    _, peers = call_tool(find_peer_examples, {}, {"producer_id": _session_producer(), **STATE})
     evidence.record_tool_result(peers)
     invented = Claim(text="Made up", citation=Citation(source="CHIRPS v2.0 rainfall (invented)",
                                                        standard_clause=CLAUSE))

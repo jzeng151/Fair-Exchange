@@ -54,25 +54,32 @@ cd data && uv sync && uv run pytest
 | WRI Aqueduct 4.0 | Baseline water stress, and projected stress for 2030 and 2050 (business as usual) | region (river basin at the point) |
 | World Bank Pink Sheet | Benchmark price change over 12 months and vs the 5-year average: Arabica coffee, cocoa, US bananas | crop |
 
-56 regions in 16 countries, including all of Peru, Côte d'Ivoire, Colombia, Honduras and Mexico in the sample. Each region is one point near its centre (`REGIONS` in `regional.py`), so climate and water facts have strength `nearest`. Prices are world benchmarks, not farm-gate prices, so they have strength `limited`.
+56 regions in 16 countries, including all of Peru, Côte d'Ivoire, Colombia, Honduras and Mexico in the sample. Each region is one point near its centre (`REGIONS` in `regional.py`).
+
+The table is `src/fx_data/regional_facts.csv`, one fact per row, with exactly the #8 spec columns: `fact_id, scope, country, admin1, crop, tags, indicator, value, unit, comparison, period, source_name, source_url, extracted_at, curated`. `RegionalFacts.load()` validates every row and fails on a bad one.
+
+- `scope` is `region` (one point near the region's centre), `country` (the average of that country's region rows in this table, said in `comparison`) or `global` (benchmark prices, by `crop`).
+- `fact_id` is `RF-` plus a hash of scope, country, admin1, crop and indicator, so it stays the same across rebuilds.
+- `tags` are the challenge tags the indicator speaks to (`INDICATOR_TAGS` in `regional.py`), `;`-separated.
+- Prices are world benchmarks, not farm-gate prices; their `comparison` says so.
 
 ```python
 from fx_data.regional import RegionalFacts
 facts = RegionalFacts.load()
-answer = facts.lookup("Colombia", "Cauca", "Coffee")
-answer.facts   # [{"text", "source", "metric", "value", "unit", "period", "strength"}, ...]
+items = facts.lookup("Colombia", "Cauca", {"coffee"}, {"water", "climate and weather"})
+# [{"source", "kind": "regional", "text", "period", "strength", "data": <the CSV row>}, ...]
 ```
 
-`lookup` never substitutes another region: an unknown region returns crop prices only (`match_level="country"`), or nothing.
+`lookup` (#15) returns region rows (`exact`), then country rows (`nearest`), then global rows (`limited`), at most 8, filtered by tag and crop. It never substitutes another region; nothing matching is an empty list.
 
 ### Rebuild
 
 ```bash
 PYTHONPATH=src uv run python -m fx_data.regional fetch   # network, ~15 min -> regional_sources.json
-PYTHONPATH=src uv run python -m fx_data.regional build   # offline -> regional_facts.json
+PYTHONPATH=src uv run python -m fx_data.regional build   # offline -> regional_facts.csv
 ```
 
-Both files are committed. `tests/test_regional.py` fails if `regional_facts.json` no longer matches `regional_sources.json`. To add a region, add it to `REGIONS` and run both steps. The Pink Sheet workbook URL changes each year; update `PINK_SHEET_URL` when it does.
+Both files are committed. `tests/test_regional.py` fails if `regional_facts.csv` no longer matches `regional_sources.json`. To add a region, add it to `REGIONS` and run both steps. The Pink Sheet workbook URL changes each year; update `PINK_SHEET_URL` when it does.
 
 ## Peer projects and producer profiles (issue #16)
 
@@ -80,7 +87,7 @@ Both files are committed. `tests/test_regional.py` fails if `regional_facts.json
 PYTHONPATH=src uv run python -m fx_data.peers   # offline -> peer_projects.json, producer_profiles.json
 ```
 
-- **`peer_projects.json`**: 347 of the 349 environmental Premium projects (2 lorem-ipsum placeholder rows dropped), each with a challenge tag, status and dates. Organizations get a stable `ORG-xxxxxxxx` reference, and organization and person names in the text are replaced (`NAME_REPLACEMENTS` in `peers.py`). The owning account is stored only as a salted hash (`owner_key`) so a producer's own projects can be left out.
+- **`peer_projects.json`**: the peer catalog (#16), 347 of the 349 environmental Premium projects (2 lorem-ipsum placeholder rows dropped). Each row holds only the publishable fields (fictional organization name, country, crop, entity type, category, sub-category, start year, description), an opaque `catalog_id` and the challenge `tags`. Organizations get a fictional name (`FICTIONAL_NAMES` in `peers.py`), and organization and person names in descriptions are replaced (`NAME_REPLACEMENTS`). The owning account is stored only as a salted hash (`owner_key`) so a producer's own projects can be left out; it is never returned. An interim build until the #7 generator, which adds the Comprehend PII check and the reviewed crop and entity-type vocabulary.
 - **`producer_profiles.json`**: producer id → country, region, crop, entity type. A stand-in until the producer-record tool (#14) and the Athena tables (#28) exist. Region is the region most of the producer's projects are in; 7 of the 146 sample producers have none.
 
 `tests/test_peers.py` fails if either file is stale, or if an account id or a listed name appears in `peer_projects.json`.
@@ -91,6 +98,6 @@ PYTHONPATH=src uv run python -m fx_data.peers   # offline -> peer_projects.json,
 PYTHONPATH=src uv run python -m fx_data.records   # offline -> producer_records.json
 ```
 
-One record per sample producer: profile (with certification status), their own Premium projects (placeholder rows left out), and a survey summary. Survey answers are reduced to shares of survey responses from an allowlist of farming, water and practice questions (`YES_NO_FIELDS`, `CHOICE_FIELDS`, `MULTI_FIELDS` in `records.py`). Sensitive questions (harassment, borrowing, medical access, child schooling, committees, income) are never read. A share is only reported when at least 5 **distinct survey responses** answered (a response that picks several options counts once), and a reason is only named if at least 5 responses gave it. Each fact's period is the years of the responses behind it. They are called "survey responses", not "households": about half the sample's survey rows are not household surveys. 22 of 146 producers have survey responses; 14 have enough to summarize.
+One record per sample producer: profile with certification scope (status is never read, #21), their own Premium projects (placeholder rows left out), and a survey summary. Survey answers are reduced to shares of survey responses from an allowlist of farming, water and practice questions (`YES_NO_FIELDS`, `CHOICE_FIELDS`, `MULTI_FIELDS` in `records.py`). Sensitive questions (harassment, borrowing, medical access, child schooling, committees, income) are never read. A share is only reported when at least 5 **distinct survey responses** answered (a response that picks several options counts once), and a reason is only named if at least 5 responses gave it. Each fact's period is the years of the responses behind it. They are called "survey responses", not "households": about half the sample's survey rows are not household surveys. 22 of 146 producers have survey responses; 12 have enough to summarize. `ProducerRecords.items(producer_id)` returns the record as data-tool items (#17 contract): certification scope, one item per own project, one per survey summary.
 
 `tests/test_records.py` fails if `producer_records.json` is stale or a sensitive field is added to the allowlist.

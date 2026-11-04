@@ -67,7 +67,7 @@
     "claim": {
       "text": "Rainfall fell.",
       "citation": {
-        "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+        "source": "CHIRPS v2.0 rainfall anomaly, Cauca, Colombia, 2024-2025 [RF-F8C4E1]",
         "standard_clause": "APS 1.1",
         "period": null,
         "strength": "exact"
@@ -81,7 +81,7 @@
     "claim": {
       "text": "A peer built tanks.",
       "citation": {
-        "source": "FTUSA Premium project (sample data, fictionalized) PROJ-6128A37C",
+        "source": "Premium project, Higuera Producers' Group [PROJ-295DB6A0]",
         "standard_clause": "APS 1.1",
         "period": null,
         "strength": "exact"
@@ -170,7 +170,7 @@
       {
         "text": "Rainfall fell.",
         "citation": {
-          "source": "CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)",
+          "source": "CHIRPS v2.0 rainfall anomaly, Cauca, Colombia, 2024-2025 [RF-F8C4E1]",
           "standard_clause": "APS 1.1",
           "period": null,
           "strength": "exact"
@@ -181,7 +181,7 @@
       {
         "text": "A peer built tanks.",
         "citation": {
-          "source": "FTUSA Premium project (sample data, fictionalized) PROJ-6128A37C",
+          "source": "Premium project, Higuera Producers' Group [PROJ-295DB6A0]",
           "standard_clause": "APS 1.1",
           "period": null,
           "strength": "exact"

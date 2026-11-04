@@ -73,10 +73,10 @@ def cauca_producer() -> str:
 
 def real_sources(producer_id: str) -> tuple[list[dict], list[dict]]:
     """What the real tools return for this producer, so scripted claims can cite real sources."""
-    state = {"producer_id": producer_id, "step": "respond"}
+    state = {"producer_id": producer_id, "step": "respond", "tags": list(SUMMARY_TAGS)}
     _, regional = call_tool(get_regional_context, {}, state)
-    _, peers = call_tool(find_peer_examples, {"challenge": "water"}, state)
-    return regional["facts"], peers
+    _, peers = call_tool(find_peer_examples, {}, state)
+    return regional, peers
 
 
 def claim(text: str, source: str, clause: str = CLAUSE) -> dict:
@@ -95,9 +95,12 @@ def playback(text: str = "Entiendo: la lluvia bajó y la cosecha cayó.", entity
                                      "location_disputed": location_disputed})
 
 
+SUMMARY_TAGS = ("water", "climate and weather")
+
+
 def summary() -> tuple:
     return ("out", "RecordSummary", {"summary_original": "La lluvia bajó.", "summary_english": "Rain fell.",
-                                     "tags": ["water", "climate and weather"]})
+                                     "tags": list(SUMMARY_TAGS)})
 
 
 def short_reply(text: str = "Claro.") -> tuple:
@@ -108,7 +111,7 @@ def answer(insights: list[dict], peers: list[dict]) -> tuple:
     return ("out", "AnswerDraft", {"insights": insights, "peer_examples": peers})
 
 
-RETRIEVE = (("tool", "get_regional_context", {}), ("tool", "find_peer_examples", {"challenge": "water"}))
+RETRIEVE = (("tool", "get_regional_context", {}), ("tool", "find_peer_examples", {}))
 
 
 class Run:

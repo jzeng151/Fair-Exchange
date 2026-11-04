@@ -45,7 +45,7 @@ export const scenarios: Scenario[] = [
     coords: { lat: 2.45, lon: -76.6 },
     chart: {
       title: { en: 'Annual rainfall in Cauca vs. 2014–2023 average', es: 'Lluvia anual en Cauca vs. promedio 2014–2023' },
-      unit: 'mm', source: 'CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)',
+      unit: 'mm', source: 'CHIRPS v2.0 rainfall anomaly, Cauca, Colombia, 2024-2025 [RF-F8C4E1]',
       bars: [
         { label: { en: '2014–23 avg', es: 'Prom. 2014–23' }, value: 2103, ref: true },
         { label: { en: '2024', es: '2024' }, value: 1675 },
@@ -68,12 +68,12 @@ export const scenarios: Scenario[] = [
     insights: [
       {
         text: { es: 'La lluvia cerca del centro de Cauca promedió 1.861 mm al año en 2024–2025, un 11,5% por debajo del promedio de 2014–2023 (2.103 mm). 2024 estuvo cerca de un 20% por debajo y 2025 cerca de un 3% por debajo.', en: 'Rainfall near the centre of Cauca averaged 1,861 mm a year in 2024–2025, 11.5% below the 2014–2023 average of 2,103 mm. 2024 was about 20% below and 2025 about 3% below.' },
-        source: 'CHIRPS v2.0 rainfall (Climate Hazards Center, via SERVIR ClimateSERV)', period: '2014–2025', strength: 'nearest',
+        source: 'CHIRPS v2.0 rainfall anomaly, Cauca, Colombia, 2024-2025 [RF-F8C4E1]', period: '2014–2025', strength: 'nearest',
         clause: 'APS 4.1.1',
       },
       {
         text: { es: 'WRI Aqueduct califica el estrés hídrico de la cuenca cerca del centro de Cauca como bajo a medio (10-20%) y proyecta que seguirá en ese nivel en 2030 y 2050, con un aumento leve del índice.', en: 'WRI Aqueduct rates water stress in the river basin near the centre of Cauca as low to medium (10-20%) and projects it stays in that band in 2030 and 2050, with the score rising slightly.' },
-        source: 'WRI Aqueduct 4.0 water risk atlas', period: '2030–2050 projection', strength: 'nearest',
+        source: 'WRI Aqueduct 4.0 projected water stress, Cauca, Colombia, 2030-2050 [RF-E680B5]', period: '2030–2050 projection', strength: 'nearest',
         clause: 'APS 4.1.1',
       },
       {
@@ -111,7 +111,7 @@ export const scenarios: Scenario[] = [
     coords: { lat: 17.06, lon: -96.72 },
     chart: {
       title: { en: 'International arabica benchmark price, past year', es: 'Precio internacional de referencia del arábica, último año' },
-      unit: 'US$/kg', source: 'World Bank Commodity Price Data (Pink Sheet): Coffee, Arabica',
+      unit: 'US$/kg', source: 'World Bank Pink Sheet (Coffee, Arabica) coffee price, global, October 2026 [RF-74608A]',
       bars: [
         { label: { en: 'Oct ’25', es: 'Oct ’25' }, value: 8.90, ref: true },
         { label: { en: 'Jan', es: 'Ene' }, value: 8.02 },
@@ -136,7 +136,7 @@ export const scenarios: Scenario[] = [
     insights: [
       {
         text: { en: 'World Bank data puts the international arabica benchmark at US$7.40 per kg in October 2026, 16.9% lower than a year earlier and 18% above its 5-year average. This is a world market price, not a farm-gate price.' },
-        source: 'World Bank Commodity Price Data (Pink Sheet): Coffee, Arabica', period: 'Oct 2025 – Oct 2026', strength: 'limited',
+        source: 'World Bank Pink Sheet (Coffee, Arabica) coffee price, global, October 2026 [RF-74608A]', period: 'Oct 2025 – Oct 2026', strength: 'limited',
         clause: 'APS 5.2.3',
       },
       {

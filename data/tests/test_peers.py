@@ -3,8 +3,9 @@ import csv
 import json
 import re
 
-from fx_data.peers import (ACCOUNTS_CSV, NAME_REPLACEMENTS, PEERS_PATH, PROFILES_PATH, PROJECTS_CSV,
-                           build_peers, build_profiles, fictionalize, owner_key, tag_for)
+from fx_data.peers import (ACCOUNTS_CSV, FICTIONAL_NAMES, NAME_REPLACEMENTS, PEERS_PATH, PROFILES_PATH,
+                           PROJECTS_CSV, PUBLISHABLE, PeerProjects, build_peers, build_profiles,
+                           build_status_index, fictionalize, owner_key, resolve_status, tag_for)
 
 CHALLENGE_TAGS = {
     "climate and weather", "water", "soil and land", "market and price", "labor and migration",
@@ -31,36 +32,85 @@ def test_every_project_is_kept_except_placeholders():
     assert not any("lorem" in json.dumps(p).lower() for p in peers["projects"])
 
 
-def test_every_project_has_a_known_tag_and_source():
+def test_catalog_rows_hold_only_publishable_fields_plus_id_tags_and_owner_key():
     for p in build_peers()["projects"]:
-        assert p["challenge_tag"] in CHALLENGE_TAGS
-        assert p["source"].endswith(p["project_ref"])
+        assert set(p) == set(PUBLISHABLE) | {"catalog_id", "tags", "owner_key"}
+        assert p["tags"] and set(p["tags"]) <= CHALLENGE_TAGS
+        assert p["start_year"] is None or 2000 <= p["start_year"] <= 2030
 
 
-def test_status_is_a_known_value_or_missing_together_with_its_dates():
+def test_start_year_is_resolved_for_almost_every_project():
     projects = build_peers()["projects"]
+    assert sum(p["start_year"] is None for p in projects) <= 12, "the status join has stopped resolving"
+
+
+def test_catalog_ids_are_unique_so_a_citation_names_one_project():
+    ids = [p["catalog_id"] for p in build_peers()["projects"]]
+    assert len(ids) == len(set(ids))
+
+
+def test_organizations_are_fictional_and_one_name_per_organization():
+    projects = build_peers()["projects"]
+    assert {p["organization"] for p in projects} <= set(FICTIONAL_NAMES)
+    by_owner = {}
     for p in projects:
-        if p["status"] is None:
-            assert p["start_date"] is None and p["end_date"] is None
-        else:
-            assert p["status"] in {"Completed", "In Progress", "In Planning"}
-    assert sum(p["status"] is None for p in projects) <= 12, "the join has stopped resolving projects"
-
-
-def test_project_refs_are_unique_so_a_citation_names_one_project():
-    refs = [p["project_ref"] for p in build_peers()["projects"]]
-    assert len(refs) == len(set(refs))
+        assert by_owner.setdefault(p["owner_key"], p["organization"]) == p["organization"]
+    assert len(set(by_owner.values())) == len(by_owner)
 
 
 def test_a_project_never_borrows_another_projects_status():
     # One account has three projects with the same description and different years and statuses.
-    by_name = {p["name"]: p for p in build_peers()["projects"]}
-    assert (by_name["21. Reforestation of Green Areas"]["status"],
-            by_name["21. Reforestation of Green Areas"]["start_date"]) == ("Completed", "2021-01-01")
-    assert by_name["23. Reforestation of green areas"]["start_date"] == "2023-01-01"
-    # Identical repeats whose statuses disagree get no status at all.
-    unresolved = [p for p in build_peers()["projects"] if p["status"] is None]
-    assert unresolved, "expected the sample's genuinely ambiguous projects to be left without a status"
+    index = build_status_index()
+    with open(PROJECTS_CSV, encoding="utf-8") as fh:
+        rows = {r["translated_project_name"]: r for r in csv.DictReader(fh)}
+    first = resolve_status(index, rows["21. Reforestation of Green Areas"])
+    assert (first["project_status_name"], first["project_start_date"]) == ("Completed", "2021-01-01")
+    assert resolve_status(index, rows["23. Reforestation of green areas"])["project_start_date"] == "2023-01-01"
+
+
+# --- find (#16 lookup) -------------------------------------------------------------------------
+
+def _row(catalog_id, org, owner, tags=("water",), crop="Coffee", entity="Cooperative", year=2020):
+    return {"catalog_id": catalog_id, "organization": org, "owner_key": owner_key(owner), "tags": list(tags),
+            "country": "Peru", "crop": crop, "entity_type": entity, "category": "Environmental",
+            "sub_category": "Clean Water", "start_year": year, "description": f"Project {catalog_id}."}
+
+
+def _catalog(*rows):
+    return PeerProjects({"projects": list(rows)})
+
+
+def test_find_leaves_out_the_producers_own_projects_and_other_tags():
+    catalog = _catalog(_row("P1", "Ceiba Producers' Group", "ME"), _row("P2", "Nogal Producers' Group", "OTHER"),
+                       _row("P3", "Cedro Producers' Group", "OTHER2", tags=("soil and land",)))
+    items = catalog.find("ME", {"water"}, {"coffee"}, "Cooperative")
+    assert [i["data"]["description"] for i in items] == ["Project P2."]
+
+
+def test_find_strength_follows_crop_and_entity_type_and_ranks_strongest_first():
+    catalog = _catalog(_row("P1", "A", "a", crop="Cocoa", entity="Estate"),
+                       _row("P2", "B", "b", crop="Coffee", entity="Estate"),
+                       _row("P3", "C", "c"))
+    items = catalog.find("ME", {"water"}, {"coffee"}, "Cooperative")
+    assert [i["strength"] for i in items] == ["exact", "nearest", "limited"]
+    assert [i["source"] for i in items] == ["Premium project, C [P3]", "Premium project, B [P2]",
+                                            "Premium project, A [P1]"]
+
+
+def test_find_breaks_ties_by_most_recent_and_keeps_one_project_per_organization():
+    catalog = _catalog(_row("P1", "A", "a", year=2019), _row("P2", "A", "a", year=2023),
+                       _row("P3", "B", "b", year=2021), _row("P4", "C", "c", year=2018), _row("P5", "D", "d"))
+    items = catalog.find("ME", {"water"}, {"coffee"}, "Cooperative")
+    assert [i["source"] for i in items] == ["Premium project, A [P2]", "Premium project, B [P3]",
+                                            "Premium project, D [P5]"]
+
+
+def test_find_returns_only_publishable_fields_and_nothing_when_no_tag_matches():
+    catalog = _catalog(_row("P1", "A", "a"))
+    (item,) = catalog.find("ME", {"water"}, set(), None)
+    assert set(item) == {"source", "kind", "text", "period", "strength", "data"}
+    assert set(item["data"]) == set(PUBLISHABLE) and item["kind"] == "peer"
+    assert catalog.find("ME", {"education"}, {"coffee"}, "Cooperative") == []
 
 
 def test_peer_file_holds_no_account_ids():

@@ -1,4 +1,4 @@
-"""Producer-record tool (issue #14): this producer's own profile, Premium projects and survey context."""
+"""Producer-record tool (issue #14): this producer's own certification scope, Premium projects and survey context."""
 from functools import lru_cache
 
 from fx_data.records import ProducerRecords
@@ -14,20 +14,12 @@ def _records() -> ProducerRecords:
 
 
 @tool(context=True)
-def get_producer_record(tool_context: ToolContext) -> dict:
-    """Return this producer's own profile, Premium projects and safe survey fields (farming, water, practices only).
-
-    Returns `found`, then:
-      - profile: country, region, crop, entity_type, certification_scope, supply_chain_role, source
-      - premium_projects: their own projects (name, challenge, action, intended_outcome, status, dates, source)
-      - survey: responses, facts (each with text, source, period, responses), and a note when
-        there is nothing to summarize. No survey data is normal; say so rather than guess.
-    Cite each item's `source`.
+def get_producer_record(tool_context: ToolContext) -> list | dict:
+    """Return this producer's own record: certification scope, their Premium projects and safe survey
+    summaries (farming, water and practices only).
+    Each item has: source (cite it exactly), kind, text, period, strength and data.
+    No survey items is normal; say so rather than guess. An empty list means no record is on file.
     """
     if refusal := retrieval_refusal(tool_context):
         return refusal
-    producer_id = session_producer_id(tool_context)
-    record = _records().get(producer_id)
-    if record is None:
-        return {"found": False, "note": "No record on file for this producer."}
-    return {"found": True, **record}
+    return _records().items(session_producer_id(tool_context))

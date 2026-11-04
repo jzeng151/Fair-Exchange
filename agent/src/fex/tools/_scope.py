@@ -23,3 +23,8 @@ def retrieval_refusal(tool_context: ToolContext) -> dict | None:
 def session_entity_type(tool_context: ToolContext) -> str | None:
     """Entity type the producer corrected in playback (#13). Not a scope field; used for peer matching."""
     return tool_context.invocation_state.get("entity_type") or None
+
+
+def session_tags(tool_context: ToolContext) -> set[str]:
+    """Challenge tags from the confirmed playback (#13). Set by the engine, never by the model."""
+    return set(tool_context.invocation_state.get("tags") or ())
