@@ -40,17 +40,10 @@ The final proof is the timed clean redeploy (#40): the person running
 it follows only these documents and records every step that was missing or wrong, which is fixed
 before close.
 
-### Wiring the checks into CI
+Both run in CI (the "Handoff docs checks" step in `.github/workflows/ci.yml`). Run them locally from the
+repository root before changing an interface:
 
-Both checks are plain Python (no dependencies) and run from the repository root. A maintainer adds
-this step to the `checks` job in `.github/workflows/ci.yml` (kept out of this PR because the push
-token lacks `workflow` scope):
-
-```yaml
-      - name: Handoff docs checks
-        run: |
-          python docs/handoff/check_links.py
-          python docs/handoff/check_open_decisions.py
+```bash
+python3 docs/handoff/check_links.py
+python3 docs/handoff/check_open_decisions.py
 ```
-
-Until then, run them locally before changing an interface.
