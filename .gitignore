@@ -167,3 +167,9 @@ notebooks/fisher-puns-5ep-ckpt-1900/pytorch_model.bin
 notebooks/fisher-puns.tar.gz
 HCM_BACKUP.pg.dump
 
+
+# The generic rules above ("data", "lib/") also match this project's own folders, which silently
+# skips new files in them. Re-include the project packages.
+!/data/
+!/Fair-Exchange-Scaffolding/data/
+!/Fair-Exchange-Scaffolding/infra/lib/
