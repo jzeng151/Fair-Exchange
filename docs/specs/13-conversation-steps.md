@@ -100,11 +100,13 @@ The AgentCore runtime role gets only these permissions. Other specs refer here.
 - `bedrock:ApplyGuardrail` on the FEX Guardrail ([#12 spec](12-guardrail.md))
 - `bedrock:Retrieve` on the standards Knowledge Base ([#17 spec](17-standards-grounding.md))
 - `comprehend:DetectPiiEntities` ([#20 spec](20-pii-flagging.md))
+- `s3:GetObject` on the deployed agent code object in the artifacts bucket, and `kms:Decrypt` on that object's key when it uses SSE-KMS
+- CloudWatch Logs permissions needed for the runtime log group and streams; X-Ray trace and sampling permissions; and `cloudwatch:PutMetricData` restricted to the `bedrock-agentcore` namespace, as required by the configured observability setup
 - S3 read on the producer and peer data objects ([#14 spec](14-producer-record-tool.md))
 - `kms:Decrypt` on the stack key for those S3 reads
 - Only in stacks deployed with `evalAccess=true`: `s3:PutObject` on the eval evidence bucket ([#34 spec](34-negative-scope-tests.md))
 - Only in stacks deployed with `evalAccess=true`: `kms:GenerateDataKey` on the stack key for evidence writes. Grant `kms:Decrypt` as well if evidence uploads use multipart upload.
-- The key policy permits these uses by the runtime role. Scope KMS access to the stack key and, where supported, S3 use for the relevant buckets.
+- The relevant key policies permit these uses by the runtime role. Scope KMS access to the keys used by these objects and, where supported, S3 use for the relevant buckets. Scope logging permissions to the runtime's log group and streams where the action supports resource-level permissions.
 
 ### Actions (shared contract owned here)
 

@@ -86,7 +86,7 @@ One command, run from the infra package. In order, it:
    - CloudWatch Transaction Search. If it is off, the script adds the Logs resource policy and turns it on, then waits for `ACTIVE` (ADR 0002 measured 64 seconds).
 3. **Deploys the artifacts stack** and reads its bucket name from the stack output.
 4. **Builds the agent zip** with ARM64 Linux wheels (ADR 0002) and uploads it to that bucket under a new key.
-5. **Deploys the application stack**, passing the code key and the `stackName`, `disposable`, `evalAccess` and `trail` values.
+5. **Deploys the application stack**, passing the code key and the `stackName`, `disposable`, `evalAccess` and `trail` values. The identity that creates or updates the runtime has `s3:GetObject` on the code object and any KMS access required to read it; the artifacts key policy permits that access.
 6. **Uploads data:** the producer table, peer catalog and seeded records ([#7](07-synthetic-data.md), [#37](37-seeded-records.md)).
 7. **Builds and publishes the web app** to the stack's bucket and invalidates CloudFront.
 8. **Runs a smoke check** of `GET /health` and the Knowledge Base, and prints the outputs.
@@ -117,6 +117,8 @@ Template tests, using `aws-cdk-lib/assertions` on the synthesized stack:
 - every log group has a retention value set;
 - no resource has a hard-coded physical name;
 - the runtime role's actions and resources match the [#13 spec](13-conversation-steps.md) for the stack's flags, including the required KMS access and the evidence write only when `evalAccess=true`;
+- the runtime role can read the specified code object and use its encryption key, with no broader code-bucket access than required;
+- logging, tracing and metrics permissions cover the configured runtime observability setup and use resource scopes and conditions where supported;
 - the key policy permits the runtime's specified KMS operations, and an eval-disabled stack grants no evidence write permission;
 - with `disposable=true`, nothing is retained, and the KMS key's deletion window is 7 days;
 - `evalAccess` and `trail` resources appear only when their flags are set, and the main stack name can't be synthesized with `evalAccess=true`;
@@ -124,7 +126,7 @@ Template tests, using `aws-cdk-lib/assertions` on the synthesized stack:
 - with `disposable=false`, the stateful resources are retained;
 - two stacks synthesized with different names share no resource names.
 
-Script checks, run once in the sandbox: a re-run with no changes succeeds, and a missing model access fails with the named message.
+Script checks, run once in the sandbox: a re-run with no changes succeeds, a missing model access fails with the named message, and a deployment using the encrypted code object starts the runtime and produces the configured logs, traces and metrics.
 
 ## Out of Scope
 
