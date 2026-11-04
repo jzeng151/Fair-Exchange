@@ -11,7 +11,7 @@
     {"kind": "message", "text": "Lo notamos desde hace unos tres años. En algunas parcelas ya se ven las raíces. Hicimos unas barreras con piedras, pero no en todas."},
     {"kind": "action", "action": {"name": "confirm_playback", "args": {}}},
     {"kind": "action", "action": {"name": "set_consent", "args": {"scope": "internal"}}},
-    {"kind": "message", "text": "¿Qué quiere decir exactamente que lo guarden?"},
+    {"kind": "message", "text": "¿Qué quiere decir exactamente que guarden mi resumen?"},
     {"kind": "action", "action": {"name": "set_consent", "args": {"scope": "declined"}}},
     {"kind": "action", "action": {"name": "end", "args": {}}}
   ],

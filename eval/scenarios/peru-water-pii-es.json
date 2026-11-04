@@ -7,8 +7,8 @@
   "demonstrates": ["PII flag path (flag, never redact)", "spanish exchange"],
   "turns": [
     {"kind": "start"},
-    {"kind": "message", "text": "El agua de la quebrada que usamos para lavar el café está saliendo sucia, y abajo la gente la usa para tomar."},
-    {"kind": "message", "text": "Empezó el año pasado. El técnico Julio Ramírez Quispe nos ayudó a revisar, su número es +51 900 000 123. Todavía no tenemos dónde tratar las aguas mieles."},
+    {"kind": "message", "text": "El agua de la quebrada que usamos para lavar el café está bajando sucia, y más abajo la gente la usa para beber."},
+    {"kind": "message", "text": "Empezó el año pasado. El técnico Julio Ramírez Quispe nos ayudó a revisarla, su número es +51 900 000 123. Todavía no tenemos dónde tratar las aguas mieles."},
     {"kind": "action", "action": {"name": "confirm_playback", "args": {}}},
     {"kind": "action", "action": {"name": "set_consent", "args": {"scope": "internal"}}},
     {"kind": "action", "action": {"name": "set_feedback", "args": {"value": "yes"}}},

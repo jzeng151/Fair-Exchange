@@ -7,7 +7,7 @@
     {"id": "t04", "language": "es", "text": "La quebrada de donde sacamos agua para el beneficio se está secando en verano.", "tags": ["water"], "labeled_by": "draft"},
     {"id": "t05", "language": "en", "text": "The wastewater from washing the coffee is going straight into the river and our neighbours are complaining.", "tags": ["water"], "labeled_by": "draft"},
     {"id": "t06", "language": "es", "text": "No llueve como antes y ya no alcanza el agua para regar.", "tags": ["climate and weather", "water"], "labeled_by": "draft"},
-    {"id": "t07", "language": "es", "text": "La roya está atacando las plantas viejas y el suelo ya no da como antes.", "tags": ["soil and land"], "labeled_by": "draft"},
+    {"id": "t07", "language": "es", "text": "La roya está atacando las plantas viejas y la tierra ya no produce como antes.", "tags": ["soil and land"], "labeled_by": "draft"},
     {"id": "t08", "language": "en", "text": "Our hillside plots are washing away every rainy season and we're losing topsoil.", "tags": ["soil and land"], "labeled_by": "draft"},
     {"id": "t09", "language": "en", "text": "Fertilizer has become so expensive that most members stopped using it, and yields are falling.", "tags": ["soil and land", "market and price"], "labeled_by": "draft"},
     {"id": "t10", "language": "en", "text": "Buyers are paying us almost a quarter less per kilo than last year.", "tags": ["market and price"], "labeled_by": "draft"},

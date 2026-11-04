@@ -7,8 +7,8 @@
   "demonstrates": ["spanish exchange", "playback correction", "full evidence", "consent granted", "feedback"],
   "turns": [
     {"kind": "start"},
-    {"kind": "message", "text": "Este año casi no llovió como antes. Llevamos dos temporadas con lluvias muy irregulares y la última cosecha de café bajó bastante."},
-    {"kind": "message", "text": "Empezó a finales de 2024. Perdimos más o menos un tercio de la cosecha. Algunos socios sembraron más sombra en los cafetales, pero no alcanzó."},
+    {"kind": "message", "text": "Este año no ha llovido como antes. Llevamos dos temporadas con lluvias muy irregulares y la última cosecha de café bajó bastante."},
+    {"kind": "message", "text": "Empezó a finales de 2024. Perdimos más o menos un tercio de la cosecha. Algunos socios sembraron más árboles de sombra en los cafetales, pero no alcanzó."},
     {"kind": "action", "action": {"name": "correct_playback", "args": {"text": "No fue un tercio, fue casi la mitad de la cosecha."}}},
     {"kind": "action", "action": {"name": "confirm_playback", "args": {}}},
     {"kind": "action", "action": {"name": "set_consent", "args": {"scope": "internal"}}},
