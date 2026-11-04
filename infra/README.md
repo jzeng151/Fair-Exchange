@@ -77,7 +77,7 @@ while it is created, like the clause documents, are uploaded by `deploy.sh` into
 | Stack | Holds | Deleted with the stack? |
 |---|---|---|
 | `FairExchangeArtifacts` | The artifacts key (customer-managed KMS, rotated) and the artifacts bucket (encrypted with it): standards clause documents under `clauses/`, later the agent code zip | No. Both are kept. Clause documents expire after 30 days (`STANDARDS_DOCS_TTL_DAYS`), so a kept bucket empties itself. The key costs about $1 a month until it is scheduled for deletion. |
-| `FairExchange` | Website hosting (with its own `WebKey`), the application data key, the Guardrail, the standards Knowledge Base (vectors encrypted with the data key) and its ingestion, AgentCore Memory (encrypted with the data key), and later the API, agent runtime, records and analytics | The Knowledge Base, its vectors and ingestion resources are deleted. The website bucket, `WebKey` and the data key are kept. |
+| `FairExchange` | Website hosting (with its own `WebKey`), the application data key, the Guardrail, the standards Knowledge Base (vectors encrypted with the data key) and its ingestion, AgentCore Memory (encrypted with the data key), the records and conversations tables (data key, point-in-time recovery), and later the API, agent runtime, records and analytics | The Knowledge Base, its vectors and ingestion resources are deleted. The website bucket, `WebKey`, the data key and both tables are kept. |
 
 `deploy.sh` runs, in order:
 
@@ -111,3 +111,16 @@ Base; re-run `deploy.sh` to restore it.
 
 The ingestion handler is inline Lambda code (`lib/standards-kb/ingest_handler.py`, under 4 KB) because
 no CDK assets can be published.
+
+## Tables (#25, #26)
+
+`FairExchange` outputs `RecordsTableName`, `RecordsTableArn`, `RecordsTableStreamArn`, `ConversationsTableName` and
+`ConversationsTableArn`. The records table has a keys-only stream for the Athena sync (#28). To deploy the sync stack
+against it until it is part of `deploy.sh`:
+
+```bash
+out() { aws cloudformation describe-stacks --stack-name FairExchange --query "Stacks[0].Outputs[?OutputKey=='$1'].OutputValue | [0]" --output text; }
+EXPECTED_AWS_ACCOUNT=100300582834 RECORDS_TABLE_NAME="$(out RecordsTableName)" \
+  RECORDS_TABLE_STREAM_ARN="$(out RecordsTableStreamArn)" RECORDS_TABLE_KEY_ARN="$(out DataKeyArn)" \
+  bash infra/deploy-athena-sync.sh
+```
