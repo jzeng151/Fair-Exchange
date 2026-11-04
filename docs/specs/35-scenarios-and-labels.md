@@ -59,6 +59,7 @@ Scenarios are data files. Each file holds the producer, the language, the exact 
   - every scenario file validates against its schema, and every scenario ends with `end`;
   - every `producer_id` exists in the producer table;
   - every action is a valid [#13](13-conversation-steps.md) action;
+- against the deployed API, consecutive turns wait for `done` and the end of the response stream before the next request, without receiving a turn-lock 409;
   - the required scenarios S1 to S7 exist;
   - every label uses only the 11 tags.
 - **Seam 1:** S1 to S7 run against the agent entrypoint with a scripted fake model. Their expected outcomes are checked, except tags, which need the real model.

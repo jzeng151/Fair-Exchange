@@ -78,7 +78,8 @@ Generator tests (public function, data package), with the Comprehend step stubbe
 - the survey output contains only allowlisted columns, even when the input has every column filled;
 - excluded sample rows (factories, apparel) are absent;
 - unmapped values appear in the report;
-- the peer catalog holds only publishable fields plus `owner_producer_id`, and no sample project or account IDs;
+- the peer catalog holds only publishable fields plus the private `owner_producer_id`; sample account IDs may appear in that private field, but sample project IDs and account IDs do not appear in publishable fields;
+- for a sample producer, the peer tool excludes that producer's own projects and never returns `owner_producer_id` or sample IDs;
 - a sample producer's region is derived from its projects, and a producer without projects has an empty region;
 - a project with an unmapped sub-category is left out of the peer catalog and reported;
 - a stubbed PII hit leaves the project out.
