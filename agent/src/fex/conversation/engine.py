@@ -205,12 +205,14 @@ class ConversationEngine:
     def __init__(self, *, store: StateStore, small_model: Any, large_model: Any, standards: Standards | None = None,
                  profiles: Callable[[str], Profile | None] | None = None, tools: list | None = None,
                  clock: Callable[[], datetime] | None = None, max_retries: int = 2,
-                 records: Any = None, scope_check: ScopeCheck | None = None) -> None:
+                 records: Any = None, scope_check: ScopeCheck | None = None,
+                 pii_scanner: Callable[[str, str], list[dict]] | None = None) -> None:
         self.store = store
         self.small_model, self.large_model = small_model, large_model
         self.standards = standards or Standards.load()
         self.profiles = profiles or _default_profiles()
         self.tools = tools if tools is not None else ALL_TOOLS
+        self.pii_scanner = pii_scanner  # the Comprehend seam (#20): None in tests, wired in runtime
         self.clock = clock or (lambda: datetime.now(UTC))
         self.max_retries = max_retries
         self.records = records  # a fex.records.RecordStore; None = records are not saved (#26)
@@ -333,7 +335,7 @@ class ConversationEngine:
         from fex.records import RecordConflict, save_record  # local: records imports conversation state
 
         try:
-            result = save_record(state, self.records, self.clock())
+            result = save_record(state, self.records, self.clock(), pii_scanner=self.pii_scanner)
         except (RecordConflict, ValueError) as exc:
             log.error("record not saved for conversation %s: %s", state.conversation_id, exc)
             turn.emit("error", code="agent_failed", message="Your answer could not be saved. Please try again.")

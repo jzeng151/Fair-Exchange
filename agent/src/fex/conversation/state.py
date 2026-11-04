@@ -9,6 +9,8 @@ from typing import Literal, Protocol
 
 from pydantic import BaseModel, Field
 
+from fex.models import PiiScanState  # noqa: F401  (re-exported so state round-trips keep the type)
+
 from fex.conversation.contract import (
     Answer, ConsentScope, Evidence, FeedbackValue, HistoryEntry, Step,
 )
@@ -66,6 +68,9 @@ class ConversationState(BaseModel):
     feedback: FeedbackValue | None = None
     evidence_sources: list[str] = Field(default_factory=list, description="Sources tools returned this session")
     history: list[HistoryEntry] = Field(default_factory=list)
+    pii: PiiScanState | None = Field(
+        default=None, description="PII scan tracking (#20): per-text status plus the accumulated flag, "
+                                  "types and matches that the record's pii fields carry on the next save")
     excluded_history: list[int] = Field(
         default_factory=list, description="History positions of out-of-scope exchanges (#21): shown on resume, "
                                           "never given to a model, so they can't reach the playback or record")

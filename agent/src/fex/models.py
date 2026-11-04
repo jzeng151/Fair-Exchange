@@ -84,6 +84,49 @@ class EarlierAnswer(BaseModel):
         default=None, description="null for an interrupted answer, which never finished")
 
 
+TextStatus = Literal["pending", "done", "failed"]  # a text's scan status in the conversation state
+PiiEntityType = Literal["NAME", "PHONE", "EMAIL", "ADDRESS"]
+
+
+class PiiMatch(BaseModel):
+    """One personal-information match a scan found, kept for human review (issue #20)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    entity_type: PiiEntityType = Field(
+        description="Only these four types are looked for")
+    text: str = Field(min_length=1, description="The matched words; kept for review, never redacted or logged")
+    context: str = Field(min_length=1, description="Up to 10 words before and after the match")
+    message_at: datetime = Field(description="When the text containing the match was said")
+
+
+class TextScanStatus(BaseModel):
+    """Per-text scan status kept in the conversation state (issue #20): done texts are never rescanned."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    history_index: int = Field(ge=0, description="Position in the conversation state's history")
+    at: datetime = Field(description="When the text was said")
+    kind: Literal["message", "correct_playback"]
+    status: TextStatus = "pending"
+
+
+class PiiScanState(BaseModel):
+    """The conversation's accumulated PII scan state (issue #20); the record fields come from here.
+
+    `check` stays None until a real scan ran: an unconfigured scanner is a missing configuration,
+    not a failed scan, so it must not flag a record.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    per_text: list[TextScanStatus] = Field(default_factory=list)
+    flagged: bool = Field(default=False, description="Stays set for the life of the conversation once anything flags")
+    entity_types: list[PiiEntityType] = Field(default_factory=list)
+    matches: list[PiiMatch] = Field(default_factory=list)
+    check: Literal["done", "failed", "unsupported_language"] | None = None
+
+
 class _RecordBase(BaseModel):
     """Fields every record has. Unknown fields are rejected, so nothing slips in unnoticed."""
 
@@ -131,6 +174,12 @@ class CompletedRecord(_RecordBase):
     insights: list[Claim] = Field(default_factory=list, description="What the data shows, as given to the producer")
     peer_examples: list[Claim] = Field(default_factory=list, description="What others tried, as given to the producer")
     feedback: Literal["yes", "somewhat", "no"] | None = Field(default=None, description="Was the guidance helpful?")
+    pii_entity_types: list[Literal["NAME", "PHONE", "EMAIL", "ADDRESS"]] = Field(
+        default_factory=list, description="Types found across the conversation, in first-seen order")
+    pii_matches: list[PiiMatch] = Field(
+        default_factory=list, description="Every match found across scanned texts; matches are removed if the record turns declined")
+    pii_check: Literal["done", "failed", "unsupported_language"] | None = Field(
+        default=None, description="Scan result: None until the first scan ran; unsupported_language covers languages other than en and es")
     pii_flag: bool = Field(default=False, description="Personal information flagged for human review; never redacted")
     review_status: Literal["pending", "reviewed"] = "pending"
     reviewed_by: str | None = None
