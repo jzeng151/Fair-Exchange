@@ -74,3 +74,22 @@ def test_glue_columns_in_cdk_match_the_exported_fields():
             for name, cols in re.findall(r"\n  ([a-z_]+):\s*\[(.*?)\n  \]", block.group(1), re.S)}
     athena_tables = {t: f for t, f in TABLES.items() if t != "peer_catalog"}  # the peer catalog is for the tool only
     assert glue == {t: list(f) for t, f in athena_tables.items()}
+
+
+ATHENA_SYNC_TS = ROOT / "infra" / "lib" / "athena-sync-stack.ts"
+
+
+def test_journey_3_query_reads_only_source_tables_and_columns_that_exist():
+    # The shipped Journey 3 join (#28) must use the tables this export fills, not placeholder names
+    text = ATHENA_SYNC_TS.read_text(encoding="utf-8")
+    query = re.search(r"export const JOURNEY_3_QUERY = `(.*?)`;", text, re.S).group(1)
+    used = set(re.findall(r"\$\{SOURCE_DATABASE\}\.([a-z_]+)", query))
+    athena_tables = {t: f for t, f in TABLES.items() if t != "peer_catalog"}
+    assert used and used <= set(athena_tables), f"unknown source tables: {used - set(athena_tables)}"
+    # the columns the query reads from each source table exist in that table
+    for table, column in [("premium_projects", "producer_id"), ("survey_facts", "producer_id"),
+                          ("survey_facts", "responses"), ("certification", "producer_id"),
+                          ("certification", "certification_scope")]:
+        assert table in used and column in athena_tables[table], (table, column)
+    assert "MAX(responses)" in query  # survey facts are per-question summaries, not individual responses
+    assert "certification_scope" in query

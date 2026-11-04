@@ -14,6 +14,10 @@ import { Construct } from 'constructs';
  * tool, and its private owner_producer_id column is never queried.
  */
 
+/** The source Glue database for a stack: `<stack>_source` (spec 05: names derive from the stack name). */
+export const sourceDatabaseName = (stackName: string): string =>
+  `${stackName.toLowerCase().replace(/[^a-z0-9_]/g, '_')}_source`;
+
 /** Glue columns per table. data/tests/test_export.py checks they match fx_data.export.TABLES exactly. */
 export const SOURCE_TABLES: Record<string, glue.CfnTable.ColumnProperty[]> = {
   producers: [
@@ -78,7 +82,7 @@ export class FexDataBucket extends Construct {
       removalPolicy: RemovalPolicy.RETAIN,
     });
 
-    this.databaseName = `${stack.stackName.toLowerCase().replace(/[^a-z0-9_]/g, '_')}_source`;
+    this.databaseName = sourceDatabaseName(stack.stackName);
     const database = new glue.CfnDatabase(this, 'Database', {
       catalogId: stack.account,
       databaseInput: { name: this.databaseName, description: 'Fair Exchange producer data (data bucket, #7 #14)' },
