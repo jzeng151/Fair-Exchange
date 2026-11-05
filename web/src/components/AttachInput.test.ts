@@ -64,4 +64,18 @@ describe('attach input (#169)', () => {
     expect(w.emitted('description')).toBeUndefined()
     expect(w.get('[role="alert"]').text()).toContain('type')
   })
+
+  it('deletes the file again once an upload cancelled mid-flight finishes, so S3 is not left holding it', async () => {
+    let finishUpload!: () => void
+    const { w, service } = setup('en', { upload: vi.fn(() => new Promise<void>((r) => { finishUpload = r })) })
+    await pick(w, photo())
+    await w.get('[data-action="cancel-attach"]').trigger('click')
+    expect(service.cancel).toHaveBeenCalledTimes(1) // at once, in case the upload already landed
+    finishUpload()
+    await flushPromises()
+    expect(service.cancel).toHaveBeenCalledTimes(2) // and again, because the upload recreated the object
+    expect(service.cancel).toHaveBeenLastCalledWith('a-1')
+    expect(service.read).not.toHaveBeenCalled()
+    expect(w.emitted('description')).toBeUndefined()
+  })
 })

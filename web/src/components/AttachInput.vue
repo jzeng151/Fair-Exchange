@@ -66,7 +66,8 @@ async function chosen(e: Event) {
   pending = { api, id: created.attachment_id }
   try {
     await api.upload(created.upload, file)
-    if (mine !== generation) return
+    // Cancelled while uploading: cancel() already deleted the key, but the upload has now recreated it.
+    if (mine !== generation) { void api.cancel(created.attachment_id).catch(() => {}); return }
     const { description } = await api.read(created.attachment_id)
     if (mine !== generation) return
     pending = undefined

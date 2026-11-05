@@ -103,7 +103,7 @@ This changes [#41](41-voice-notes.md)'s "Out of Scope: voice replies from FEX" (
 - **Consent explainer.** Under the consent question, three short lines in the conversation language:
   - FTUSA only: the Fair Trade USA team can read it to improve support.
   - Shared: other producers and partners only ever see it combined with others, never with your name.
-  - Don't keep: nothing from this conversation is kept.
+  - Don't keep: no summary is saved for Fair Trade USA, only that the producer said no. The conversation itself is deleted automatically after 7 days (the AgentCore Memory event expiry, `MEMORY_EVENT_EXPIRY_DAYS`). The same correction applies to the message shown after declining, which used to say "nothing from this conversation is kept" (changed 2026-11-05 in review).
 
   These lines match what [#19](19-consent-and-decline.md) and [#29](29-analytics-api.md) already guarantee and promise nothing more.
 

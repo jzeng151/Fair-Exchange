@@ -344,7 +344,23 @@ describe('LiveChatView: clearer answers (#169)', () => {
     expect(lines).toHaveLength(3)
     expect(lines[0]).toContain('equipo de Fair Trade USA')
     expect(lines[1]).toContain('nunca con su nombre')
-    expect(lines[2]).toContain('no se guarda nada')
+    // Declining keeps no summary (#19), but the conversation itself stays in memory until it expires (7 days).
+    expect(lines[2]).toContain('no se guarda ningún resumen')
+    expect(lines[2]).toContain('7 días')
+    expect(lines.join(' ')).not.toContain('no se guarda nada')
+  })
+
+  it('after a decline, says no summary is kept and when the conversation itself is deleted, not that nothing is kept', async () => {
+    const fake = fakeClient({
+      start: [{ type: 'conversation', conversationId: 'c-1' }, ...step('consent', ['reopen_playback', 'set_consent', 'end'])],
+      action: { set_consent: [{ type: 'record_saved', seq: 1, status: 'declined', consent_scope: null as never, version: 1 }, ...step('consent', ['reopen_playback', 'set_consent', 'end'])] },
+    })
+    const w = await open(fake)
+    await w.get('[data-consent="declined"]').trigger('click')
+    await flushPromises()
+    const note = w.get('.alert.info').text()
+    expect(note).toContain('no se guarda ningún resumen')
+    expect(note).toContain('7 días')
   })
 })
 
