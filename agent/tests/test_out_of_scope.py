@@ -1,6 +1,6 @@
 """Issue #21: out-of-scope handling (Journey 4). Spec: docs/specs/21-out-of-scope.md.
 
-Seam 1 (agent entrypoint) with a FAKE detection function: how detection decides is "Not decided".
+Seam 1 (agent entrypoint) with a fake detection function. The Bedrock adapter has separate tests.
 """
 import boto3
 import pytest
