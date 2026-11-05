@@ -13,7 +13,8 @@ Not decided, so not built here (spec "Further Notes"):
   - the retention values (set by configuration: FEX_EVENT_EXPIRY_DAYS, FEX_MAX_LIFETIME_MINUTES);
   - when the deletion function is called;
   - which long-term memories are eligible for recall. `recall_eligibility` returns nothing until the
-    decline policy is decided, so recall is built but switched off and declined text cannot resurface.
+    decline policy is decided, and nothing in the engine calls it yet, so recall is off and declined
+    text cannot resurface.
 """
 from __future__ import annotations
 
@@ -88,9 +89,10 @@ def recall_eligibility(actor_id: str, query: str) -> list[dict[str, Any]]:
     """Which long-term memories may feed intake and playback for this producer.
 
     Switched off: returns nothing until the decline policy is decided (spec "Recall eligibility"), so
-    recalled context cannot leak declined text into a later conversation or record. The one place recall
-    is decided lives here, so turning it on is a single, testable change. Recall is never a citable
-    source even when on; insights and peer examples come only from the data tools and the citation check.
+    recalled context cannot leak declined text into a later conversation or record. Nothing calls it yet:
+    turning recall on means changing this function and also adding a call from intake and playback in the
+    engine. Recall is never a citable source even when on; insights and peer examples come only from the
+    data tools and the citation check.
     """
     return []
 
