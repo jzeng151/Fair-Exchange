@@ -1,7 +1,7 @@
 // GENERATED FILE. Do not edit by hand.
 // Source: agent/src/fex/models.py  ->  agent/scripts/generate_types.py
-// schema-sha256: 39014519872858610d5a8d440163007f92a78dbf3672104cc5254b464e8d585b
-// body-sha256: 54eb60f2923ffef85a9ec873fe678b0e46ffedd52632889a9c434d4720cd710e
+// schema-sha256: 27c6d1d4c9c0a53afa0410f40f7fd01decdc4871c08a16c9b22bd5ab85707dbe
+// body-sha256: 2e0b15e60c0d222bf9ff8533aa4fa93732735dd9d81335fdd359b5315c8c8346
 // end-of-banner
 /**
  * One record per Fair Exchange conversation. Generated from agent/src/fex/models.py; do not edit by hand.
@@ -27,6 +27,14 @@ export type Scope1 = "internal" | "internal_and_outward" | "declined";
  */
 export type ConsentHistory = ConsentChoice[];
 export type CreatedAt = string;
+export type At = string;
+export type Code = string;
+export type Kind = "step" | "tool" | "verifier" | "pii";
+export type Refs = string[];
+/**
+ * The agent's reasoning trail for reviewers, oldest first (#26)
+ */
+export type DecisionLog = DecisionLogEntry[];
 /**
  * null for an interrupted answer, which never finished
  */
@@ -247,6 +255,7 @@ export interface CompletedRecord {
   consent: StoredConsent;
   consent_history?: ConsentHistory;
   created_at: CreatedAt;
+  decision_log?: DecisionLog;
   earlier_answers?: EarlierAnswers;
   entity_type: EntityType;
   evidence: Evidence1;
@@ -299,6 +308,15 @@ export interface StoredConsent {
 export interface ConsentChoice {
   recorded_at: RecordedAt1;
   scope: Scope1;
+}
+/**
+ * One step of the agent's reasoning trail (#26). `refs` holds opaque IDs only (DECISION_REF).
+ */
+export interface DecisionLogEntry {
+  at: At;
+  code: Code;
+  kind: Kind;
+  refs?: Refs;
 }
 /**
  * An answer shown to the producer and later replaced (#26).

@@ -67,6 +67,7 @@ export const RECORD_COLUMNS: { name: string; type: string }[] = [
   { name: 'insights', type: claims },
   { name: 'peer_examples', type: claims },
   { name: 'feedback', type: str },
+  { name: 'decision_log', type: `array<struct<at:${str},kind:${str},code:${str},refs:array<${str}>>>` },
   { name: 'pii_entity_types', type: `array<${str}>` },
   { name: 'pii_check', type: str },
   { name: 'pii_flag', type: 'boolean' },

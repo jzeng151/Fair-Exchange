@@ -31,7 +31,8 @@ A claim passes the verifier (`fex.verifier.check_claim`) only if:
 | its text has no directive phrase (`fex.tone.DIRECTIVE_PHRASES`, English and Spanish) | `directive_language` |
 | a claim line that cannot be parsed (#18) | `malformed` |
 
-The decision log records only the codes.
+The decision log records only the codes, with the claim's bracketed source ID and clause ID as refs. A ref
+that is not an ID (`fex.models.DECISION_REF`) is left out, so model-written text never reaches the record.
 
 ## `get_producer_record()` (#14)
 

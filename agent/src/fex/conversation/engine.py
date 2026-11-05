@@ -29,7 +29,7 @@ from fex.guardrail import CONVERSATION_KEY, OutputAssessor, narrative_texts
 from fex.conversation.state import (
     ConversationState, DecisionLogEntry, Playback, Profile, ShownClaims, StateConflict, StateStore,
 )
-from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer
+from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer, decision_refs
 from fex.tools import ALL_TOOLS, DATA_TOOLS
 from fex.tools._contract import EVIDENCE_KEY, ITEMS_KEY, TOOLS_RUN_KEY, run_data_tool
 from fex.tools.standards import RETRIEVER_KEY, ClauseRetriever, default_retriever
@@ -161,14 +161,15 @@ _BRACKET_ID = re.compile(r"\[([^\[\]]+)\]\s*$")
 
 
 def _claim_refs(claim: Claim) -> list[str]:
-    """Opaque IDs for the decision log: the source's bracketed item ID and the clause ID. No free text."""
+    """Opaque IDs for the decision log: the source's bracketed item ID and the clause ID. No free text.
+    The model writes both strings, so anything that is not an ID (DECISION_REF) is left out."""
     refs = []
     if match := _BRACKET_ID.search(claim.citation.source):
         refs.append(match.group(1))
     clause = claim.citation.standard_clause.split()
     if len(clause) == 2 and clause[0].upper() in ("APS", "FPS"):
         refs.append(f"{clause[0].upper()} {clause[1]}")
-    return refs
+    return decision_refs(refs)
 
 
 class _Turn:

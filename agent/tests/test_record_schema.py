@@ -238,3 +238,49 @@ def test_ai_usage_rejects_bad_entries(bad):
         CompletedRecord.model_validate(completed(ai_usage=[bad]))
     with pytest.raises(ValidationError):
         DeclinedRecord.model_validate(declined(ai_usage=[bad]))
+
+
+# ---------------------------------------------------------------- decision log (#26)
+
+def log_entry(*refs):
+    return {"at": NOW, "kind": "verifier", "code": "unknown_source", "refs": list(refs)}
+
+
+def test_decision_log_accepts_opaque_ids():
+    refs = ["RF-F8C4E1", "SV-0A1B2C", "CAT-01D1C7DD", "PRJ-0A1B2C3D", "CFC19603C1B7B29C017954FD1DB2D620", "SYN-001",
+            "SYN-SCOPE-A", "APS 3.2.1", "APS 1.1.1.a", "FPS 4.1", "get_regional_context", "playback", "PHONE"]
+    record = parse_record(completed(decision_log=[log_entry(*refs)]))
+    assert record.decision_log[0].refs == refs
+
+
+@pytest.mark.parametrize("ref", ["Juan Pérez", "555-0100", "5551234567", "+15551234567", "0123456", "RF-5551234",
+                                 "PRJ-5551234567", "APS three", "get_regional_context; drop", "RF-F8C4E1 extra",
+                                 "rf-f8c4e1", ""])
+def test_decision_log_rejects_anything_but_an_id(ref):
+    with pytest.raises(ValidationError):
+        parse_record(completed(decision_log=[log_entry(ref)]))
+
+
+def test_declined_record_rejects_a_decision_log():
+    with pytest.raises(ValidationError):
+        parse_record(declined(decision_log=[log_entry("RF-F8C4E1")]))
+
+
+def test_every_data_source_id_is_a_valid_decision_ref():
+    """Guards the ref pattern against new ID shapes in the data: a shape it rejects would drop from the log."""
+    import re
+
+    from fx_data.peers import PeerProjects, ProducerProfiles
+    from fx_data.records import ProducerRecords
+    from fx_data.regional import RegionalFacts, source_label
+    from fx_data.standards import Standards
+
+    from fex.models import DECISION_REF
+
+    records = ProducerRecords.load()
+    labels = [item["source"] for pid in ProducerProfiles.load()._profiles for item in records.items(pid)]
+    labels += [source_label(row) for row in RegionalFacts.load().rows]
+    ids = [re.search(r"\[([^\[\]]+)\]\s*$", label).group(1) for label in labels]
+    ids += [p["catalog_id"] for p in PeerProjects.load()._projects]
+    ids += list(Standards.load()._by_id)
+    assert ids and [i for i in ids if not re.match(DECISION_REF, i)] == []
