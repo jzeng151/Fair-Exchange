@@ -21,6 +21,7 @@ from fex.verifier import SourceKind
 EVIDENCE_KEY = "evidence"  # a fex.verifier.SessionEvidence
 TOOLS_RUN_KEY = "tools_run"  # set of tool names that returned data in this respond step
 ITEMS_KEY = "items"  # every item returned in this respond step, in order, for the answer prompt (#18)
+LOG_KEY = "log_tool_call"  # (tool name, items) -> None: the engine logs each data tool run (#26)
 
 
 class EvidenceItem(TypedDict):
@@ -51,4 +52,6 @@ def run_data_tool(tool: DataTool, state: dict[str, Any]) -> list[EvidenceItem] |
         ran.add(tool.name)
     if (collected := state.get(ITEMS_KEY)) is not None:
         collected.extend(items)
+    if (log_call := state.get(LOG_KEY)) is not None:
+        log_call(tool.name, items)
     return items

@@ -19,7 +19,7 @@ from typing import Any, Protocol
 from botocore.exceptions import ClientError
 
 from fex.conversation.contract import ActionEntry, SpokenEntry
-from fex.conversation.state import ConversationState
+from fex.conversation.state import ConversationState, DecisionLogEntry
 from fex.models import CompletedRecord, DeclinedRecord, PiiScanState, TextScanStatus, decision_refs, parse_record
 from fex.pii import PiiText, scan_texts
 
@@ -165,7 +165,10 @@ def save_record(state: ConversationState, store: RecordStore, now: datetime,
     fails; in both cases nothing is written.
     """
     if pii_scanner is not None:
+        before = state.pii.entity_types if state.pii else []
         run_pii_scan(state, pii_scanner)
+        if found := [t for t in (state.pii.entity_types if state.pii else []) if t not in before]:
+            state.decision_log.append(DecisionLogEntry(at=now, kind="pii", code="pii_found", refs=found))
     first = state.record_version is None
     version = 1 if first else state.record_version + 1
     created_at = now if first else state.record_created_at
