@@ -72,6 +72,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
+    "exchange.middleware.RelativeScriptPrefixMiddleware",  # links work behind any path proxy (e.g. /proxy/8000/)
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -99,8 +100,8 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# Behind the workshop proxy the app is served under a path prefix (e.g. /proxy/8099/).
-# FORCE_SCRIPT_NAME makes Django emit URLs (static, api) under that prefix so assets resolve.
+# Behind a path proxy (e.g. /proxy/8000/) links are made relative per request (exchange/middleware.py), so no
+# setting is needed. URL_PREFIX, if set, makes Django emit absolute URLs under that prefix instead.
 FORCE_SCRIPT_NAME = os.environ.get("URL_PREFIX") or None
 _PREFIX = (FORCE_SCRIPT_NAME or "").rstrip("/")
 
@@ -108,7 +109,8 @@ STATIC_URL = f"{_PREFIX}/static/" if _PREFIX else "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "exchange" / "static"]
 STORAGES = {
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    # WhiteNoise's compressed manifest storage, with URLs relative to the page (exchange/storage.py)
+    "staticfiles": {"BACKEND": "exchange.storage.RelativeStaticFilesStorage"},
 }
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

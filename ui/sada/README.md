@@ -15,6 +15,9 @@ uv run python manage.py runserver 0.0.0.0:8099
 test
 Or `bash run.sh`, which sets up `.venv` on first run and starts the server on http://localhost:8010.
 
+**Behind a path proxy** (for example `https://<host>/proxy/8000/`), the page loads without styles unless the app
+knows the prefix: run `PORT=8000 URL_PREFIX=/proxy/8000 bash run.sh`, or set `URL_PREFIX` in `.env`.
+
 **Mock or Real API:** the chat answers from a built-in mock, or from the real FEX agent through the Fair
 Exchange chat API. See [docs/REAL-API.md](docs/REAL-API.md) to connect locally or to the deployed stack.
 

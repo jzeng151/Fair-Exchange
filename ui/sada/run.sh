@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Run the PoC UI locally: bash run.sh   (PORT=8099 bash run.sh to change the port)
+# Behind a path proxy such as https://<host>/proxy/8000/, set the prefix so links include it:
+#   PORT=8000 URL_PREFIX=/proxy/8000 bash run.sh   (or put URL_PREFIX in .env)
 # Creates .venv and installs requirements.txt on first run. App settings and AWS credentials come from .env,
 # which config/settings.py reads itself.
 set -euo pipefail
@@ -20,5 +22,5 @@ else
 fi
 
 .venv/bin/python manage.py collectstatic --noinput -v 0
-echo "Fair Trade Exchange UI: http://localhost:${port}/"
+echo "Fair Trade Exchange UI: http://localhost:${port}/${URL_PREFIX:+ (links use the prefix ${URL_PREFIX})}"
 exec .venv/bin/python manage.py runserver "0.0.0.0:${port}"
