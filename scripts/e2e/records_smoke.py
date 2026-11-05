@@ -74,7 +74,7 @@ def main():
     now = datetime.now(timezone.utc).isoformat()
     try:
         for record_id, producer_id in zip(ids, producers):
-            record = CompletedRecord(record_id=record_id, producer_id=producer_id,
+            record = CompletedRecord(record_id=record_id, producer_id=producer_id, status='completed',
                 created_at=now, updated_at=now, closed_at=now, version=1,
                 consent={'scope': 'internal', 'recorded_at': now}, language='en', entity_type='cooperative',
                 summary_original='[Synthetic deployment test] Rainfall affected the harvest.',

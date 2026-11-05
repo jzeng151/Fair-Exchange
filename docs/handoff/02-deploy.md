@@ -146,6 +146,11 @@ these APIs. The reviewer can filter, inspect, correct, resolve PII flags and app
 closed records. Stale edits show a reload action without discarding the draft;
 approved records are read-only. Without an API URL, browser-only demos still work.
 
+When the Athena sync stack exists, deployment also validates and uploads the 200
+deterministic synthetic analytics records using `agent/scripts/load_seeded_records.py`.
+The loader replaces only the `records-seeded/` prefix in the records bucket. It
+does not write to DynamoDB, the live `records/` prefix, or the reviewer queue.
+
 The deployment runs `scripts/e2e/records_smoke.py` from the agent environment when
 the Athena sync stack exists. It verifies identity and role separation, producer
 scope, CORS, PII gating, reviewer corrections, version conflicts, approval, and the
