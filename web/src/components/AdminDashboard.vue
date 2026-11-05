@@ -37,24 +37,32 @@ const adminPasscode = ref((() => { try { return sessionStorage.getItem(ADMIN_KEY
 const live = ref<AnalyticsResponse | null>(null)
 const liveError = ref<string | null>(null)
 const loading = ref(false)
+const requested = ref(false) // an admin has asked for live analytics at least once
+// Only the newest request may update the view, so a slower earlier response (for another filter) is dropped.
+let latest = 0
 async function loadLive() {
   if (!props.apiUrl) return
   try { sessionStorage.setItem(ADMIN_KEY, adminPasscode.value.trim()) } catch { /* storage unavailable */ }
+  const mine = ++latest
+  requested.value = true
   loading.value = true
   liveError.value = null
+  live.value = null
   try {
-    live.value = await fetchAnalytics(props.apiUrl, adminPasscode.value.trim(), includePending.value)
+    const result = await fetchAnalytics(props.apiUrl, adminPasscode.value.trim(), includePending.value)
+    if (mine === latest) live.value = result
   } catch (err) {
-    live.value = null
+    if (mine !== latest) return
     const status = err instanceof LiveError ? err.status : -1
     liveError.value = status === 401 || status === 403 ? 'The admin passcode wasn’t accepted.'
       : status === 503 ? 'Analytics are temporarily unavailable. Please try again in a moment.'
         : status === 0 ? 'Can’t reach the analytics API right now.' : 'Something went wrong. Please try again.'
   } finally {
-    loading.value = false
+    if (mine === latest) loading.value = false
   }
 }
-watch(includePending, () => { if (source.value === 'live' && live.value) void loadLive() })
+// Any filter change reloads (including while a load is in flight), so the counts always match the controls.
+watch(includePending, () => { if (source.value === 'live' && requested.value) void loadLive() })
 const sections = computed(() => live.value
   ? ([['Live records', live.value.live], ['Seeded demo data', live.value.seeded]] as [string, AnalyticsSection][])
   : [])
