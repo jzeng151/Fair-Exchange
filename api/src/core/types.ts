@@ -9,6 +9,7 @@ export interface Conversation {
   createdAt: number;
   status: ConversationStatus;
   closedAt?: number;
+  language?: string;
   lastActivityAt: number;
   /** Epoch ms. A turn is in progress while this is in the future. */
   lockExpiresAt?: number;
@@ -74,6 +75,8 @@ export interface ConversationStore {
   /** Releases the lock only if `token` still holds it. Otherwise does nothing. */
   releaseLock(conversationId: string, token: string): Promise<void>;
   markClosed(conversationId: string, now: number): Promise<void>;
+  /** Cache only agent-identified language for voice transcription. No conversation content. */
+  setLanguage?(conversationId: string, token: string, language: string): Promise<void>;
   /** All open conversations. Used only by the sweep. */
   listOpen(): Promise<Conversation[]>;
 }

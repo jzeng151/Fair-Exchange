@@ -78,7 +78,7 @@ onBeforeUnmount(() => window.removeEventListener('hashchange', onHash))
   <main class="container">
     <!-- v-show keeps the producer's conversation in place while switching sides -->
     <ChatView v-show="side === 'producer'" :producer-view="true" :subtitles="subtitles" />
-    <LiveChatView v-if="apiUrl" v-show="side === 'live'" :api-url="apiUrl" />
+    <LiveChatView v-if="apiUrl" v-show="side === 'live'" :active="side === 'live'" :api-url="apiUrl" />
     <LiveYourRecordView v-if="side === 'me' && apiUrl" :api-url="apiUrl" />
     <YourRecordView v-else-if="side === 'me'" ref="yourRecord" :producer-id="demoProducerId" />
     <LiveReviewerView v-if="side === 'review' && apiUrl" :api-url="apiUrl" />
