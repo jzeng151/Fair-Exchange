@@ -9,8 +9,8 @@ import type { Log } from './types.js';
  *
  * The producer ID comes only from the identity (#11); it is never read from the request. The fields
  * the spec says must never leave are stripped here: the English summary for a non-English producer,
- * every pii_* field, and the reviewer's identity. (The record schema has no decision log or ai_usage
- * field, so those cannot leak through this route.)
+ * every pii_* field, decision_log, ai_usage and the reviewer's identity. The explicit allow-list
+ * below keeps new internal fields out of producer responses.
  */
 
 export interface MeDeps {

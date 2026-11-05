@@ -122,6 +122,14 @@
           "title": "Created At",
           "type": "string"
         },
+        "decision_log": {
+          "description": "Recorded decisions for reviewers; absent on declined records",
+          "items": {
+            "$ref": "#/$defs/DecisionLogEntry"
+          },
+          "title": "Decision Log",
+          "type": "array"
+        },
         "earlier_answers": {
           "description": "Answers shown and later replaced, oldest first",
           "items": {
@@ -469,6 +477,48 @@
         "recorded_at"
       ],
       "title": "ConsentChoice",
+      "type": "object"
+    },
+    "DecisionLogEntry": {
+      "additionalProperties": false,
+      "description": "A recorded decision, containing fixed codes and opaque references only.",
+      "properties": {
+        "at": {
+          "format": "date-time",
+          "title": "At",
+          "type": "string"
+        },
+        "code": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9_]*$",
+          "title": "Code",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "step",
+            "tool",
+            "verifier",
+            "pii"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "refs": {
+          "description": "Step/tool names, item or clause IDs, or PII types; never narrative text",
+          "items": {
+            "type": "string"
+          },
+          "title": "Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "at",
+        "kind",
+        "code"
+      ],
+      "title": "DecisionLogEntry",
       "type": "object"
     },
     "DeclinedConsent": {

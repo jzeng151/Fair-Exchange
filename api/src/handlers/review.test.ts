@@ -30,6 +30,7 @@ function record(n: number, overrides: Record<string, unknown> = {}): StoredRecor
     tags: ['climate and weather'],
     evidence: 'full',
     earlier_answers: [],
+    decision_log: [{ at: '2026-11-04T10:15:00Z', kind: 'tool', code: 'tool_called', refs: ['get_producer_record'] }],
     insights: [],
     peer_examples: [],
     feedback: null,

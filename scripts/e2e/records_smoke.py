@@ -78,13 +78,14 @@ def main():
                 created_at=now, updated_at=now, closed_at=now, version=1,
                 consent={'scope': 'internal', 'recorded_at': now}, language='en', entity_type='cooperative',
                 summary_original='[Synthetic deployment test] Rainfall affected the harvest.',
-                tags=['climate and weather'], evidence='limited', review_status='pending', pii_flag=True)
+                tags=['climate and weather'], evidence='limited', review_status='pending', pii_flag=True,
+                decision_log=[{'at': now, 'kind': 'step', 'code': 'step_changed', 'refs': ['closed']}])
             parse_record(record.model_dump(mode='json'))
             store.create(record); created.append(record_id)
         mine = request('/me/records', producer)['records']
         assert ids[0] in {r['record_id'] for r in mine} and ids[1] not in {r['record_id'] for r in mine}
         own = next(r for r in mine if r['record_id'] == ids[0])
-        assert not any(k in own for k in ['pii_flag', 'pii_matches', 'reviewed_by', 'ai_usage'])
+        assert not any(k in own for k in ['pii_flag', 'pii_matches', 'reviewed_by', 'ai_usage', 'decision_log'])
         assert ids[0] in {r['record_id'] for r in request('/records', reviewer)['records']}
         original = request('/records/' + ids[0], reviewer)
         request('/records/' + ids[0] + '/approve', reviewer, 'POST', {'version': 1}, expected=409)
@@ -94,6 +95,8 @@ def main():
         request('/records/' + ids[0], reviewer, 'PATCH', {'version': 1, 'pii_review': 'cleared'}, expected=409)
         approved = request('/records/' + ids[0] + '/approve', reviewer, 'POST', {'version': 2})
         assert approved['version'] == 3 and approved['review_status'] == 'reviewed'
+        assert approved['decision_log'] == patched['decision_log'] == original['decision_log']
+        assert original['decision_log'][0]['refs'] == ['closed']
         request('/records/' + ids[0], reviewer, 'PATCH', {'version': 3, 'pii_review': 'confirmed'}, expected=409)
         updated = next(r for r in request('/me/records', producer)['records'] if r['record_id'] == ids[0])
         assert updated['summary'] == patched['reviewer_summary_original'] and updated['changed_by_reviewer']
@@ -110,7 +113,7 @@ def main():
             time.sleep(2)
         else: raise AssertionError('Reviewed record did not reach S3')
         query = athena.start_query_execution(WorkGroup=sync['AthenaWorkGroup'], QueryString=
-            f"SELECT version, review_status FROM fex.conversation_records WHERE record_id = '{ids[0]}'")['QueryExecutionId']
+            f"SELECT version, review_status, cardinality(decision_log) FROM fex.conversation_records WHERE record_id = '{ids[0]}'")['QueryExecutionId']
         deadline = time.monotonic() + 45
         while time.monotonic() < deadline:
             status = athena.get_query_execution(QueryExecutionId=query)['QueryExecution']['Status']
@@ -119,7 +122,8 @@ def main():
             time.sleep(1)
         else: raise AssertionError('Athena timed out')
         rows = athena.get_query_results(QueryExecutionId=query)['ResultSet']['Rows'][1:]
-        assert [[v.get('VarCharValue') for v in r['Data']] for r in rows] == [['3', 'reviewed']]
+        assert obj['decision_log'] == approved['decision_log']
+        assert [[v.get('VarCharValue') for v in r['Data']] for r in rows] == [['3', 'reviewed', '1']]
         print('PASS: reviewer approval reached S3 and Athena', flush=True)
     finally:
         for record_id in created:

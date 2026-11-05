@@ -146,6 +146,7 @@ describe('GET /me/records', () => {
           summary_english: 'Heavy rain hurt the harvest',
           reviewed_by: 'reviewer-1',
           reviewed_at: '2026-11-05T09:00:00Z',
+          decision_log: [{ at: '2026-11-05T09:00:00Z', kind: 'tool', code: 'tool_called', refs: ['get_producer_record'] }],
         }),
       ),
     );

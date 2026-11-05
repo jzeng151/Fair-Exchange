@@ -115,6 +115,17 @@ defineExpose({ refresh: () => { if (signedIn.value) void refresh() } })
         <ul><li v-for="(match, i) in selected.pii_matches ?? []" :key="i">{{ match.entity_type }}: {{ match.context }}</li></ul>
         <div v-if="!readonly && selected.pii_flag" class="actions"><button :disabled="busy" @click="save('confirmed')">Confirm flag and save</button><button :disabled="busy" @click="save('cleared')">Clear flag and save</button></div>
         <p>Producer feedback: {{ selected.feedback ?? 'Not provided' }}</p>
+        <section aria-label="Decision log">
+          <h3>Decision log</h3>
+          <p class="small">Recorded steps, tool calls and checks. References identify sources without copying conversation text.</p>
+          <ol v-if="selected.decision_log?.length">
+            <li v-for="(entry, i) in selected.decision_log" :key="i">
+              <time :datetime="entry.at">{{ entry.at }}</time> · {{ entry.kind }} · <code>{{ entry.code }}</code>
+              <span v-if="entry.refs?.length"> · {{ entry.refs.join(', ') }}</span>
+            </li>
+          </ol>
+          <p v-else>No decision log was stored for this record.</p>
+        </section>
         <p v-if="selected.reviewed_by">Reviewed by {{ selected.reviewed_by }} · {{ selected.reviewed_at }}</p>
         <div v-if="!readonly" class="actions"><button :disabled="busy || !dirty" @click="save()">Save corrections</button><button class="btn-primary" :disabled="busy || dirty || !!unresolved" @click="approve">Approve record</button></div>
         <p v-if="unresolved">Resolve the PII flag first.</p><p v-if="dirty">Save your corrections before approving.</p>

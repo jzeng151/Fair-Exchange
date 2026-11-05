@@ -16,6 +16,10 @@ The record is the single stored output of a conversation. It is generated from t
   that a declined record carries no narrative content.
 - Regenerate with `agent/scripts/generate_types.py`; a CI drift test fails if the generated files and
   the models disagree.
+- Completed records include `decision_log`, an ordered list of timestamps, kinds, fixed codes and
+  opaque references. The live reviewer displays it read-only. Older records default to an empty log;
+  no historical entries are invented. Declined records reject the field, and `GET /me/records`
+  excludes it. Reviewer corrections preserve it.
 
 ## Data tools
 

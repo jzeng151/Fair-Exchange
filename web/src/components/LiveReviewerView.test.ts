@@ -25,6 +25,17 @@ async function open() {
   return w
 }
 describe('live reviewer', () => {
+  it('shows stored decision codes and references read-only, with an honest legacy empty state', async () => {
+    record.decision_log = [{ at: record.created_at, kind: 'tool', code: 'tool_called', refs: ['get_producer_record'] }]
+    const w = await open()
+    const log = w.get('[aria-label="Decision log"]')
+    expect(log.text()).toContain('tool_called')
+    expect(log.text()).toContain('get_producer_record')
+    expect(log.findAll('input,textarea,button')).toHaveLength(0)
+    w.unmount()
+    delete record.decision_log
+    expect((await open()).get('[aria-label="Decision log"]').text()).toContain('No decision log was stored')
+  })
   it('retains unsaved corrections on conflict and reloads explicitly', async () => {
     const w = await open()
     await w.get('textarea').setValue('Unsaved correction')

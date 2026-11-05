@@ -1,7 +1,7 @@
 // GENERATED FILE. Do not edit by hand.
 // Source: agent/src/fex/models.py  ->  agent/scripts/generate_types.py
-// schema-sha256: 39014519872858610d5a8d440163007f92a78dbf3672104cc5254b464e8d585b
-// body-sha256: 54eb60f2923ffef85a9ec873fe678b0e46ffedd52632889a9c434d4720cd710e
+// schema-sha256: 0c5686a2c33f4bacad99b7ecd5fde747d68ee5e897f3b0f68991cfeef08295bb
+// body-sha256: 31d345f99c62b9579f285002a589a72e80e2972b6e24c392bc02379e70d8c41c
 // end-of-banner
 /**
  * One record per Fair Exchange conversation. Generated from agent/src/fex/models.py; do not edit by hand.
@@ -27,6 +27,17 @@ export type Scope1 = "internal" | "internal_and_outward" | "declined";
  */
 export type ConsentHistory = ConsentChoice[];
 export type CreatedAt = string;
+export type At = string;
+export type Code = string;
+export type Kind = "step" | "tool" | "verifier" | "pii";
+/**
+ * Step/tool names, item or clause IDs, or PII types; never narrative text
+ */
+export type Refs = string[];
+/**
+ * Recorded decisions for reviewers; absent on declined records
+ */
+export type DecisionLog = DecisionLogEntry[];
 /**
  * null for an interrupted answer, which never finished
  */
@@ -247,6 +258,7 @@ export interface CompletedRecord {
   consent: StoredConsent;
   consent_history?: ConsentHistory;
   created_at: CreatedAt;
+  decision_log?: DecisionLog;
   earlier_answers?: EarlierAnswers;
   entity_type: EntityType;
   evidence: Evidence1;
@@ -299,6 +311,15 @@ export interface StoredConsent {
 export interface ConsentChoice {
   recorded_at: RecordedAt1;
   scope: Scope1;
+}
+/**
+ * A recorded decision, containing fixed codes and opaque references only.
+ */
+export interface DecisionLogEntry {
+  at: At;
+  code: Code;
+  kind: Kind;
+  refs?: Refs;
 }
 /**
  * An answer shown to the producer and later replaced (#26).

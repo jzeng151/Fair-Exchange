@@ -108,6 +108,7 @@ def test_declined_record_holds_only_identifiers_and_time():
     ("tags", ["water"]),
     ("insights", []),
     ("feedback", "no"),
+    ("decision_log", []),
 ])
 def test_declined_record_rejects_any_narrative_content(narrative_field, value):
     with pytest.raises(ValidationError):

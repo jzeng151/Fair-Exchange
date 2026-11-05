@@ -177,3 +177,13 @@ def test_a_dropped_claim_logs_only_its_reason_codes():
     assert sorted(logged) == [("verifier", "clause_not_retrieved"), ("verifier", "directive_language")]
     refs = [ref for e in r.state().decision_log for ref in e.refs]
     assert "APS 2.1.1" in refs and not any("Rainfall" in ref or "tanks" in ref for ref in refs)
+
+
+def test_rejected_citations_cannot_copy_model_text_into_decision_references():
+    r = Run()
+    confirmed(r)
+    private = claim("Unverified claim", "Invented [Private Person 555-0100]", clause="APS Private")
+    r.large.add(*RETRIEVE, answer([private], []), answer([private], []), answer([private], []))
+    r.action("confirm_playback")
+    assert any(e.kind == "verifier" for e in r.state().decision_log)
+    assert "Private" not in str([e.refs for e in r.state().decision_log])

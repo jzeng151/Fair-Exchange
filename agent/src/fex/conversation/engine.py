@@ -160,14 +160,14 @@ def _tool_errors(messages: list[dict]) -> list[str]:
 _BRACKET_ID = re.compile(r"\[([^\[\]]+)\]\s*$")
 
 
-def _claim_refs(claim: Claim) -> list[str]:
+def _claim_refs(claim: Claim, evidence: SessionEvidence) -> list[str]:
     """Opaque IDs for the decision log: the source's bracketed item ID and the clause ID. No free text."""
     refs = []
-    if match := _BRACKET_ID.search(claim.citation.source):
+    if claim.citation.source in evidence.sources and (match := _BRACKET_ID.search(claim.citation.source)):
         refs.append(match.group(1))
-    clause = claim.citation.standard_clause.split()
-    if len(clause) == 2 and clause[0].upper() in ("APS", "FPS"):
-        refs.append(f"{clause[0].upper()} {clause[1]}")
+    clause = claim.citation.standard_clause.upper()
+    if re.fullmatch(r"(?:APS|FPS) [0-9]+(?:\.[0-9]+)*", clause):
+        refs.append(clause)
     return refs
 
 
@@ -348,6 +348,7 @@ class ConversationEngine:
         A conflict or invalid record is logged and surfaced as an error, never retried."""
         if self.records is None:
             return
+        self._log_step(state)
         from fex.records import RecordConflict, save_record  # local: records imports conversation state
 
         try:
@@ -471,7 +472,7 @@ class ConversationEngine:
                         codes = sorted({p.code for p in problems})
                         log.warning("dropped unverified claim (%s): %s", section, ", ".join(codes))
                         for code in codes:
-                            self._log(state, "verifier", code, _claim_refs(claim))
+                            self._log(state, "verifier", code, _claim_refs(claim, evidence))
                     break
                 draft = self._write(state, self._rewrite_prompt(state, items, failed))
                 pending = [("insights", c) for c in draft.insights] + [("peer_examples", c) for c in draft.peer_examples]
@@ -501,6 +502,11 @@ class ConversationEngine:
 
     def _log(self, state: ConversationState, kind: str, code: str, refs: list[str]) -> None:
         state.decision_log.append(DecisionLogEntry(at=self.clock(), kind=kind, code=code, refs=refs))
+
+    def _log_step(self, state: ConversationState) -> None:
+        previous = next((e for e in reversed(state.decision_log) if e.code == "step_changed"), None)
+        if previous is None or previous.refs != [state.step]:
+            self._log(state, "step", "step_changed", [state.step])
 
     def _retrieve(self, state: ConversationState, evidence: SessionEvidence) -> list[dict]:
         """The model calls the data tools; code then calls any it skipped (#17). Returns every item returned
@@ -534,6 +540,8 @@ class ConversationEngine:
                 except Exception as exc:
                     raise _AgentFailed(f"data tool failed: {data_tool.name}: {exc}") from exc
         finally:
+            for name in sorted(tools_run):
+                self._log(state, "tool", "tool_called", [name])
             state.keep_evidence(evidence)
         return items
 
@@ -623,6 +631,8 @@ class ConversationEngine:
             self._emit_step(state, turn)
         turn.emit("actions", allowed=allowed_actions(state), language=state.language)
         if save:
+            if step_changed:
+                self._log_step(state)
             state.updated_at = self.clock()
             try:
                 self.store.save(state, expected_revision=turn.loaded_revision)

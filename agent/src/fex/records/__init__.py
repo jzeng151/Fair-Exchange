@@ -20,7 +20,7 @@ from botocore.exceptions import ClientError
 
 from fex.conversation.contract import ActionEntry, SpokenEntry
 from fex.conversation.state import ConversationState
-from fex.models import CompletedRecord, DeclinedRecord, PiiScanState, TextScanStatus, parse_record
+from fex.models import CompletedRecord, DeclinedRecord, DecisionLogEntry, PiiScanState, TextScanStatus, parse_record
 from fex.pii import PiiText, scan_texts
 
 log = logging.getLogger(__name__)
@@ -142,6 +142,7 @@ def build_record(state: ConversationState, *, version: int, created_at: datetime
         "insights": [c.model_dump() for c in answer.insights],
         "peer_examples": [c.model_dump() for c in answer.peer_examples],
         "earlier_answers": [a.model_dump() for a in state.earlier_answers],
+        "decision_log": [entry.model_dump() for entry in state.decision_log],
         "feedback": state.feedback,
     })
 
@@ -163,7 +164,12 @@ def save_record(state: ConversationState, store: RecordStore, now: datetime,
     fails; in both cases nothing is written.
     """
     if pii_scanner is not None:
+        before = state.pii.model_dump() if state.pii else None
         run_pii_scan(state, pii_scanner)
+        if state.pii and state.pii.model_dump() != before:
+            state.decision_log.append(DecisionLogEntry(at=now, kind="pii",
+                code="pii_found" if state.pii.check == "done" and state.pii.flagged else f"pii_check_{state.pii.check}",
+                refs=list(state.pii.entity_types)))
     first = state.record_version is None
     version = 1 if first else state.record_version + 1
     created_at = now if first else state.record_created_at

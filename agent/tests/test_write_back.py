@@ -15,7 +15,7 @@ from fex.records import DynamoRecordStore, RecordConflict, save_record
 TABLE = "fair-exchange-records-test"
 NARRATIVE = {"language", "entity_type", "summary_original", "summary_english", "tags", "evidence",
              "earlier_answers", "insights", "peer_examples", "feedback", "reviewer_tags",
-             "reviewer_summary_original", "reviewer_summary_english"}
+             "reviewer_summary_original", "reviewer_summary_english", "decision_log"}
 
 
 @pytest.fixture
@@ -122,6 +122,23 @@ def test_declined_record_has_no_narrative_fields(run, table):
     record = stored(table, run)
     assert record["status"] == "declined" and not NARRATIVE & set(record)
     assert [c["scope"] for c in record["consent_history"]] == ["declined"]
+
+
+def test_completed_record_keeps_decisions_through_close(run, table):
+    run.to_feedback()
+    run.action("end")
+    entries = stored(table, run)["decision_log"]
+    assert any(e["code"] == "tool_called" for e in entries)
+    assert entries[-1]["code"] == "step_changed" and entries[-1]["refs"] == ["closed"]
+    assert all(set(e) == {"at", "kind", "code", "refs"} for e in entries)
+    assert all(e["code"].replace("_", "").isalnum() for e in entries)
+
+
+def test_declining_after_saving_removes_the_decision_log(run, table):
+    run.to_feedback()
+    assert stored(table, run)["decision_log"]
+    run.action("set_consent", scope="declined")
+    assert "decision_log" not in stored(table, run)
 
 
 def test_completed_declined_completed_switching_keeps_earlier_answers(run, table):

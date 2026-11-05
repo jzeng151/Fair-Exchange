@@ -166,6 +166,16 @@ _NON_ENGLISH_NEEDS_ENGLISH_SUMMARY = {
 }
 
 
+class DecisionLogEntry(BaseModel):
+    """A recorded decision, containing fixed codes and opaque references only."""
+
+    model_config = ConfigDict(extra="forbid")
+    at: datetime
+    kind: Literal["step", "tool", "verifier", "pii"]
+    code: str = Field(min_length=1, pattern=r"^[a-z][a-z0-9_]*$")
+    refs: list[str] = Field(default_factory=list, description="Step/tool names, item or clause IDs, or PII types; never narrative text")
+
+
 class CompletedRecord(_RecordBase):
     """A conversation the producer agreed to save."""
 
@@ -183,6 +193,8 @@ class CompletedRecord(_RecordBase):
         description="limited when the shown answer had no insights or no peer examples")
     earlier_answers: list[EarlierAnswer] = Field(
         default_factory=list, description="Answers shown and later replaced, oldest first")
+    decision_log: list[DecisionLogEntry] = Field(
+        default_factory=list, description="Recorded decisions for reviewers; absent on declined records")
     insights: list[Claim] = Field(default_factory=list, description="What the data shows, as given to the producer")
     peer_examples: list[Claim] = Field(default_factory=list, description="What others tried, as given to the producer")
     feedback: Literal["yes", "somewhat", "no"] | None = Field(default=None, description="Was the guidance helpful?")

@@ -64,6 +64,7 @@ export const RECORD_COLUMNS: { name: string; type: string }[] = [
   { name: 'evidence', type: evidence },
   { name: 'earlier_answers',
     type: `array<struct<given_at:${str},reason:${str},insights:${claims},peer_examples:${claims},evidence:${evidence}>>` },
+  { name: 'decision_log', type: `array<struct<at:${str},kind:${str},code:${str},refs:array<${str}>>>` },
   { name: 'insights', type: claims },
   { name: 'peer_examples', type: claims },
   { name: 'feedback', type: str },
