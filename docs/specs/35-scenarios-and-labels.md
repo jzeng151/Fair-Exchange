@@ -1,6 +1,6 @@
 # Spec: Scripted scenarios and labeled set (#35)
 
-Status: approved for build, 2026-11-04.
+Status: approved for build, 2026-11-04. Revised 2026-11-05: synthetic scenario producers and contrast runs.
 
 ## Problem Statement
 
@@ -31,14 +31,16 @@ Scenarios are data files. Each file holds the producer, the language, the exact 
 
 | ID | Producer | Language | Path |
 |---|---|---|---|
-| S1 | Colombian coffee smallholder, Cauca | en | Drought; correction in playback; consent `internal`; feedback |
-| S2 | Mexican coffee cooperative | es | Price drop; consent `internal_and_outward` |
-| S3 | Vietnamese processor | en | Labor shortage; the regional tool returns nothing, so the answer has no regional insight |
-| S4 | Honduran or Peruvian producer | es | Starts describing a challenge, then declines at consent |
-| S5 | Côte d'Ivoire cocoa producer | en | Names a person and gives a phone number; PII flag |
-| S6 | Any | en | Asks for certification status (out of scope), then describes a real challenge. The out-of-scope expectation is checked only once the #21 detection function is decided; until then S6 checks the in-scope part only. |
-| S7 | Contrast partner of S1 | en | Same tag as S1, different crop or region; used for distinctness |
+| S1 | `SYN-001`: Colombian coffee smallholder, Cauca | en | Drought; correction in playback; consent `internal`; feedback |
+| S2 | `SYN-002`: Mexican coffee cooperative | es | Price drop; consent `internal_and_outward` |
+| S3 | `SYN-003`: Vietnamese coffee processor | en | Labor shortage; the regional tool returns nothing, so the answer has no regional insight |
+| S4 | `SYN-004`: Honduran coffee cooperative | es | Starts describing a challenge, then declines at consent |
+| S5 | `SYN-005`: Côte d'Ivoire cocoa cooperative | en | Names a person and gives a phone number; PII flag |
+| S6 | `SYN-006`: Côte d'Ivoire cocoa smallholder | en | Asks for certification status (out of scope), then describes a labor challenge. The out-of-scope expectation is checked only once the #21 detection function is decided; until then S6 checks the in-scope part only. |
+| S7 | `SYN-005`: Côte d'Ivoire cocoa cooperative | en | Contrast partner of S1: same tag (climate and weather), different crop and region; used for distinctness (#7 pair C1) |
 
+- **Producers (decided 2026-11-05).** The scenario producers are #7's synthetic producers, listed once in `scenario_producers` in #7's producer definitions. S5 and S7 share a producer. Each has a full synthetic record, projects and surveys.
+- **Contrast runs.** Each producer in #7's `contrast_pairs` needs a scenario run for the distinctness check ([#36](36-eval-harness.md)). S1 to S7 cover `SYN-001`, `SYN-002`, `SYN-003`, `SYN-005` and `SYN-006` (S6 is C3's run for `SYN-006`). `SYN-007` and `SYN-008` get their own files in `eval/scenarios/contrast/`. Only S1 to S7 sit at the top of `eval/scenarios/`: the web picker and the demo sign-in allow-list read that folder.
 - **Demo set.** S1 to S5 make up the minimum demo run-through (README), with S6 added once its detection is decided. S2 and S4 cover Spanish.
 - **Runner behavior.** The scenario runner reads each turn's response stream to the end, through the `done` event, and checks the expected `step` and `actions` before sending the next turn. `step` and `actions` arrive before the turn finishes saving, and the turn lock rejects an early next request with 409 ([#25](25-chat-endpoint.md)). It answers extra intake questions from `intake_replies`. It fails a scenario if an expected step doesn't arrive within 60 seconds. The same runner is used by #34, #36 and #40.
 
@@ -46,6 +48,7 @@ Scenarios are data files. Each file holds the producer, the language, the exact 
 
 - **Contents (decided 2026-11-04 as part of the minimum set).** 15 short scripted producer accounts of a challenge, the text a producer would type in intake. They are spread across the 11 tags, in English and Spanish, and written by the team from the scenario producers and the sample's project reasons.
 - **Running them.** Each account has a `producer_id` from the producer table and runs as a scenario: the account as the intake message, `intake_replies`, `confirm_playback`, `set_consent` `internal`, then `end`.
+- **Producers for live runs.** Not decided (do not build or assume). Live eval runs capture tool results in eval evidence, which needs the FTUSA confirmation in [#34](34-negative-scope-tests.md).
 - **Labeling.**
   - Two team members tag each account independently with any number of the 11 tags, without seeing FEX's output.
   - Their agreement (mean Jaccard, same as the eval metric) is reported.
@@ -58,11 +61,12 @@ Scenarios are data files. Each file holds the producer, the language, the exact 
 - **File checks (eval package):**
   - every scenario file validates against its schema, and every scenario ends with `end`;
   - every `producer_id` exists in the producer table;
+  - each scenario's producer matches #7's `scenario_producers`, and every producer in #7's `contrast_pairs` has a scenario run;
   - every action is a valid [#13](13-conversation-steps.md) action;
-- against the deployed API, consecutive turns wait for `done` and the end of the response stream before the next request, without receiving a turn-lock 409;
-  - the required scenarios S1 to S7 exist;
+  - the required scenarios S1 to S7 exist, and no other JSON file sits at the top of `eval/scenarios/`;
   - every label uses only the 11 tags.
-- **Seam 1:** S1 to S7 run against the agent entrypoint with a scripted fake model. Their expected outcomes are checked, except tags, which need the real model.
+- **Seam 1:** S1 to S7 run against the agent entrypoint with a scripted fake model and a fake PII scanner. Their expected outcomes are checked, except tags, which need the real model.
+- **Deployed smoke test:** against the deployed API, consecutive turns wait for `done` and the end of the response stream before the next request, without receiving a turn-lock 409.
 
 ## Out of Scope
 

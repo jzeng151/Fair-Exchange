@@ -155,6 +155,15 @@ def test_a_stored_state_with_a_non_id_ref_still_loads_and_saves_without_it(run, 
     assert record.decision_log[-1].refs == ["APS 2.1.1"]
 
 
+def test_the_record_holds_the_step_change_its_own_save_made(run, table):
+    """Saves can come before the step is emitted in a turn; the record must still have that change (#26)."""
+    run.to_feedback()
+    run.action("end")
+    record = parse_record(stored(table, run))
+    assert [e.refs for e in record.decision_log if e.code == "step_changed"][-2:] == [["consent", "feedback"],
+                                                                                      ["feedback", "closed"]]
+
+
 def test_declined_record_has_no_decision_log(run, table):
     run.to_consent()
     run.action("set_consent", scope="declined")
