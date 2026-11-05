@@ -32,7 +32,9 @@ FEX identifies the producer's language during intake and replies in it for the w
   - `summary_english` is required for any non-English conversation; the existing schema already enforces this.
   - Both come from the confirmed playback ([#26 spec](26-write-back.md)).
   - `tags` always uses the English values of the 11-tag set.
-- **Translation.** Claude handles Spanish directly, with no Amazon Translate in the loop, per the vision document's assumption. If evals show Spanish quality is not good enough, that becomes a spec change.
+- **Conversation.** Claude handles Spanish (and French, [#24](24-french-exchange.md)) directly: what FEX says to the producer is never machine-translated.
+- **Reviewer translation (changed 2026-11-04: Amazon Translate).** For a non-English conversation, `summary_english` is **Amazon Translate's** translation of `summary_original` (source: the conversation language, target: `en`), made when the playback is confirmed. Reviewers then check a translation from a dedicated service rather than a model paraphrase, and FTUSA already uses Translate in its ETL (technical environment). The model's own English summary is still requested and is the **fallback**: if the Translate call fails, `summary_english` is the model's text and the decision log records `translation_fallback`, so the record never lacks an English summary. Demo mode (no AWS) uses the model's English summary. The agent runtime gets `translate:TranslateText`.
+  - This replaces the earlier rule (no Amazon Translate in the loop, from the vision document's assumption) for reviewer-facing English only; the conversation itself still has no translation step.
 
 ## Testing Decisions
 
@@ -42,7 +44,10 @@ FEX identifies the producer's language during intake and replies in it for the w
   - fixed answer text in Spanish;
   - both summaries present;
   - tags using English values;
-  - a record without `summary_english` for a Spanish conversation rejected.
+  - a record without `summary_english` for a Spanish conversation rejected;
+  - `summary_english` for a Spanish conversation is the translator's output for `summary_original`, with source `es` and target `en`;
+  - a failing translator falls back to the model's English summary and logs `translation_fallback`;
+  - an English conversation calls no translator.
 - **Evals:** one scripted Spanish scenario runs end to end with real Bedrock. It has the same record quality checks as the English scenarios.
 
 ## Out of Scope

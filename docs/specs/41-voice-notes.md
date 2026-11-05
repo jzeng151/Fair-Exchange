@@ -45,6 +45,7 @@ These are on the same REST API, TypeScript on Node.js 24, `producer` role, with 
   - on completion it deletes the audio and job output. It stores the transcript with a conditional write only if the item is still eligible for completion and has not expired or been cancelled;
   - on failure it marks the item `failed`, unless cancelled, and deletes the audio.
   - Cleanup is idempotent, so a repeat event is harmless.
+- **English translation (added 2026-11-04: Amazon Translate).** When the transcript's language is not English, the completion worker also stores `transcript_english`, Amazon Translate's English translation of the transcript, written in the same conditional update. The status route returns it with the transcript, and it follows the transcript's lifetime (removed on first delivery, never returned after `expires_at`). The client shows it under the transcript as an English subtitle for presenters and reviewers; what the producer sends is still only their own words. If Translate fails, the transcript is still delivered, without `transcript_english`.
 - **Voice items.** A small voice table (key `voice_id`) holds `conversation_id`, `status`, `expires_at` (one hour after creation) and, until it is delivered, the transcript.
 - **Transcript lifetime.** The first `GET` that returns the transcript also removes it from the item and sets `status` to `delivered`. A later `GET` returns `delivered` with no transcript. Any `GET` after `expires_at` returns 404. If the transcript is never fetched, it remains in the item until DynamoDB TTL deletes it, typically within a few days after expiry. This is the physical retention period; one hour is the access limit, not a deletion deadline.
 - **Limits.** Recordings are at most 2 minutes. Failed jobs return `failed`, and the producer can type instead.
@@ -65,7 +66,7 @@ These are on the same REST API, TypeScript on Node.js 24, `producer` role, with 
 - **CORS.** The voice bucket allows `POST` from the web app's CloudFront origin only.
 - **Roles:**
   - **Voice route handler:** read on the conversations table (ownership check), read and write on the voice table, write and delete on the voice bucket prefix (cancellation), `transcribe:StartTranscriptionJob`, and the KMS key.
-  - **Completion worker:** `transcribe:GetTranscriptionJob`, read and delete on the voice bucket, write on the voice table, and the KMS key.
+  - **Completion worker:** `transcribe:GetTranscriptionJob`, `translate:TranslateText`, read and delete on the voice bucket, write on the voice table, and the KMS key.
 - **Transcribe access:** Define the batch job's S3 access path explicitly. The principal used by Transcribe must be able to read the input object and write the output object, scoped to the voice prefixes, and use the KMS key as required. Configure the corresponding key policy. If the selected job configuration uses a data-access role, specify its trust policy and the handler's scoped `iam:PassRole` permission.
 - **PII and scope.**
   - The sent transcript is producer-typed text, so it gets the PII check ([#20](20-pii-flagging.md)) and the out-of-scope check ([#21](21-out-of-scope.md)) like any message.
@@ -85,7 +86,9 @@ These are on the same REST API, TypeScript on Node.js 24, `producer` role, with 
   - if cancellation occurs between the worker reading the item and attempting its completion update, the conditional update cannot restore the transcript or change the cancelled status;
   - the first `GET` after completion returns the transcript and removes it; a second `GET` returns `delivered` with no transcript;
   - a `GET` after `expires_at` returns 404, even before TTL has removed the item;
-  - no transcript text is logged.
+  - no transcript text is logged;
+  - a Spanish transcript is stored with its `transcript_english` translation, and both are removed on first delivery;
+  - a failing translation still delivers the transcript, without `transcript_english`.
 - **Deployed integration check:** transcribe an uploaded recording using the encrypted voice bucket, then verify completion and cleanup with the specified roles and key policy.
 - **Component tests:**
   - the transcript lands in the message box and is not sent automatically;

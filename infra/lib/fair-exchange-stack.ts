@@ -7,6 +7,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import type { Construct } from 'constructs';
 import { FexRuntime } from './agent-runtime';
 import { type AnalyticsSource, FexChatApi } from './chat-api';
+import { FexDataBucket } from './data-bucket';
 import { FexGuardrail } from './guardrail';
 import { FexMemory } from './memory';
 import { FexTables } from './tables';
@@ -116,6 +117,10 @@ export class FairExchangeStack extends Stack {
     // Records (#26) and conversations (#25) tables. The agent runtime (#5, next) gets read/write on the records
     // table only (#13 "Agent runtime permissions"); the chat API Lambdas get the conversations table.
     const tables = new FexTables(this, 'Tables', { encryptionKey: dataKey });
+
+    // The data bucket (#5 "Data", #7, #14): the producer data as JSON-lines tables, with Glue tables for Athena.
+    // deploy.sh uploads the files. The agent still reads the packaged copy; moving the tools to this bucket is next.
+    new FexDataBucket(this, 'Data', { encryptionKey: dataKey });
 
     // The FEX agent (#5, #13): AgentCore Runtime with the role limited to the #13 permission list
     const agent = new FexRuntime(this, 'Agent', {

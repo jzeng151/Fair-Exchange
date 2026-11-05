@@ -9,6 +9,7 @@ import * as destinations from 'aws-cdk-lib/aws-lambda-destinations';
 import * as eventSources from 'aws-cdk-lib/aws-lambda-event-sources';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import type { Construct } from 'constructs';
+import { sourceDatabaseName } from './data-bucket';
 
 /**
  * Spec 28: DynamoDB records table -> S3 objects -> Glue table -> Athena.
@@ -83,6 +84,17 @@ export const RECORD_COLUMNS: { name: string; type: string }[] = [
  * Scalar columns only, so it also runs on Redshift. The synthetic tables come from #7; the names and the
  * `producer_id` join column below are assumptions to confirm when they land.
  */
+/**
+ * The producer data tables live in the application stack's source database (infra/lib/data-bucket.ts, #7 #14),
+ * filled by deploy.sh. The application stack is `FairExchange` here; a second copy (#40) has its own.
+ */
+export const SOURCE_DATABASE = sourceDatabaseName('FairExchange');
+
+/**
+ * Journey 3: each record with the producer's Premium, survey and certification data. Survey facts are
+ * per-question summaries (allowlisted, at least 5 responses each), so the survey figure is the most responses
+ * any one question had, not a count of fact rows. Certification is one scope per producer.
+ */
 export const JOURNEY_3_QUERY = `SELECT
   r.record_id,
   r.producer_id,
@@ -94,13 +106,13 @@ export const JOURNEY_3_QUERY = `SELECT
   CASE WHEN r.language = 'en' THEN r.summary_original ELSE r.summary_english END AS summary_english,
   COALESCE(p.premium_projects, 0) AS premium_projects,
   COALESCE(s.survey_responses, 0) AS survey_responses,
-  COALESCE(c.certifications, 0) AS certifications
+  c.certification_scope
 FROM ${SYNC_DATABASE}.${RECORDS_GLUE_TABLE} r
-LEFT JOIN (SELECT producer_id, COUNT(*) AS premium_projects FROM ${SYNC_DATABASE}.premium_projects GROUP BY producer_id) p
+LEFT JOIN (SELECT producer_id, COUNT(*) AS premium_projects FROM ${SOURCE_DATABASE}.premium_projects GROUP BY producer_id) p
   ON p.producer_id = r.producer_id
-LEFT JOIN (SELECT producer_id, COUNT(*) AS survey_responses FROM ${SYNC_DATABASE}.survey_responses GROUP BY producer_id) s
+LEFT JOIN (SELECT producer_id, MAX(responses) AS survey_responses FROM ${SOURCE_DATABASE}.survey_facts GROUP BY producer_id) s
   ON s.producer_id = r.producer_id
-LEFT JOIN (SELECT producer_id, COUNT(*) AS certifications FROM ${SYNC_DATABASE}.certifications GROUP BY producer_id) c
+LEFT JOIN ${SOURCE_DATABASE}.certification c
   ON c.producer_id = r.producer_id`;
 
 /** Athena only: UNNEST of arrays does not port to Redshift the same way. */

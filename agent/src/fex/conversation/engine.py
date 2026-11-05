@@ -213,13 +213,14 @@ class ConversationEngine:
                  clock: Callable[[], datetime] | None = None, max_retries: int = 2,
                  records: Any = None, scope_check: ScopeCheck | None = None,
                  pii_scanner: Callable[[str, str], list[dict]] | None = None,
-                 output_assessor: OutputAssessor | None = None) -> None:
+                 output_assessor: OutputAssessor | None = None, translator: Any = None) -> None:
         self.store = store
         self.small_model, self.large_model = small_model, large_model
         self.standards = standards or Standards.load()
         self.profiles = profiles or _default_profiles()
         self.tools = tools if tools is not None else ALL_TOOLS
         self.pii_scanner = pii_scanner  # the Comprehend seam (#20): None in tests, wired in runtime
+        self.translator = translator  # a fex.translate.Translator (#22): None = the model's English summary
         self.retriever = retriever if retriever is not None else default_retriever()
         self.clock = clock or (lambda: datetime.now(UTC))
         self.max_retries = max_retries
@@ -387,6 +388,17 @@ class ConversationEngine:
             place = ", ".join(p for p in (state.profile.region, state.profile.country) if p) or "?"
             turn.say(copy.text(state.language, "location_kept", place=place))
 
+    def _english(self, state: ConversationState, summary: RecordSummary) -> str | None:
+        """The reviewer's English summary (#22): Amazon Translate's translation of the producer-language summary.
+        The model's English is the fallback, so a record never lacks one."""
+        if self.translator is None:
+            return summary.summary_english
+        try:
+            return self.translator.translate(summary.summary_original, state.language, "en")
+        except Exception:  # noqa: BLE001 - any Translate failure falls back; the code is logged, never the text
+            self._log(state, "step", "translation_fallback", [])
+            return summary.summary_english
+
     def _confirm(self, state: ConversationState, turn: _Turn) -> None:
         assert state.playback is not None
         note = f"\nLocation note (keep it in both summaries): {state.location_note}" if state.location_note else ""
@@ -394,7 +406,7 @@ class ConversationEngine:
                                    f"Language: {state.language}\nConfirmed playback: {state.playback.model_dump_json()}"
                                    + note, RecordSummary)
         state.playback.summary_original = summary.summary_original
-        state.playback.summary_english = None if state.language == "en" else summary.summary_english
+        state.playback.summary_english = None if state.language == "en" else self._english(state, summary)
         state.playback.tags = summary.tags
         state.playback.confirmed = True
         state.step = "respond"

@@ -135,7 +135,7 @@ class Run:
     """One conversation against a fresh engine."""
 
     def __init__(self, producer_id: str | None = None, profiles=None, records=None, scope_check=None,
-                 pii_scanner=None, retriever=None):
+                 pii_scanner=None, retriever=None, translator=None):
         self.producer_id = producer_id or cauca_producer()
         self.conversation_id = "conv-1"
         self.small, self.large = ScriptedModel(), ScriptedModel()
@@ -148,6 +148,8 @@ class Run:
             kwargs["scope_check"] = scope_check
         if pii_scanner is not None:
             kwargs["pii_scanner"] = pii_scanner
+        if translator is not None:
+            kwargs["translator"] = translator
         self.retriever = retriever or FakeRetriever()
         self.engine = ConversationEngine(store=self.store, small_model=self.small, large_model=self.large,
                                          standards=STANDARDS, retriever=self.retriever, clock=self._clock, **kwargs)

@@ -83,6 +83,7 @@ How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Docs
 
+- [Tutorial: use the platform end to end locally](docs/tutorial.md): run the chain, walk one conversation, read the record
 - [Vision document](docs/requirements/vision.md): problem, users, MVP scope, success criteria
 - [Technical environment](docs/requirements/technical-environment.md): required stack, permitted and prohibited libraries, security baseline
 - [Architecture decisions](docs/adr/) and [handoff docs](docs/handoff/)
