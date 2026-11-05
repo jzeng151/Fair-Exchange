@@ -36,7 +36,7 @@
           <div class="weather-head">
             <span class="weather-icon">{{ persona.weather.icon }}</span>
             <div><b>{{ persona.weather.summary }}</b>
-              <span class="footnote" style="margin:0">Live weather soon · mocked</span></div>
+              <span class="footnote" style="margin:0">{% if weather_live %}Live · Open-Meteo{% else %}Sample weather{% endif %}</span></div>
           </div>
           <div class="weather-stats">
             <div><span>{{ persona.weather.temp_c }}°C</span><small>Temp</small></div>
@@ -65,7 +65,11 @@
       <div class="chat-head">
         <span class="live" aria-hidden="true"></span>
         <span class="title">Producer Exchange</span>
-        <span class="badge-poc">MOCKED</span>
+        <span class="badge-poc {% if data_source == 'live' %}live{% endif %}" title="{% if data_source == 'live' %}Answers come from the real FEX agent via its API (sample data){% else %}Answers are made up by this UI (no agent){% endif %}">{% if data_source == 'live' %}REAL API{% else %}MOCK{% endif %}</span>
+        <div class="source-switch" role="group" aria-label="Data source">
+          <a href="?source=mock" class="{% if requested_source == 'mock' %}active{% endif %}">Mock</a>
+          <a href="?source=live" class="{% if requested_source == 'live' %}active{% endif %}">Real API</a>
+        </div>
         <div class="right">
           <label class="speaker-toggle footnote"><input type="checkbox" id="speak-toggle"> 🔊 Speak</label>
           <select class="lang-select" id="lang" aria-label="Language">
@@ -122,12 +126,28 @@
           <span class="slider"></span>
           <span id="share-label">Sharing off</span>
         </label>
-        <div class="points" id="points-box" style="display:none">
-          <div class="points-ring"><b id="points-val">0</b><small>points</small></div>
-          <div>
-            <div><b id="tier-val">Seed</b> tier</div>
-            <div class="footnote" id="shared-val" style="margin:0">0 exchanges shared</div>
+        <div id="share-stats" style="display:none">
+          <div class="points">
+            <div class="points-ring"><b id="points-val">0</b><small>points</small></div>
+            <div>
+              <div><b id="tier-val">Seed</b> tier</div>
+              <div class="footnote" id="next-tier" style="margin:0"></div>
+            </div>
           </div>
+
+          <h4 class="share-sub">Points from sharing</h4>
+          <div id="points-breakdown" class="kv-list"></div>
+
+          <h4 class="share-sub">Your shared data</h4>
+          <div class="share-tiles">
+            <div><span id="stat-shared">0</span><small>Exchanges</small></div>
+            <div><span id="stat-topics">0</span><small>Topics</small></div>
+            <div><span id="stat-rating">–</span><small>Your rating</small></div>
+          </div>
+          <div id="stat-tags" class="share-tags"></div>
+
+          <h4 class="share-sub">How others used it <span class="sample-tag">sample</span></h4>
+          <div id="usage-list" class="kv-list"></div>
         </div>
       </div>
     </aside>
@@ -137,6 +157,7 @@
 
 {{ opening|json_script:"opening-data" }}
 {{ questions|json_script:"questions-data" }}
+{{ opening_suggestions|json_script:"opening-suggestions-data" }}
 {% endblock %}
 
 {% block scripts %}
@@ -144,6 +165,9 @@
   window.FTX = {
     opening: JSON.parse(document.getElementById('opening-data').textContent),
     candidateQuestions: JSON.parse(document.getElementById('questions-data').textContent),
+    openingSuggestions: JSON.parse(document.getElementById('opening-suggestions-data').textContent),
+    source: "{{ data_source }}",
+    notice: "{{ notice|escapejs }}",
     csrftoken: "{{ csrf_token }}",
     personaId: "{{ persona.id }}",
     language: "{{ language }}",

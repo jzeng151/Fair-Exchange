@@ -9,12 +9,12 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/app.css' %}">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='46' fill='%230a5c55'/><text x='50' y='68' font-size='54' text-anchor='middle' fill='%23f6b942' font-family='sans-serif' font-weight='bold'>F</text></svg>">
+  <link rel="icon" type="image/png" href="{% static 'img/ftc-seal.png' %}">
 </head>
 <body class="{% block bodyclass %}{% endblock %}">
   <header class="topbar">
     <a class="brand" href="{% url 'picker' %}" style="color:#fff;text-decoration:none">
-      <span class="mark">F</span>
+      <img class="mark-seal" src="{% static 'img/ftc-seal.png' %}" alt="Fair Trade Certified" width="31" height="43">
       <span>Fair Trade Exchange <small>Producer Intelligence · proof of concept</small></span>
     </a>
     <nav class="nav">

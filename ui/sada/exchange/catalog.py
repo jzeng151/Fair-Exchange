@@ -48,6 +48,9 @@ class Persona:
     avatar: str          # emoji
     language: str = "en"  # chat language the persona starts in (a key of engine.LANGUAGES)
     flag: str = ""        # emoji flag for the location
+    # Real API mode: the scenario producer (eval/scenarios/*.json) this persona signs in as. Producers only;
+    # the real agent serves producers, so consumers stay on mock data.
+    fex_producer_id: str = ""
 
     def as_dict(self) -> dict:
         d = asdict(self)
@@ -65,6 +68,7 @@ PERSONAS: list[Persona] = [
         blurb="Smallholder coffee farmer; late rains hurt this season's cherries.",
         org="Chiapas Highlands Coffee Cooperative",
         language="es", flag="🇲🇽",
+        fex_producer_id="95A4A8BC3F2E3F38F8D6A81B57BA5E4A",  # mexico-price-drop-en
         location=Location("Chiapas, Mexico", 16.75, -92.64, 6),
         weather=Weather("Dry and warm, late rains", 24, 11, "38% below normal", "High", "🌤️"),
         questions=[
@@ -79,6 +83,7 @@ PERSONAS: list[Persona] = [
         blurb="Cooperative member in Cauca; prices dipped below last year.",
         org="Cauca Coffee Growers Cooperative",
         language="es", flag="🇨🇴",
+        fex_producer_id="CFC19603C1B7B29C017954FD1DB2D620",  # colombia-drought-es
         location=Location("Cauca, Colombia", 2.44, -76.61, 6),
         weather=Weather("Humid, scattered showers", 21, 48, "near normal", "Medium", "🌦️"),
         questions=[
@@ -93,6 +98,7 @@ PERSONAS: list[Persona] = [
         blurb="Artisanal fisher cooperative; catches are shifting with warmer water.",
         org="Pacífico Norte Fishers Association",
         language="es", flag="🇵🇪",
+        fex_producer_id="A7F700B04BCE55512CB026A71121426C",  # peru-water-pii-es
         location=Location("Piura, Peru (coast)", -5.19, -81.11, 6),
         weather=Weather("Warm sea surface, calm", 26, 2, "dry season", "Low", "🌊"),
         questions=[
@@ -107,6 +113,7 @@ PERSONAS: list[Persona] = [
         blurb="Rice grower; soil is tiring on low-cover plots.",
         org="Sud-Comoé Rice Collective",
         language="fr", flag="🇨🇮",
+        fex_producer_id="9D79CF4ED3FBE4CFBD3640576B74642A",  # cote-divoire-cocoa-pii-fr
         location=Location("Sud-Comoé, Côte d'Ivoire", 5.52, -3.22, 6),
         weather=Weather("Hot, humid, storms building", 30, 64, "12% above normal", "Medium", "⛈️"),
         questions=[

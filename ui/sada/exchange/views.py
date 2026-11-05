@@ -1,18 +1,41 @@
 """Views: persona picker, the chat page, about, docs, demo, and the mock chat API.
 
-No sign-on (SDD.md). The visitor clicks a persona tile, then chats as that persona. Location
-and a (made-up) weather overlay come from the chosen persona; the chat engine mocks the Fair Exchange
-API and is shaped so the real runtime can replace it.
+No sign-on (SDD.md). The visitor clicks a persona tile, then chats as that persona. Location and weather
+(live from Open-Meteo, else sample values) come from the chosen persona. Answers come from the mock engine,
+or, in Real API mode, from the real FEX agent through the Fair Exchange chat API (fex_live.py,
+docs/REAL-API.md). The header's Mock / Real API switch picks the source per session.
 """
 from __future__ import annotations
 
 import json
 
+from django.conf import settings
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 
-from . import engine, catalog, trends, weather, uploads
+from . import engine, catalog, fex_live, trends, weather, uploads
+
+
+def _data_source(request) -> str:
+    """The requested source: ?source=mock|live (remembered in the session), else the session, else DATA_SOURCE."""
+    asked = request.GET.get("source")
+    if asked in ("mock", "live"):
+        request.session["data_source"] = asked
+    return request.session.get("data_source") or settings.DATA_SOURCE
+
+
+def _live_problem(persona) -> str:
+    """Why the real agent can't serve this persona, or "" if it can."""
+    if not fex_live.configured():
+        return "The Real API needs FEX_API_URL (see docs/REAL-API.md), so this chat uses mock answers."
+    if not persona.fex_producer_id:
+        return "The real FEX agent serves producers only, so this consumer chat uses mock answers."
+    return ""
+
+
+def _live_conversations(request) -> dict:
+    return request.session.setdefault("fex_conversations", {})
 
 
 def picker(request):
@@ -52,18 +75,42 @@ def chat(request, persona_id: str):
     if language not in engine.LANGUAGES:
         language = persona.language if persona.language in engine.LANGUAGES else "en"
     request.session["language"] = language
-    # Real weather (Open-Meteo) for this persona's location; falls back to the mocked overlay.
-    live = weather.weather_for(persona)
+
+    requested = _data_source(request)
+    source, notice, opening, opening_suggestions = "mock", "", engine.opening(persona, language), []
+    conversations = _live_conversations(request)
+    conversations.pop(persona_id, None)  # every page load starts a fresh conversation
+    if requested == "live":
+        notice = _live_problem(persona)
+        if not notice:
+            try:
+                cid, first = fex_live.start(persona)
+                conversations[persona_id] = cid
+                source, opening, opening_suggestions = "live", first["text"], first["suggestions"]
+                request.session.setdefault("fex_buttons", {})[persona_id] = first["suggestions"]
+                language = first["language"] if first["language"] in engine.LANGUAGES else language
+                request.session["language"] = language
+            except fex_live.LiveUnavailable as e:
+                notice = f"{e}. This chat uses mock answers until it's reachable."
+    request.session.modified = True
+
+    # Real weather (Open-Meteo) for this persona's location; always attempted in Real API mode.
+    live_weather, weather_live = weather.weather_status(persona, force=requested == "live")
     pdata = persona.as_dict()
-    pdata["weather"] = live.as_dict()
+    pdata["weather"] = live_weather.as_dict()
     context = {
         "persona": pdata,
         "languages": engine.LANGUAGES,
         "language": language,
-        "opening": engine.opening(persona, language),
+        "opening": opening,
+        "opening_suggestions": opening_suggestions,
         "questions": persona.questions,
         "trends": trends.trends_for(persona),
         "uploads_enabled": uploads.enabled(),
+        "data_source": source,
+        "requested_source": requested,
+        "notice": notice,
+        "weather_live": weather_live,
     }
     return render(request, "exchange/chat.html", context)
 
@@ -88,6 +135,7 @@ def api_chat(request):
         return HttpResponseBadRequest("invalid JSON")
 
     message = (payload.get("message") or "").strip()
+    action = payload.get("action") if isinstance(payload.get("action"), dict) else None
     if not message:
         return HttpResponseBadRequest("empty message")
     if len(message) > 4000:
@@ -101,12 +149,21 @@ def api_chat(request):
     if not persona:
         return HttpResponseBadRequest("no persona selected")
 
+    if _data_source(request) == "live" and not _live_problem(persona):
+        live = _live_turn(request, persona, message, action)
+        if live is not None:
+            return JsonResponse(live)
+
     attachments = payload.get("attachments") or []  # E1: [{name, kind, key?}]
     # Answer with live weather folded into the persona so the insight reflects real conditions.
     import dataclasses
     live_persona = dataclasses.replace(persona, weather=weather.weather_for(persona))
     answer = engine.respond(message, live_persona, language)
     data = answer.as_dict()
+    data["source"] = "mock"
+    live_error = request.session.pop("fex_last_error", None)
+    if live_error:
+        data["text"] = f"⚠ {live_error}. This is a mock answer instead.\n\n" + data["text"]
     if attachments:
         names = ", ".join(a.get("name", "file") for a in attachments[:5])
         stored = sum(1 for a in attachments if a.get("key"))
@@ -119,6 +176,37 @@ def api_chat(request):
         data["text"] = note + "\n\n" + data["text"]
         data["attachments_ack"] = [a.get("name", "file") for a in attachments[:5]]
     return JsonResponse(data)
+
+
+def _live_turn(request, persona, message: str, action: dict | None) -> dict | None:
+    """One turn with the real agent: a button sends its action, typed text a message. None means fall back to mock
+    (with a note), so the demo never dead-ends when the chat API is down."""
+    conversations = _live_conversations(request)
+    try:
+        cid = conversations.get(persona.id)
+        if not cid:  # e.g. the session was reset; open a new conversation first
+            cid, _ = fex_live.start(persona)
+            conversations[persona.id] = cid
+        if action and action.get("name"):
+            events = fex_live.action(persona, cid, action["name"], action.get("args") or {})
+        else:
+            events = fex_live.message(persona, cid, message)
+        data = fex_live.to_answer(events, request.session.get("language", persona.language))
+        buttons = request.session.setdefault("fex_buttons", {})
+        if data["closed"]:
+            conversations.pop(persona.id, None)
+            buttons.pop(persona.id, None)
+        elif data["has_actions"]:
+            buttons[persona.id] = data["suggestions"]
+        else:
+            data["suggestions"] = buttons.get(persona.id, [])
+        if data["language"] in engine.LANGUAGES:
+            request.session["language"] = data["language"]
+        request.session.modified = True
+        return data
+    except fex_live.LiveUnavailable as e:
+        request.session["fex_last_error"] = str(e)
+        return None
 
 
 @require_POST
@@ -157,14 +245,19 @@ def api_report(request):
 
 @require_POST
 def api_points(request):
-    """E6/E7: compute shared-data points for the given shared turns and tags."""
+    """E6/E7: shared-data points (with breakdown), your ratings of shared answers, and how others used them."""
     try:
         payload = json.loads(request.body or "{}")
     except json.JSONDecodeError:
         return HttpResponseBadRequest("invalid JSON")
     shared_turns = int(payload.get("shared_turns") or 0)
     tags = payload.get("tags") or []
-    return JsonResponse(trends.points_summary(shared_turns, tags))
+    ratings = payload.get("ratings") or []
+    data = trends.points_summary(shared_turns, tags, ratings)
+    persona = catalog.get_persona(payload.get("persona_id") or request.session.get("persona_id", ""))
+    if persona:
+        data["usage"] = trends.usage_summary(persona, shared_turns, tags)
+    return JsonResponse(data)
 
 
 def healthz(request):

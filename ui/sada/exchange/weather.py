@@ -70,20 +70,26 @@ def _fetch(lat: float, lon: float) -> Weather:
     )
 
 
-def weather_for(persona: Persona) -> Weather:
-    """Live weather for the persona's location, cached; the persona's mocked value on any failure."""
-    if not getattr(settings, "USE_LIVE_WEATHER", False):
-        return persona.weather
+def weather_status(persona: Persona, force: bool = False) -> tuple[Weather, bool]:
+    """(weather, is_live) for the persona's location. Live from Open-Meteo when USE_LIVE_WEATHER is on, or when
+    `force` is set (Real API mode); cached for 30 minutes. The persona's sample values on any failure."""
+    if not (force or getattr(settings, "USE_LIVE_WEATHER", False)):
+        return persona.weather, False
     loc = persona.location
     key = f"{loc.lat:.2f},{loc.lon:.2f}"
     now = time.time()
     hit = _CACHE.get(key)
     if hit and now - hit[0] < _TTL:
-        return hit[1]
+        return hit[1], True
     try:
         w = _fetch(loc.lat, loc.lon)
         _CACHE[key] = (now, w)
-        return w
+        return w, True
     except Exception:
         # Keep the demo resilient: fall back to the made-up overlay.
-        return persona.weather
+        return persona.weather, False
+
+
+def weather_for(persona: Persona, force: bool = False) -> Weather:
+    """Live weather for the persona's location, cached; the persona's mocked value on any failure."""
+    return weather_status(persona, force)[0]

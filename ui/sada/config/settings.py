@@ -109,3 +109,11 @@ UPLOADS_BUCKET = os.environ.get("UPLOADS_BUCKET", "")
 
 # Live weather via Open-Meteo (no API key). Falls back to the persona's mocked values on any error.
 USE_LIVE_WEATHER = os.environ.get("USE_LIVE_WEATHER", "1") == "1"
+
+# Data source for the chat (see docs/REAL-API.md). "mock" answers from exchange/engine.py; "live" talks to the
+# real FEX agent through the Fair Exchange chat API at FEX_API_URL. The chat header can switch per session.
+DATA_SOURCE = os.environ.get("DATA_SOURCE", "mock")
+DATA_SOURCE = DATA_SOURCE if DATA_SOURCE in ("mock", "live") else "mock"
+FEX_API_URL = os.environ.get("FEX_API_URL", "")            # local chain: http://127.0.0.1:3000; deployed: ApiUrl output
+FEX_DEMO_PASSCODE = os.environ.get("FEX_DEMO_PASSCODE", "")  # deployed API only (DemoPasscodeSecretArn)
+FEX_API_TIMEOUT = int(os.environ.get("FEX_API_TIMEOUT", "300"))  # seconds; a real answer turn can take a while
