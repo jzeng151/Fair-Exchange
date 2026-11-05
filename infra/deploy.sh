@@ -50,7 +50,7 @@ else
 fi
 # AgentCore traces need CloudWatch Transaction Search, set once per account and region (ADR 0002).
 destination="$(aws xray get-trace-segment-destination --query Destination --output text 2>/dev/null || true)"
-if [[ "$destination" != CloudWatchLogs ]]; then
+if [[ "$destination" != CloudWatchLogs && "${SKIP_TRANSACTION_SEARCH:-0}" != 1 ]]; then
   echo "CloudWatch Transaction Search is off (trace destination: ${destination:-unknown}). Turn it on first;" >&2
   echo "see docs/adr/0002-agentcore-runtime-spike.md (Logs resource policy, then update-trace-segment-destination)." >&2
   exit 1

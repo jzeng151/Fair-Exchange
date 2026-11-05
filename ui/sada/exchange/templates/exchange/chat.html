@@ -1,6 +1,6 @@
 {% extends "exchange/base.html" %}
 {% load static %}
-{% block title %}{{ persona.name }} · Fair Trade Exchange{% endblock %}
+{% block title %}{{ persona.name }} · Fair Exchange{% endblock %}
 {% block bodyclass %}chat-body{% endblock %}
 
 {% block body %}
@@ -101,18 +101,21 @@
         <textarea id="input" rows="1" placeholder="Share what's on your mind…" autocomplete="off"></textarea>
         <button type="submit" class="icon-btn send" title="Send">➤</button>
       </form>
+      <p class="footprint-note">🌱 FEX uses a small AI model for most steps and a larger one only for your cited answer,
+        and runs only while you're talking to it. Voice recordings are deleted once transcribed.
+        <a href="{% url 'about' %}#footprint">How we keep FEX light</a></p>
     </main>
 
     <!-- RIGHT: demographics & trends + share-data + points -->
     <aside class="chat-aside side-right">
       <div class="card card-pad">
-        <h3>Who's around you</h3>
+        <h3>Who's around you <span class="sample-tag">sample</span></h3>
         <div class="demo-grid">
           {% for d in trends.demographics %}
             <div class="demo"><span>{{ d.value }}</span><small>{{ d.label }}</small></div>
           {% endfor %}
         </div>
-        <h3 style="margin-top:1rem">Trending concerns</h3>
+        <h3 style="margin-top:1rem">Trending concerns <span class="sample-tag">sample</span></h3>
         {% for t in trends.trending %}
           <div class="trend-item">
             <span class="trend-arrow">{{ t.trend }}</span>
@@ -179,6 +182,8 @@
     reportUrl: "{% url 'api_report' %}",
     pointsUrl: "{% url 'api_points' %}",
     presignUrl: "{% url 'api_presign' %}",
+    speakUrl: "{% url 'api_speak' %}",
+    transcribeUrl: "{% url 'api_transcribe' %}",
     uploadsEnabled: {{ uploads_enabled|yesno:"true,false" }},
   };
 </script>

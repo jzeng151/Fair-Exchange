@@ -14,7 +14,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponse
 from django.shortcuts import render, redirect
 from django.views.decorators.http import require_POST
 
-from . import engine, catalog, fex_live, trends, weather, uploads
+from . import engine, catalog, fex_live, trends, weather, uploads, aws_tools
 
 
 def _data_source(request) -> str:
@@ -89,7 +89,17 @@ def chat(request, persona_id: str):
                 source, opening, opening_suggestions = "live", first["text"], first["suggestions"]
                 # Only action names go in the (cookie-backed) session; buttons are rebuilt from them.
                 request.session.setdefault("fex_allowed", {})[persona_id] = first["allowed"]
-                language = first["language"] if first["language"] in engine.LANGUAGES else language
+                asked = request.GET.get("lang")
+                if asked in engine.LANGUAGES and asked != first["language"]:
+                    # The link names a language: keep it, and translate FEX's greeting (Amazon Translate).
+                    try:
+                        opening = aws_tools.translate(opening, asked)
+                    except Exception:
+                        pass
+                    opening_suggestions = fex_live.buttons(first["allowed"], asked)
+                    language = asked
+                else:
+                    language = first["language"] if first["language"] in engine.LANGUAGES else language
                 request.session["language"] = language
             except fex_live.LiveUnavailable as e:
                 notice = f"{e}. This chat uses mock answers until it's reachable."
@@ -150,12 +160,32 @@ def api_chat(request):
     if not persona:
         return HttpResponseBadRequest("no persona selected")
 
+    attachments = payload.get("attachments") or []  # E1: [{name, kind, key?, content_type?}]
     if _data_source(request) == "live" and not _live_problem(persona):
-        live = _live_turn(request, persona, message, action)
+        # Attached photos/documents are read with Claude on Amazon Bedrock; the description goes to FEX with the
+        # producer's words, so FEX's grounding, scope and PII checks apply to it like any message.
+        read = _read_attachments(attachments, language) if action is None else []
+        to_send = message
+        if read:
+            to_send = (message if message != "(shared attachment)" else "") + "\n\n" + "\n".join(
+                f"[Attached {r['name']}: {r['text']}]" for r in read)
+        live = _live_turn(request, persona, to_send.strip(), action)
         if live is not None:
+            if read:
+                live["text"] = "\n".join(f"📎 {r['name']} (read with Claude on Amazon Bedrock): {r['text']}"
+                                         for r in read) + "\n\n" + live["text"]
+                live["attachments_read"] = read
+            chosen = payload.get("language")
+            if payload.get("language_chosen") and chosen in engine.LANGUAGES and chosen != live.get("language"):
+                try:
+                    live["text"] = aws_tools.translate(live["text"], chosen) + \
+                        "\n\n🌐 Translated from FEX's reply with Amazon Translate."
+                    live["language"] = chosen
+                    request.session["language"] = chosen
+                except Exception:
+                    pass
             return JsonResponse(live)
 
-    attachments = payload.get("attachments") or []  # E1: [{name, kind, key?}]
     # Answer with live weather folded into the persona so the insight reflects real conditions.
     import dataclasses
     live_persona = dataclasses.replace(persona, weather=weather.weather_for(persona))
@@ -190,6 +220,11 @@ def _live_turn(request, persona, message: str, action: dict | None) -> dict | No
             conversations[persona.id] = cid
         if action and action.get("name"):
             events = fex_live.action(persona, cid, action["name"], action.get("args") or {})
+            # Feedback is the last question: end the conversation right after it, so it doesn't keep asking.
+            if action["name"] == "set_feedback" and not any(e.get("type") == "error" for e in events):
+                events = events + fex_live.action(persona, cid, "end", {})
+                events.append({"type": "text", "text": "\n\n" + fex_live.ENDED.get(
+                    request.session.get("language", persona.language), fex_live.ENDED["en"])})
         else:
             events = fex_live.message(persona, cid, message)
         data = fex_live.to_answer(events, request.session.get("language", persona.language))
@@ -208,6 +243,52 @@ def _live_turn(request, persona, message: str, action: dict | None) -> dict | No
     except fex_live.LiveUnavailable as e:
         request.session["fex_last_error"] = str(e)
         return None
+
+
+def _read_attachments(attachments: list, language: str) -> list[dict]:
+    if not aws_tools.bucket():
+        return []
+    out = []
+    for a in attachments[:3]:
+        if not a.get("key") or not str(a["key"]).startswith("uploads/"):
+            continue
+        import mimetypes  # an older page may not send the type: work it out from the file name
+        content_type = a.get("content_type") or mimetypes.guess_type(a.get("name") or a["key"])[0] or ""
+        try:
+            text = aws_tools.read_attachment(a["key"], content_type, engine.LANGUAGES.get(language, "English"))
+        except Exception:
+            text = None
+        out.append({"name": a.get("name", "file"),
+                    "text": text or "this file couldn't be read, so FEX hasn't used it. Please describe it in words."})
+    return out
+
+
+@require_POST
+def api_speak(request):
+    """Amazon Polly: an answer read aloud (MP3). 204 when the language has no Polly voice."""
+    try:
+        payload = json.loads(request.body or "{}")
+        audio = aws_tools.speak((payload.get("text") or "")[:2900], payload.get("language") or "en")
+    except Exception:
+        audio = None
+    if not audio:
+        return HttpResponse(status=204)
+    return HttpResponse(audio, content_type="audio/mpeg")
+
+
+@require_POST
+def api_transcribe(request):
+    """Amazon Transcribe: a recorded voice note (raw audio body) becomes text for the message box."""
+    if not aws_tools.bucket():
+        return JsonResponse({"error": "Voice notes are not set up."}, status=503)
+    audio = request.body
+    if not audio or len(audio) > 5 * 1024 * 1024:
+        return JsonResponse({"error": "The recording is empty or too long."}, status=400)
+    try:
+        text = aws_tools.transcribe(audio, request.content_type or "audio/webm", request.GET.get("language", "en"))
+    except Exception:
+        return JsonResponse({"error": "The recording couldn't be transcribed. Please type instead."}, status=502)
+    return JsonResponse({"text": text})
 
 
 @require_POST

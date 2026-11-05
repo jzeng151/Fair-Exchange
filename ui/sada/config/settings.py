@@ -129,6 +129,8 @@ BEDROCK_MODEL_ID = os.environ.get("BEDROCK_MODEL_ID", "anthropic.claude-sonnet-4
 AWS_REGION = os.environ.get("AWS_DEFAULT_REGION", "us-west-2")
 # When false (default for the PoC), the chat uses the deterministic mock engine, no AWS calls.
 USE_BEDROCK = os.environ.get("USE_BEDROCK", "0") == "1"
+# Claude on Bedrock reads attached photos and documents (aws_tools.read_attachment).
+VISION_MODEL_ID = os.environ.get("VISION_MODEL_ID", "us.anthropic.claude-haiku-5-5")
 
 # S3 bucket for message attachments (browser uploads via presigned PUT URLs). Empty = feature off.
 UPLOADS_BUCKET = os.environ.get("UPLOADS_BUCKET", "")

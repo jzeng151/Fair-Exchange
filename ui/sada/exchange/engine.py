@@ -53,7 +53,7 @@ class Answer:
 # Fixed UI copy per language, written in code (not model-generated) so tone and translation are stable.
 _COPY = {
     "en": {
-        "greeting": "Hi {name}, good to meet you. I'm the Fair Trade Exchange assistant. "
+        "greeting": "Hi {name}, good to meet you. I'm FEX, the Fair Exchange assistant. "
                     "What has felt difficult lately for your {focus} work in {region}?",
         "scope_redirect": "That's a little outside what I can help with here. I'm best at your own "
                           "challenges, what regional data shows, and what peers have tried. "
@@ -64,7 +64,7 @@ _COPY = {
         "handback": "You and your cooperative know your situation best. These are options to weigh, not steps to take.",
     },
     "es": {
-        "greeting": "Hola {name}, un gusto saludarte. Soy el asistente de Fair Trade Exchange. "
+        "greeting": "Hola {name}, un gusto saludarte. Soy FEX, el asistente de Fair Exchange. "
                     "¿Qué ha sido difícil últimamente en tu trabajo de {focus} en {region}?",
         "scope_redirect": "Eso queda un poco fuera de lo que puedo ayudar aquí. Lo mío son tus propios "
                           "desafíos, lo que muestran los datos de la región y lo que han probado otros productores. "
@@ -75,7 +75,7 @@ _COPY = {
         "handback": "Tú y tu cooperativa conocen mejor su situación. Son opciones para considerar, no pasos a seguir.",
     },
     "fr": {
-        "greeting": "Bonjour {name}, ravi de vous rencontrer. Je suis l'assistant Fair Trade Exchange. "
+        "greeting": "Bonjour {name}, ravi de vous rencontrer. Je suis FEX, l'assistant de Fair Exchange. "
                     "Qu'est-ce qui a été difficile récemment dans votre travail de {focus} à {region} ?",
         "scope_redirect": "Cela sort un peu de ce que je peux traiter ici. Je suis surtout utile sur vos "
                           "propres difficultés, ce que montrent les données régionales et ce que des pairs ont essayé. "
@@ -86,7 +86,7 @@ _COPY = {
         "handback": "Vous et votre coopérative connaissez le mieux votre situation. Ce sont des options à peser, pas des consignes.",
     },
     "pt": {
-        "greeting": "Olá {name}, prazer em conhecer você. Sou o assistente Fair Trade Exchange. "
+        "greeting": "Olá {name}, prazer em conhecer você. Sou o FEX, o assistente do Fair Exchange. "
                     "O que tem sido difícil ultimamente no seu trabalho de {focus} em {region}?",
         "scope_redirect": "Isso foge um pouco do que posso ajudar aqui. Sou melhor com os seus próprios "
                           "desafios, o que os dados regionais mostram e o que outros produtores tentaram. "
@@ -97,7 +97,7 @@ _COPY = {
         "handback": "Você e sua cooperativa conhecem melhor a sua situação. São opções a ponderar, não passos a seguir.",
     },
     "sw": {
-        "greeting": "Habari {name}, nafurahi kukutana nawe. Mimi ni msaidizi wa Fair Trade Exchange. "
+        "greeting": "Habari {name}, nafurahi kukutana nawe. Mimi ni FEX, msaidizi wa Fair Exchange. "
                     "Ni nini kimekuwa kigumu hivi karibuni katika kazi yako ya {focus} huko {region}?",
         "scope_redirect": "Hilo liko nje kidogo ya ninachoweza kusaidia hapa. Nina uwezo zaidi kuhusu "
                           "changamoto zako mwenyewe, data ya eneo, na walichojaribu wakulima wenzako. "
@@ -108,7 +108,7 @@ _COPY = {
         "handback": "Wewe na ushirika wako mnajua hali yenu vizuri zaidi. Haya ni machaguo ya kupima, si hatua za kufuata.",
     },
     "hi": {
-        "greeting": "नमस्ते {name}, आपसे मिलकर अच्छा लगा। मैं Fair Trade Exchange सहायक हूँ। "
+        "greeting": "नमस्ते {name}, आपसे मिलकर अच्छा लगा। मैं FEX हूँ, Fair Exchange सहायक। "
                     "{region} में आपके {focus} कार्य में हाल में क्या कठिन रहा है?",
         "scope_redirect": "यह उससे थोड़ा बाहर है जिसमें मैं यहाँ मदद कर सकता हूँ। मैं आपकी अपनी "
                           "चुनौतियों, क्षेत्रीय आँकड़ों और साथी किसानों के प्रयासों पर सबसे उपयोगी हूँ। "
@@ -252,7 +252,7 @@ def _bedrock_answer(message: str, persona: Persona, language: str, topic: dict, 
         client = boto3.client("bedrock-runtime", region_name=settings.AWS_REGION)
         lang_name = LANGUAGES.get(language, "English")
         system = (
-            "You are the Fair Trade Exchange assistant. "
+            "You are FEX, the Fair Exchange assistant. "
             "Reply in " + lang_name + ". Use ONLY the two evidence points provided; do not invent facts. "
             "Phrase everything as suggestions, never commands (no 'you should'/'you must'). "
             "End by handing the decision back to the producer and their cooperative. Keep it to 4 short sentences."

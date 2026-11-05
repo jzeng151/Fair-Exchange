@@ -17,6 +17,25 @@
 
   const synth = window.speechSynthesis;
   const LOCALE = { en: "en-US", es: "es-ES", fr: "fr-FR", pt: "pt-BR", sw: "sw-KE", hi: "hi-IN" };
+  let languageChosen = false;  // the producer picked a language in the menu: FEX's real replies are translated (Amazon Translate)
+
+  // Amazon Polly reads answers aloud (neural voice); the browser voice is the fallback.
+  let audio = null;
+  function stopAudio() { if (audio) { audio.pause(); audio = null; } if (synth) synth.cancel(); }
+  async function pollySpeak(text, onstart, onend) {
+    stopAudio();
+    try {
+      const res = await fetch(T.speakUrl, { method: "POST", headers: { "Content-Type": "application/json", "X-CSRFToken": T.csrftoken },
+                                            body: JSON.stringify({ text, language }) });
+      if (res.status === 200) {
+        audio = new Audio(URL.createObjectURL(await res.blob()));
+        audio.onended = audio.onerror = onend; onstart(); await audio.play(); return;
+      }
+    } catch (e) {}
+    if (!synth) { onend(); return; }
+    const u = new SpeechSynthesisUtterance(text); u.lang = LOCALE[language] || "en-US";
+    u.onstart = onstart; u.onend = u.onerror = onend; synth.speak(u);
+  }
 
   function el(tag, cls, html) { const n = document.createElement(tag); if (cls) n.className = cls; if (html !== undefined) n.innerHTML = html; return n; }
   function esc(s) { return (s || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
@@ -44,7 +63,7 @@
     }
     const row = el("div", "row " + turn.role);
     row.dataset.turnId = turn.id;
-    row.appendChild(el("div", "bubble-avatar", turn.role === "user" ? "🧑" : "🌱"));
+    row.appendChild(el("div", turn.role === "user" ? "bubble-avatar" : "bubble-avatar fex", turn.role === "user" ? "🧑" : "FEX"));
     row.appendChild(msg);
     if (turn.role === "user") {
       const del = el("button", "del-btn", "✕");
@@ -61,17 +80,13 @@
   function responseActions(turn, data) {
     const bar = el("div", "msg-actions");
 
-    if (synth) {
+    {
       const listen = el("button", "act-btn", "🔊 Listen");
-      listen.type = "button"; listen.title = "Read this answer aloud";
+      listen.type = "button"; listen.title = "Read this answer aloud (Amazon Polly)";
+      const done = () => { listen.classList.remove("playing"); listen.textContent = "🔊 Listen"; };
       listen.onclick = () => {
-        if (listen.classList.contains("playing")) { synth.cancel(); return; }
-        synth.cancel();
-        const u = new SpeechSynthesisUtterance(turn.text);
-        u.lang = LOCALE[language] || "en-US";
-        u.onstart = () => { listen.classList.add("playing"); listen.textContent = "⏹ Stop"; };
-        u.onend = u.onerror = () => { listen.classList.remove("playing"); listen.textContent = "🔊 Listen"; };
-        synth.speak(u);
+        if (listen.classList.contains("playing")) { stopAudio(); done(); return; }
+        pollySpeak(turn.text, () => { listen.classList.add("playing"); listen.textContent = "⏹ Stop"; }, done);
       };
       bar.appendChild(listen);
     }
@@ -80,9 +95,9 @@
     share.type = "button"; share.title = "Share this answer";
     share.onclick = async () => {
       const sources = (data.citations || []).map(c => "• " + c.label).join("\n");
-      const text = turn.text + (sources ? "\n\nSources:\n" + sources : "") + "\n\n— Fair Trade Exchange (demo)";
+      const text = turn.text + (sources ? "\n\nSources:\n" + sources : "") + "\n\n— FEX, Fair Exchange (demo)";
       if (navigator.share) {
-        try { await navigator.share({ title: "Fair Trade Exchange", text }); } catch (e) {}
+        try { await navigator.share({ title: "Fair Exchange", text }); } catch (e) {}
         return;
       }
       try { await navigator.clipboard.writeText(text); share.textContent = "✓ Copied"; }
@@ -179,7 +194,7 @@
   }
 
   // ---- speech out -------------------------------------------------------
-  function speak(text) { if (!$("speak-toggle").checked || !synth) return; synth.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = LOCALE[language] || "en-US"; synth.speak(u); }
+  function speak(text) { if (!$("speak-toggle").checked) return; pollySpeak(text, () => {}, () => {}); }
 
   // ---- send -------------------------------------------------------------
   let busy = false;
@@ -195,7 +210,7 @@
     pendingAttachments = []; pendingFiles = []; renderAttachRow();
 
     const pending = el("div", "row assistant");
-    pending.appendChild(el("div", "bubble-avatar", "🌱"));
+    pending.appendChild(el("div", "bubble-avatar fex", "FEX"));
     pending.appendChild(el("div", "msg assistant typing", "<span></span><span></span><span></span>"));
     transcript.appendChild(pending); transcript.scrollTop = transcript.scrollHeight;
 
@@ -204,7 +219,7 @@
       const res = await fetch(T.chatUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-CSRFToken": T.csrftoken },
-        body: JSON.stringify({ message, language, persona_id: T.personaId, attachments: atts,
+        body: JSON.stringify({ message, language, language_chosen: languageChosen, persona_id: T.personaId, attachments: atts,
                                action: action ? { name: action.name, args: action.args } : null }),
       });
       data = res.ok ? await res.json() : null;
@@ -238,7 +253,7 @@
   input.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
 
   // ---- language ---------------------------------------------------------
-  $("lang").addEventListener("change", e => { language = e.target.value; addSystem("Language switched to " + e.target.options[e.target.selectedIndex].text + "."); });
+  $("lang").addEventListener("change", e => { language = e.target.value; languageChosen = true; addSystem("Language switched to " + e.target.options[e.target.selectedIndex].text + "."); });
 
   // ---- attachments ------------------------------------------------------
   $("attach-btn").addEventListener("click", () => $("file-input").click());
@@ -260,7 +275,7 @@
 
   // Upload pending files to S3 via presigned PUT (when enabled); returns attachments with keys.
   async function uploadAttachments() {
-    const atts = pendingAttachments.map(a => ({ name: a.name, kind: a.kind }));
+    const atts = pendingAttachments.map(a => ({ name: a.name, kind: a.kind, content_type: a.content_type }));
     if (!T.uploadsEnabled || !pendingFiles.length) return atts;
     try {
       const res = await fetch(T.presignUrl, {
@@ -405,9 +420,37 @@
   }
 
   // ---- voice in ---------------------------------------------------------
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  // Amazon Transcribe: record a voice note, upload it, and put the transcript in the message box to review.
   const micBtn = $("mic");
-  if (SR) {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (navigator.mediaDevices && window.MediaRecorder) {
+    let rec = null, chunks = [];
+    micBtn.title = "Record a voice note (Amazon Transcribe)";
+    micBtn.onclick = async () => {
+      if (rec && rec.state === "recording") { rec.stop(); return; }
+      let stream;
+      try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { addSystem("The microphone isn't available."); return; }
+      chunks = [];
+      rec = new MediaRecorder(stream);
+      rec.ondataavailable = e => { if (e.data.size) chunks.push(e.data); };
+      rec.onstop = async () => {
+        stream.getTracks().forEach(t => t.stop());
+        micBtn.classList.remove("recording");
+        const type = (rec.mimeType || "audio/webm").split(";")[0];
+        const blob = new Blob(chunks, { type });
+        micBtn.disabled = true; const old = input.placeholder; input.placeholder = "Transcribing with Amazon Transcribe…";
+        try {
+          const res = await fetch(T.transcribeUrl + "?language=" + encodeURIComponent(language), {
+            method: "POST", headers: { "Content-Type": type, "X-CSRFToken": T.csrftoken }, body: blob });
+          const d = await res.json();
+          if (d.text) { input.value = (input.value ? input.value + " " : "") + d.text; input.focus(); }
+          else addSystem(d.error || "Nothing was heard. Please try again.");
+        } catch (e) { addSystem("The recording couldn't be transcribed. Please type instead."); }
+        micBtn.disabled = false; input.placeholder = old;
+      };
+      rec.start(); micBtn.classList.add("recording");
+    };
+  } else if (SR) {
     const rec = new SR(); rec.interimResults = true; let recording = false;
     micBtn.onclick = () => { if (recording) { rec.stop(); return; } rec.lang = LOCALE[language] || "en-US"; rec.start(); };
     rec.onstart = () => { recording = true; micBtn.classList.add("recording"); };
@@ -415,7 +458,6 @@
     rec.onresult = e => { let t = ""; for (let i = e.resultIndex; i < e.results.length; i++) t += e.results[i][0].transcript; input.value = t; };
     rec.onerror = () => { recording = false; micBtn.classList.remove("recording"); };
   } else { micBtn.style.display = "none"; }
-  if (!synth) { $("speak-toggle").closest("label").style.display = "none"; }
 
   // ---- bootstrap --------------------------------------------------------
   function bootstrap() {

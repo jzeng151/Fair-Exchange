@@ -98,7 +98,7 @@ PERSONAS: list[Persona] = [
         blurb="Artisanal fisher cooperative; catches are shifting with warmer water.",
         org="Pacífico Norte Fishers Association",
         language="es", flag="🇵🇪",
-        fex_producer_id="A7F700B04BCE55512CB026A71121426C",  # peru-water-pii-es
+        fex_producer_id="CED2DEE8ED99922FA5C6244DEF177AF3",  # S4 honduras (es): the Peru scenario left eval/scenarios
         location=Location("Piura, Peru (coast)", -5.19, -81.11, 6),
         weather=Weather("Warm sea surface, calm", 26, 2, "dry season", "Low", "🌊"),
         questions=[

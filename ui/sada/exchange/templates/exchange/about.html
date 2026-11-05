@@ -1,5 +1,5 @@
 {% extends "exchange/base.html" %}
-{% block title %}About · Fair Trade Exchange{% endblock %}
+{% block title %}About · Fair Exchange{% endblock %}
 {% block body %}
 <div class="wrap">
   <div class="page">
@@ -32,7 +32,7 @@
 
       <div class="value-grid">
         <div class="value"><h3>Enablement, not direction</h3>
-          <p>The assistant offers options and evidence. It never tells a producer what to do — the
+          <p>FEX offers options and evidence. It never tells a producer what to do — the
           decision stays with the producer and their cooperative.</p></div>
         <div class="value"><h3>Every claim is cited</h3>
           <p>Insights and peer examples carry a source: the producer's own record, open data, a
@@ -40,16 +40,44 @@
         <div class="value"><h3>Consent and voice</h3>
           <p>Producers own their data and consent to sharing. Personal details are flagged for a human
           reviewer, never auto-erased, so authentic voice is preserved.</p></div>
+        <div class="value"><h3>Light on resources</h3>
+          <p>AI uses energy, so FEX uses it sparingly: small models where they are enough, no model
+          training, and nothing running when no one is talking to it. <a href="#footprint">Details</a></p></div>
         <div class="value"><h3>Multilingual</h3>
           <p>The exchange runs in the producer's language. Spanish is the confirmed focus language, with
           more available in this prototype.</p></div>
       </div>
 
+      <h2 id="footprint">How we keep FEX light</h2>
+      <p>Fair Trade cares about the planet, and AI is not free for it: every answer uses electricity in a
+      data center. We can't make that zero, so we designed FEX to use as little as it needs:</p>
+      <ul>
+        <li><b>The right-sized model for each step.</b> A small model (Claude Haiku) handles the questions,
+        the read-back of your description and the summary. The larger model (Claude Sonnet) runs only for
+        the cited answer.</li>
+        <li><b>No model training.</b> FEX uses existing models on Amazon Bedrock. The Fair Trade standards were
+        indexed once into a knowledge base, and facts are looked up rather than generated.</li>
+        <li><b>Nothing runs when no one is talking.</b> FEX is serverless (Amazon Bedrock AgentCore, AWS
+        Lambda, on-demand storage): no servers or GPUs sit idle waiting.</li>
+        <li><b>Short conversations, little data kept.</b> A conversation closes after 2 hours without activity.
+        Voice recordings are deleted once transcribed, attachments after a day, and only what you agree to
+        save is kept.</li>
+        <li><b>For the climate, too.</b> FEX exists to help producers adapt to drought, irregular rain and water
+        stress, using open climate data.</li>
+      </ul>
+      <p><b>Where the nature data comes from.</b> FEX's water-stress figures come from WRI Aqueduct, which is
+      listed in the <a href="https://tnfd.global/assessment-guidance/tools-catalogue/">TNFD Tools Catalogue</a>
+      (TNFD notes that inclusion does not imply endorsement). Rainfall comes from CHIRPS and prices from the World
+      Bank, which are not in the catalogue; we plan to move to catalogue-listed sources where they fit.</p>
+      <p><b>What we can't claim yet.</b> We haven't measured FEX's footprint, so we don't call it
+      carbon-neutral. Amazon reports matching the electricity it uses with renewable energy; in production,
+      Fair Trade USA could track FEX's estimated emissions with the AWS Customer Carbon Footprint Tool.</p>
+
       <h2>About this prototype</h2>
-      <p>This is a standalone proof of concept with <b>no sign-on</b>. It makes up a friendly profile for
-      you and mocks the conversation so we can shape the experience before wiring the real Fair Exchange
-      API (a Strands agent on Amazon Bedrock AgentCore). Everything here is fictitious and for
-      demonstration only.</p>
+      <p>This is a proof of concept with <b>no sign-on</b>, and every profile is fictitious. In <b>Real API</b>
+      mode, producer conversations go to the real FEX agent (a Strands agent on Amazon Bedrock AgentCore) over
+      sample producer data; in <b>Mock</b> mode, answers are made up by this page. Panels marked "sample" are
+      illustrative.</p>
       <p><a class="btn" href="{% url 'picker' %}">Start a conversation →</a></p>
     </div>
   </div>

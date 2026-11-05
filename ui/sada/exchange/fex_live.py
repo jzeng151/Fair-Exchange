@@ -33,9 +33,9 @@ _ACTION_LABELS = {
         ("confirm_playback", ""): "✓ Yes, that's right",
         ("reopen_playback", ""): "↺ Change what I said",
         ("retry_answer", ""): "↻ Try the answer again",
-        ("set_consent", "internal"): "Save for Fair Trade USA only",
-        ("set_consent", "internal_and_outward"): "Save and share with other producers",
-        ("set_consent", "declined"): "Don't save",
+        ("set_consent", "internal"): "🔒 Only Fair Trade USA",
+        ("set_consent", "internal_and_outward"): "🌍 Fair Trade USA, and shared with other producers",
+        ("set_consent", "declined"): "🚫 Don't save",
         ("set_feedback", "yes"): "👍 It helped",
         ("set_feedback", "somewhat"): "🤔 Somewhat",
         ("set_feedback", "no"): "👎 Not really",
@@ -45,9 +45,9 @@ _ACTION_LABELS = {
         ("confirm_playback", ""): "✓ Sí, es correcto",
         ("reopen_playback", ""): "↺ Cambiar lo que dije",
         ("retry_answer", ""): "↻ Intentar la respuesta de nuevo",
-        ("set_consent", "internal"): "Guardar solo para Fair Trade USA",
-        ("set_consent", "internal_and_outward"): "Guardar y compartir con otros productores",
-        ("set_consent", "declined"): "No guardar",
+        ("set_consent", "internal"): "🔒 Solo Fair Trade USA",
+        ("set_consent", "internal_and_outward"): "🌍 Fair Trade USA, y compartido con otros productores",
+        ("set_consent", "declined"): "🚫 No guardar",
         ("set_feedback", "yes"): "👍 Me ayudó",
         ("set_feedback", "somewhat"): "🤔 Algo",
         ("set_feedback", "no"): "👎 No mucho",
@@ -57,9 +57,9 @@ _ACTION_LABELS = {
         ("confirm_playback", ""): "✓ Oui, c'est bien ça",
         ("reopen_playback", ""): "↺ Modifier ce que j'ai dit",
         ("retry_answer", ""): "↻ Réessayer la réponse",
-        ("set_consent", "internal"): "Enregistrer pour Fair Trade USA seulement",
-        ("set_consent", "internal_and_outward"): "Enregistrer et partager avec d'autres producteurs",
-        ("set_consent", "declined"): "Ne pas enregistrer",
+        ("set_consent", "internal"): "🔒 Fair Trade USA seulement",
+        ("set_consent", "internal_and_outward"): "🌍 Fair Trade USA, et partagé avec d'autres producteurs",
+        ("set_consent", "declined"): "🚫 Ne pas enregistrer",
         ("set_feedback", "yes"): "👍 Ça m'a aidé",
         ("set_feedback", "somewhat"): "🤔 Un peu",
         ("set_feedback", "no"): "👎 Pas vraiment",
@@ -131,11 +131,40 @@ def action(persona: Persona, cid: str, name: str, args: dict) -> list[dict]:
 def buttons(allowed: list[str], language: str) -> list[dict]:
     """The buttons for the agent's allowed actions: {label, action, args}, main choice first."""
     labels = _ACTION_LABELS.get(language, _ACTION_LABELS["en"])
+    if "set_feedback" in allowed:  # the last question: keep it simple (feedback, or end)
+        allowed = [a for a in allowed if a in ("set_feedback", "end")]
     return [
         {"label": labels.get((name, key), name.replace("_", " ")), "action": name, "args": args}
         for name in sorted((a for a in allowed if a in _BUTTON_ORDER), key=_BUTTON_ORDER.index)
         for key, args in _ACTION_CHOICES[name]
     ]
+
+
+# Shown with the save choice, so each option is clear before the producer picks.
+CONSENT_EXPLAINER = {
+    "en": ("Who can see what you shared?\n"
+           "🔒 Only Fair Trade USA: their team can read it to improve support.\n"
+           "🌍 Shared with other producers: they only ever see it combined with others, never with your name.\n"
+           "🚫 Don't save: nothing from this conversation is kept."),
+    "es": ("¿Quién puede ver lo que compartió?\n"
+           "🔒 Solo Fair Trade USA: su equipo puede leerlo para mejorar el apoyo.\n"
+           "🌍 Compartido con otros productores: solo lo ven junto con otros, nunca con su nombre.\n"
+           "🚫 No guardar: no se guarda nada de esta conversación."),
+    "fr": ("Qui peut voir ce que vous avez partagé ?\n"
+           "🔒 Fair Trade USA seulement : son équipe peut le lire pour améliorer son soutien.\n"
+           "🌍 Partagé avec d'autres producteurs : ils ne le voient que regroupé avec d'autres, jamais avec votre nom.\n"
+           "🚫 Ne pas enregistrer : rien de cette conversation n'est conservé."),
+}
+SAVED_AS = {
+    "internal": {"en": "✓ Saved: only Fair Trade USA can see it.", "es": "✓ Guardado: solo Fair Trade USA puede verlo.",
+                 "fr": "✓ Enregistré : seul Fair Trade USA peut le voir."},
+    "internal_and_outward": {"en": "✓ Saved: Fair Trade USA can see it, and other producers only combined with others, never with your name.",
+                             "es": "✓ Guardado: Fair Trade USA puede verlo, y otros productores solo junto con otros, nunca con su nombre.",
+                             "fr": "✓ Enregistré : Fair Trade USA peut le voir, et d'autres producteurs seulement regroupé, jamais avec votre nom."},
+}
+ENDED = {"en": "Thank you for your feedback. This conversation has ended. Start a new chat any time.",
+         "es": "Gracias por su opinión. Esta conversación terminó. Puede empezar un chat nuevo cuando quiera.",
+         "fr": "Merci pour votre avis. Cette conversation est terminée. Vous pouvez commencer un nouveau chat à tout moment."}
 
 
 def to_answer(events: list[dict], fallback_language: str) -> dict:
@@ -159,23 +188,29 @@ def to_answer(events: list[dict], fallback_language: str) -> dict:
 
     parts = ["".join(said).strip()] if "".join(said).strip() else []
     citations: list[dict] = []
-    for c in claims:
+    # Each claim is numbered, and its citation carries the same number: the source, its period and the
+    # Fair Trade standard clause it relates to, so every point can be traced to where it came from.
+    for n, c in enumerate(claims, 1):
         claim = c.get("claim") or {}
         cit = claim.get("citation") or {}
-        parts.append("• " + claim.get("text", ""))
-        label = cit.get("source", "source")
-        if cit.get("period"):
+        parts.append(f"• {claim.get('text', '')} [{n}]")
+        label = f"[{n}] " + cit.get("source", "source")
+        if cit.get("period") and cit["period"] not in label:  # most sources already name their period
             label += f" ({cit['period']})"
-        citations.append({"label": label, "kind": _SECTION_KIND.get(c.get("section"), "regional")})
         if cit.get("standard_clause"):
-            citations.append({"label": cit["standard_clause"], "kind": "standard"})
+            label += f" · Standard {cit['standard_clause']}"
+        if "aqueduct" in label.lower():  # verified on tnfd.global/assessment-guidance/tools-catalogue (2026-11-05)
+            label += " · Listed in the TNFD Tools Catalogue"
+        citations.append({"label": label, "kind": _SECTION_KIND.get(c.get("section"), "regional")})
     parts += errors
+    if step == "consent" and "set_consent" in allowed:
+        parts.append(CONSENT_EXPLAINER.get(language, CONSENT_EXPLAINER["en"]))
     if saved:
         declined = saved.get("status") == "declined"
         parts.append(({"en": "Noted: nothing about your conversation is stored.", "es": "Anotado: no se guarda nada de su conversación.",
                        "fr": "Noté : rien de votre conversation n'est conservé."} if declined else
-                      {"en": "Saved (version {v}).", "es": "Guardado (versión {v}).", "fr": "Enregistré (version {v})."})
-                     .get(language, "Saved (version {v}).").format(v=saved.get("version")))
+                      SAVED_AS.get(saved.get("consent_scope"), SAVED_AS["internal"]))
+                     .get(language, "Saved."))
 
     if step == "closed" and not parts:
         parts.append({"en": "This conversation is closed. Start a new chat to talk again.",

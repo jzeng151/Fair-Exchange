@@ -40,6 +40,30 @@ Resources:
         PasswordLength: 64
         ExcludeCharacters: "\"'\\"
 
+  # Voice notes (Amazon Transcribe) and attachments (read with Claude on Bedrock). Private; objects expire after a day.
+  UploadsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault: { SSEAlgorithm: AES256 }
+      LifecycleConfiguration:
+        Rules:
+          - Id: expire
+            Status: Enabled
+            ExpirationInDays: 1
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: [PUT]
+            AllowedOrigins: ["*"]
+            AllowedHeaders: ["*"]
+            MaxAge: 3000
+
   LogGroup:
     Type: AWS::Logs::LogGroup
     Properties:
@@ -69,6 +93,22 @@ Resources:
                   - HasPasscode
                   - [!Ref DjangoSecretKey, !Ref DemoPasscodeSecretArn]
                   - [!Ref DjangoSecretKey]
+        - PolicyName: aws-tools
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: [s3:PutObject, s3:GetObject, s3:DeleteObject]
+                Resource: !Sub "${UploadsBucket.Arn}/*"
+              - Effect: Allow
+                Action: [polly:SynthesizeSpeech, translate:TranslateText, comprehend:DetectDominantLanguage,
+                         transcribe:StartTranscriptionJob, transcribe:GetTranscriptionJob, transcribe:DeleteTranscriptionJob]
+                Resource: "*"
+              - Effect: Allow
+                Action: [bedrock:InvokeModel]
+                Resource:
+                  - !Sub "arn:aws:bedrock:${AWS::Region}:${AWS::AccountId}:inference-profile/us.anthropic.claude-haiku-5-5"
+                  - "arn:aws:bedrock:*::foundation-model/anthropic.claude-haiku-5-5"
 
   Web:
     Type: AWS::Lambda::Function
@@ -97,6 +137,8 @@ Resources:
           FEX_API_TIMEOUT: "300"
           USE_LIVE_WEATHER: "1"
           USE_BEDROCK: "0"
+          UPLOADS_BUCKET: !Ref UploadsBucket
+          VISION_MODEL_ID: us.anthropic.claude-haiku-5-5
 
   WebUrl:
     Type: AWS::Lambda::Url

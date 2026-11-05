@@ -33,12 +33,21 @@ CLOSED = [{"type": "record_saved", "status": "completed", "version": 3, "consent
 
 
 class ToAnswerTests(SimpleTestCase):
-    def test_claims_become_bullets_and_deduplicated_citations(self):
+    def test_each_claim_is_numbered_with_its_own_citation(self):
         a = fex_live.to_answer(ANSWER, "en")
-        self.assertIn("• Rain was 30% below normal.", a["text"])
-        self.assertEqual([c["label"] for c in a["citations"]], ["CHIRPS v2.0 (2025)", "APS 2.4.2.a", "Premium project PROJ-1"])
-        self.assertEqual([c["kind"] for c in a["citations"]], ["regional", "standard", "peer"])
+        self.assertIn("• Rain was 30% below normal. [1]", a["text"])
+        self.assertIn("• A peer group built tanks. [2]", a["text"])
+        self.assertEqual([c["label"] for c in a["citations"]],
+                         ["[1] CHIRPS v2.0 (2025) · Standard APS 2.4.2.a", "[2] Premium project PROJ-1 · Standard APS 2.4.2.a"])
+        self.assertEqual([c["kind"] for c in a["citations"]], ["regional", "peer"])
         self.assertEqual(a["language"], "es")
+
+    def test_aqueduct_citations_note_the_tnfd_tools_catalogue(self):
+        events = [{"type": "claim", "section": "insights", "seq": 1, "claim": {"text": "Water stress is high.", "citation":
+                   {"source": "WRI Aqueduct 4.0 projected water stress, Chiapas", "standard_clause": "FPS 5.1.2.c"}}}]
+        label = fex_live.to_answer(events, "en")["citations"][0]["label"]
+        self.assertTrue(label.endswith("· Listed in the TNFD Tools Catalogue"))
+        self.assertNotIn("TNFD", fex_live.to_answer(ANSWER, "en")["citations"][0]["label"])
 
     def test_buttons_follow_allowed_actions_in_order_without_correct_playback(self):
         labels = [b["label"] for b in fex_live.to_answer(PLAYBACK, "en")["suggestions"]]
@@ -50,7 +59,7 @@ class ToAnswerTests(SimpleTestCase):
     def test_closed_turn_says_so(self):
         a = fex_live.to_answer(CLOSED, "en")
         self.assertTrue(a["closed"])
-        self.assertIn("Saved (version 3).", a["text"])
+        self.assertIn("✓ Saved: only Fair Trade USA can see it.", a["text"])
 
 
 class PickerAndChatTests(SimpleTestCase):
@@ -98,7 +107,7 @@ class RealApiTests(SimpleTestCase):
             self.assertEqual(self.chat("Prices dropped")["step"], "playback")
             answer = self.chat("✓ Sí, es correcto", {"name": "confirm_playback", "args": {}})
             self.assertEqual(answer["source"], "live")
-            self.assertEqual(len(answer["citations"]), 3)
+            self.assertEqual(len(answer["citations"]), 2)
             # A rejected action keeps the previous buttons instead of leaving none.
             kept = self.chat("No guardar", {"name": "set_feedback", "args": {"value": "yes"}})
             self.assertEqual(kept["suggestions"], answer["suggestions"])
