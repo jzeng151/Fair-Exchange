@@ -134,3 +134,31 @@ def test_a_stale_answer_turn_cannot_overwrite_the_evidence_of_a_stop_that_arrive
     assert of(events, "error")[0].code == "agent_failed"
     ev = store.get(r.conversation_id)
     assert ev.final_step == "closed" and ev.answers == [], "evidence matches the saved, closed conversation"
+
+
+def test_a_failed_answer_write_stays_visible_after_a_later_write_succeeds():
+    class FailsOnce(InMemoryEvidenceStore):
+        failed = False
+
+        def put(self, evidence):
+            if not self.failed:
+                self.failed = True
+                raise RuntimeError("bucket unavailable")
+            super().put(evidence)
+
+    r = Run()
+    store = FailsOnce()
+    r.engine.evidence_store = store
+    r.to_feedback()  # the answer's write fails; the consent turn writes nothing
+    r.action("end")
+    ev = store.get(r.conversation_id)
+    assert ev.final_step == "closed" and ev.answers == [] and ev.respond_steps == 1
+    assert not ev.complete, "the lost answer is visible, not hidden by the close"
+
+
+def test_complete_evidence_holds_every_answer_started():
+    r = Run()
+    store = capturing(r)
+    r.to_feedback()
+    r.action("end")
+    assert store.get(r.conversation_id).complete

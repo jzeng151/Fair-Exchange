@@ -463,6 +463,7 @@ class ConversationEngine:
     def _respond(self, state: ConversationState, turn: _Turn) -> None:
         state.step, state.answer, state.answer_failed = "respond", None, False
         state.partial, state.partial_started_at = ShownClaims(), self.clock()
+        state.respond_steps += 1
         lang = state.language
         # For eval evidence (#34): filled as the answer is built, so a failed answer still records what it had
         items: list[dict] = []
@@ -533,7 +534,7 @@ class ConversationEngine:
                 written_at=self.clock())
             if answer is not None:
                 ev.answers.append(answer)
-            ev.final_step, ev.written_at = state.step, self.clock()
+            ev.final_step, ev.written_at, ev.respond_steps = state.step, self.clock(), state.respond_steps
             self.evidence_store.put(ev)
         except Exception:  # noqa: BLE001 - logged with the conversation ID only; the evaluator reports it unscored
             log.exception("eval evidence not written for %s", state.conversation_id)

@@ -74,6 +74,8 @@ class ConversationState(BaseModel):
     partial: ShownClaims | None = Field(default=None, description="Claims shown in an answer that has not finished")
     partial_started_at: datetime | None = None
     answer_failed: bool = False
+    respond_steps: int = Field(default=0, description="Answers started; eval evidence compares it to the answers "
+                               "it holds, so a lost evidence write shows (#34)")
     earlier_answers: list[EarlierAnswer] = Field(default_factory=list)
     consent: ConsentScope | None = None
     consent_history: list[ConsentChoice] = Field(default_factory=list)

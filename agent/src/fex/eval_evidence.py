@@ -39,6 +39,12 @@ class EvalEvidence(BaseModel):
     final_step: str = Field(description="The #13 step the conversation was in at the last write")
     written_at: datetime
     answers: list[AnswerEvidence] = Field(default_factory=list, description="Every respond step, oldest first")
+    respond_steps: int = Field(default=0, description="Answers the conversation started, from its state")
+
+    @property
+    def complete(self) -> bool:
+        """False when an answer's evidence write failed: the conversation started more answers than this holds."""
+        return len(self.answers) == self.respond_steps
 
     def item_for(self, source: str) -> EvidenceItem | None:
         """The latest tool result with this source label, or None."""
