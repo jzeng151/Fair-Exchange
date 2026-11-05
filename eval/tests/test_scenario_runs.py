@@ -22,6 +22,7 @@ from fex.tools.standards import LocalClauseRetriever
 EVAL = Path(__file__).parents[1]
 RUNS = sorted((EVAL / "scenarios").glob("S*.json")) + sorted((EVAL / "scenarios" / "contrast").glob("*.json"))
 LAST_REPLY = "That's all I can add."
+MAX_EXTRA_REPLIES = 6  # extra intake answers before a run fails instead of waiting forever (#35)
 
 # The invented person in S5. Detecting names is Comprehend's job; this checks what the agent does with a hit.
 KNOWN_NAMES = ["Kouame Konan"]
@@ -58,13 +59,15 @@ def run_scenario(scenario: dict, records_dir: Path) -> tuple[list[dict], list[st
             problems.append(f"turn {n}: {turn['action']['name']} not in allowed actions {allowed}")
         body = {"kind": "message", "text": turn["message"]} if "message" in turn else {"kind": "action", "action": turn["action"]}
         events = send(body)
-        steps = [e["step"] for e in events if e["type"] == "step"]
-        # Extra intake questions: answer them until the expected later step arrives
-        while turn["expect_step"] != "intake" and steps[-1:] == ["intake"]:
-            events = send({"kind": "message", "text": replies.pop(0) if replies else LAST_REPLY})
-            steps = [e["step"] for e in events if e["type"] == "step"]
-            seen += events
         seen += events
+        steps = [e["step"] for e in events if e["type"] == "step"]
+        # Extra intake questions: answer them until the expected later step arrives, but not forever
+        extra = 0
+        while turn["expect_step"] != "intake" and steps[-1:] == ["intake"] and extra < MAX_EXTRA_REPLIES:
+            events = send({"kind": "message", "text": replies.pop(0) if replies else LAST_REPLY})
+            seen += events
+            steps = [e["step"] for e in events if e["type"] == "step"]
+            extra += 1
         if errors := [e["code"] for e in events if e["type"] == "error"]:
             problems.append(f"turn {n}: error events {errors}")
         if turn["expect_step"] not in steps:
@@ -92,3 +95,14 @@ def test_the_fake_scanner_finds_only_the_invented_person_and_phone():
     found = fake_pii_scanner(text, "en")
     assert [(e["Type"], text[e["BeginOffset"]:e["EndOffset"]]) for e in found] == [
         ("NAME", "Kouame Konan"), ("PHONE", "+225 07 00 00 00 00")]
+
+
+def test_a_run_that_never_leaves_intake_fails_instead_of_looping(tmp_path, monkeypatch):
+    # An intake that never reaches playback must end the run with a problem, not send replies forever
+    import fex.conversation.engine as engine_module
+
+    monkeypatch.setattr(engine_module.ConversationEngine, "_intake",
+                        lambda self, state, turn: turn.say("Tell me more."))
+    scenario = json.loads(RUNS[0].read_text(encoding="utf-8"))
+    _, problems = run_scenario(scenario, tmp_path)
+    assert problems and "expected step playback" in problems[0]
