@@ -42,6 +42,14 @@ describe('live reviewer', () => {
     expect(w.text()).toContain('[Synthetic] Test Person mentioned')
     expect(w.findAll('button').find((b) => b.text() === 'Approve record')!.attributes('disabled')).toBeDefined()
   })
+  it('shows the decision log, or says it is empty', async () => {
+    record.decision_log = [{ at: record.created_at, kind: 'verifier', code: 'clause_not_retrieved', refs: ['RF-F8C4E1', 'APS 2.1.1'] }]
+    const w = await open()
+    expect(w.text()).toContain('Decision log')
+    expect(w.text()).toContain('verifier · clause_not_retrieved · RF-F8C4E1, APS 2.1.1')
+    record.decision_log = []
+    expect((await open()).text()).toContain('No decisions logged')
+  })
   it('makes approved records read-only', async () => {
     record.review_status = 'reviewed'
     const w = await open()

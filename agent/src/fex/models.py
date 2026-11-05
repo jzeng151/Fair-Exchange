@@ -5,7 +5,7 @@ JSON Schema and TypeScript types are generated from these models. Do not hand-ed
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, TypeAdapter, model_validator
 
 # The 11 challenge tags from the Vision document
 ChallengeTag = Literal[
@@ -75,6 +75,26 @@ class ModelUsage(BaseModel):
     model_id: str = Field(min_length=1)
     input_tokens: int = Field(ge=0)
     output_tokens: int = Field(ge=0)
+
+
+# What a decision-log ref may be (#26): a source item ID, a producer ID, an APS/FPS clause ID, a tool or step
+# name, or a PII entity type. Anything else (free text, model output, producer words) fails validation.
+DECISION_REF = (
+    r"^(?:(?:PRJ-|CAT-|RF-|SV-)?[0-9A-F]{6,32}|SYN-(?:[0-9]{3}|SCOPE-[A-Z])|(?:APS|FPS) [0-9]+(?:\.[0-9]+)*(?:\.[a-z])?"
+    r"|get_producer_record|get_regional_context|find_peer_examples|find_standards"
+    r"|intake|playback|respond|consent|feedback|closed|NAME|PHONE|EMAIL|ADDRESS)$"
+)
+
+
+class DecisionLogEntry(BaseModel):
+    """One step of the agent's reasoning trail (#26). `refs` holds opaque IDs only (DECISION_REF)."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    at: datetime
+    kind: Literal["step", "tool", "verifier", "pii"]
+    code: str
+    refs: list[Annotated[str, StringConstraints(pattern=DECISION_REF)]] = Field(default_factory=list)
 
 
 class EarlierAnswer(BaseModel):
@@ -186,6 +206,8 @@ class CompletedRecord(_RecordBase):
     insights: list[Claim] = Field(default_factory=list, description="What the data shows, as given to the producer")
     peer_examples: list[Claim] = Field(default_factory=list, description="What others tried, as given to the producer")
     feedback: Literal["yes", "somewhat", "no"] | None = Field(default=None, description="Was the guidance helpful?")
+    decision_log: list[DecisionLogEntry] = Field(
+        default_factory=list, description="The agent's reasoning trail for reviewers, oldest first (#26)")
     pii_entity_types: list[Literal["NAME", "PHONE", "EMAIL", "ADDRESS"]] = Field(
         default_factory=list, description="Types found across the conversation, in first-seen order")
     pii_matches: list[PiiMatch] = Field(

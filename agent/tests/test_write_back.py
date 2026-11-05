@@ -124,6 +124,25 @@ def test_declined_record_has_no_narrative_fields(run, table):
     assert [c["scope"] for c in record["consent_history"]] == ["declined"]
 
 
+def test_completed_record_carries_the_decision_log_with_ids_only(run, table):
+    run.to_playback()
+    run.small.add(summary())
+    invented = claim("Rainfall fell.", "Notes from a visit [Juan Pérez, 555-0100]", clause="APS 2.1.1")
+    run.large.add(*RETRIEVE, *[answer([invented], [])] * 3)
+    run.action("confirm_playback")
+    run.action("set_consent", scope="internal")
+    record = parse_record(stored(table, run))
+    assert record.decision_log == run.state().decision_log
+    assert ("verifier", "unknown_source", ["APS 2.1.1"]) in [(e.kind, e.code, e.refs) for e in record.decision_log]
+    assert not any("Juan" in ref or "555" in ref for e in record.decision_log for ref in e.refs)
+
+
+def test_declined_record_has_no_decision_log(run, table):
+    run.to_consent()
+    run.action("set_consent", scope="declined")
+    assert "decision_log" not in stored(table, run)
+
+
 def test_completed_declined_completed_switching_keeps_earlier_answers(run, table):
     run.to_consent()
     run.action("reopen_playback")

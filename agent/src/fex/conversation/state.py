@@ -14,18 +14,8 @@ from fex.models import PiiScanState  # noqa: F401  (re-exported so state round-t
 from fex.conversation.contract import (
     Answer, ConsentScope, Evidence, FeedbackValue, HistoryEntry, Step,
 )
-from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer
+from fex.models import ChallengeTag, Claim, ConsentChoice, DecisionLogEntry, EarlierAnswer
 from fex.verifier import SessionEvidence, SourceKind
-
-
-class DecisionLogEntry(BaseModel):
-    """One step of the agent's reasoning trail (#26). `refs` holds opaque IDs only: tool names, the
-    bracketed item IDs from sources, clause IDs. Never free text, model output or producer words."""
-
-    at: datetime
-    kind: Literal["step", "tool", "verifier", "pii"]
-    code: str
-    refs: list[str] = Field(default_factory=list)
 
 
 class Profile(BaseModel):

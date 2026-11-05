@@ -122,6 +122,14 @@
           "title": "Created At",
           "type": "string"
         },
+        "decision_log": {
+          "description": "The agent's reasoning trail for reviewers, oldest first (#26)",
+          "items": {
+            "$ref": "#/$defs/DecisionLogEntry"
+          },
+          "title": "Decision Log",
+          "type": "array"
+        },
         "earlier_answers": {
           "description": "Answers shown and later replaced, oldest first",
           "items": {
@@ -469,6 +477,46 @@
         "recorded_at"
       ],
       "title": "ConsentChoice",
+      "type": "object"
+    },
+    "DecisionLogEntry": {
+      "additionalProperties": false,
+      "description": "One step of the agent's reasoning trail (#26). `refs` holds opaque IDs only (DECISION_REF).",
+      "properties": {
+        "at": {
+          "format": "date-time",
+          "title": "At",
+          "type": "string"
+        },
+        "code": {
+          "title": "Code",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "step",
+            "tool",
+            "verifier",
+            "pii"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "refs": {
+          "items": {
+            "pattern": "^(?:(?:PRJ-|CAT-|RF-|SV-)?[0-9A-F]{6,32}|SYN-(?:[0-9]{3}|SCOPE-[A-Z])|(?:APS|FPS) [0-9]+(?:\\.[0-9]+)*(?:\\.[a-z])?|get_producer_record|get_regional_context|find_peer_examples|find_standards|intake|playback|respond|consent|feedback|closed|NAME|PHONE|EMAIL|ADDRESS)$",
+            "type": "string"
+          },
+          "title": "Refs",
+          "type": "array"
+        }
+      },
+      "required": [
+        "at",
+        "kind",
+        "code"
+      ],
+      "title": "DecisionLogEntry",
       "type": "object"
     },
     "DeclinedConsent": {

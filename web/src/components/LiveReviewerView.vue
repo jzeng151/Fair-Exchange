@@ -114,6 +114,9 @@ defineExpose({ refresh: () => { if (signedIn.value) void refresh() } })
         <p>{{ selected.pii_flag ? 'Flagged for human review' : 'No personal information flagged' }} · {{ selected.pii_review ?? 'No review decision' }}</p>
         <ul><li v-for="(match, i) in selected.pii_matches ?? []" :key="i">{{ match.entity_type }}: {{ match.context }}</li></ul>
         <div v-if="!readonly && selected.pii_flag" class="actions"><button :disabled="busy" @click="save('confirmed')">Confirm flag and save</button><button :disabled="busy" @click="save('cleared')">Clear flag and save</button></div>
+        <h3>Decision log</h3>
+        <ul v-if="selected.decision_log?.length"><li v-for="(entry, i) in selected.decision_log" :key="i">{{ entry.at }} · {{ entry.kind }} · {{ entry.code }}<template v-if="entry.refs?.length"> · {{ entry.refs.join(', ') }}</template></li></ul>
+        <p v-else>No decisions logged</p>
         <p>Producer feedback: {{ selected.feedback ?? 'Not provided' }}</p>
         <p v-if="selected.reviewed_by">Reviewed by {{ selected.reviewed_by }} · {{ selected.reviewed_at }}</p>
         <div v-if="!readonly" class="actions"><button :disabled="busy || !dirty" @click="save()">Save corrections</button><button class="btn-primary" :disabled="busy || dirty || !!unresolved" @click="approve">Approve record</button></div>
