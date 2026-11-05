@@ -14,14 +14,21 @@ from fex.models import (
     CompletedRecord,
     DeclinedConsent,
     DeclinedRecord,
+    EarlierAnswer,
     StoredConsent,
 )
-from fx_evals.evaluators import Registry, run_evaluators
+from fx_evals.evaluators import (
+    Registry,
+    citation_validity,
+    directive_language,
+    run_evaluators,
+)
 from fx_evals.judge import parse_rubric
 from fx_evals.runner import (
     build_dataset,
     distinctness_pairs,
     distinctness_violation,
+    human_tag_agreement,
     load_contrast_config,
     load_reference,
     load_scenarios,
@@ -43,8 +50,9 @@ from fx_evals.sessions import (
 EVAL = Path(__file__).resolve().parents[1]
 ROOT = repo_root()
 NOW = datetime(2026, 11, 4, 15, 30, tzinfo=timezone.utc)
-STEP_DONE = [{"step": {"kind": "summary"}, "summary": {"text": "ok"}},
-             {"step": {"kind": "done"}, "done": {}}]
+# Flat wire events (#25): progress step then terminal done.
+STEP_DONE = [{"type": "step", "step": "closed", "language": "en"},
+             {"type": "done"}]
 
 
 def _record(session_id: str, producer_id: str, *, language: str = "en",
@@ -156,7 +164,7 @@ def test_drive_sends_producer_identity_and_every_turn():
         assert conversation_id == f"conv-{scenario['id']}"
         kinds = [call[0] for call in stub.calls]
         assert kinds[0] == "create" and kinds[-1] == "actions"
-        producer_id, language = stub.calls[0][1]["producer_id"], stub.calls[0][1]["language"]
+        producer_id, language = stub.calls[0][1]  # create args tuple: (producer_id, language)
         assert producer_id == scenario["producer_id"] and language == scenario["language"]
         messages = [call[1][1] for call in stub.calls if call[0] == "message"]
         expected = [turn["text"] for turn in scenario["turns"] if turn["kind"] == "message"]
@@ -175,9 +183,9 @@ def test_drive_unknown_turn_kind_raises():
                "turns": [{"kind": "teleport"}]}, stub)
 
 
-def test_drive_failed_step_raises():
-    stub = StubChatTransport("conv-x", [{"step": {"kind": "failed"}, "error": {"code": "boom"}}])
-    with pytest.raises(AssertionError, match="reported a failed step"):
+def test_drive_error_event_raises():
+    stub = StubChatTransport("conv-x", [{"type": "error", "code": "boom", "message": "kaput"}])
+    with pytest.raises(AssertionError, match="reported an error"):
         drive({"id": "x", "producer_id": "p", "language": "en",
                "turns": [{"kind": "message", "text": "hi"}]}, stub)
 
@@ -274,7 +282,7 @@ def test_declined_record_values():
                              JudgeStub())
     by_id = {r["evaluator_id"]: r for r in results}
     assert by_id["tag_overlap"]["value"] == 0.0
-    assert by_id["citation_validity"]["value"] == 1.0  # nothing shown, nothing invalid
+    assert by_id["citation_validity"]["value"] is None  # F5: nothing cited -> unscored, not 1.0
     assert by_id["answer_completeness"]["value"] == 0.0
     assert by_id["directive_language"]["value"] == 1.0
     assert by_id["enablement_tone"]["value"] == 0.0
@@ -328,7 +336,7 @@ def test_run_offline_registry_seam_and_report(tmp_path):
     assert report["results"] == [{"evaluator_id": "custom", "session_id": "conv-alpha",
                                   "value": 1.0, "breakdown": {}}]
     assert report["distinctness"] == {"pairs_checked": 0, "violations": [],
-                                      "pair_answers": []}
+                                      "marks_pending": [], "pair_answers": []}
     json_path, md_path = write_report(report, tmp_path)
     assert json.loads(json_path.read_text())["results"] == report["results"]
     assert md_path.read_text().startswith("# Eval run")
@@ -359,7 +367,9 @@ def test_run_offline_full_with_real_fixtures(tmp_path):
         scenarios=scenarios, references=references,
         transport_factory=lambda: next(transports),
         stores=stores, evaluator_registry=run_evaluators, judge=JudgeStub(4))
-    assert len(report["results"]) == 6 * len(scenarios)
+    n_declined = sum(
+        1 for s in scenarios if s.get("expect", {}).get("record", {}).get("status") == "declined")
+    assert len(report["results"]) == 6 * (len(scenarios) - n_declined)  # F3: declined sessions skip evals
     assert report["distinctness"]["violations"] == []
     blocks = report["distinctness"]["pair_answers"]
     assert blocks, "the committed contrast pair produced a side-by-side block"
@@ -460,6 +470,31 @@ def test_run_offline_reports_pair_side_by_sides(tmp_path):
     assert "  - alpha:" in md
 
 
+def test_run_offline_marks_generic_pair_once():
+    """F4: a reviewer-marked generic pair appends ONE violation, not two."""
+    scenarios = [{"id": "alpha", "producer_id": "P1", "language": "en",
+                  "turns": [{"kind": "message", "text": "bad harvest"}]},
+                 {"id": "beta", "producer_id": "P2", "language": "en",
+                  "turns": [{"kind": "message", "text": "bad harvest"}]}]
+    stores = SessionDirectory(
+        records={"conv-alpha": _good_record("conv-alpha", "P1"),
+                 "conv-beta": _good_record("conv-beta", "P2")},
+        evidence={})
+    transports = iter([StubChatTransport("conv-alpha", STEP_DONE),
+                       StubChatTransport("conv-beta", STEP_DONE)])
+    report = run_offline(
+        scenarios=scenarios, references=load_reference(scenarios),
+        transport_factory=lambda: next(transports), stores=stores,
+        evaluator_registry=lambda *a, **k: [], judge=JudgeStub(),
+        contrast_config={"pairs": [{"a": "alpha", "b": "beta",
+                                    "basis": "same tag"}],
+                         "reviewer_marks": {"alpha|beta": "generic"}})
+    assert report["distinctness"]["pairs_checked"] == 1
+    assert report["distinctness"]["violations"] == [
+        "alpha vs beta (reviewer marked generic)"]
+    assert report["distinctness"]["pair_answers"][0]["reviewer_mark"] == "generic"
+
+
 # --- the AgentCore dataset shape ---------------------------------------------------------
 
 
@@ -553,3 +588,52 @@ def test_outcome_checks_declined():
     checks = outcome_checks(scenario, record)
     assert all(c["pass"] for c in checks)
     assert outcome_checks({"id": "s-none", "expect": {}}, None) == []
+
+
+def test_citation_validity_unscored_without_evidence():
+    """F5: absent evidence capture is unscored, not a free 1.0."""
+    result = citation_validity(_session("s-ne", _good_record("s-ne", "P1")))
+    assert result["evaluator_id"] == "citation_validity"
+    assert result["value"] is None
+    assert result["breakdown"]["reason"]
+
+
+def test_directive_language_flags_replaced_answers():
+    """F6: phrasing the producer already saw in a replaced answer still counts."""
+    earlier = EarlierAnswer(
+        given_at=NOW,
+        reason="reopened",
+        evidence="full",
+        insights=[Claim(text="We suggest pooling the funds.",
+                        citation=Citation(source="producer-record:P1",
+                                          standard_clause="APS 3.2.1"))],
+    )
+    record = _record("s-ea", "P1").model_copy(update={"earlier_answers": [earlier]})
+    result = directive_language(_session("s-ea", record))
+    assert result["value"] == 0.0
+    assert result["breakdown"]["matches"]
+
+
+def test_distinctness_uses_real_peer_labels():
+    """F2: real tool peer labels resolve to the bracketed id, per evidence kind."""
+    evidence_a = _evidence("v-a", [{"source": "Premium project, OrgA [cat-7]",
+                                    "kind": "peer"}], ["APS 4.1.0"])
+    a = _session("v-a", _record(
+        "v-a", "P1", peers=[(
+            "org a pooled funds", "Premium project, OrgA [cat-7]", "APS 4.1.0")]),
+        evidence_a)
+    b = _session("v-b", _record(
+        "v-b", "P2", peers=[(
+            "org b pooled funds", "Premium project, OrgB [cat-9]", "APS 4.1.0")]),
+        _evidence("v-b", [{"source": "Premium project, OrgB [cat-9]",
+                           "kind": "peer"}], ["APS 4.1.0"]))
+    # Distinct bracketed ids: peer labels differentiate (clause-only view said identical)
+    assert distinctness_violation(a, b) is False
+    same = _session("v-c", _record(
+        "v-c", "P2", peers=[(
+            "org b pooled funds", "Premium project, OrgB [cat-7]", "APS 4.1.0")]),
+        _evidence("v-c", [{"source": "Premium project, OrgB [cat-7]",
+                           "kind": "peer"}], ["APS 4.1.0"]))
+    # Same bracketed id is still caught; the prose wrapper does not hide it
+    assert distinctness_violation(a, same) is True
+

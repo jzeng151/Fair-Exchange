@@ -17,10 +17,12 @@ from dataclasses import dataclass
 from typing import Any, Protocol
 
 from fex.models import ChallengeTag, Claim, Citation, CompletedRecord, DeclinedRecord
+from fex.tone import DIRECTIVE_PHRASES, find_directive
 
 from fx_evals.sessions import EvalEvidence, ReferenceData, Session
 
-RESULT = dict[str, Any]  # {evaluator_id, session_id, value: float 0..1, breakdown: {...}}
+RESULT = dict[str, Any]  # {evaluator_id, session_id, value: float 0..1 (None = unscored),
+#                          breakdown: {...}}
 
 # Tool names as registered in the agent (fex/tools). `citation_validity` checks a claim's
 # `citation.source` label against the source labels the listed tools returned in THIS
@@ -35,27 +37,8 @@ PEER_TOOL = "find_peer_examples"
 PEER_SOURCE_PREFIX = "peer-project:"
 INSIGHT_TOOLS = TOOL_SOURCES_BY_KIND["insight"]
 
-# Directive phrases (#17: guidance means options with reasons, never directives; en + es).
-DIRECTIVE_PHRASES: tuple[str, ...] = (
-    "you should",
-    "you must",
-    "you need to",
-    "you ought to",
-    "we recommend you",
-    "i advise you",
-    "the best option is to",
-    "the best option",
-    "we recommend",
-    "usted debe",
-    "usted tiene que",
-    "usted necesita",
-    "le recomendamos que",
-    "te recomiendo que",
-    "tienes que",
-    "la mejor opción es",
-    "la mejor opción",
-    "le recomendamos",
-)
+# Directive phrases: one shared list with the agent's own tone verifier (#17/#36) —
+# fex.tone.DIRECTIVE_PHRASES + find_directive (accent-insensitive whole-word match).
 TAG_OVERLAP_TARGET = 0.80  # spec: Jaccard >= 0.8 with the human labels
 
 
@@ -75,7 +58,8 @@ def jaccard(left: Iterable[Any], right: Iterable[Any]) -> float:
     return len(left_set & right_set) / len(union)
 
 
-def _result(evaluator_id: str, session: Session, value: float, breakdown: dict[str, Any]) -> RESULT:
+def _result(evaluator_id: str, session: Session, value: float | None,
+            breakdown: dict[str, Any]) -> RESULT:
     return {
         "evaluator_id": evaluator_id,
         "session_id": session.session_id,
@@ -89,12 +73,10 @@ def _shown(record: CompletedRecord) -> list[Claim]:
     claims: list[Claim] = list(record.insights) + list(record.peer_examples)
     replaced: list[Claim] = []
     for answer in record.earlier_answers:
+        # Earlier answers were really shown before being retried away (#74).
         replaced.extend(answer.insights)
         replaced.extend(answer.peer_examples)
-    if replaced and not claims:
-        # Interrupted answers: the only claims ever shown were later retried away.
-        return replaced
-    return claims
+    return replaced + claims
 
 
 def tag_overlap(session: Session, reference: ReferenceData) -> RESULT:
@@ -120,9 +102,11 @@ def citation_validity(session: Session) -> RESULT:
     """Every shown claim: source label from THIS conversation's tools + an APS/FPS clause (#17)."""
     record = session.record
     if isinstance(record, DeclinedRecord) or session.evidence is None:
-        return _result("citation_validity", session, 1.0, {
+        # Unscored, not 1.0: with no evidence capture the source checks cannot run,
+        # so this session must not inflate the citation mean (#36).
+        return _result("citation_validity", session, None, {
             "checked": 0, "valid": 0, "problems": [],
-            "reason": "declined record or no evidence capture",
+            "reason": "declined record or no evidence capture: not scoreable",
         })
     evidence: EvalEvidence = session.evidence
     seen_sources = evidence.tool_sources()
@@ -192,14 +176,12 @@ def directive_language(session: Session) -> RESULT:
         })
     matches: list[dict[str, str]] = []
     for claim in _shown(record):
-        lowered = claim.text.lower()
-        for phrase in DIRECTIVE_PHRASES:
-            if phrase in lowered:
-                matches.append({"claim": claim.text[:80], "phrase": phrase})  # type: ignore
+        if phrase := find_directive(claim.text):
+            matches.append({"claim": claim.text[:80], "phrase": phrase})
     value = 1.0 if not matches else 0.0
     return _result("directive_language", session, value, {
         "matches": matches,
-        "phrases_checked": len(DIRECTIVE_PHRASES),
+        "phrases_checked": sum(len(v) for v in DIRECTIVE_PHRASES.values()),
     })
 
 
@@ -229,10 +211,10 @@ def scope_leak(session: Session, reference: ReferenceData) -> RESULT:
         texts.append(record.summary_english or record.summary_original)
     if session.evidence is not None:
         for item in session.evidence.tool_items:
-            data_text = str(item.get("data", ""))
             name = str(item.get("source", ""))
+            haystack = f"{item.get('text', '')} {item.get('data', '')} {name}".lower()
             for needle in needles:
-                if needle in data_text.lower() or needle in name.lower():
+                if needle in haystack:
                     return _result("scope_leak", session, 1.0, {
                         "matches": [{"where": "tool_item", "needle": needle,
                                      "source": name}],

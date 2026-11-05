@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 from pathlib import Path
 from typing import Any
 
@@ -66,6 +67,7 @@ def _forbidden_needles(
     scenario: dict[str, Any],
     scenarios: list[dict[str, Any]],
 ) -> list[str]:
+    own_note = str(scenario.get("profile_note") or "").lower()
     needles: list[str] = []
     for other in scenarios:
         if str(other.get("id")) == str(scenario.get("id")):
@@ -73,7 +75,9 @@ def _forbidden_needles(
         needles.append(str(other.get("producer_id")))
         for fragment in str(other.get("profile_note") or "").split(","):
             head = fragment.split(".")[0].strip()
-            if len(head) >= 4:
+            if len(head) >= 4 and head.lower() not in own_note:
+                # Attributes the current producer's own profile shares (e.g. a school
+                # name) are not leaks of the other producers' data (#36).
                 needles.append(head)
     return needles
 
@@ -93,16 +97,30 @@ def distinctness_violation(
         record = session.record
         if getattr(record, "insights", None) is None:
             return set()
+        # source label -> tool-item kind from captured evidence (#36: classify by the
+        # data tools' source contract rather than the synthetic test prefixes alone)
+        kinds: dict[str, str] = {}
+        if session.evidence is not None:
+            for item in session.evidence.tool_items:
+                item_source = str(item.get("source") or "")
+                if item_source:
+                    kinds[item_source] = str(item.get("kind") or "")
         labels: set[str] = set()
         for claim in list(record.insights) + list(record.peer_examples):
             citation = claim.citation
             labels.add(f"clause:{citation.standard_clause}")
-            if citation.source.startswith("peer-project:"):
-                labels.add(f"peer:{citation.source}")
-            elif citation.source.startswith("regional:"):
-                labels.add(f"regional:{citation.source}")
-            # own-record sources (`producer-record:`) are left out: they always
-            # differ across producers, so they cannot signal distinct answers.
+            source = citation.source
+            kind = kinds.get(source, "")
+            if kind == "peer" or source.startswith("peer-project:"):
+                # Real peer labels: `Premium project, <organization> [<catalog_id>]` —
+                # the bracketed id is the stable identifier; synthetic test labels
+                # (`peer-project:P-…`) keep the full source string.
+                match = re.search(r"\[([^]]+)\]\s*$", source)
+                labels.add(f"peer:{match.group(1) if match else source}")
+            elif kind == "regional" or source.startswith("regional:"):
+                labels.add(f"regional:{source}")
+            # every other kind (producer record / standards) is producer-specific or
+            # shared by design — it cannot signal copied answers.
         return labels
 
     left, right = _cited(session_a), _cited(session_b)
@@ -134,16 +152,40 @@ def build_dataset(
     return entries
 
 
-def summarize(results: list[dict[str, Any]], distinctness: dict[str, Any]) -> dict[str, Any]:
-    """Report summary (#36 spec: the one-report means and rates)."""
+def human_tag_agreement(
+    sessions_by_scenario: dict[str, Session],
+    references: dict[str, ReferenceData],
+) -> float | None:
+    """Human-human tag agreement (spec 36 report bullet: shown next to mean tag
+    overlap): the mean Jaccard between the human reference labels and each
+    reviewer's corrected tags, over the sessions a reviewer has marked.
+
+    A session whose record carries no reviewer tags is excluded, not a 0 —
+    with no marked sessions at all the agreement is None."""
+    values = []
+    for scenario_id, session in sorted(sessions_by_scenario.items()):
+        reviewer_tags = getattr(session.record, "reviewer_tags", None) or []
+        if not reviewer_tags:
+            continue
+        values.append(jaccard(reviewer_tags, references[scenario_id].reference_tags))
+    return sum(values) / len(values) if values else None
+
+
+def summarize(results: list[dict[str, Any]], distinctness: dict[str, Any],
+              human_tag_agreement: float | None = None) -> dict[str, Any]:
+    """Report summary (#36 spec: the one-report means and rates; the human-human
+    agreement rides next to mean_tag_overlap per the spec's report bullets)."""
     def mean(evaluator_id: str) -> float | None:
-        values = [r["value"] for r in results if r["evaluator_id"] == evaluator_id]
+        # None (unscored — e.g. no evidence capture) is excluded, not a 0 (#36).
+        values = [r["value"] for r in results
+                  if r["evaluator_id"] == evaluator_id and r["value"] is not None]
         return sum(values) / len(values) if values else None
 
     pairs_checked = distinctness.get("pairs_checked", 0)
     violations = distinctness.get("violations", [])
     return {
         "mean_tag_overlap": mean("tag_overlap"),
+        "human_tag_agreement": human_tag_agreement,
         "citation_validity": mean("citation_validity"),
         "answer_completeness": mean("answer_completeness"),
         "directive_language_violations": sum(
@@ -154,6 +196,7 @@ def summarize(results: list[dict[str, Any]], distinctness: dict[str, Any]) -> di
             (pairs_checked - len(violations)) / pairs_checked) if pairs_checked else None,
         "scope_leak_count": sum(
             1 for r in results if r["evaluator_id"] == "scope_leak" and r["value"] != 0.0),
+        "pairs_awaiting_reviewer_marks": len(distinctness.get("marks_pending", [])),
     }
 
 
@@ -218,6 +261,12 @@ def run_offline(
     outcomes: list[dict[str, Any]] = []
     for scenario, session in sessions:
         reference = references[str(scenario["id"])]
+        if isinstance(session.record, DeclinedRecord):
+            # The declined path has no shown answer: feeding it to the evaluators
+            # distorts every mean with a degenerate row, so it gets outcome checks
+            # only (#36).
+            outcomes.extend(outcome_checks(scenario, session.record))
+            continue
         results.extend(runner_fn(session, reference, judge))
         outcomes.extend(outcome_checks(scenario, session.record))
     sessions_by_scenario = {str(scenario["id"]): session
@@ -228,7 +277,9 @@ def run_offline(
     return {
         "results": results,
         "failures": failures,
-        "summary": summarize(results, distinctness),
+        "summary": summarize(
+            results, distinctness,
+            human_tag_agreement=human_tag_agreement(sessions_by_scenario, references)),
         "outcomes": outcomes,
         "distinctness": distinctness,
     }
@@ -308,19 +359,30 @@ def build_distinctness(
     sessions_by_scenario: dict[str, Session],
     contrast_config: dict[str, Any],
 ) -> dict[str, Any]:
-    """The distinctness block: checked rows, violations, and side-by-side answers."""
+    """The distinctness block: checked rows, violations, side-by-side answers,
+    and the reviewer marks wiring (spec 36: a human marks each pair 'tailored'
+    or 'generic'; a generic mark is itself a violation, and pairs still awaiting
+    a mark are listed in marks_pending rather than counted as violations)."""
     rows = distinctness_pairs(
         sessions_by_scenario, pairs=list(contrast_config.get("pairs") or []))
-    violations = [
-        (f"{row['a']} vs {row['b']} (unchecked: missing {', '.join(row['missing'])})")
-        if row["missing"] else f"{row['a']} vs {row['b']}"
-        for row in rows if row["missing"] or row["violation"]
-    ]
+    marks = dict(contrast_config.get("reviewer_marks") or {})
+    violations: list[str] = []
+    for row in rows:
+        key = f"{row['a']} vs {row['b']}"
+        if marks.get(f"{row['a']}|{row['b']}") == "generic":
+            violations.append(f"{key} (reviewer marked generic)")
+        elif row["missing"]:
+            violations.append(
+                f"{key} (unchecked: missing {', '.join(row['missing'])})")
+        elif row["violation"]:
+            violations.append(key)
     return {
         "pairs_checked": len(rows),
         "violations": violations,
-        "pair_answers": pair_answers(sessions_by_scenario, rows,
-                                     dict(contrast_config.get("reviewer_marks") or {})),
+        "marks_pending": [f"{row['a']} vs {row['b']}" for row in rows
+                          if marks.get(f"{row['a']}|{row['b']}") not
+                          in ("tailored", "generic")],
+        "pair_answers": pair_answers(sessions_by_scenario, rows, marks),
     }
 
 
@@ -342,8 +404,9 @@ def write_report(report: dict[str, Any], results_dir: Path = RESULTS_DIR) -> lis
         lines.append(f"- outcome {check['scenario_id']} {check['field']}: "
                      f"expected {check['expected']}, got {check['actual']} [{mark}]")
     for result in report["results"]:
-        lines.append(
-            f"- {result['evaluator_id']} {result['session_id']}: {result['value']:.2f}")
+        value = result["value"]
+        shown = "n/a" if value is None else f"{value:.2f}"
+        lines.append(f"- {result['evaluator_id']} {result['session_id']}: {shown}")
     distinct = report["distinctness"]
     lines.append(f"- distinctness: {distinct['pairs_checked']} checked, "
                  f"{len(distinct['violations'])} violations")
@@ -413,7 +476,8 @@ def main() -> None:
     report = {
         "results": results,
         "failures": failures,
-        "summary": summarize(results, distinctness),
+        "summary": summarize(results, distinctness,
+                             human_tag_agreement(sessions_by_scenario, references)),
         "outcomes": outcomes,
         "distinctness": distinctness,
     }

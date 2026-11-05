@@ -4,8 +4,8 @@ on-demand AgentCore Evaluations runner.
 
 Spec: docs/specs/36-eval-harness.md.
 """
+from fex.tone import DIRECTIVE_PHRASES  # one shared phrase list with the agent (#17/#36)
 from fx_evals.evaluators import (
-    DIRECTIVE_PHRASES,
     RESULT,
     TAG_OVERLAP_TARGET,
     Registry,
