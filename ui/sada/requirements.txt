@@ -1,0 +1,6 @@
+# Runtime packages for the PoC UI. Versions match uv.lock; keep them in step with pyproject.toml.
+boto3==1.43.124
+django==6.1.3
+gunicorn==26.2.0
+python-dotenv==1.2.4
+whitenoise==6.12.0
