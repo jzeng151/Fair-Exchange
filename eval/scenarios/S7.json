@@ -1,0 +1,27 @@
+{
+  "scenario_id": "S7",
+  "title": "Ecuadorian banana grower, drying irrigation canal (English) — contrast partner of S1",
+  "producer_id": "1978416593265821B2A50DA5DEDF4B9D",
+  "language": "en",
+  "profile_note": "Sample producer: bananas, El Oro, Ecuador. Same challenge tags as S1 (climate and weather, water) but a different crop and region; used to check the agent keeps distinct producers distinct.",
+  "turns": [
+    {"message": "The irrigation canal that feeds our banana plots has been drying up, and the bunches are failing before they ripen.", "expect_step": "intake"},
+    {"message": "It has been getting worse for two years. We pump water from a river now, but the level keeps dropping and the fuel costs are high.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
+    {"action": {"name": "set_feedback", "args": {"value": "yes"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
+  ],
+  "intake_replies": [
+    "We also try to time planting with the rains, but the rains have become unpredictable."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal",
+    "evidence": "full",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["climate and weather", "water"],
+    "out_of_scope": false
+  }
+}

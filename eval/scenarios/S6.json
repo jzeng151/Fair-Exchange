@@ -1,0 +1,27 @@
+{
+  "scenario_id": "S6",
+  "title": "Nicaraguan coffee producer, asks certification status (out of scope) then a labor challenge (English)",
+  "producer_id": "0EE8D264D111FB5D78D7A4295495AAE1",
+  "language": "en",
+  "profile_note": "Sample producer: coffee, 1st Grade, Jinotega, Nicaragua. The first message asks for certification status, an out-of-scope request (the out_of_scope_certification_status copy). The #21 detector is 'Not decided' and defaults to always_in_scope, so until it lands the runner checks only the in-scope labor challenge that follows.",
+  "turns": [
+    {"message": "Before we start, are we Fair Trade certified yet? I'd like to know our status.", "expect_step": "intake"},
+    {"message": "Anyway, our real problem is that we can't find enough pickers at harvest. Young people keep leaving for the city and the coffee is left on the trees.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
+    {"action": {"name": "set_feedback", "args": {"value": "somewhat"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
+  ],
+  "intake_replies": [
+    "We tried offering a small harvest bonus, but not many stayed."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal",
+    "evidence": "full",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["labor and migration"],
+    "out_of_scope": true
+  }
+}

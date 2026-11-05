@@ -1,0 +1,28 @@
+{
+  "scenario_id": "S4",
+  "title": "Honduran coffee producer, soil erosion, declines storage (Spanish)",
+  "producer_id": "CED2DEE8ED99922FA5C6244DEF177AF3",
+  "language": "es",
+  "profile_note": "Sample producer: coffee, 1st Grade, La Paz, Honduras. Has regional data, survey facts and peer examples, so the answer has full evidence before the producer declines.",
+  "turns": [
+    {"message": "Con las lluvias fuertes se nos está lavando la tierra de las parcelas en ladera. Cada año hay menos suelo bueno.", "expect_step": "intake"},
+    {"message": "Lo notamos desde hace unos tres años. En algunas parcelas ya se ven las raíces. Hicimos unas barreras con piedras, pero no en todas.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
+    {"message": "¿Qué quiere decir exactamente que guarden mi resumen?", "expect_step": "feedback"},
+    {"action": {"name": "set_consent", "args": {"scope": "declined"}}, "expect_step": "consent"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
+  ],
+  "intake_replies": [
+    "En la parte más alta del cerro ya casi no queda tierra para sembrar."
+  ],
+  "expected": {
+    "record_status": "declined",
+    "consent_scope": "declined",
+    "evidence": "full",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["soil and land"],
+    "out_of_scope": false
+  }
+}

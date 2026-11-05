@@ -1,0 +1,28 @@
+{
+  "scenario_id": "S1",
+  "title": "Colombian coffee smallholder, two dry seasons (English)",
+  "producer_id": "CFC19603C1B7B29C017954FD1DB2D620",
+  "language": "en",
+  "profile_note": "Sample producer: coffee, 1st Grade cooperative, Cauca, Colombia. Regional data and peer examples exist, so the answer has full evidence.",
+  "turns": [
+    {"message": "It hasn't rained like it used to. We've had two seasons of very irregular rain and last year's coffee harvest dropped a lot.", "expect_step": "intake"},
+    {"message": "It started at the end of 2024. We lost about a third of the crop. Some of us planted more shade trees in the coffee, but it wasn't enough.", "expect_step": "playback"},
+    {"action": {"name": "correct_playback", "args": {"text": "It wasn't a third, it was almost half the harvest."}}, "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
+    {"action": {"name": "set_feedback", "args": {"value": "yes"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
+  ],
+  "intake_replies": [
+    "We tried planting more shade trees and saving water in tanks, but the rain just did not come."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal",
+    "evidence": "full",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["climate and weather", "water"],
+    "out_of_scope": false
+  }
+}
