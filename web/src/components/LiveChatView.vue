@@ -2,7 +2,7 @@
 // Live mode (#116): the producer chat against the REAL chat API (routes and stream: #25 spec).
 // Everything FEX says comes from the agent; this view only renders events and sends the producer's
 // words and button choices. The scripted demo (ChatView.vue) is untouched and stays the default.
-import { computed, nextTick, onBeforeUnmount, reactive, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import AttachInput from './AttachInput.vue'
 import FexMark from './FexMark.vue'
 import VoiceInput from './VoiceInput.vue'
@@ -45,6 +45,8 @@ const player = createListenPlayer({
 const listenKey = (i: number) => `${view.conversationId}:${i}`
 function listen(i: number, text: string) { player.toggle(listenKey(i), text, view.language) }
 onBeforeUnmount(() => player.stop())
+// App.vue hides this view with v-show rather than unmounting it, so leaving the live chat stops Listen too.
+watch(() => props.active, (now) => { if (now === false) player.stop() })
 const correcting = ref(false)
 const changingConsent = ref(false) // feedback step: the consent choice collapses to one line until 'Change'
 const changingFeedback = ref(false) // once answered, the feedback question collapses to one line until 'Change'

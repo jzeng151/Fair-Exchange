@@ -386,6 +386,25 @@ describe('LiveChatView: Listen and attachments (#169)', () => {
     expect(w.findAll('[data-action="listen"]')).toHaveLength(1) // FEX's words only, not the producer's
   })
 
+  it('stops Listen when the producer leaves the live chat, even before the audio arrives', async () => {
+    const fake = fakeClient()
+    let arrive: (b: Blob) => void = () => {}
+    const speak = vi.fn(() => new Promise<Blob>((resolve) => { arrive = resolve }))
+    const w = mount(LiveChatView, { props: { apiUrl: 'http://api.test', active: true, makeClient: () => fake.client,
+      makeSpeech: () => ({ speak }) } })
+    await w.get('[data-scenario="S1"]').trigger('click')
+    await flushPromises()
+    await w.get('.msg.agent + [data-action="listen"]').trigger('click')
+    await flushPromises()
+    expect(w.get('[data-action="listen"]').attributes('aria-pressed')).toBe('true')
+    await w.setProps({ active: false }) // App.vue hides the view with v-show, it is not unmounted
+    await flushPromises()
+    expect(w.get('[data-action="listen"]').attributes('aria-pressed')).toBe('false')
+    arrive(new Blob(['mp3'], { type: 'audio/mpeg' })) // a late reply must not start playing
+    await flushPromises()
+    expect(w.get('[data-action="listen"]').attributes('aria-pressed')).toBe('false')
+  })
+
   it("puts an attachment's description in the message box without sending it", async () => {
     const fake = fakeClient()
     const w = mount(LiveChatView, { props: { apiUrl: 'http://api.test', makeClient: () => fake.client } })
