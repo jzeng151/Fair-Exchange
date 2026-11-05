@@ -6,6 +6,7 @@ so it can be reviewed once (tone: enablement, never directive). Unknown language
 
 COPY = {
     "en": {
+        "scope_unavailable": "I couldn't check whether I can help with that message. Please try sending it again.",
         "out_of_scope_other_producer_data": "I can't share another producer's records or conversations; each producer's information stays theirs.",
         "out_of_scope_certification_status": "I can't help with certification status or audit results; that isn't part of what I do.",
         "out_of_scope_grievance": "I'm not the right channel for complaints or grievances, so I can't take this here.",
@@ -20,6 +21,7 @@ COPY = {
         "invalid": "That option isn't available right now.",
     },
     "es": {
+        "scope_unavailable": "No pude comprobar si puedo ayudar con ese mensaje. Intente enviarlo de nuevo.",
         "out_of_scope_other_producer_data": "No puedo compartir registros ni conversaciones de otros productores; la información de cada productor es suya.",
         "out_of_scope_certification_status": "No puedo ayudar con el estado de la certificación ni con resultados de auditoría; eso no es parte de lo que hago.",
         "out_of_scope_grievance": "No soy el canal adecuado para quejas o reclamos, así que no puedo recibirlo aquí.",
@@ -34,6 +36,7 @@ COPY = {
         "invalid": "Esa opción no está disponible ahora.",
     },
     "fr": {
+        "scope_unavailable": "Je n'ai pas pu vérifier si je peux vous aider avec ce message. Veuillez le renvoyer.",
         "out_of_scope_other_producer_data": "Je ne peux pas partager les dossiers ou les conversations d'autres producteurs ; les informations de chaque producteur lui appartiennent.",
         "out_of_scope_certification_status": "Je ne peux pas aider pour le statut de certification ou les résultats d'audit ; cela ne fait pas partie de mon rôle.",
         "out_of_scope_grievance": "Je ne suis pas le bon canal pour les plaintes ou réclamations, je ne peux donc pas les recevoir ici.",

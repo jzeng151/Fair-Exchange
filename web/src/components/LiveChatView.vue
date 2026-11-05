@@ -4,6 +4,7 @@
 // words and button choices. The scripted demo (ChatView.vue) is untouched and stays the default.
 import { computed, nextTick, reactive, ref } from 'vue'
 import FexMark from './FexMark.vue'
+import VoiceInput from './VoiceInput.vue'
 import { copyFor } from '../data/liveCopy'
 import { languageName, liveProducers } from '../data/liveProducers'
 import { createLiveClient, LiveError } from '../lib/liveClient'
@@ -11,13 +12,21 @@ import { apply, beginTurn, fromResume, newView, said } from '../lib/liveView'
 import type { ActionName, LiveClient, StreamEvent } from '../lib/liveClient'
 import type { Item, LiveView } from '../lib/liveView'
 
-const props = defineProps<{ apiUrl: string; makeClient?: (producerId: string) => LiveClient }>()
+const props = defineProps<{ apiUrl: string; active?: boolean; makeClient?: (producerId: string) => LiveClient }>()
 
 const producerId = ref<string | null>(null)
+// The picked card. Two scenarios can share a producer (S5 and S7, #35), so the card, not the producer, is the key.
+const scenarioId = ref<string | null>(null)
 const view = reactive<LiveView>(newView())
 const input = ref('')
+const voiceEnglish = ref('')
+function receiveTranscript(text: string, english?: string) {
+  input.value = [input.value.trim(), text].filter(Boolean).join('\n')
+  voiceEnglish.value = english ?? ''
+}
 const correcting = ref(false)
 const changingConsent = ref(false) // feedback step: the consent choice collapses to one line until 'Change'
+const changingFeedback = ref(false) // once answered, the feedback question collapses to one line until 'Change'
 const scroller = ref<HTMLElement | null>(null)
 let client: LiveClient | null = null
 // Bumped whenever the producer changes: a turn started for an earlier producer stops applying events
@@ -40,9 +49,9 @@ const t = computed(() => copyFor(view.language))
 const can = (a: ActionName) => view.allowed.includes(a)
 const closed = computed(() => view.step === 'closed')
 const canType = computed(() => !!view.conversationId && !closed.value && !view.busy)
-const producer = computed(() => liveProducers.find((p) => p.id === producerId.value))
+const producer = computed(() => liveProducers.find((p) => p.scenarioId === scenarioId.value))
 
-// Remember the last conversation per producer in this tab, so a reload resumes it (per-viewer convenience only).
+// Remember the last conversation per scenario card in this tab, so a reload resumes it (per-viewer convenience only).
 const KEY = (id: string) => `fex.live.${id}`
 function remember(id: string, conversationId: string | null) {
   try { conversationId ? sessionStorage.setItem(KEY(id), conversationId) : sessionStorage.removeItem(KEY(id)) } catch { /* storage unavailable */ }
@@ -51,7 +60,7 @@ function recall(id: string): string | null {
   try { return sessionStorage.getItem(KEY(id)) } catch { return null }
 }
 
-function reset(next = newView()) { Object.assign(view, next) }
+function reset(next = newView()) { Object.assign(view, next); input.value = ''; voiceEnglish.value = '' }
 async function scrollDown() {
   await nextTick()
   if (scroller.value) scroller.value.scrollTop = scroller.value.scrollHeight
@@ -67,21 +76,24 @@ function errorText(err: unknown): string {
   return t.value.errors.other
 }
 
-/** One turn: send, then render each event as it arrives. Errors become a notice in the transcript. */
-async function turn(events: () => AsyncGenerator<StreamEvent>) {
+/** One turn: send, then render each event as it arrives. Errors become a notice in the transcript.
+ *  Returns true only if the turn finished without an error and the producer did not change. */
+async function turn(events: () => AsyncGenerator<StreamEvent>): Promise<boolean> {
   const mine = session
-  const owner = producerId.value
+  const owner = scenarioId.value
   beginTurn(view)
   try {
     for await (const e of events()) {
-      if (mine !== session) return // the producer changed: stop reading this stream
+      if (mine !== session) return false // the producer changed: stop reading this stream
       apply(view, e)
       await scrollDown()
     }
+    return !view.error
   } catch (err) {
-    if (mine !== session) return
+    if (mine !== session) return false
     view.items.push({ kind: 'notice', tone: 'error', text: errorText(err) })
     if (err instanceof LiveError && err.status === 404 && owner) remember(owner, null)
+    return false
   } finally {
     if (mine === session) {
       view.busy = false
@@ -91,15 +103,19 @@ async function turn(events: () => AsyncGenerator<StreamEvent>) {
   }
 }
 
-async function pick(id: string) {
+async function pick(scenario: string) {
+  const card = liveProducers.find((p) => p.scenarioId === scenario)
+  if (!card) return
+  const id = card.id
   const mine = ++session
   producerId.value = id
+  scenarioId.value = scenario
   resumeFailed.value = null
   savePasscode()
   client = props.makeClient
     ? props.makeClient(id)
     : createLiveClient({ baseUrl: props.apiUrl, producerId: id, passcode: passcode.value.trim() })
-  const saved = recall(id)
+  const saved = recall(scenario)
   if (saved) {
     try {
       const resumed = await client.resume(saved)
@@ -115,7 +131,7 @@ async function pick(id: string) {
         view.items.push({ kind: 'notice', tone: 'error', text: errorText(err) })
         return
       }
-      remember(id, null) // the server says it is gone
+      remember(scenario, null) // the server says it is gone
     }
   }
   await startNew()
@@ -133,6 +149,7 @@ async function send() {
   const text = input.value.trim()
   if (!text || !canType.value || !client || !view.conversationId) return
   input.value = ''
+  voiceEnglish.value = ''
   correcting.value = false
   said(view, text)
   const id = view.conversationId
@@ -144,7 +161,10 @@ async function act(action: ActionName, args: Record<string, unknown> = {}) {
   if (action === 'end' && !window.confirm(t.value.endConfirm)) return
   const id = view.conversationId
   if (action === 'set_consent') changingConsent.value = false
-  await turn(() => client!.action(id, action, args))
+  if (action === 'set_feedback') changingFeedback.value = false
+  const ok = await turn(() => client!.action(id, action, args))
+  // The agent keeps the feedback step open so a misclick can be fixed (#23); show the answer as given.
+  if (action === 'set_feedback' && ok) view.feedback = args.value as LiveView['feedback']
 }
 const currentConsent = computed(() => view.consent)
 
@@ -152,6 +172,7 @@ function back() {
   session++
   resumeFailed.value = null
   producerId.value = null
+  scenarioId.value = null
   client = null
   reset()
 }
@@ -187,7 +208,7 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
       <h1>Choose a demo scenario</h1>
       <p class="small">Each card is an official demo scenario (<code>eval/scenarios/</code>): a sample producer and the messages to send.</p>
       <div class="picker-cards">
-        <button v-for="p in liveProducers" :key="p.scenarioId" class="picker-card" :data-producer="p.id" :data-scenario="p.scenarioId" @click="pick(p.id)">
+        <button v-for="p in liveProducers" :key="p.scenarioId" class="picker-card" :data-producer="p.id" :data-scenario="p.scenarioId" @click="pick(p.scenarioId)">
           <span class="flag" aria-hidden="true">{{ p.flag }}</span>
           <strong>{{ p.title }}</strong>
           <span class="label neutral">{{ languageName[p.language] ?? p.language }}</span>
@@ -226,7 +247,7 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
 
         <div v-if="resumeFailed" class="live-actions">
           <div class="btn-row">
-            <button class="btn-primary" data-action="retry-resume" @click="pick(producerId!)">{{ t.retry }}</button>
+            <button class="btn-primary" data-action="retry-resume" @click="pick(scenarioId!)">{{ t.retry }}</button>
             <button class="btn-text" @click="startNew">{{ t.start }}</button>
           </div>
         </div>
@@ -250,12 +271,17 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
             <template v-else>{{ t.consentAsk }}</template>
             <button class="btn-text inline" data-action="change-consent" @click="changingConsent = true">{{ t.change }}</button>
           </p>
-          <div v-if="can('set_feedback')" class="choice">
+          <div v-if="can('set_feedback') && (!view.feedback || changingFeedback)" class="choice">
             <p>{{ t.feedbackAsk }}</p>
             <div class="btn-row">
-              <button v-for="f in feedbackChoices" :key="f" class="btn-default" :data-feedback="f" @click="act('set_feedback', { value: f })">{{ t.feedback[f] }}</button>
+              <button v-for="f in feedbackChoices" :key="f" class="btn-default" :data-feedback="f"
+                :aria-pressed="view.feedback === f" @click="act('set_feedback', { value: f })">{{ t.feedback[f] }}</button>
             </div>
           </div>
+          <p v-else-if="can('set_feedback') && view.feedback" class="small feedback-line">
+            {{ t.feedbackThanks }} {{ t.yourAnswer }}: {{ t.feedback[view.feedback] }}
+            <button class="btn-text inline" data-action="change-feedback" @click="changingFeedback = true">{{ t.change }}</button>
+          </p>
           <div class="btn-row secondary">
             <button v-if="can('reopen_playback')" class="btn-text" data-action="reopen_playback" @click="act('reopen_playback')">{{ t.reopen }}</button>
             <button v-if="can('end')" class="btn-text" data-action="end" @click="act('end')">
@@ -265,9 +291,13 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
           </div>
         </div>
 
+        <VoiceInput v-if="view.conversationId && producerId" :key="view.conversationId"
+          :api-url="apiUrl" :conversation-id="view.conversationId" :producer-id="producerId" :passcode="passcode.trim()"
+          :language="view.language" :disabled="!canType || active === false" @transcript="receiveTranscript" />
+        <p v-if="voiceEnglish" class="small" lang="en">English translation of the recording: {{ voiceEnglish }}</p>
         <form class="composer" @submit.prevent="send">
           <label class="sr-only" for="live-msg">Message</label>
-          <input id="live-msg" v-model="input" :placeholder="correcting ? t.correctPlaceholder : t.placeholder" :disabled="!canType" autocomplete="off" />
+          <textarea rows="2" id="live-msg" v-model="input" :placeholder="correcting ? t.correctPlaceholder : t.placeholder" :disabled="!canType" autocomplete="off"></textarea>
           <button class="btn-primary" :disabled="!canType || !input.trim()">{{ t.send }}</button>
         </form>
       </section>

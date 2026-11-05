@@ -142,6 +142,11 @@ export async function streamTurn(
   let doneSent = false;
   try {
     for await (const event of boundedStream(deps, request)) {
+      if (request.kind !== 'start' && event.type === 'step' && typeof event.language === 'string'
+        && ['en', 'es', 'fr'].includes(event.language) && event.language !== conversation.language) {
+        await deps.store.setLanguage?.(conversation.conversationId, lease.token, event.language);
+        conversation.language = event.language;
+      }
       writeEvent(sink, event);
       if (event.type === 'done') doneSent = true;
       if (event.type === 'step' && event.step === 'closed') {

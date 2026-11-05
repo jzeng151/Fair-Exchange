@@ -146,6 +146,11 @@ step "9/10 Uploading the producer data to the data bucket (#7, #14; Glue tables 
 data_bucket="$(output FairExchange DataBucketName)"
 (cd "$repo/data" && uv run --quiet python -m fx_data.export "$build/data")
 aws s3 sync --only-show-errors --delete "$build/data/" "s3://$data_bucket/"
+if [[ "$sync_key" == arn:aws:kms:* ]]; then
+  records_bucket="$(output FairExchangeAthenaSync RecordsBucketName)"
+  (cd "$repo/agent" && uv run --quiet python scripts/load_seeded_records.py \
+    --bucket "$records_bucket" --region "$AWS_REGION")
+fi
 
 step "10/10 Building and publishing the website (live mode uses the chat API), then smoke tests"
 api_url="$(output FairExchange ApiUrl)"
@@ -160,6 +165,7 @@ kb_id="$(output FairExchange StandardsKnowledgeBaseId)"
 if [[ "$sync_key" == arn:aws:kms:* ]]; then
   admin_secret="$(output FairExchange AdminPasscodeSecretArn)"
   python3 "$repo/scripts/e2e/analytics_smoke.py" --api "$api_url" --admin-secret-arn "$admin_secret"
+  (cd "$repo/agent" && uv run --quiet python ../scripts/e2e/records_smoke.py)
 fi
 
 echo
@@ -173,4 +179,9 @@ admin_secret="$(output FairExchange AdminPasscodeSecretArn)"
 if [[ "$admin_secret" == arn:* ]]; then
   echo "Admin passcode (analytics):"
   echo "  aws secretsmanager get-secret-value --secret-id $admin_secret --query SecretString --output text"
+fi
+reviewer_secret="$(output FairExchange ReviewerPasscodeSecretArn)"
+if [[ "$reviewer_secret" == arn:* ]]; then
+  echo "Reviewer passcode (record review):"
+  echo "  aws secretsmanager get-secret-value --secret-id $reviewer_secret --query SecretString --output text"
 fi

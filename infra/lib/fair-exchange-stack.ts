@@ -141,6 +141,7 @@ export class FairExchangeStack extends Stack {
     // The chat API (#25) with the sandbox sign-in stand-in (#11). CORS allows only the website.
     new FexChatApi(this, 'ChatApi', {
       conversations: tables.conversations,
+      records: tables.records,
       runtimeArn: agent.runtime.attrAgentRuntimeArn,
       allowedOrigin: `https://${distribution.distributionDomainName}`,
       inactivityMinutes: INACTIVITY_MINUTES,

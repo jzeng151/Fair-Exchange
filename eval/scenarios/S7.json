@@ -1,0 +1,27 @@
+{
+  "scenario_id": "S7",
+  "title": "Côte d'Ivoire cocoa cooperative, a longer dry season (English), contrast partner of S1",
+  "producer_id": "SYN-005",
+  "language": "en",
+  "profile_note": "Synthetic producer (#7): cocoa cooperative, Bas-Sassandra, Côte d'Ivoire (the same producer as S5), with agroforestry and drought-tolerant seedling projects. Same challenge tags as S1 (climate and weather, water) but a different crop, region and entity type: contrast pair C1, used to check the agent keeps distinct producers distinct.",
+  "turns": [
+    {"message": "The dry season has become longer and the rains come late. Our members' cocoa trees are dropping their flowers and young pods.", "expect_step": "intake"},
+    {"message": "It has been getting worse for two years. The streams our members use to water the seedling nursery dry up early. We started planting shade trees between the cocoa, but the young trees are struggling too.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
+    {"action": {"name": "set_feedback", "args": {"value": "yes"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
+  ],
+  "intake_replies": [
+    "We also raise drought-tolerant seedlings, but the nursery needs water we often don't have."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal",
+    "evidence": "full",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["climate and weather", "water"],
+    "out_of_scope": false
+  }
+}

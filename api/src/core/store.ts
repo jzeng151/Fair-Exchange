@@ -23,6 +23,7 @@ const toConversation = (item: Item): Conversation => ({
   lastActivityAt: Number(item.last_activity_at!.N),
   lockExpiresAt: item.lock_expires_at ? Number(item.lock_expires_at.N) : undefined,
   lockToken: item.lock_token?.S,
+  language: item.language?.S,
 });
 
 const num = (n: number): AttributeValue => ({ N: String(n) });
@@ -134,6 +135,13 @@ export class DynamoConversationStore implements ConversationStore {
       if (err instanceof ConditionalCheckFailedException) return;
       throw err;
     }
+  }
+
+  async setLanguage(conversationId: string, token: string, language: string): Promise<void> {
+    await this.client.send(new UpdateItemCommand({ TableName: this.table,
+      Key: { conversation_id: { S: conversationId } }, UpdateExpression: 'SET #lang = :lang',
+      ConditionExpression: 'lock_token = :token', ExpressionAttributeNames: { '#lang': 'language' },
+      ExpressionAttributeValues: { ':lang': { S: language }, ':token': { S: token } } }));
   }
 
   async markClosed(conversationId: string, now: number): Promise<void> {

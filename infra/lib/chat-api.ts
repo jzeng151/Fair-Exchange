@@ -12,6 +12,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
+import { FexVoice } from './voice';
 import { RECORDS_GLUE_TABLE, RECORDS_PREFIX, SEEDED_GLUE_TABLE, SEEDED_PREFIX, SYNC_DATABASE } from './athena-sync-stack';
 
 const REPO = path.resolve(__dirname, '..', '..');
@@ -21,6 +22,7 @@ const API_DIR = path.join(REPO, 'api');
 const PRODUCER_HEADER = 'x-demo-producer-id';
 const PASSCODE_HEADER = 'x-demo-passcode';
 const ADMIN_PASSCODE_HEADER = 'x-demo-admin-passcode';
+const REVIEWER_PASSCODE_HEADER = 'x-demo-reviewer-passcode';
 
 /** The Athena side of the analytics route (#29): from the FairExchangeAthenaSync and analytics queries stacks. */
 export interface AnalyticsSource {
@@ -46,6 +48,7 @@ export function scenarioProducerIds(dir = path.join(REPO, 'eval', 'scenarios')):
 
 export interface FexChatApiProps {
   conversations: dynamodb.ITable;
+  records: dynamodb.ITable;
   runtimeArn: string;
   /** The web app's origin, e.g. https://dxxxx.cloudfront.net; the only CORS origin (#25). */
   allowedOrigin: string;
@@ -173,8 +176,8 @@ export class FexChatApi extends Construct {
       },
       defaultCorsPreflightOptions: {
         allowOrigins: [props.allowedOrigin],
-        allowMethods: ['GET', 'POST', 'OPTIONS'],
-        allowHeaders: ['content-type', PRODUCER_HEADER, PASSCODE_HEADER, ADMIN_PASSCODE_HEADER],
+        allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
+        allowHeaders: ['content-type', PRODUCER_HEADER, PASSCODE_HEADER, ADMIN_PASSCODE_HEADER, REVIEWER_PASSCODE_HEADER],
         maxAge: Duration.hours(1),
       },
     });
@@ -202,6 +205,64 @@ export class FexChatApi extends Construct {
     this.api.root.addResource('health').addMethod('GET', proxied(health));
 
     if (props.analytics) this.adminPasscode = this.addAnalytics(props, fn);
+
+    const reviewerSecret = new secretsmanager.Secret(this, 'ReviewerPasscode', {
+      description: 'Fair Exchange sandbox reviewer passcode',
+      generateSecretString: { passwordLength: 20, excludePunctuation: true, includeSpace: false },
+      encryptionKey: props.dataKey, removalPolicy: RemovalPolicy.DESTROY,
+    });
+    const sessionAuth = fn('SessionAuthorizer', 'sessionAuthorizer.ts', 'handler', {
+      timeout: Duration.seconds(10), description: 'FEX sandbox identity for producer, reviewer and admin',
+      environment: {
+        PRODUCER_SECRET_ARN: this.passcode.secretArn, REVIEWER_SECRET_ARN: reviewerSecret.secretArn,
+        ...(this.adminPasscode ? { ADMIN_SECRET_ARN: this.adminPasscode.secretArn } : {}),
+        DEMO_PRODUCER_IDS: scenarioProducerIds().join(','),
+      },
+    });
+    this.passcode.grantRead(sessionAuth);
+    reviewerSecret.grantRead(sessionAuth);
+    this.adminPasscode?.grantRead(sessionAuth);
+    const sessionAuthorizer = new apigw.RequestAuthorizer(this, 'SessionAuthorizerConfig', {
+      handler: sessionAuth,
+      // Credential headers are alternatives. With caching off, missing optional headers do not short-circuit to 401.
+      identitySources: [], resultsCacheTtl: Duration.seconds(0),
+    });
+    const session = { authorizer: sessionAuthorizer, authorizationType: apigw.AuthorizationType.CUSTOM };
+    new FexVoice(this, 'Voice', { ...props, conversationResource: one, authorization: session });
+    const recordEnv = { RECORDS_TABLE: props.records.tableName, ALLOWED_ORIGIN: props.allowedOrigin };
+    const identity = fn('Identity', 'me.ts', 'identity', {
+      timeout: Duration.seconds(10), environment: { ALLOWED_ORIGIN: props.allowedOrigin }, description: 'FEX: GET /me',
+    });
+    const mine = fn('MyRecords', 'me.ts', 'records', {
+      timeout: Duration.seconds(29), environment: recordEnv, description: 'FEX: producer-only GET /me/records',
+    });
+    const grantRecords = (f: lambda.IFunction, actions: string[]) => {
+      f.addToRolePolicy(new iam.PolicyStatement({ actions, resources: [props.records.tableArn] }));
+      props.dataKey.grantDecrypt(f);
+    };
+    grantRecords(mine, ['dynamodb:Scan']);
+    const me = this.api.root.addResource('me');
+    me.addMethod('GET', proxied(identity), session);
+    me.addResource('records').addMethod('GET', proxied(mine), session);
+    const review = {
+      list: fn('ReviewList', 'review.ts', 'list', { timeout: Duration.seconds(29), environment: recordEnv, description: 'FEX: reviewer record list' }),
+      get: fn('ReviewGet', 'review.ts', 'get', { timeout: Duration.seconds(29), environment: recordEnv, description: 'FEX: reviewer record detail' }),
+      patch: fn('ReviewPatch', 'review.ts', 'patch', { timeout: Duration.seconds(29), environment: recordEnv, description: 'FEX: reviewer corrections' }),
+      approve: fn('ReviewApprove', 'review.ts', 'approve', { timeout: Duration.seconds(29), environment: recordEnv, description: 'FEX: reviewer approval' }),
+    };
+    grantRecords(review.list, ['dynamodb:Scan']);
+    grantRecords(review.get, ['dynamodb:GetItem']);
+    for (const f of [review.patch, review.approve]) {
+      grantRecords(f, ['dynamodb:GetItem', 'dynamodb:PutItem']);
+      props.dataKey.grantEncryptDecrypt(f);
+    }
+    const records = this.api.root.addResource('records');
+    records.addMethod('GET', proxied(review.list), session);
+    const record = records.addResource('{id}');
+    record.addMethod('GET', proxied(review.get), session);
+    record.addMethod('PATCH', proxied(review.patch), session);
+    record.addResource('approve').addMethod('POST', proxied(review.approve), session);
+    new CfnOutput(Stack.of(this), 'ReviewerPasscodeSecretArn', { value: reviewerSecret.secretArn });
 
     // #25 sweep: every 15 minutes
     new events.Rule(this, 'SweepSchedule', {

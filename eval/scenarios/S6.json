@@ -1,0 +1,27 @@
+{
+  "scenario_id": "S6",
+  "title": "Côte d'Ivoire cocoa smallholder, asks certification status (out of scope) then a labor challenge (English)",
+  "producer_id": "SYN-006",
+  "language": "en",
+  "profile_note": "Synthetic producer (#7): cocoa smallholder, Goh-Djiboua, Côte d'Ivoire, with a shared pod-breaking work group. The first message asks for certification status, an out-of-scope request (the out_of_scope_certification_status copy). The #21 detector is 'Not decided' and defaults to always_in_scope, so until it lands the runner checks only the in-scope labor challenge that follows. Also the run for SYN-006 in contrast pair C3 (with SYN-003, S3).",
+  "turns": [
+    {"message": "Before we start, am I Fair Trade certified yet? I'd like to know my status.", "expect_step": "intake"},
+    {"message": "Anyway, my real problem is that I can't find enough people to help with the cocoa harvest. Young people keep leaving for the city and ripe pods are left on the trees.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
+    {"action": {"name": "set_feedback", "args": {"value": "somewhat"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
+  ],
+  "intake_replies": [
+    "I joined a shared work group for pod breaking, but there are still not enough hands at harvest."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal",
+    "evidence": "full",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["labor and migration"],
+    "out_of_scope": true
+  }
+}

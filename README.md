@@ -89,3 +89,13 @@ How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
 - [Architecture decisions](docs/adr/) and [handoff docs](docs/handoff/)
 
 The original `.docx` files from Fair Trade USA are in [`docs/requirements/source/`](docs/requirements/source/). They are the source of truth if the Markdown copies ever disagree.
+
+## Team 60
+
+The people behind the Fair Trade USA Producer Exchange Agent. Our pitch deck is here: [docs/team60-pitch.pptx](docs/team60-pitch.pptx).
+
+- Frank Yu
+- Jason Zeng
+- Sadananda Narayanappa
+- Tripat Panesar
+- Sriya Uttharkar

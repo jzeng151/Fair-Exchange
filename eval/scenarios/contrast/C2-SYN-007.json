@@ -1,0 +1,27 @@
+{
+  "scenario_id": "C2-SYN-007",
+  "title": "Ecuadorian banana farm with hired labor, falling box prices (English), contrast partner of S2",
+  "producer_id": "SYN-007",
+  "language": "en",
+  "profile_note": "Synthetic producer (#7): banana hired-labor farm, El Oro, Ecuador, with a packing station upgrade. Same challenge as S2 (market and price) but a different crop, country and entity type: the SYN-007 run for contrast pair C2.",
+  "turns": [
+    {"message": "The price buyers pay for our banana boxes has dropped this year, and we still have to pay our workers the same wages.", "expect_step": "intake"},
+    {"message": "It started after the last contract renewal. We get about a tenth less per box. We upgraded the packing station to reach export grade, but the buyers still pay less.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
+    {"action": {"name": "set_feedback", "args": {"value": "yes"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
+  ],
+  "intake_replies": [
+    "We are also looking for a second exporter, but the contracts run for a full year."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal",
+    "evidence": "full",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["market and price"],
+    "out_of_scope": false
+  }
+}

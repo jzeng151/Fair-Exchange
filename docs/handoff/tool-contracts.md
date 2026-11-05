@@ -7,7 +7,7 @@ What each FEX tool takes, returns and guarantees. Code: `agent/src/fex/tools/`. 
 The contract is owned by [`docs/specs/17-standards-grounding.md`](../specs/17-standards-grounding.md). Code: `fex.tools._contract`.
 
 - **No model-settable arguments.** Every data tool is `@tool(context=True)` with no parameters. It reads everything from `tool_context.invocation_state`, which the conversation engine builds in code: `producer_id`, `step`, `entity_type` (a playback correction), `tags`, `summary_english` and `summary_original` (the confirmed playback). A value the model adds anyway is ignored. `agent/tests/test_scope_guard.py` asserts every tool in `ALL_TOOLS` has an empty input schema.
-- **Scope.** No producer in the session: the tool returns an error (`PermissionError: No producer in session`). Location and crop come from the producer's profile (`fx_data.peers.ProducerProfiles`, a stand-in until #14 and #28).
+- **Scope.** No producer in the session: the tool returns an error (`PermissionError: No producer in session`). Location and crop come from the producer's profile (`fx_data.peers.ProducerProfiles`, from the producer table the #7 generator builds).
 - **Step gating (#13).** Outside `respond`, including when no step is set, a data tool returns `{"refused": true, "reason": "Data tools run only after the producer confirms the playback."}` instead of data.
 - **Result shape.** A list of items, each `{source, kind, text, period, strength, data}`:
   - `source`: the citable label. FEX copies it unchanged into `Citation.source`.
@@ -15,6 +15,7 @@ The contract is owned by [`docs/specs/17-standards-grounding.md`](../specs/17-st
   - `strength`: `exact`, `nearest` or `limited`. `data`: tool-specific fields.
   - Nothing found: an empty list, which leads to the limited-evidence path.
 - **Session evidence.** `run_data_tool` adds each item's `source` and `kind` (and, for standards, the clause ID) to the conversation's `SessionEvidence` as it returns them. The verifier accepts only those sources and clauses.
+- **Decision log.** Every data tool run, by the model or the backstop, logs `{kind: "tool", code: "tool_called", refs: [tool name, item IDs...]}`. The item IDs are the bracketed IDs from each `source` (the clause ID for standards), so a reviewer sees which sources the answer could cite.
 - **Backstop.** After the model's retrieval call, the engine calls any data tool the model skipped through the same `run_data_tool`, and logs `{kind: "tool", code: "tool_backstopped", refs: [tool name]}` in the decision log. Claims are written only after that, from every item returned.
 - Tests that call a tool directly get `step: "respond"` from `tests/tool_harness.call_tool` unless they pass another step (or `step=None` for none).
 
@@ -31,14 +32,15 @@ A claim passes the verifier (`fex.verifier.check_claim`) only if:
 | its text has no directive phrase (`fex.tone.DIRECTIVE_PHRASES`, English and Spanish) | `directive_language` |
 | a claim line that cannot be parsed (#18) | `malformed` |
 
-The decision log records only the codes.
+The decision log records only the codes, with the claim's bracketed source ID and clause ID as refs. A ref
+that is not an ID (`fex.models.DECISION_REF`) is left out, so model-written text never reaches the record.
 
 ## `get_producer_record()` (#14)
 
 Items with `kind: "producer_record"`, built by `fx_data.records.ProducerRecords.items`, in this order:
 
 - **Certification scope**, one item. `source` is `Your certification record [<producer_id>]`; `data` is `{"certification_scope": …}`. Certification status and audit results are never read (#21).
-- **Own Premium projects**, one item per project. `source` is `Your Premium project: <name> [<project_ref>]`; `data` is `{category, sub_category, year, amount, description}`. The sample has no amounts, so `amount` is `null`. The producer's own projects keep their real names and text; it is their own record. Placeholder rows (lorem ipsum) are left out.
+- **Own Premium projects**, one item per project. `source` is `Your Premium project: <title> [<project_id>]`; `data` is `{category, sub_category, year, amount, description}`. The sample has no amounts, so `amount` is `null`. The producer's own projects keep their real names and text; it is their own record. Placeholder rows (lorem ipsum) are left out.
 - **Survey summaries**, one item per allowlisted column with enough answers. `source` is `Your <years> survey: <column> [SV-…]`; `data` is `{column, responses}`.
 
 ```json
@@ -82,7 +84,7 @@ At most 8 items: region rows, then country, then global. It never substitutes a 
 
 ## `find_peer_examples()` (#16)
 
-Peer catalog projects (`peer_projects.json`) that share a confirmed tag, excluding the session producer's own projects:
+Peer catalog projects (the generated `peer_catalog` table, #7) that share a confirmed tag, excluding the session producer's own projects:
 
 | Matches | `strength` |
 |---|---|
@@ -124,7 +126,19 @@ Items with `kind: "standard"`: the top 5 distinct APS/FPS clauses the standards 
 |---|---|---|
 | `regional_sources.json` | `fx_data.regional fetch` (network) | when adding regions or refreshing data |
 | `regional_facts.csv` | `fx_data.regional build` (offline; validated, #8 columns) | after `fetch` |
-| `peer_projects.json`, `producer_profiles.json` | `fx_data.peers` (offline) | when the sample data changes |
-| `producer_records.json` | `fx_data.records` (offline) | when the sample data changes |
+| `generated/<table>/<table>.jsonl`: producers, Premium projects, survey responses, certifications, peer catalog | `fx_data.generator` (Comprehend for new descriptions, or `--offline`) | when the sample data or `data/generator_inputs/` change |
 
 The architecture in the [repository README](../../README.md) puts the regional table in S3 and peer search in a Knowledge Base. For the sandbox these ship as package data, like `clauses.json` (#9). Moving them to S3 or a Knowledge Base changes the loaders in `fx_data`, not the tool contracts.
+
+## Scope classification before conversation processing
+
+The live runtime calls `BedrockScopeCheck` before intake, follow-up messages or playback corrections.
+It uses `FEX_SMALL_MODEL` through the existing guarded Bedrock model factory, with no data tools.
+Only a validated category and language leave the classifier. Code chooses the fixed refusal text.
+A service or validation failure preserves the step and asks the producer to retry; the rejected
+exchange is excluded from later prompts and PII scans. Decision logs carry fixed scope codes only.
+The no-AWS demo remains a scripted stand-in. Retention and disabled recall are unchanged.
+
+Run `cd agent && uv run pytest tests/test_scope_classifier.py tests/test_out_of_scope.py` for
+local checks. `scripts/e2e/scope_classifier_smoke.py` exercises synthetic messages against the
+configured real Bedrock small model without reading or writing producer records.

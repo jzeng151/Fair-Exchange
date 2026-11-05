@@ -1,0 +1,27 @@
+{
+  "scenario_id": "S2",
+  "title": "Mexican coffee cooperative, falling prices (Spanish)",
+  "producer_id": "SYN-002",
+  "language": "es",
+  "profile_note": "Synthetic producer (#7): coffee cooperative, Chiapas, Mexico, with a price stabilization fund and a dry mill. Regional facts and market-and-price peer examples exist, so the answer has full evidence. Contrast pair C2 (with SYN-007).",
+  "turns": [
+    {"message": "El precio que nos pagan los compradores por el café ha bajado mucho este año, y a nuestros socios les preocupa no cubrir sus costos.", "expect_step": "intake"},
+    {"message": "Empezó después de la cosecha pasada. Algunos socios recibieron casi una quinta parte menos por kilo. Intentamos vender más por la cooperativa en vez de a los intermediarios locales.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal_and_outward"}}, "expect_step": "feedback"},
+    {"action": {"name": "set_feedback", "args": {"value": "somewhat"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
+  ],
+  "intake_replies": [
+    "También guardamos parte de la cosecha para venderla más adelante, cuando el precio suba."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal_and_outward",
+    "evidence": "full",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["market and price"],
+    "out_of_scope": false
+  }
+}

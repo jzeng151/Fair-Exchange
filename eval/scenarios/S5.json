@@ -1,0 +1,27 @@
+{
+  "scenario_id": "S5",
+  "title": "Côte d'Ivoire cocoa cooperative, irregular rainfall, names a person and a phone number (English)",
+  "producer_id": "SYN-005",
+  "language": "en",
+  "profile_note": "Synthetic producer (#7): cocoa cooperative, Bas-Sassandra, Côte d'Ivoire (the same producer as S7). The PII path: the producer names a person and gives a phone number (both invented). The record is flagged, never redacted.",
+  "turns": [
+    {"message": "The rain has become irregular and this year's cocoa harvest dropped a lot.", "expect_step": "intake"},
+    {"message": "It got worse over the last two seasons. The technician Kouame Konan came to help us check the trees, and you can reach him at +225 07 00 00 00 00. We water by hand when we can, but it is not enough.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
+    {"action": {"name": "set_feedback", "args": {"value": "yes"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
+  ],
+  "intake_replies": [
+    "We also dug small channels to catch what little rain does fall."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal",
+    "evidence": "full",
+    "pii_flag": true,
+    "pii_entity_types": ["NAME", "PHONE"],
+    "tags": ["climate and weather"],
+    "out_of_scope": false
+  }
+}

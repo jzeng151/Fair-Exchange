@@ -19,8 +19,8 @@ from typing import Any, Protocol
 from botocore.exceptions import ClientError
 
 from fex.conversation.contract import ActionEntry, SpokenEntry
-from fex.conversation.state import ConversationState
-from fex.models import CompletedRecord, DeclinedRecord, PiiScanState, TextScanStatus, parse_record
+from fex.conversation.state import ConversationState, DecisionLogEntry
+from fex.models import CompletedRecord, DeclinedRecord, PiiScanState, TextScanStatus, decision_refs, parse_record
 from fex.pii import PiiText, scan_texts
 
 log = logging.getLogger(__name__)
@@ -143,6 +143,8 @@ def build_record(state: ConversationState, *, version: int, created_at: datetime
         "peer_examples": [c.model_dump() for c in answer.peer_examples],
         "earlier_answers": [a.model_dump() for a in state.earlier_answers],
         "feedback": state.feedback,
+        # Conversations saved before refs were filtered (#156) can hold non-ID refs; they never reach the record.
+        "decision_log": [{**e.model_dump(), "refs": decision_refs(e.refs)} for e in state.decision_log],
     })
 
 
@@ -163,7 +165,10 @@ def save_record(state: ConversationState, store: RecordStore, now: datetime,
     fails; in both cases nothing is written.
     """
     if pii_scanner is not None:
+        before = state.pii.entity_types if state.pii else []
         run_pii_scan(state, pii_scanner)
+        if found := [t for t in (state.pii.entity_types if state.pii else []) if t not in before]:
+            state.decision_log.append(DecisionLogEntry(at=now, kind="pii", code="pii_found", refs=found))
     first = state.record_version is None
     version = 1 if first else state.record_version + 1
     created_at = now if first else state.record_created_at

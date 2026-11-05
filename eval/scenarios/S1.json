@@ -1,0 +1,28 @@
+{
+  "scenario_id": "S1",
+  "title": "Colombian coffee smallholder, two dry seasons (English)",
+  "producer_id": "SYN-001",
+  "language": "en",
+  "profile_note": "Synthetic producer (#7): coffee smallholder, Cauca, Colombia, with drip irrigation and shade tree projects. Regional data and peer examples exist, so the answer has full evidence. Contrast pairs C1 (with SYN-005, S7) and C4 (with SYN-008).",
+  "turns": [
+    {"message": "It hasn't rained like it used to. I've had two seasons of very irregular rain and last year's coffee harvest on my plot dropped a lot.", "expect_step": "intake"},
+    {"message": "It started at the end of 2024. I lost about a third of the crop. I planted more shade trees over the coffee, but it wasn't enough.", "expect_step": "playback"},
+    {"action": {"name": "correct_playback", "args": {"text": "It wasn't a third, it was almost half the harvest."}}, "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
+    {"action": {"name": "set_feedback", "args": {"value": "yes"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
+  ],
+  "intake_replies": [
+    "I put in drip lines and saved water in tanks, but the rain just did not come."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal",
+    "evidence": "full",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["climate and weather", "water"],
+    "out_of_scope": false
+  }
+}

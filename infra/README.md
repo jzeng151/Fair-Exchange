@@ -1,19 +1,21 @@
 # infra/
 
 AWS CDK v2 (TypeScript). Issue #5 requires a single-command full-stack deployment;
-issue #40 records a timed clean redeploy. `infra/deploy.sh` is that command; today it deploys website
-hosting and the standards Knowledge Base (#17). Later features add their resources to the `FairExchange` stack.
+issue #40 records a timed clean redeploy. `infra/deploy.sh` builds and deploys the application,
+including the agent runtime, website, chat, producer-record and reviewer APIs, and analytics
+when the Athena sync stack exists.
 
 The `FairExchange` stack hosts the Vue website using a private KMS-encrypted S3 bucket
-and CloudFront with origin access control. It does not provision the stub API or
-agent. Only compiled files from `web/dist` are published.
+and CloudFront with origin access control. AgentCore hosts FEX; API Gateway and Lambda
+serve the application API. Only compiled files from `web/dist` are published to the website bucket.
 
 Run from the repository root:
 
 ```bash
 npm --prefix infra ci
 (cd infra && npx cdk synth FairExchange) # preview only; creates nothing
-EXPECTED_AWS_ACCOUNT=100300582834 AWS_REGION=us-west-2 bash infra/deploy.sh
+EXPECTED_AWS_ACCOUNT=100300582834 AWS_REGION=us-west-2 \
+  FEX_MAX_LIFETIME_MINUTES=1440 LOG_RETENTION_DAYS=30 bash infra/deploy.sh
 ```
 
 `web/`, `api/`, `agent/`, `data/`, `eval/`, and `infra/` are root-level folders.

@@ -1,6 +1,6 @@
 import { Logger } from '@aws-lambda-powertools/logger';
 import type { APIGatewayProxyEvent, APIGatewayProxyResult } from 'aws-lambda';
-import { resolveIdentity, type IdentityFullResolver } from '../core/identity.js';
+import { Unauthorized, resolveIdentity, type IdentityFullResolver } from '../core/identity.js';
 import { handleMe, type MeDeps } from '../core/me.js';
 import { DynamoRecordStore } from '../core/reviewStore.js';
 
@@ -9,7 +9,23 @@ import { DynamoRecordStore } from '../core/reviewStore.js';
  * Normal (non-streaming) Lambda integration on the same REST API as the chat endpoint.
  */
 
-const HEADERS = { 'content-type': 'application/json' };
+const HEADERS = {
+  'content-type': 'application/json',
+  ...(process.env.ALLOWED_ORIGIN ? { 'access-control-allow-origin': process.env.ALLOWED_ORIGIN, vary: 'Origin' } : {}),
+};
+
+export function createIdentityHandler(resolve: IdentityFullResolver = resolveIdentity) {
+  return async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
+    try {
+      const identity = await resolve(event);
+      return { statusCode: 200, headers: HEADERS, body: JSON.stringify({ user_id: identity.userId, roles: identity.roles }) };
+    } catch (error) {
+      return { statusCode: error instanceof Unauthorized ? 401 : 500, headers: HEADERS,
+        body: JSON.stringify({ message: error instanceof Unauthorized ? 'Unauthorized' : 'Internal error' }) };
+    }
+  };
+}
+export const identity = createIdentityHandler();
 
 function buildMeDeps(): MeDeps {
   const table = process.env.RECORDS_TABLE;

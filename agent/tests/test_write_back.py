@@ -3,16 +3,20 @@
 Spec: docs/specs/26-write-back.md. Seam 1 (agent entrypoint) with the record store on moto DynamoDB,
 so conditional writes behave as in AWS.
 """
+from datetime import UTC, datetime
+
 import boto3
 import pytest
 from moto import mock_aws
 from pydantic import ValidationError
 from tests.conversation_harness import RETRIEVE, Run, answer, claim, of, playback, summary
 
+from fex.conversation.state import ConversationState, DecisionLogEntry
 from fex.models import ConsentChoice, parse_record
 from fex.records import DynamoRecordStore, RecordConflict, save_record
 
 TABLE = "fair-exchange-records-test"
+NOW = datetime(2026, 11, 5, 12, 0, tzinfo=UTC)
 NARRATIVE = {"language", "entity_type", "summary_original", "summary_english", "tags", "evidence",
              "earlier_answers", "insights", "peer_examples", "feedback", "reviewer_tags",
              "reviewer_summary_original", "reviewer_summary_english"}
@@ -122,6 +126,48 @@ def test_declined_record_has_no_narrative_fields(run, table):
     record = stored(table, run)
     assert record["status"] == "declined" and not NARRATIVE & set(record)
     assert [c["scope"] for c in record["consent_history"]] == ["declined"]
+
+
+@pytest.mark.parametrize("bracket", ["Juan Pérez, 555-0100", "5551234567"])
+def test_completed_record_carries_the_decision_log_with_ids_only(run, table, bracket):
+    run.to_playback()
+    run.small.add(summary())
+    invented = claim("Rainfall fell.", f"Notes from a visit [{bracket}]", clause="APS 2.1.1")
+    run.large.add(*RETRIEVE, *[answer([invented], [])] * 3)
+    run.action("confirm_playback")
+    run.action("set_consent", scope="internal")
+    record = parse_record(stored(table, run))
+    assert [e.model_dump() for e in record.decision_log] == [e.model_dump() for e in run.state().decision_log]
+    assert ("verifier", "unknown_source", ["APS 2.1.1"]) in [(e.kind, e.code, e.refs) for e in record.decision_log]
+    assert not any("Juan" in ref or "555" in ref for e in record.decision_log for ref in e.refs)
+
+
+def test_a_stored_state_with_a_non_id_ref_still_loads_and_saves_without_it(run, table):
+    """States saved before refs were filtered can hold any bracket text; they must keep working (#156 review)."""
+    run.to_consent()
+    state = run.state()
+    state.decision_log.append(DecisionLogEntry(at=NOW, kind="verifier", code="unknown_source",
+                                               refs=["unknown-source", "APS 2.1.1"]))
+    reloaded = ConversationState.model_validate_json(state.model_dump_json())
+    reloaded.consent, reloaded.consent_history = "internal", [ConsentChoice(scope="internal", recorded_at=NOW)]
+    save_record(reloaded, DynamoRecordStore(table), NOW)
+    record = parse_record(stored(table, run))
+    assert record.decision_log[-1].refs == ["APS 2.1.1"]
+
+
+def test_the_record_holds_the_step_change_its_own_save_made(run, table):
+    """Saves can come before the step is emitted in a turn; the record must still have that change (#26)."""
+    run.to_feedback()
+    run.action("end")
+    record = parse_record(stored(table, run))
+    assert [e.refs for e in record.decision_log if e.code == "step_changed"][-2:] == [["consent", "feedback"],
+                                                                                      ["feedback", "closed"]]
+
+
+def test_declined_record_has_no_decision_log(run, table):
+    run.to_consent()
+    run.action("set_consent", scope="declined")
+    assert "decision_log" not in stored(table, run)
 
 
 def test_completed_declined_completed_switching_keeps_earlier_answers(run, table):

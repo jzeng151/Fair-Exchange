@@ -66,7 +66,7 @@ These extend the merged verifier.
 - **Reason codes.** Each failure carries a fixed reason code (`unknown_source`, `wrong_source_kind`, `unknown_clause`, `clause_not_retrieved`, `directive_language`, `malformed`), alongside today's readable reason. The decision log records only the codes ([#26 spec](26-write-back.md)).
 - **Directive language.** Claim text containing a directive phrase fails, with the reason "directive language". The phrases are kept in one shared list, in English, Spanish and French ([#24](24-french-exchange.md)), also used by the eval tone check: e.g. "you should", "we recommend", "the best option", "usted debe", "le recomendamos", "la mejor opción", "vous devriez", "nous recommandons", "la meilleure option", "il faut que vous".
 - **Unchanged:** no model involvement, and dropping claims that still fail after the last retry. How retries work with streaming is in the [#18 spec](18-grounded-response.md).
-- **What it proves.** The check proves provenance: each claim cites a real, retrieved source of the right kind and a retrieved clause. It does not prove the claim's wording matches the cited fact, or that the clause is the best fit. Those are checked by evals and by the reviewer.
+- **What it proves.** The check proves provenance: each claim cites a real, retrieved source of the right kind and a retrieved clause. It does not prove the claim's wording matches the cited fact, or that the clause is the best fit. The eval harness's claim-support evaluator ([#36](36-eval-harness.md)) and the reviewer check the wording. Only the reviewer checks whether the clause is the best fit.
 
 ## Testing Decisions
 

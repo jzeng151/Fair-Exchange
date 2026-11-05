@@ -1,11 +1,14 @@
-"""Peer projects and producer profiles built from the FTUSA sample (#16)."""
+"""The peer catalog (#16) as the generator writes it (#7), and the peer lookup."""
 import csv
 import json
 import re
 
-from fx_data.peers import (ACCOUNTS_CSV, FICTIONAL_NAMES, NAME_REPLACEMENTS, PEERS_PATH, PROFILES_PATH,
-                           PROJECTS_CSV, PUBLISHABLE, PeerProjects, build_peers, build_profiles,
-                           build_status_index, fictionalize, resolve_status, tag_for)
+from fx_data.peers import (ACCOUNTS_CSV, FICTIONAL_NAMES, NAME_REPLACEMENTS, PROJECTS_CSV, PUBLISHABLE,
+                           PeerProjects, build_status_index, crop_set, fictionalize, resolve_status)
+from fx_data.tables import read_table, table_path
+
+CATALOG = read_table("peer_catalog")
+CATALOG_TEXT = table_path("peer_catalog").read_text(encoding="utf-8")
 
 CHALLENGE_TAGS = {
     "climate and weather", "water", "soil and land", "market and price", "labor and migration",
@@ -19,41 +22,30 @@ def _account_ids() -> set[str]:
         return {r["account_sk"] for r in csv.DictReader(fh)}
 
 
-def test_committed_tables_match_the_sample_data():
-    assert json.loads(PEERS_PATH.read_text(encoding="utf-8")) == build_peers()
-    assert json.loads(PROFILES_PATH.read_text(encoding="utf-8")) == build_profiles()
-
-
-def test_every_project_is_kept_except_placeholders():
-    with open(PROJECTS_CSV, encoding="utf-8") as fh:
-        total = sum(1 for _ in csv.DictReader(fh))
-    peers = build_peers()
-    assert len(peers["projects"]) + peers["dropped_placeholder_rows"] == total
-    assert not any("lorem" in json.dumps(p).lower() for p in peers["projects"])
+def test_catalog_has_no_placeholder_text():
+    assert CATALOG and "lorem" not in CATALOG_TEXT.lower()
 
 
 def test_catalog_rows_hold_only_publishable_fields_plus_id_tags_and_owner():
-    for p in build_peers()["projects"]:
+    for p in CATALOG:
         assert set(p) == set(PUBLISHABLE) | {"catalog_id", "tags", "owner_producer_id"}
         assert p["tags"] and set(p["tags"]) <= CHALLENGE_TAGS
         assert p["start_year"] is None or 2000 <= p["start_year"] <= 2030
 
 
 def test_start_year_is_resolved_for_almost_every_project():
-    projects = build_peers()["projects"]
-    assert sum(p["start_year"] is None for p in projects) <= 12, "the status join has stopped resolving"
+    assert sum(p["start_year"] is None for p in CATALOG) <= 12, "the status join has stopped resolving"
 
 
 def test_catalog_ids_are_unique_so_a_citation_names_one_project():
-    ids = [p["catalog_id"] for p in build_peers()["projects"]]
+    ids = [p["catalog_id"] for p in CATALOG]
     assert len(ids) == len(set(ids))
 
 
 def test_organizations_are_fictional_and_one_name_per_organization():
-    projects = build_peers()["projects"]
-    assert {p["organization"] for p in projects} <= set(FICTIONAL_NAMES)
+    assert {p["organization"] for p in CATALOG} <= set(FICTIONAL_NAMES)
     by_owner = {}
-    for p in projects:
+    for p in CATALOG:
         assert by_owner.setdefault(p["owner_producer_id"], p["organization"]) == p["organization"]
     assert len(set(by_owner.values())) == len(by_owner)
 
@@ -105,6 +97,21 @@ def test_find_breaks_ties_by_most_recent_and_keeps_one_project_per_organization(
                                             "Premium project, D [P5]"]
 
 
+def test_other_never_counts_as_a_match():
+    # #14 spec: "other" is never used for matching. Two producers of unknown structure or crop are not alike.
+    catalog = _catalog(_row("P1", "A", "a", crop="coffee", entity="other"), _row("P2", "B", "b", crop="other", entity="other"))
+    items = catalog.find("ME", {"water"}, {"coffee"}, "other")
+    assert [(i["source"], i["strength"]) for i in items] == [("Premium project, A [P1]", "nearest"),
+                                                             ("Premium project, B [P2]", "limited")]
+
+
+def test_other_crop_in_a_profile_is_ignored():
+    assert crop_set("coffee;other") == {"coffee"}
+    catalog = _catalog(_row("P1", "A", "a", crop="other", entity="smallholder"))
+    (item,) = catalog.find("ME", {"water"}, crop_set("other"), "cooperative")
+    assert item["strength"] == "limited"
+
+
 def test_find_returns_only_publishable_fields_and_nothing_when_no_tag_matches():
     catalog = _catalog(_row("P1", "A", "a"))
     (item,) = catalog.find("ME", {"water"}, set(), None)
@@ -116,8 +123,8 @@ def test_find_returns_only_publishable_fields_and_nothing_when_no_tag_matches():
 def test_account_ids_appear_only_in_the_private_owner_column():
     # #7 spec: sample account IDs may appear in owner_producer_id, never in a publishable field.
     accounts = _account_ids()
-    for p in build_peers()["projects"]:
-        assert p["owner_producer_id"] in accounts
+    for p in CATALOG:
+        assert p["owner_producer_id"] in accounts or p["owner_producer_id"].startswith("SYN-")
         public = json.dumps({k: v for k, v in p.items() if k != "owner_producer_id"})
         assert not any(account in public for account in accounts)
 
@@ -127,13 +134,12 @@ def _contains(text: str, name: str) -> bool:
 
 
 def test_peer_file_holds_no_known_organization_or_person_names():
-    text = PEERS_PATH.read_text(encoding="utf-8")
     for name, _ in NAME_REPLACEMENTS:
-        assert not _contains(text, name), name
+        assert not _contains(CATALOG_TEXT, name), name
 
 
 def test_names_found_in_code_review_are_gone_in_any_spelling():
-    text = PEERS_PATH.read_text(encoding="utf-8")
+    text = CATALOG_TEXT
     for name in ("CAFESCOR", "Coopervitae", "MELCOOP", "Nobland", "Chemase", "Kitumbe", "Finteaflo",
                  "Rahmat", "Joan Fernie", "FABICOOP", "Asoprokia", "CAFISEVILLA", "COMIXCAEL",
                  "Montesol", "Campo Limpio", "Zarzamora"):
@@ -148,16 +154,3 @@ def test_names_are_replaced_whatever_their_capitalization():
 
 def test_fictionalize_replaces_longest_name_first():
     assert fictionalize("SCPP Barra de Palmitas and SCPP") == "the fishing cooperative and fishing cooperative"
-
-
-def test_subcategory_decides_the_tag_then_keywords():
-    assert tag_for("Clean Water") == "water"
-    assert tag_for("", "Solar panels for the pump") == "climate and weather"
-    assert tag_for("", "Composting to reduce soil erosion") == "soil and land"
-    assert tag_for("", "Community clean-up day") == "biodiversity and conservation"
-
-
-def test_every_sample_producer_has_a_profile():
-    profiles = build_profiles()["profiles"]
-    assert set(profiles) == _account_ids()
-    assert all(p["country"] for p in profiles.values())

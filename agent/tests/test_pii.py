@@ -323,6 +323,19 @@ def test_save_scans_the_producers_words_and_the_record_carries_them(table):
     assert record["pii_matches"][0]["entity_type"] == "NAME" and "María Torres" in record["pii_matches"][0]["text"]
 
 
+def test_newly_found_types_are_logged_once(table):
+    run = _consent_run(table, SpyClient(NAME_ENTITIES), message_text=NAME_TEXT)
+    run.action("set_feedback", value="yes")  # a second save rescans nothing new
+    found = [(e.kind, e.refs) for e in run.state().decision_log if e.code == "pii_found"]
+    assert found == [("pii", ["NAME"])]
+    assert [e["refs"] for e in stored(table, run.conversation_id)["decision_log"] if e["code"] == "pii_found"] == [["NAME"]]
+
+
+def test_no_pii_entry_when_nothing_is_found(table):
+    run = _consent_run(table, SpyClient())
+    assert not [e for e in run.state().decision_log if e.code == "pii_found"]
+
+
 def test_the_correction_is_scanned_too(table):
     scanner = SpyClient(NAME_ENTITIES)
     run = _consent_run(table, scanner, correct=NAME_TEXT)
