@@ -165,11 +165,7 @@ def api_chat(request):
         # Attached photos/documents are read with Claude on Amazon Bedrock; the description goes to FEX with the
         # producer's words, so FEX's grounding, scope and PII checks apply to it like any message.
         read = _read_attachments(attachments, language) if action is None else []
-        to_send = message
-        if read:
-            to_send = (message if message != "(shared attachment)" else "") + "\n\n" + "\n".join(
-                f"[Attached {r['name']}: {r['text']}]" for r in read)
-        live = _live_turn(request, persona, to_send.strip(), action)
+        live = _live_turn(request, persona, _live_message(message, read), action)
         if live is not None:
             if read:
                 live["text"] = "\n".join(f"📎 {r['name']} (read with Claude on Amazon Bedrock): {r['text']}"
@@ -182,6 +178,9 @@ def api_chat(request):
                         "\n\n🌐 Translated from FEX's reply with Amazon Translate."
                     live["language"] = chosen
                     request.session["language"] = chosen
+                    if not live.get("closed"):  # the buttons follow the chosen language too
+                        live["suggestions"] = fex_live.buttons(
+                            request.session.get("fex_allowed", {}).get(persona.id, []), chosen)
                 except Exception:
                     pass
             return JsonResponse(live)
@@ -207,6 +206,31 @@ def api_chat(request):
         data["text"] = note + "\n\n" + data["text"]
         data["attachments_ack"] = [a.get("name", "file") for a in attachments[:5]]
     return JsonResponse(data)
+
+
+API_MESSAGE_LIMIT = 4000  # MAX_MESSAGE_CHARS in api/src/core/validate.ts, counted in UTF-16 units (JS length)
+
+
+def _utf16_len(text: str) -> int:
+    return len(text.encode("utf-16-le")) // 2
+
+
+def _clip_utf16(text: str, limit: int) -> str:
+    """Text cut to at most `limit` UTF-16 units, never splitting a character."""
+    if _utf16_len(text) <= limit:
+        return text
+    return text.encode("utf-16-le")[:max(limit, 0) * 2].decode("utf-16-le", errors="ignore")
+
+
+def _live_message(message: str, read: list[dict]) -> str:
+    """The text sent to the chat API: the producer's words plus what was read from attachments, within the API's
+    limit. Attachment context gets at most half the limit; the producer's words are trimmed to fit the rest."""
+    if not read:
+        return _clip_utf16(message, API_MESSAGE_LIMIT)
+    context = _clip_utf16("\n".join(f"[Attached {r['name']}: {r['text']}]" for r in read), API_MESSAGE_LIMIT // 2)
+    words = message if message != "(shared attachment)" else ""
+    words = _clip_utf16(words, API_MESSAGE_LIMIT - _utf16_len(context) - 2)
+    return (words + "\n\n" + context).strip()
 
 
 def _live_turn(request, persona, message: str, action: dict | None) -> dict | None:

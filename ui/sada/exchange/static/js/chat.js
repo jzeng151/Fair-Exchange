@@ -421,9 +421,10 @@
 
   // ---- voice in ---------------------------------------------------------
   // Amazon Transcribe: record a voice note, upload it, and put the transcript in the message box to review.
+  // Transcribe needs the uploads bucket; without it, the browser's own speech recognition is used instead.
   const micBtn = $("mic");
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (navigator.mediaDevices && window.MediaRecorder) {
+  if (T.uploadsEnabled && navigator.mediaDevices && window.MediaRecorder) {
     let rec = null, chunks = [];
     micBtn.title = "Record a voice note (Amazon Transcribe)";
     micBtn.onclick = async () => {

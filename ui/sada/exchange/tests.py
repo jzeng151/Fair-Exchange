@@ -113,6 +113,39 @@ class RealApiTests(SimpleTestCase):
             self.assertEqual(kept["suggestions"], answer["suggestions"])
         self.assertEqual(calls[1], ("/conversations/c-1/messages", {"text": "Prices dropped"}))
 
+    def test_translated_reply_shows_buttons_in_the_chosen_language(self, _weather):
+        def fake(persona, method, path, body=None):
+            return {"/conversations": START, "/conversations/c-1/messages": PLAYBACK}[path]
+
+        with mock.patch.object(fex_live, "_request", side_effect=fake), \
+                mock.patch("exchange.aws_tools.translate", return_value="Voici ce que j'ai compris."):
+            self.client.get("/chat/prod-coffee-co/?source=live")
+            d = self.client.post("/api/chat", json.dumps({
+                "message": "Les prix ont baissé", "persona_id": "prod-coffee-co",
+                "language": "fr", "language_chosen": True}), content_type="application/json").json()
+        self.assertEqual(d["language"], "fr")
+        self.assertEqual([b["label"] for b in d["suggestions"]], ["✓ Oui, c'est bien ça", "Terminer la conversation"])
+
+    def test_attachment_description_fits_the_api_message_limit(self, _weather):
+        sent = []
+
+        def fake(persona, method, path, body=None):
+            sent.append(body)
+            return {"/conversations": START, "/conversations/c-1/messages": PLAYBACK}[path]
+
+        read = [{"name": "field.jpg", "text": "Dry, cracked soil around young coffee plants."}]
+        with mock.patch.object(fex_live, "_request", side_effect=fake), \
+                mock.patch("exchange.views._read_attachments", return_value=read):
+            self.client.get("/chat/prod-coffee-co/?source=live")
+            d = self.client.post("/api/chat", json.dumps({
+                "message": "é" * 3990 + " 🌧️", "persona_id": "prod-coffee-co",
+                "attachments": [{"name": "field.jpg", "kind": "image", "key": "k"}]}),
+                content_type="application/json").json()
+        self.assertEqual(d["source"], "live")
+        text = sent[-1]["text"]
+        self.assertLessEqual(len(text.encode("utf-16-le")) // 2, 4000)  # the API counts UTF-16 units
+        self.assertIn("Dry, cracked soil around young coffee plants.", text)
+
     def test_unreachable_api_falls_back_to_mock_with_a_note(self, _weather):
         with mock.patch.object(fex_live, "_request", side_effect=fex_live.LiveUnavailable("Can't reach the chat API")):
             html = self.client.get("/chat/prod-coffee-co/?source=live").content.decode()
