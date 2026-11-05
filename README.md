@@ -92,9 +92,8 @@ The original `.docx` files from Fair Trade USA are in [`docs/requirements/source
 
 The people behind the Fair Trade USA Producer Exchange Agent:
 
-- Visakh Madathil (Amazon)
-- Frank Yu (Blackchamber) — agent engineering
-- Jason Zeng (Pursuit)
-- Sadananda Narayanappa (Lockheed Martin) — data & evaluation
-- Tripat Panesar (Carilion Clinic) — UX & demo
-- Sriya Uttharkar — eval data labeling
+- Frank Yu
+- Jason Zeng
+- Sadananda Narayanappa
+- Tripat Panesar
+- Sriya Uttharkar
