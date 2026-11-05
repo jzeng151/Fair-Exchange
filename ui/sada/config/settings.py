@@ -56,7 +56,14 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
     o for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if o
-] or ["https://*.amazonaws.com", "https://*.elb.amazonaws.com", "https://*.on.aws"]  # *.on.aws: Lambda function URLs
+] or [
+    "https://*.amazonaws.com", "https://*.elb.amazonaws.com",
+    "https://*.on.aws",           # Lambda function URLs (deploy/deploy.sh)
+    "https://*.cloudfront.net",   # workshop path proxies behind CloudFront, e.g. https://<id>.cloudfront.net/proxy/8000/
+    "https://*.sagemaker.aws",    # SageMaker Studio / code editor proxies
+]
+# Path proxies forward to the app under a different Host; trust the original host when they pass it on.
+USE_X_FORWARDED_HOST = True
 
 if ON_LAMBDA:
     # The function URL terminates HTTPS and forwards the scheme in X-Forwarded-Proto.
