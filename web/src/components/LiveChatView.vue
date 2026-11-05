@@ -68,21 +68,24 @@ function errorText(err: unknown): string {
   return t.value.errors.other
 }
 
-/** One turn: send, then render each event as it arrives. Errors become a notice in the transcript. */
-async function turn(events: () => AsyncGenerator<StreamEvent>) {
+/** One turn: send, then render each event as it arrives. Errors become a notice in the transcript.
+ *  Returns true only if the turn finished without an error and the producer did not change. */
+async function turn(events: () => AsyncGenerator<StreamEvent>): Promise<boolean> {
   const mine = session
   const owner = producerId.value
   beginTurn(view)
   try {
     for await (const e of events()) {
-      if (mine !== session) return // the producer changed: stop reading this stream
+      if (mine !== session) return false // the producer changed: stop reading this stream
       apply(view, e)
       await scrollDown()
     }
+    return !view.error
   } catch (err) {
-    if (mine !== session) return
+    if (mine !== session) return false
     view.items.push({ kind: 'notice', tone: 'error', text: errorText(err) })
     if (err instanceof LiveError && err.status === 404 && owner) remember(owner, null)
+    return false
   } finally {
     if (mine === session) {
       view.busy = false
@@ -146,9 +149,9 @@ async function act(action: ActionName, args: Record<string, unknown> = {}) {
   const id = view.conversationId
   if (action === 'set_consent') changingConsent.value = false
   if (action === 'set_feedback') changingFeedback.value = false
-  await turn(() => client!.action(id, action, args))
+  const ok = await turn(() => client!.action(id, action, args))
   // The agent keeps the feedback step open so a misclick can be fixed (#23); show the answer as given.
-  if (action === 'set_feedback' && !view.error) view.feedback = args.value as LiveView['feedback']
+  if (action === 'set_feedback' && ok) view.feedback = args.value as LiveView['feedback']
 }
 const currentConsent = computed(() => view.consent)
 

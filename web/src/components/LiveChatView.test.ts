@@ -148,6 +148,40 @@ describe('LiveChatView', () => {
     expect(w.find('.feedback-line').exists()).toBe(false)
   })
 
+  it('a feedback answer whose request fails keeps the question open', async () => {
+    const fake = fakeClient({ start: [{ type: 'conversation', conversationId: 'c-1' }, ...step('feedback', ['set_feedback', 'end'])] })
+    fake.client.action = () => (async function* () { throw new LiveError(0, 'unreachable') })()
+    const w = await open(fake)
+    await w.get('[data-feedback="yes"]').trigger('click')
+    await flushPromises()
+    expect(w.find('[data-feedback="yes"]').exists()).toBe(true)
+    expect(w.find('.feedback-line').exists()).toBe(false)
+  })
+
+  it("a feedback answer still saving for one producer is never shown as another producer's answer", async () => {
+    let release!: () => void
+    const gate = new Promise<void>((r) => { release = r })
+    const feedbackStart = (id: string) => [{ type: 'conversation', conversationId: id } as StreamEvent, ...step('feedback', ['set_feedback', 'end'])]
+    const clients: Record<string, LiveClient> = {
+      CFC19603C1B7B29C017954FD1DB2D620: { ...fakeClient({ start: feedbackStart('c-A') }).client, action: async function* () {
+        await gate
+        for (const e of step('feedback', ['set_feedback', 'end'])) yield e
+      } },
+      A7F700B04BCE55512CB026A71121426C: fakeClient({ start: feedbackStart('c-B') }).client,
+    }
+    const w = mount(LiveChatView, { props: { apiUrl: 'http://api.test', makeClient: (id: string) => clients[id]! } })
+    await w.get('[data-producer="CFC19603C1B7B29C017954FD1DB2D620"]').trigger('click')
+    await flushPromises()
+    await w.get('[data-feedback="yes"]').trigger('click')
+    await w.get('.back-link').trigger('click')
+    await w.get('[data-producer="A7F700B04BCE55512CB026A71121426C"]').trigger('click')
+    await flushPromises()
+    release() // A's feedback request finishes after B's conversation has loaded
+    await flushPromises()
+    expect(w.find('[data-feedback="yes"]').exists()).toBe(true)
+    expect(w.find('.feedback-line').exists()).toBe(false)
+  })
+
   it('asks before ending, and does nothing if the producer cancels (#13)', async () => {
     const fake = fakeClient()
     const w = await open(fake)
