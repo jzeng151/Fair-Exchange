@@ -2,9 +2,9 @@
   "id": "mexico-price-drop-en",
   "title": "Mexican coffee cooperative, falling prices (English)",
   "producer_id": "95A4A8BC3F2E3F38F8D6A81B57BA5E4A",
-  "profile_note": "Sample producer: coffee, 2nd Grade cooperative, Chiapas, Mexico. Regional facts and coffee price benchmarks exist; the sample has no market-and-price peer projects, so the answer has limited evidence.",
+  "profile_note": "Sample producer: coffee, 2nd Grade cooperative, Chiapas, Mexico. Regional facts and coffee price benchmarks exist, and Crop Diversification projects from other Mexican coffee unions give market-and-price peer examples (#7), so the answer has full evidence.",
   "language": "en",
-  "demonstrates": ["limited evidence (no peer examples)", "consent with outward sharing"],
+  "demonstrates": ["full answer from sample peer projects", "consent with outward sharing"],
   "turns": [
     {"kind": "start"},
     {"kind": "message", "text": "The price buyers are paying our cooperative for coffee has dropped a lot this year, and our members are worried they won't cover their costs."},
@@ -16,7 +16,7 @@
   ],
   "expect": {
     "tags": ["market and price"],
-    "evidence": "limited",
+    "evidence": "full",
     "record": {"status": "completed", "consent_scope": "internal_and_outward", "feedback": "somewhat", "pii_flag": false}
   }
 }

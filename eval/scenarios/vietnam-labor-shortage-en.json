@@ -1,10 +1,10 @@
 {
   "id": "vietnam-labor-shortage-en",
   "title": "Vietnamese processor, labor shortage (English)",
-  "producer_id": "0F0B3837DB56741F8FE33D6009F930FB",
-  "profile_note": "Sample producer: furniture and home goods factory, Binh Duong, Vietnam. The regional table does not cover Vietnam and the sample has no labor peer projects, so the answer has limited evidence (the #13 spec's limited-evidence example).",
+  "producer_id": "SYN-003",
+  "profile_note": "Synthetic producer (#7): coffee processor, Dak Lak, Vietnam. The regional table does not cover Vietnam, so the answer has no regional insight (#35 S3). It does have its own record and labor peer projects from other synthetic producers.",
   "language": "en",
-  "demonstrates": ["limited evidence (no regional data, no peer examples)", "negative feedback"],
+  "demonstrates": ["no regional insight (no regional data for Vietnam)", "negative feedback"],
   "turns": [
     {"kind": "start"},
     {"kind": "message", "text": "We can't find enough workers. Several people left for jobs in the city and we are behind on orders."},
@@ -16,7 +16,7 @@
   ],
   "expect": {
     "tags": ["labor and migration"],
-    "evidence": "limited",
+    "evidence": "full",
     "record": {"status": "completed", "consent_scope": "internal", "feedback": "no", "pii_flag": false}
   }
 }

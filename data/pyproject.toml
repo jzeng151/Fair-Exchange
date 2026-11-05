@@ -7,6 +7,8 @@ dependencies = ["openpyxl>=3.1,<4"]
 
 [dependency-groups]
 dev = ["pytest>=8,<9"]
+# Only the generator's Comprehend step (fx_data.generator) needs AWS; tests and the agent never do.
+generator = ["boto3>=1.34,<2"]
 
 [build-system]
 requires = ["hatchling"]

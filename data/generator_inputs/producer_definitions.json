@@ -1,0 +1,1906 @@
+{
+ "description": "Synthetic producers for the #7 generator: scripted scenario producers, the #34 scope-test pair, and contrast pairs that share a challenge tag but differ in crop, region or entity type. Projects use English text written for this file, without names. Survey answers use the sample's wording and only #14 allowlisted columns.",
+ "scenario_producers": {
+  "S1": "SYN-001",
+  "S2": "SYN-002",
+  "S3": "SYN-003",
+  "S4": "SYN-004",
+  "S5": "SYN-005",
+  "S7": "SYN-005"
+ },
+ "contrast_pairs": [
+  {
+   "pair_id": "C1",
+   "tag": "climate and weather",
+   "producers": [
+    "SYN-001",
+    "SYN-005"
+   ],
+   "differ_in": [
+    "crop",
+    "region",
+    "entity_type"
+   ]
+  },
+  {
+   "pair_id": "C2",
+   "tag": "market and price",
+   "producers": [
+    "SYN-002",
+    "SYN-007"
+   ],
+   "differ_in": [
+    "crop",
+    "region",
+    "entity_type"
+   ]
+  },
+  {
+   "pair_id": "C3",
+   "tag": "labor and migration",
+   "producers": [
+    "SYN-003",
+    "SYN-006"
+   ],
+   "differ_in": [
+    "crop",
+    "region",
+    "entity_type"
+   ]
+  },
+  {
+   "pair_id": "C4",
+   "tag": "climate and weather",
+   "producers": [
+    "SYN-001",
+    "SYN-008"
+   ],
+   "differ_in": [
+    "entity_type"
+   ]
+  }
+ ],
+ "producers": [
+  {
+   "producer_id": "SYN-001",
+   "country": "Colombia",
+   "admin1": "Cauca",
+   "crops": [
+    "coffee"
+   ],
+   "entity_type": "smallholder",
+   "certification_scope": "Producer",
+   "note": "S1: Colombian coffee smallholder in Cauca facing drought. Contrast C1 with SYN-005 and C4 with SYN-008.",
+   "projects": [
+    {
+     "title": "Drip irrigation for dry-season coffee plots",
+     "category": "Environmental",
+     "sub_category": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
+     "tags": [
+      "climate and weather",
+      "water"
+     ],
+     "start_year": 2023,
+     "amount": 3200,
+     "description": "Installed drip lines and a 5,000-litre storage tank so young coffee plants survive the longer dry spells of the last three seasons."
+    },
+    {
+     "title": "Shade trees over the coffee plot",
+     "category": "Environmental",
+     "sub_category": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
+     "tags": [
+      "climate and weather",
+      "biodiversity and conservation"
+     ],
+     "start_year": 2024,
+     "amount": 900,
+     "description": "Planted guamo and plantain between coffee rows to cool the plot and hold moisture in the soil during hot, dry months."
+    }
+   ],
+   "survey_responses": [
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 1.5,
+     "yield_produced_per_hectare_nbr": 1100.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "No",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 950.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "No",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change",
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Vegetables / produces for local consumption"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 1.0,
+     "yield_produced_per_hectare_nbr": 1200.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "No",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 1.5,
+     "yield_produced_per_hectare_nbr": 1100.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change",
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Vegetables / produces for local consumption"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 950.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 1.0,
+     "yield_produced_per_hectare_nbr": 1200.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change",
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Vegetables / produces for local consumption"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    }
+   ]
+  },
+  {
+   "producer_id": "SYN-002",
+   "country": "Mexico",
+   "admin1": "Chiapas",
+   "crops": [
+    "coffee"
+   ],
+   "entity_type": "cooperative",
+   "certification_scope": "Producer",
+   "note": "S2: Mexican coffee cooperative facing a price drop. Contrast C2 with SYN-007.",
+   "projects": [
+    {
+     "title": "Price stabilization fund for members",
+     "category": "Economic",
+     "sub_category": null,
+     "tags": [
+      "market and price",
+      "financial and access to capital"
+     ],
+     "start_year": 2023,
+     "amount": 18000,
+     "description": "Set aside part of the Premium as a fund that tops up the price paid to members when the export price falls below the cost of production."
+    },
+    {
+     "title": "Dry mill to sell green coffee directly",
+     "category": "Economic",
+     "sub_category": null,
+     "tags": [
+      "market and price",
+      "infrastructure"
+     ],
+     "start_year": 2021,
+     "amount": 45000,
+     "description": "Built a small dry mill so the cooperative can sell green coffee to buyers directly instead of selling parchment to intermediaries."
+    },
+    {
+     "title": "Shared picker crews at harvest",
+     "category": "Social",
+     "sub_category": null,
+     "tags": [
+      "labor and migration"
+     ],
+     "start_year": 2024,
+     "amount": 6000,
+     "description": "Organized crews of pickers shared between member farms, with transport and meals, because young people leaving for cities left farms short of hands."
+    }
+   ],
+   "survey_responses": [
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 800.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Corn plantation"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 4.0,
+     "yield_produced_per_hectare_nbr": 700.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production",
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Increased benefits"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.5,
+     "yield_produced_per_hectare_nbr": 900.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Corn plantation"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 800.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production",
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Increased benefits"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 4.0,
+     "yield_produced_per_hectare_nbr": 700.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Corn plantation"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 2.5,
+     "yield_produced_per_hectare_nbr": 900.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production",
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Increased benefits"
+     ]
+    }
+   ]
+  },
+  {
+   "producer_id": "SYN-003",
+   "country": "Vietnam",
+   "admin1": "Dak Lak",
+   "crops": [
+    "coffee"
+   ],
+   "entity_type": "processor",
+   "certification_scope": "Producer",
+   "note": "S3: Vietnamese coffee processor facing a labor shortage. Not in the regional table, so no regional facts. Contrast C3 with SYN-006.",
+   "projects": [
+    {
+     "title": "Dormitory for seasonal processing workers",
+     "category": "Social",
+     "sub_category": null,
+     "tags": [
+      "labor and migration",
+      "infrastructure"
+     ],
+     "start_year": 2023,
+     "amount": 22000,
+     "description": "Built a dormitory near the processing plant so seasonal workers from other provinces have a safe place to stay during the harvest peak."
+    },
+    {
+     "title": "Harvest-season wage bonus",
+     "category": "Social",
+     "sub_category": null,
+     "tags": [
+      "labor and migration"
+     ],
+     "start_year": 2024,
+     "amount": 15000,
+     "description": "Paid a bonus to workers who stayed for the whole processing season, after the plant lost staff to factories in the cities."
+    }
+   ],
+   "survey_responses": [
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 10.0,
+     "yield_produced_per_hectare_nbr": 2600.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours",
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 12.0,
+     "yield_produced_per_hectare_nbr": 2400.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 10.0,
+     "yield_produced_per_hectare_nbr": 2600.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours",
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 12.0,
+     "yield_produced_per_hectare_nbr": 2400.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 10.0,
+     "yield_produced_per_hectare_nbr": 2600.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours",
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 12.0,
+     "yield_produced_per_hectare_nbr": 2400.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours"
+     ]
+    }
+   ]
+  },
+  {
+   "producer_id": "SYN-004",
+   "country": "Honduras",
+   "admin1": "Copan",
+   "crops": [
+    "coffee"
+   ],
+   "entity_type": "cooperative",
+   "certification_scope": "Producer",
+   "note": "S4: Honduran Spanish-language coffee cooperative (the decline scenario).",
+   "projects": [
+    {
+     "title": "Wastewater ponds for wet mills",
+     "category": "Environmental",
+     "sub_category": "Clean Water",
+     "tags": [
+      "water"
+     ],
+     "start_year": 2022,
+     "amount": 12000,
+     "description": "Dug settling ponds beside members' wet mills so coffee washing water is treated before it reaches the stream."
+    },
+    {
+     "title": "Rainwater tanks at collection centres",
+     "category": "Environmental",
+     "sub_category": "Clean Water",
+     "tags": [
+      "water",
+      "climate and weather"
+     ],
+     "start_year": 2024,
+     "amount": 7000,
+     "description": "Installed rainwater tanks at two collection centres to keep processing going when the river runs low."
+    }
+   ],
+   "survey_responses": [
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 1000.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Vegetables / produces for local consumption"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Sense of community"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.5,
+     "yield_produced_per_hectare_nbr": 1150.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Vegetables / produces for local consumption"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Sense of community"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 1000.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Vegetables / produces for local consumption"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Sense of community"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.5,
+     "yield_produced_per_hectare_nbr": 1150.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Vegetables / produces for local consumption"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Sense of community"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 1000.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Vegetables / produces for local consumption"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Sense of community"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.5,
+     "yield_produced_per_hectare_nbr": 1150.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Vegetables / produces for local consumption"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Sense of community"
+     ]
+    }
+   ]
+  },
+  {
+   "producer_id": "SYN-005",
+   "country": "Côte d'Ivoire",
+   "admin1": "Bas-Sassandra",
+   "crops": [
+    "cocoa"
+   ],
+   "entity_type": "cooperative",
+   "certification_scope": "Producer",
+   "note": "S5 and S7: Côte d'Ivoire cocoa cooperative facing drought. Contrast C1 with SYN-001.",
+   "projects": [
+    {
+     "title": "Cocoa agroforestry against drought",
+     "category": "Environmental",
+     "sub_category": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
+     "tags": [
+      "climate and weather",
+      "biodiversity and conservation"
+     ],
+     "start_year": 2023,
+     "amount": 14000,
+     "description": "Gave members fruit and timber seedlings to plant among cocoa trees, to shade the trees through longer and hotter dry seasons."
+    },
+    {
+     "title": "Nursery for drought-tolerant cocoa seedlings",
+     "category": "Environmental",
+     "sub_category": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
+     "tags": [
+      "climate and weather",
+      "soil and land"
+     ],
+     "start_year": 2024,
+     "amount": 8000,
+     "description": "Set up a cooperative nursery that raises drought-tolerant cocoa seedlings to replace trees lost in the last dry season."
+    },
+    {
+     "title": "Transport for harvest workers",
+     "category": "Social",
+     "sub_category": null,
+     "tags": [
+      "labor and migration"
+     ],
+     "start_year": 2022,
+     "amount": 5000,
+     "description": "Rented trucks to bring harvest workers from neighbouring villages during the main crop, when farms could not find enough labor."
+    }
+   ],
+   "survey_responses": [
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 450.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small animal farming (Guinea pigs, pigs, ducks etc)"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 4.0,
+     "yield_produced_per_hectare_nbr": 400.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change",
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Small animal farming (Guinea pigs, pigs, ducks etc)"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 5.0,
+     "yield_produced_per_hectare_nbr": 500.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small animal farming (Guinea pigs, pigs, ducks etc)"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 450.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change",
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Small animal farming (Guinea pigs, pigs, ducks etc)"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 4.0,
+     "yield_produced_per_hectare_nbr": 400.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small animal farming (Guinea pigs, pigs, ducks etc)"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 5.0,
+     "yield_produced_per_hectare_nbr": 500.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change",
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Small animal farming (Guinea pigs, pigs, ducks etc)"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    }
+   ]
+  },
+  {
+   "producer_id": "SYN-006",
+   "country": "Côte d'Ivoire",
+   "admin1": "Goh-Djiboua",
+   "crops": [
+    "cocoa"
+   ],
+   "entity_type": "smallholder",
+   "certification_scope": "Producer",
+   "note": "Côte d'Ivoire cocoa smallholder facing a labor shortage. Contrast C3 with SYN-003.",
+   "projects": [
+    {
+     "title": "Shared work groups for pod breaking",
+     "category": "Social",
+     "sub_category": null,
+     "tags": [
+      "labor and migration",
+      "social and community"
+     ],
+     "start_year": 2023,
+     "amount": 1200,
+     "description": "Joined neighbouring farmers in a rotating work group to break pods and ferment beans, since hired workers have become hard to find."
+    },
+    {
+     "title": "Evening literacy classes for young farmers",
+     "category": "Social",
+     "sub_category": null,
+     "tags": [
+      "education"
+     ],
+     "start_year": 2024,
+     "amount": 600,
+     "description": "Paid a teacher for evening reading and arithmetic classes so young farmers can check weights and payments themselves."
+    }
+   ],
+   "survey_responses": [
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 380.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 420.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 380.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 420.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 380.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 420.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    }
+   ]
+  },
+  {
+   "producer_id": "SYN-007",
+   "country": "Ecuador",
+   "admin1": "El Oro",
+   "crops": [
+    "banana"
+   ],
+   "entity_type": "hired_labor_farm",
+   "certification_scope": "Producer",
+   "note": "Ecuadorian banana farm with hired labor facing a price drop. Contrast C2 with SYN-002.",
+   "projects": [
+    {
+     "title": "Packing station upgrade for export grade",
+     "category": "Economic",
+     "sub_category": null,
+     "tags": [
+      "market and price",
+      "infrastructure"
+     ],
+     "start_year": 2023,
+     "amount": 30000,
+     "description": "Rebuilt the packing station with new washing tanks and scales so more fruit meets export grade and less is sold at the local price."
+    },
+    {
+     "title": "Worker transport and meals in peak weeks",
+     "category": "Social",
+     "sub_category": null,
+     "tags": [
+      "labor and migration"
+     ],
+     "start_year": 2024,
+     "amount": 9000,
+     "description": "Provided a bus and hot meals for workers during peak harvest weeks, when the farm competed with mines for labor."
+    },
+    {
+     "title": "On-farm health post for workers",
+     "category": "Social",
+     "sub_category": null,
+     "tags": [
+      "health"
+     ],
+     "start_year": 2022,
+     "amount": 11000,
+     "description": "Equipped a health post on the farm with a part-time nurse, so workers no longer lose a day travelling to the town clinic."
+    }
+   ],
+   "survey_responses": [
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 25.0,
+     "yield_produced_per_hectare_nbr": 38000.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Banana plantation"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours",
+      "Increased benefits"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 30.0,
+     "yield_produced_per_hectare_nbr": 41000.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Banana plantation"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours",
+      "Increased benefits"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 25.0,
+     "yield_produced_per_hectare_nbr": 38000.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Banana plantation"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours",
+      "Increased benefits"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 30.0,
+     "yield_produced_per_hectare_nbr": 41000.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Banana plantation"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours",
+      "Increased benefits"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 25.0,
+     "yield_produced_per_hectare_nbr": 38000.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Banana plantation"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours",
+      "Increased benefits"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 30.0,
+     "yield_produced_per_hectare_nbr": 41000.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Damaged by natural disasters"
+     ],
+     "income_sources_ms_core": [
+      "Banana plantation"
+     ],
+     "ft_benefits_ms_core": [
+      "Steady wages/hours",
+      "Increased benefits"
+     ]
+    }
+   ]
+  },
+  {
+   "producer_id": "SYN-008",
+   "country": "Colombia",
+   "admin1": "Cauca",
+   "crops": [
+    "coffee"
+   ],
+   "entity_type": "cooperative",
+   "certification_scope": "Producer",
+   "note": "Colombian coffee cooperative in Cauca facing drought. Contrast C4 with SYN-001 (entity type only).",
+   "projects": [
+    {
+     "title": "Weather stations for member farms",
+     "category": "Environmental",
+     "sub_category": "Climate Change Mitigation/Adaptation (Clean Energy, Agroforestry etc.)",
+     "tags": [
+      "climate and weather"
+     ],
+     "start_year": 2024,
+     "amount": 10000,
+     "description": "Installed four small weather stations and sent members text alerts before dry spells and heavy rain."
+    },
+    {
+     "title": "Cover crops to keep soil moisture",
+     "category": "Environmental",
+     "sub_category": "Crop Diversification",
+     "tags": [
+      "climate and weather",
+      "soil and land"
+     ],
+     "start_year": 2022,
+     "amount": 4000,
+     "description": "Gave members seed for ground cover between coffee rows to keep moisture in the soil and reduce erosion on slopes."
+    }
+   ],
+   "survey_responses": [
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 1050.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 1250.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.5,
+     "yield_produced_per_hectare_nbr": 1050.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 1250.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 1050.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 2.5,
+     "yield_produced_per_hectare_nbr": 1250.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund",
+      "Training"
+     ]
+    }
+   ]
+  },
+  {
+   "producer_id": "SYN-SCOPE-A",
+   "country": "Peru",
+   "admin1": "Junin",
+   "crops": [
+    "coffee"
+   ],
+   "entity_type": "cooperative",
+   "certification_scope": "Producer",
+   "note": "Negative scope test producer A (#34). Different country, region and crop from SYN-SCOPE-B.",
+   "projects": [
+    {
+     "title": "Compost plant for coffee pulp",
+     "category": "Environmental",
+     "sub_category": "Sustainability efforts",
+     "tags": [
+      "soil and land",
+      "biodiversity and conservation"
+     ],
+     "start_year": 2023,
+     "amount": 8500,
+     "description": "Built a compost plant that turns coffee pulp from members' farms into fertilizer for the next season."
+    },
+    {
+     "title": "Leaf rust monitoring brigade",
+     "category": "Environmental",
+     "sub_category": "Pest Management",
+     "tags": [
+      "soil and land"
+     ],
+     "start_year": 2024,
+     "amount": 3000,
+     "description": "Trained a brigade of members to check plots for leaf rust each month and advise on resistant varieties."
+    }
+   ],
+   "survey_responses": [
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 900.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 850.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 900.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 850.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 900.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 2.0,
+     "yield_produced_per_hectare_nbr": 850.0,
+     "has_hired_labor_code": "Yes",
+     "harvest_changed_code": "It has decreased",
+     "has_integrated_pest_management_practices_name": "Conduct regular visual examinations of the coffee to detect pests and/or diseases",
+     "water_access_sources_name": "Water comes out of my taps",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Climate change"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Premium fund"
+     ]
+    }
+   ]
+  },
+  {
+   "producer_id": "SYN-SCOPE-B",
+   "country": "Côte d'Ivoire",
+   "admin1": "Zanzan",
+   "crops": [
+    "cocoa"
+   ],
+   "entity_type": "smallholder",
+   "certification_scope": "Producer",
+   "note": "Negative scope test producer B (#34). Different country, region and crop from SYN-SCOPE-A.",
+   "projects": [
+    {
+     "title": "Soil testing and liming for cocoa plots",
+     "category": "Environmental",
+     "sub_category": "Sustainability efforts",
+     "tags": [
+      "soil and land"
+     ],
+     "start_year": 2023,
+     "amount": 700,
+     "description": "Paid for soil tests on the cocoa plot and lime for the acid patches the tests found."
+    },
+    {
+     "title": "Cashew trees alongside cocoa",
+     "category": "Environmental",
+     "sub_category": "Crop Diversification",
+     "tags": [
+      "soil and land",
+      "market and price"
+     ],
+     "start_year": 2024,
+     "amount": 500,
+     "description": "Planted cashew trees on the drier edge of the plot to earn income in the months between cocoa harvests."
+    }
+   ],
+   "survey_responses": [
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.5,
+     "yield_produced_per_hectare_nbr": 350.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 390.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.5,
+     "yield_produced_per_hectare_nbr": 350.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 390.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2024,
+     "farm_area_ha_nbr": 2.5,
+     "yield_produced_per_hectare_nbr": 350.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Training"
+     ]
+    },
+    {
+     "response_year": 2025,
+     "farm_area_ha_nbr": 3.0,
+     "yield_produced_per_hectare_nbr": 390.0,
+     "has_hired_labor_code": "No",
+     "harvest_changed_code": "It has not changed",
+     "has_integrated_pest_management_practices_name": "Use traps, repellents, and natural pesticides",
+     "water_access_sources_name": "Water well/pump",
+     "has_received_fertilizer_training_code": "Yes",
+     "has_forest_protection_practices_code": "Yes",
+     "has_water_conservation_practices_code": "Yes",
+     "has_water_contamination_prevention_practices_code": "Yes",
+     "has_soil_conservation_practices_code": "Yes",
+     "harvest_change_reason_core": [
+      "Less land area under production"
+     ],
+     "income_sources_ms_core": [
+      "Small family business"
+     ],
+     "ft_benefits_ms_core": [
+      "Training"
+     ]
+    }
+   ]
+  }
+ ]
+}
