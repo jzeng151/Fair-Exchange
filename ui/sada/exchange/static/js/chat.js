@@ -20,18 +20,24 @@
   let languageChosen = false;  // the producer picked a language in the menu: FEX's real replies are translated (Amazon Translate)
 
   // Amazon Polly reads answers aloud (neural voice); the browser voice is the fallback.
-  let audio = null;
-  function stopAudio() { if (audio) { audio.pause(); audio = null; } if (synth) synth.cancel(); }
+  // Each Listen gets a number; stopAudio() moves it on, so a reply that arrives after the producer pressed stop,
+  // or started another Listen, never starts playing.
+  let audio = null, speechTurn = 0;
+  function stopAudio() { speechTurn++; if (audio) { audio.pause(); audio = null; } if (synth) synth.cancel(); }
   async function pollySpeak(text, onstart, onend) {
     stopAudio();
+    const mine = speechTurn;
     try {
       const res = await fetch(T.speakUrl, { method: "POST", headers: { "Content-Type": "application/json", "X-CSRFToken": T.csrftoken },
                                             body: JSON.stringify({ text, language }) });
       if (res.status === 200) {
-        audio = new Audio(URL.createObjectURL(await res.blob()));
+        const blob = await res.blob();
+        if (mine !== speechTurn) { onend(); return; }
+        audio = new Audio(URL.createObjectURL(blob));
         audio.onended = audio.onerror = onend; onstart(); await audio.play(); return;
       }
     } catch (e) {}
+    if (mine !== speechTurn) { onend(); return; }
     if (!synth) { onend(); return; }
     const u = new SpeechSynthesisUtterance(text); u.lang = LOCALE[language] || "en-US";
     u.onstart = onstart; u.onend = u.onerror = onend; synth.speak(u);

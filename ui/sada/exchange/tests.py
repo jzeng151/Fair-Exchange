@@ -160,3 +160,124 @@ class RealApiTests(SimpleTestCase):
             html = self.client.get("/chat/cons-coffee-us/?source=live").content.decode()
         req.assert_not_called()
         self.assertIn("serves producers only", html)
+
+
+class FakeS3:
+    """Just enough of boto3's S3 client: an in-memory bucket."""
+    class exceptions:
+        class ClientError(Exception):
+            pass
+
+    def __init__(self):
+        self.objects = {}
+
+    def put_object(self, Bucket, Key, Body=b"", **_):
+        self.objects[Key] = Body
+
+    def get_object(self, Bucket, Key):
+        if Key not in self.objects:
+            raise self.exceptions.ClientError("NoSuchKey")
+        return {"Body": mock.Mock(read=mock.Mock(return_value=self.objects[Key]))}
+
+    def head_object(self, Bucket, Key):
+        if Key not in self.objects:
+            raise self.exceptions.ClientError("404")
+        return {}
+
+    def list_objects_v2(self, Bucket, Prefix):
+        return {"Contents": [{"Key": k} for k in self.objects if k.startswith(Prefix)]}
+
+    def delete_objects(self, Bucket, Delete):
+        for o in Delete["Objects"]:
+            self.objects.pop(o["Key"], None)
+
+
+class FakeTranscribe:
+    """Statuses play in order; the last one repeats. COMPLETED writes the transcript, like the real job."""
+    def __init__(self, s3, statuses):
+        self.s3, self.statuses, self.deleted, self.output = s3, list(statuses), [], None
+
+    def start_transcription_job(self, OutputKey, **_):
+        self.output = OutputKey
+
+    def get_transcription_job(self, TranscriptionJobName):
+        status = self.statuses.pop(0) if len(self.statuses) > 1 else self.statuses[0]
+        if status == "COMPLETED":
+            self.s3.objects[self.output] = json.dumps({"results": {"transcripts": [{"transcript": "hola"}]}}).encode()
+        return {"TranscriptionJob": {"TranscriptionJobStatus": status}}
+
+    def delete_transcription_job(self, TranscriptionJobName):
+        self.deleted.append(TranscriptionJobName)
+
+
+@override_settings(UPLOADS_BUCKET="test-uploads")
+class TranscribeCleanupTests(SimpleTestCase):
+    def run_transcribe(self, statuses):
+        from . import aws_tools
+        s3 = FakeS3()
+        tr = FakeTranscribe(s3, statuses)
+        clock = iter(range(0, 10_000, 30))  # every poll moves the clock 30 s, so the 120 s deadline passes quickly
+        with mock.patch.object(aws_tools, "_client", side_effect=lambda name: {"s3": s3, "transcribe": tr}[name]), \
+                mock.patch.object(aws_tools.time, "time", side_effect=lambda: next(clock)), \
+                mock.patch.object(aws_tools.time, "sleep"):
+            try:
+                result = aws_tools.transcribe(b"audio", "audio/webm", "es")
+            except RuntimeError as e:
+                result = e
+        return result, s3, tr
+
+    def test_a_finished_job_is_cleaned_up_at_once(self):
+        text, s3, tr = self.run_transcribe(["IN_PROGRESS", "COMPLETED"])
+        self.assertEqual(text, "hola")
+        self.assertEqual(s3.objects, {})
+        self.assertEqual(len(tr.deleted), 1)
+
+    def test_a_timed_out_job_still_running_is_left_for_the_completion_cleanup(self):
+        err, s3, tr = self.run_transcribe(["IN_PROGRESS"])
+        self.assertIsInstance(err, RuntimeError)
+        keys = sorted(s3.objects)
+        self.assertEqual(len(keys), 2)  # the audio the job is still reading, and the abandoned marker
+        self.assertTrue(keys[0].endswith("/abandoned"))
+        self.assertEqual(tr.deleted, [])
+
+    def test_a_job_that_finishes_right_after_the_timeout_is_cleaned_up_by_the_request(self):
+        statuses = ["IN_PROGRESS"] * 3 + ["COMPLETED"]  # 3 polls fit in the 120 s wait; done at the re-check
+        err, s3, tr = self.run_transcribe(statuses)
+        self.assertIsInstance(err, RuntimeError)
+        self.assertEqual(s3.objects, {})
+        self.assertEqual(len(tr.deleted), 1)
+
+    def test_completion_cleanup_removes_an_abandoned_job_and_ignores_others(self):
+        from . import voice_cleanup
+        A, D = "a" * 32, "d" * 32  # voice IDs are uuid4 hex
+        s3, tr = FakeS3(), FakeTranscribe(None, ["COMPLETED"])
+        s3.objects = {f"voice/{A}/audio.webm": b"a", f"voice/{A}/transcript.json": b"t",
+                      f"voice/{A}/abandoned": b"",
+                      f"voice/{D}/audio.webm": b"a"}
+        with mock.patch.object(voice_cleanup, "_clients", return_value=(s3, tr)):
+            event = lambda job: {"detail": {"TranscriptionJobName": job, "TranscriptionJobStatus": "COMPLETED"}}
+            voice_cleanup.handler(event(f"fx-ui-voice-{A}"), None, bucket="test-uploads")
+            voice_cleanup.handler(event(f"fx-ui-voice-{D}"), None, bucket="test-uploads")  # still being read: left
+            voice_cleanup.handler(event("other-job"), None, bucket="test-uploads")
+        self.assertEqual(list(s3.objects), [f"voice/{D}/audio.webm"])
+        self.assertEqual(tr.deleted, [f"fx-ui-voice-{A}"])
+
+
+@override_settings(UPLOADS_BUCKET="test-uploads")
+class VoiceUploadLimitTests(SimpleTestCase):
+    def post(self, size):
+        with mock.patch("exchange.aws_tools.transcribe", return_value="hola") as tr:
+            r = self.client.post("/api/transcribe?language=es", data=b"x" * size, content_type="audio/webm")
+        return r, tr
+
+    def test_a_recording_over_djangos_default_body_limit_is_transcribed(self):
+        r, tr = self.post(3 * 1024 * 1024)  # above Django's 2.5 MiB DATA_UPLOAD_MAX_MEMORY_SIZE
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()["text"], "hola")
+        self.assertEqual(len(tr.call_args.args[0]), 3 * 1024 * 1024)
+
+    def test_a_recording_over_the_limit_is_refused_before_transcribing(self):
+        from . import views
+        r, tr = self.post(views.MAX_VOICE_BYTES + 1)
+        self.assertEqual(r.status_code, 400)
+        tr.assert_not_called()

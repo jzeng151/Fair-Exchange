@@ -300,14 +300,25 @@ def api_speak(request):
     return HttpResponse(audio, content_type="audio/mpeg")
 
 
+# A Lambda function URL accepts at most 6 MB per request, and a binary body arrives base64-encoded (4/3 larger).
+MAX_VOICE_BYTES = 4 * 1024 * 1024
+
+
 @require_POST
 def api_transcribe(request):
     """Amazon Transcribe: a recorded voice note (raw audio body) becomes text for the message box."""
     if not aws_tools.bucket():
         return JsonResponse({"error": "Voice notes are not set up."}, status=503)
-    audio = request.body
-    if not audio or len(audio) > 5 * 1024 * 1024:
-        return JsonResponse({"error": "The recording is empty or too long."}, status=400)
+    too_long = JsonResponse({"error": "The recording is empty or too long."}, status=400)
+    try:
+        if int(request.META.get("CONTENT_LENGTH") or 0) > MAX_VOICE_BYTES:
+            return too_long
+    except ValueError:
+        return too_long
+    # A bounded read of the raw body: request.body would stop at Django's 2.5 MiB DATA_UPLOAD_MAX_MEMORY_SIZE.
+    audio = request.read(MAX_VOICE_BYTES + 1)
+    if not audio or len(audio) > MAX_VOICE_BYTES:
+        return too_long
     try:
         text = aws_tools.transcribe(audio, request.content_type or "audio/webm", request.GET.get("language", "en"))
     except Exception:

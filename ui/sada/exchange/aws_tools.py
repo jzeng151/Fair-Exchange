@@ -58,13 +58,31 @@ def speak(text: str, language: str) -> bytes | None:
 
 # ----------------------------------------------------------------------------------------- Transcribe
 
+VOICE_JOB_PREFIX = "fx-ui-voice-"  # the completion cleanup (voice_cleanup.py) acts only on these jobs
+ABANDONED = "abandoned"  # marker object: the request stopped waiting, so the completion cleanup deletes the files
+
+
+def _job_status(tr, job: str) -> str | None:
+    try:
+        return tr.get_transcription_job(TranscriptionJobName=job)["TranscriptionJob"]["TranscriptionJobStatus"]
+    except Exception:
+        return None  # e.g. the job was never created
+
+
 def transcribe(audio: bytes, content_type: str, language: str) -> str:
-    """Upload a voice note, transcribe it (batch), delete the audio and transcript, and return the text."""
+    """Upload a voice note, transcribe it (batch), delete the audio and transcript, and return the text.
+
+    A batch job can't be stopped. If it is still running when the wait ends, its files can't be deleted yet: the
+    request leaves an "abandoned" marker, and voice_cleanup.py deletes everything when the job finishes. If the job
+    finished in the meantime, the request deletes everything itself (marker first, then the status check, so one of
+    the two always does)."""
     fmt = _MEDIA_FORMATS.get(content_type.split(";")[0].strip(), "webm")
     vid = uuid.uuid4().hex
     s3, tr = _client("s3"), _client("transcribe")
-    audio_key, out_key, job = f"voice/{vid}/audio.{fmt}", f"voice/{vid}/transcript.json", f"fx-ui-voice-{vid}"
+    prefix, job = f"voice/{vid}/", f"{VOICE_JOB_PREFIX}{vid}"
+    audio_key, out_key = f"{prefix}audio.{fmt}", f"{prefix}transcript.json"
     s3.put_object(Bucket=bucket(), Key=audio_key, Body=audio, ContentType=content_type)
+    finished = False
     try:
         tr.start_transcription_job(
             TranscriptionJobName=job, MediaFormat=fmt, Media={"MediaFileUri": f"s3://{bucket()}/{audio_key}"},
@@ -72,20 +90,33 @@ def transcribe(audio: bytes, content_type: str, language: str) -> str:
             LanguageCode=TRANSCRIBE_LANGUAGES.get(language, "en-US"))
         deadline = time.time() + 120
         while time.time() < deadline:
-            status = tr.get_transcription_job(TranscriptionJobName=job)["TranscriptionJob"]["TranscriptionJobStatus"]
+            status = _job_status(tr, job)
             if status == "COMPLETED":
+                finished = True
                 body = json.loads(s3.get_object(Bucket=bucket(), Key=out_key)["Body"].read())
                 return body["results"]["transcripts"][0]["transcript"].strip()
             if status == "FAILED":
+                finished = True
                 raise RuntimeError("transcription failed")
             time.sleep(1.5)
         raise RuntimeError("transcription timed out")
     finally:
-        s3.delete_objects(Bucket=bucket(), Delete={"Objects": [{"Key": audio_key}, {"Key": out_key}], "Quiet": True})
-        try:
-            tr.delete_transcription_job(TranscriptionJobName=job)
-        except Exception:
-            pass
+        if not finished:
+            s3.put_object(Bucket=bucket(), Key=prefix + ABANDONED, Body=b"")
+            finished = _job_status(tr, job) in ("COMPLETED", "FAILED", None)
+        if finished:
+            delete_voice_files(s3, tr, bucket(), vid)
+
+
+def delete_voice_files(s3, tr, bucket_name: str, vid: str) -> None:
+    """Delete a voice note's audio, transcript and marker, and its finished Transcribe job."""
+    listed = s3.list_objects_v2(Bucket=bucket_name, Prefix=f"voice/{vid}/").get("Contents", [])
+    if listed:
+        s3.delete_objects(Bucket=bucket_name, Delete={"Objects": [{"Key": o["Key"]} for o in listed], "Quiet": True})
+    try:
+        tr.delete_transcription_job(TranscriptionJobName=f"{VOICE_JOB_PREFIX}{vid}")
+    except Exception:
+        pass  # never created, or already gone
 
 
 # ------------------------------------------------------------------------------------------ Translate

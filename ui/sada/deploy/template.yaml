@@ -100,6 +100,10 @@ Resources:
               - Effect: Allow
                 Action: [s3:PutObject, s3:GetObject, s3:DeleteObject]
                 Resource: !Sub "${UploadsBucket.Arn}/*"
+              - Effect: Allow  # list a voice note's files to delete them all (aws_tools.delete_voice_files)
+                Action: s3:ListBucket
+                Resource: !GetAtt UploadsBucket.Arn
+                Condition: { StringLike: { "s3:prefix": "voice/*" } }
               - Effect: Allow
                 Action: [polly:SynthesizeSpeech, translate:TranslateText, comprehend:DetectDominantLanguage,
                          transcribe:StartTranscriptionJob, transcribe:GetTranscriptionJob, transcribe:DeleteTranscriptionJob]
@@ -139,6 +143,85 @@ Resources:
           USE_BEDROCK: "0"
           UPLOADS_BUCKET: !Ref UploadsBucket
           VISION_MODEL_ID: us.anthropic.claude-haiku-5-5
+
+  # A Transcribe batch job can't be stopped. When a voice-note request stops waiting before its job finishes, it
+  # leaves an "abandoned" marker; this function deletes that note's audio and transcript once the job finishes
+  # (exchange/voice_cleanup.py, same code package, no Django).
+  VoiceCleanupLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${AWS::StackName}-voice-cleanup
+      RetentionInDays: !Ref LogRetentionDays
+
+  VoiceCleanupRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: { Service: lambda.amazonaws.com }
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: voice-cleanup
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: [logs:CreateLogStream, logs:PutLogEvents]
+                Resource: !GetAtt VoiceCleanupLogGroup.Arn
+              - Effect: Allow
+                Action: [s3:GetObject, s3:DeleteObject]
+                Resource: !Sub "${UploadsBucket.Arn}/voice/*"
+              - Effect: Allow
+                Action: s3:ListBucket
+                Resource: !GetAtt UploadsBucket.Arn
+                Condition: { StringLike: { "s3:prefix": "voice/*" } }
+              - Effect: Allow
+                Action: transcribe:DeleteTranscriptionJob
+                Resource: !Sub "arn:aws:transcribe:${AWS::Region}:${AWS::AccountId}:transcription-job/fx-ui-voice-*"
+
+  VoiceCleanup:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub ${AWS::StackName}-voice-cleanup
+      Description: Deletes abandoned voice-note files once their Transcribe job finishes
+      Runtime: python3.12
+      Architectures: [x86_64]
+      Handler: exchange.voice_cleanup.handler
+      Code:
+        S3Bucket: !Ref CodeBucket
+        S3Key: !Ref CodeKey
+      Role: !GetAtt VoiceCleanupRole.Arn
+      MemorySize: 256
+      Timeout: 30
+      LoggingConfig:
+        LogGroup: !Ref VoiceCleanupLogGroup
+      Environment:
+        Variables:
+          UPLOADS_BUCKET: !Ref UploadsBucket
+
+  VoiceJobFinished:
+    Type: AWS::Events::Rule
+    Properties:
+      Description: Finished sample-UI voice-note jobs, for the abandoned-file cleanup
+      EventPattern:
+        source: [aws.transcribe]
+        detail-type: [Transcribe Job State Change]
+        detail:
+          TranscriptionJobName: [{ prefix: fx-ui-voice- }]
+          TranscriptionJobStatus: [COMPLETED, FAILED]
+      Targets:
+        - Id: voice-cleanup
+          Arn: !GetAtt VoiceCleanup.Arn
+
+  VoiceCleanupInvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref VoiceCleanup
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt VoiceJobFinished.Arn
 
   WebUrl:
     Type: AWS::Lambda::Url
