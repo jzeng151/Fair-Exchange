@@ -11,6 +11,7 @@ export const PRODUCER_HEADER = 'x-demo-producer-id';
 export const PASSCODE_HEADER = 'x-demo-passcode';
 /** The admin passcode has its own header, secret and authorizer: it never acts as a producer, and vice versa. */
 export const ADMIN_PASSCODE_HEADER = 'x-demo-admin-passcode';
+export const REVIEWER_PASSCODE_HEADER = 'x-demo-reviewer-passcode';
 
 /** What the authorizer hands API Gateway as context; flat strings, as the REST API requires. */
 export interface DemoContext {
@@ -62,4 +63,19 @@ export function authorizeDemoAdmin(
   const given = header(headers, ADMIN_PASSCODE_HEADER);
   if (given === undefined || !passcodeMatches(given, passcode)) return null;
   return { userId: 'demo:admin', roles: 'admin' };
+}
+
+/** Exactly one credential selects one role. Supplying multiple credentials never combines roles. */
+export function authorizeSession(
+  headers: Record<string, string | undefined> | null | undefined,
+  secrets: { producer: string; reviewer: string; admin?: string },
+  allowed: Set<string>,
+): DemoContext | null {
+  const supplied = [PASSCODE_HEADER, REVIEWER_PASSCODE_HEADER, ADMIN_PASSCODE_HEADER]
+    .filter((name) => header(headers, name) !== undefined);
+  if (supplied.length !== 1) return null;
+  if (supplied[0] === PASSCODE_HEADER) return authorizeDemo(headers, secrets.producer, allowed);
+  if (supplied[0] === ADMIN_PASSCODE_HEADER) return authorizeDemoAdmin(headers, secrets.admin ?? '');
+  const given = header(headers, REVIEWER_PASSCODE_HEADER)!;
+  return passcodeMatches(given, secrets.reviewer) ? { userId: 'demo:reviewer', roles: 'reviewer' } : null;
 }

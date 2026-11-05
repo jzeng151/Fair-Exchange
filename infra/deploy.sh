@@ -160,6 +160,7 @@ kb_id="$(output FairExchange StandardsKnowledgeBaseId)"
 if [[ "$sync_key" == arn:aws:kms:* ]]; then
   admin_secret="$(output FairExchange AdminPasscodeSecretArn)"
   python3 "$repo/scripts/e2e/analytics_smoke.py" --api "$api_url" --admin-secret-arn "$admin_secret"
+  (cd "$repo/agent" && uv run --quiet python ../scripts/e2e/records_smoke.py)
 fi
 
 echo
