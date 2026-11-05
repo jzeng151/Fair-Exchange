@@ -23,6 +23,14 @@ What to know before running Fair Exchange in production. Each links to its sourc
 - **The verifier proves provenance, not wording.** It checks that a claim's citation points to a real
   source and clause, not that the claim's wording matches that source
   ([#17](../specs/17-standards-grounding.md)).
+- **Out-of-scope requests are not declined yet.** The engine's scope check defaults to `always_in_scope`,
+  and the runtime passes no other, so a question about certification status or a worker grievance goes
+  through intake like any other message. It stays visible to the models and can reach the playback, and
+  the record if the producer confirms that playback. The Guardrail's denied topics detect both kinds of
+  message and log them to CloudWatch, but the finding does not change the conversation. The decline text
+  (en, es, fr) is built and tested behind the scope check. Whether the Guardrail finding feeds that check
+  is part of the undecided detection function ([#21](../specs/21-out-of-scope.md),
+  [#12](../specs/12-guardrail.md)).
 - **The scope metric is evidence, not proof.** It shows zero leaks across the tested attacks; it is not
   proof that no leak is possible (spec #34, `docs/specs/34-negative-scope-tests.md`, pending).
 - **Observability content capture.** The AgentCore spike found full prompts, responses and tool results
