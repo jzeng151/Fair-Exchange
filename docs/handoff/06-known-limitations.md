@@ -23,14 +23,11 @@ What to know before running Fair Exchange in production. Each links to its sourc
 - **The verifier proves provenance, not wording.** It checks that a claim's citation points to a real
   source and clause, not that the claim's wording matches that source
   ([#17](../specs/17-standards-grounding.md)).
-- **Out-of-scope requests are not declined yet.** The engine's scope check defaults to `always_in_scope`,
-  and the runtime passes no other, so a question about certification status or a worker grievance goes
-  through intake like any other message. It stays visible to the models and can reach the playback, and
-  the record if the producer confirms that playback. The Guardrail's denied topics detect both kinds of
-  message and log them to CloudWatch, but the finding does not change the conversation. The decline text
-  (en, es, fr) is built and tested behind the scope check. Whether the Guardrail finding feeds that check
-  is part of the undecided detection function ([#21](../specs/21-out-of-scope.md),
-  [#12](../specs/12-guardrail.md)).
+- **Scope classification can make mistakes.** The live runtime uses the small Bedrock model to classify
+  certification-status requests, grievances and requests for another producer's private data. Refusals
+  are fixed text. Failed classifications stop that message from reaching answering models or data tools.
+  The offline demo uses a no-AWS stand-in. Synthetic multilingual checks cover known boundaries, but
+  do not prove perfect detection ([#21](../specs/21-out-of-scope.md)).
 - **The scope metric is evidence, not proof.** It shows zero leaks across the tested attacks; it is not
   proof that no leak is possible (spec #34, `docs/specs/34-negative-scope-tests.md`, pending).
 - **Observability content capture.** The AgentCore spike found full prompts, responses and tool results
@@ -90,7 +87,7 @@ until the owning spec decides them. The CI open-decisions check fails if a spec 
 05-cdk-stack.md: 2
 13-conversation-steps.md: 1
 19-consent-and-decline.md: 3
-21-out-of-scope.md: 2
+21-out-of-scope.md: 1
 26-write-back.md: 3
 28-athena-sync.md: 1
 40-timed-redeploy.md: 1
@@ -121,8 +118,6 @@ currently has; it is checked against the specs in CI.
 - Whether records of conversations that are still open appear in Athena; the sync currently copies every
   record, with the filter kept in one place in the sync Lambda ([#28](../specs/28-athena-sync.md)).
 
-### Out of scope
-- How the out-of-scope detection function decides ([#21](../specs/21-out-of-scope.md)).
 ### Deployment and logging
 - The log-group retention period: a required deploy-time value with no default, chosen per deploy
   ([#5](../specs/05-cdk-stack.md)).

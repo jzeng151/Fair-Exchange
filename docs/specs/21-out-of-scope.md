@@ -1,6 +1,6 @@
 # Spec: Out-of-scope handling (#21)
 
-Status: approved for build, 2026-11-04. Revised 2026-11-04 after review.
+Status: approved for build, 2026-11-04. Detection method approved by the repo owner, 2026-11-05.
 
 ## Problem Statement
 
@@ -8,7 +8,7 @@ Producers will ask FEX for things it is not built for, such as their certificati
 
 ## Solution
 
-FEX declines the request, says plainly why, and offers to return to the open question about what has been difficult. Whether a request is out of scope is decided by one detection function, whose implementation is not decided yet. The record is built only from the confirmed playback, so nothing from the misdirected request reaches it.
+FEX declines the request, says plainly why, and offers to return to the open question about what has been difficult. One detection function uses the configured small Bedrock model to classify the message. The record is built only from the confirmed playback, so nothing from the misdirected request reaches it.
 
 ## User Stories
 
@@ -20,7 +20,9 @@ FEX declines the request, says plainly why, and offers to return to the open que
 
 ## Implementation Decisions
 
-- **Detection function.** One function takes the producer's message and the current step and returns `in_scope` or `out_of_scope`, with a short reason code. Handlers and tools never classify requests themselves. How it decides is not decided (below), so tests use a fake.
+- **Detection function.** One function takes the producer's message and current step. The live runtime uses the configured small Bedrock model with the detect-mode Guardrail, no data tools, and a validated structured result: one of `in_scope`, `certification_status`, `grievance`, `other_producer_data`, plus `en`, `es` or `fr`. It never generates the refusal wording. The producer message is untrusted classification input, not instructions. The offline demo retains its no-AWS stand-in.
+- **Failure.** If classification fails or produces an invalid result, no answering model or data tool receives that message. FEX keeps the current step, shows a fixed retry message in the conversation's language, and excludes the failed exchange from future model prompts, playback and PII scanning. Retention and visible resume history follow the existing memory policy.
+- **Boundaries.** General standards guidance, ordinary labor challenges, certification mentioned as background and anonymized peer examples are in scope. Mixed messages containing a prohibited request are declined as a whole; the producer can send their farming challenge separately.
 - **Out-of-scope requests** include:
   - certification status or audit results;
   - worker voice or grievance complaints;
@@ -38,7 +40,7 @@ Seam 1 (agent entrypoint) with a fake detection function and scripted model outp
 - a later confirmed playback and record containing none of the misdirected text;
 - a request for peer examples treated as in scope.
 
-The eval suite checks the decline wording with real Bedrock.
+The classifier adapter is tested with scripted Strands output, including invalid responses and provider failures. A synthetic live-Bedrock check covers the three refusal categories, English/Spanish/French, injection attempts, mixed requests, and permitted peer/labor/standards questions. This finite set is evidence, not a guarantee of perfect classification.
 
 ## Out of Scope
 
@@ -48,5 +50,4 @@ The eval suite checks the decline wording with real Bedrock.
 
 ### Not decided (do not build or assume)
 
-- How the detection function decides
 - What outcome and record a conversation gets when the producer leaves after only an out-of-scope request ([#13 spec](13-conversation-steps.md))
