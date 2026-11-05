@@ -2,6 +2,7 @@
 
 JSON Schema and TypeScript types are generated from these models. Do not hand-edit generated files.
 """
+import re
 from datetime import datetime
 from typing import Annotated, Literal
 
@@ -78,9 +79,11 @@ class ModelUsage(BaseModel):
 
 
 # What a decision-log ref may be (#26): a source item ID, a producer ID, an APS/FPS clause ID, a tool or step
-# name, or a PII entity type. Anything else (free text, model output, producer words) fails validation.
+# name, or a PII entity type. Anything else (free text, model output, producer words) fails validation. Each ID
+# shape has its exact length, so a run of digits such as a phone number never passes as an ID.
 DECISION_REF = (
-    r"^(?:(?:PRJ-|CAT-|RF-|SV-)?[0-9A-F]{6,32}|SYN-(?:[0-9]{3}|SCOPE-[A-Z])|(?:APS|FPS) [0-9]+(?:\.[0-9]+)*(?:\.[a-z])?"
+    r"^(?:(?:PRJ-|CAT-)[0-9A-F]{8}|(?:RF-|SV-)[0-9A-F]{6}|[0-9A-F]{32}|SYN-(?:[0-9]{3}|SCOPE-[A-Z])"
+    r"|(?:APS|FPS) [0-9]+(?:\.[0-9]+)*(?:\.[a-z])?"
     r"|get_producer_record|get_regional_context|find_peer_examples|find_standards"
     r"|intake|playback|respond|consent|feedback|closed|NAME|PHONE|EMAIL|ADDRESS)$"
 )
@@ -95,6 +98,11 @@ class DecisionLogEntry(BaseModel):
     kind: Literal["step", "tool", "verifier", "pii"]
     code: str
     refs: list[Annotated[str, StringConstraints(pattern=DECISION_REF)]] = Field(default_factory=list)
+
+
+def decision_refs(refs: list[str]) -> list[str]:
+    """The refs that are opaque IDs (DECISION_REF). Everything else is left out."""
+    return [ref for ref in refs if re.match(DECISION_REF, ref)]
 
 
 class EarlierAnswer(BaseModel):

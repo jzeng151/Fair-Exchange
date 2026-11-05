@@ -253,7 +253,8 @@ def test_decision_log_accepts_opaque_ids():
     assert record.decision_log[0].refs == refs
 
 
-@pytest.mark.parametrize("ref", ["Juan Pérez", "555-0100", "APS three", "get_regional_context; drop", "RF-F8C4E1 extra",
+@pytest.mark.parametrize("ref", ["Juan Pérez", "555-0100", "5551234567", "+15551234567", "0123456", "RF-5551234",
+                                 "PRJ-5551234567", "APS three", "get_regional_context; drop", "RF-F8C4E1 extra",
                                  "rf-f8c4e1", ""])
 def test_decision_log_rejects_anything_but_an_id(ref):
     with pytest.raises(ValidationError):

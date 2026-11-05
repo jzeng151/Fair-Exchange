@@ -29,7 +29,7 @@ from fex.guardrail import CONVERSATION_KEY, OutputAssessor, narrative_texts
 from fex.conversation.state import (
     ConversationState, DecisionLogEntry, Playback, Profile, ShownClaims, StateConflict, StateStore,
 )
-from fex.models import DECISION_REF, ChallengeTag, Claim, ConsentChoice, EarlierAnswer
+from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer, decision_refs
 from fex.tools import ALL_TOOLS, DATA_TOOLS
 from fex.tools._contract import EVIDENCE_KEY, ITEMS_KEY, TOOLS_RUN_KEY, run_data_tool
 from fex.tools.standards import RETRIEVER_KEY, ClauseRetriever, default_retriever
@@ -169,7 +169,7 @@ def _claim_refs(claim: Claim) -> list[str]:
     clause = claim.citation.standard_clause.split()
     if len(clause) == 2 and clause[0].upper() in ("APS", "FPS"):
         refs.append(f"{clause[0].upper()} {clause[1]}")
-    return [ref for ref in refs if re.match(DECISION_REF, ref)]
+    return decision_refs(refs)
 
 
 class _Turn:

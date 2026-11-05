@@ -504,7 +504,7 @@
         },
         "refs": {
           "items": {
-            "pattern": "^(?:(?:PRJ-|CAT-|RF-|SV-)?[0-9A-F]{6,32}|SYN-(?:[0-9]{3}|SCOPE-[A-Z])|(?:APS|FPS) [0-9]+(?:\\.[0-9]+)*(?:\\.[a-z])?|get_producer_record|get_regional_context|find_peer_examples|find_standards|intake|playback|respond|consent|feedback|closed|NAME|PHONE|EMAIL|ADDRESS)$",
+            "pattern": "^(?:(?:PRJ-|CAT-)[0-9A-F]{8}|(?:RF-|SV-)[0-9A-F]{6}|[0-9A-F]{32}|SYN-(?:[0-9]{3}|SCOPE-[A-Z])|(?:APS|FPS) [0-9]+(?:\\.[0-9]+)*(?:\\.[a-z])?|get_producer_record|get_regional_context|find_peer_examples|find_standards|intake|playback|respond|consent|feedback|closed|NAME|PHONE|EMAIL|ADDRESS)$",
             "type": "string"
           },
           "title": "Refs",

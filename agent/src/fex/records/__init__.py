@@ -20,7 +20,7 @@ from botocore.exceptions import ClientError
 
 from fex.conversation.contract import ActionEntry, SpokenEntry
 from fex.conversation.state import ConversationState
-from fex.models import CompletedRecord, DeclinedRecord, PiiScanState, TextScanStatus, parse_record
+from fex.models import CompletedRecord, DeclinedRecord, PiiScanState, TextScanStatus, decision_refs, parse_record
 from fex.pii import PiiText, scan_texts
 
 log = logging.getLogger(__name__)
@@ -143,7 +143,8 @@ def build_record(state: ConversationState, *, version: int, created_at: datetime
         "peer_examples": [c.model_dump() for c in answer.peer_examples],
         "earlier_answers": [a.model_dump() for a in state.earlier_answers],
         "feedback": state.feedback,
-        "decision_log": [e.model_dump() for e in state.decision_log],
+        # Conversations saved before refs were filtered (#156) can hold non-ID refs; they never reach the record.
+        "decision_log": [{**e.model_dump(), "refs": decision_refs(e.refs)} for e in state.decision_log],
     })
 
 

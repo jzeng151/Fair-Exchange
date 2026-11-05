@@ -1,6 +1,6 @@
 // GENERATED FILE. Do not edit by hand.
 // Source: agent/src/fex/models.py  ->  agent/scripts/generate_types.py
-// schema-sha256: 90db8fd8cb0487d57971307aad7c9c6a015fbb199d05f91b91f70799eab55cf1
+// schema-sha256: 27c6d1d4c9c0a53afa0410f40f7fd01decdc4871c08a16c9b22bd5ab85707dbe
 // body-sha256: 2e0b15e60c0d222bf9ff8533aa4fa93732735dd9d81335fdd359b5315c8c8346
 // end-of-banner
 /**
