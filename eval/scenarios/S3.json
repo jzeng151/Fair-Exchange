@@ -1,0 +1,27 @@
+{
+  "scenario_id": "S3",
+  "title": "Vietnamese processor, labor shortage (English)",
+  "producer_id": "0F0B3837DB56741F8FE33D6009F930FB",
+  "language": "en",
+  "profile_note": "Sample producer: furniture and home goods factory, Binh Duong, Vietnam. The regional table does not cover Vietnam and the sample has no labor peer projects, so the regional tool returns nothing and the answer has no regional insight (limited evidence, the #13 spec's limited-evidence example).",
+  "turns": [
+    {"message": "We can't find enough workers. Several people left for jobs in the city and we are behind on orders.", "expect_step": "intake"},
+    {"message": "It got worse over the last six months. We are short about fifteen workers. We raised wages a little and offered transport, but it hasn't been enough.", "expect_step": "intake"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "playback"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "consent"},
+    {"action": {"name": "set_feedback", "args": {"value": "no"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "feedback"}
+  ],
+  "intake_replies": [
+    "We also posted the job at the local vocational school, but not many applied."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal",
+    "evidence": "limited",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["labor and migration"],
+    "out_of_scope": false
+  }
+}

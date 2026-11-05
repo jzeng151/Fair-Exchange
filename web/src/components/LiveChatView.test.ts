@@ -174,7 +174,7 @@ describe('LiveChatView', () => {
         yield { type: 'text', seq: 1, text: 'late reply for A' } as StreamEvent
         yield { type: 'done', seq: 2 } as StreamEvent
       } },
-      A7F700B04BCE55512CB026A71121426C: { ...fakeClient().client, start: async function* () {
+      '95A4A8BC3F2E3F38F8D6A81B57BA5E4A': { ...fakeClient().client, start: async function* () {
         await gateB
         for (const e of [{ type: 'conversation', conversationId: 'c-B' }, { type: 'text', seq: 1, text: 'hello B' }, ...step('intake', ['end'])]) yield e as StreamEvent
       } },
@@ -183,7 +183,7 @@ describe('LiveChatView', () => {
     await w.get('[data-producer="CFC19603C1B7B29C017954FD1DB2D620"]').trigger('click')
     await flushPromises()
     await w.get('.back-link').trigger('click')
-    await w.get('[data-producer="A7F700B04BCE55512CB026A71121426C"]').trigger('click')
+    await w.get('[data-producer="95A4A8BC3F2E3F38F8D6A81B57BA5E4A"]').trigger('click')
     await flushPromises()
     release() // A's late reply finishes while B's first reply is still loading
     await flushPromises()
@@ -192,7 +192,7 @@ describe('LiveChatView', () => {
     releaseB()
     await flushPromises()
     expect(bubbles(w)).toEqual(['hello B'])
-    expect(sessionStorage.getItem('fex.live.A7F700B04BCE55512CB026A71121426C')).toBe('c-B')
+    expect(sessionStorage.getItem('fex.live.95A4A8BC3F2E3F38F8D6A81B57BA5E4A')).toBe('c-B')
   })
 
   it('starts fresh when the saved conversation is gone (404)', async () => {

@@ -1,0 +1,27 @@
+{
+  "scenario_id": "S2",
+  "title": "Mexican coffee cooperative, falling prices (Spanish)",
+  "producer_id": "95A4A8BC3F2E3F38F8D6A81B57BA5E4A",
+  "language": "es",
+  "profile_note": "Sample producer: coffee, 2nd Grade cooperative, Chiapas, Mexico. Regional facts and coffee price benchmarks exist, but the sample has no market-and-price peer projects, so the answer has limited evidence.",
+  "turns": [
+    {"message": "El precio que nos pagan los compradores por el café ha bajado mucho este año, y a nuestros socios les preocupa no cubrir sus costos.", "expect_step": "intake"},
+    {"message": "Empezó después de la cosecha pasada. Algunos socios recibieron casi una quinta parte menos por kilo. Intentamos vender más por la cooperativa en vez de a los intermediarios locales.", "expect_step": "intake"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "playback"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal_and_outward"}}, "expect_step": "consent"},
+    {"action": {"name": "set_feedback", "args": {"value": "somewhat"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "feedback"}
+  ],
+  "intake_replies": [
+    "También guardamos parte de la cosecha para venderla más adelante, cuando el precio suba."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal_and_outward",
+    "evidence": "limited",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["market and price"],
+    "out_of_scope": false
+  }
+}

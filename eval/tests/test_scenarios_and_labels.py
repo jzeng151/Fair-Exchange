@@ -1,6 +1,8 @@
 """Scenario and labeled-set files (#35) are well formed, so the demo runner and eval harness (#36)
 can rely on them. This checks the files, not the agent: running the scenarios end to end needs the
-conversation steps (#13) and the chat endpoint (#25)."""
+conversation steps (#13) and the chat endpoint (#25). The format follows
+docs/specs/35-scenarios-and-labels.md: scenario_id, turns of a message or an action each naming the
+step it expects, intake_replies, and the expected record."""
 import json
 from pathlib import Path
 
@@ -10,10 +12,13 @@ from fx_data.peers import ProducerProfiles
 from fex.models import ChallengeTag
 
 EVAL = Path(__file__).parents[1]
-SCENARIOS = sorted((EVAL / "scenarios").glob("*.json"))
-LABELS = json.loads((EVAL / "labeled" / "challenge-tags.json").read_text(encoding="utf-8"))["items"]
+SCENARIOS = sorted((EVAL / "scenarios").glob("S*.json"))
+LABELS = [json.loads(line) for line in (EVAL / "labeled" / "challenge-tags.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
 TAGS = set(ChallengeTag.__args__)
 PROFILES = ProducerProfiles.load()._profiles
+REQUIRED_IDS = {"S1", "S2", "S3", "S4", "S5", "S6", "S7"}
+STEPS = {"intake", "playback", "respond", "consent", "feedback", "closed"}
+PII_TYPES = {"NAME", "PHONE", "EMAIL", "ADDRESS"}
 
 # Actions and arguments from docs/specs/13-conversation-steps.md
 ACTIONS = {
@@ -30,10 +35,11 @@ def _load(path: Path) -> dict:
 
 def test_required_scenarios_exist():
     s = [_load(p) for p in SCENARIOS]
-    assert len(s) >= 3
+    assert {x["scenario_id"] for x in s} == REQUIRED_IDS
+    assert len(s) == len(SCENARIOS) == 7
     assert any(x["language"] == "es" for x in s), "at least one Spanish scenario"
-    assert any(x["expect"]["record"]["status"] == "declined" for x in s), "decline path"
-    assert any(x["expect"]["record"]["pii_flag"] for x in s), "PII flag path"
+    assert any(x["expected"]["record_status"] == "declined" for x in s), "decline path"
+    assert any(x["expected"]["pii_flag"] for x in s), "PII flag path"
     countries = {PROFILES[x["producer_id"]]["country"] for x in s}
     assert {"Colombia", "Mexico", "Vietnam"} <= countries, "the vision doc's three scenarios"
 
@@ -41,55 +47,64 @@ def test_required_scenarios_exist():
 @pytest.mark.parametrize("path", SCENARIOS, ids=[p.stem for p in SCENARIOS])
 def test_scenario_is_well_formed(path):
     s = _load(path)
-    assert s["id"] == path.stem
+    assert s["scenario_id"] == path.stem
     assert s["producer_id"] in PROFILES, "must be a sample producer, so the tools have data"
-    assert s["language"] in {"en", "es", "fr"}  # fr added with the French exchange (#24)
+    assert s["language"] in {"en", "es"}
+    assert isinstance(s["intake_replies"], list)
+    for reply in s["intake_replies"]:
+        assert 1 <= len(reply) <= 4000
     turns = s["turns"]
-    assert turns[0] == {"kind": "start"} and turns[-1]["kind"] == "action"
+    assert turns and "action" in turns[-1] and turns[-1]["action"]["name"] == "end", "the last turn is always end"
     for t in turns:
-        assert t["kind"] in {"start", "message", "action"}
-        assert "producer_id" not in json.dumps(t).lower() and "producerid" not in json.dumps(t).lower()
-        if t["kind"] == "message":
-            assert 1 <= len(t["text"]) <= 4000
-        if t["kind"] == "action":
+        assert ("message" in t) ^ ("action" in t), "a turn is a message or an action, not both"
+        assert t["expect_step"] in STEPS, t["expect_step"]
+        blob = json.dumps(t).lower()
+        assert "producer_id" not in blob and "producerid" not in blob
+        if "message" in t:
+            assert 1 <= len(t["message"]) <= 4000
+        else:
             name, args = t["action"]["name"], t["action"]["args"]
             assert name in ACTIONS, name
             assert set(args) == set(ACTIONS[name]), (name, args)
             for key, allowed in ACTIONS[name].items():
                 if allowed:
                     assert args[key] in allowed, (name, args)
-    exp = s["expect"]
+    exp = s["expected"]
     assert exp["tags"] and set(exp["tags"]) <= TAGS
     assert exp["evidence"] in {"full", "limited"}
-    assert exp["record"]["status"] in {"completed", "declined"}
+    assert exp["record_status"] in {"completed", "declined"}
+    assert isinstance(exp["pii_flag"], bool)
+    assert set(exp["pii_entity_types"]) <= PII_TYPES
+    if exp["pii_flag"]:
+        assert exp["pii_entity_types"], "a flagged record names the entity types it was flagged for"
+    assert isinstance(exp["out_of_scope"], bool)
 
 
 @pytest.mark.parametrize("path", SCENARIOS, ids=[p.stem for p in SCENARIOS])
 def test_expected_record_matches_the_last_choices(path):
     s = _load(path)
-    actions = [t["action"] for t in s["turns"] if t["kind"] == "action"]
+    actions = [t["action"] for t in s["turns"] if "action" in t]
     consent = [a["args"]["scope"] for a in actions if a["name"] == "set_consent"]
-    feedback = [a["args"]["value"] for a in actions if a["name"] == "set_feedback"]
-    rec = s["expect"]["record"]
-    assert rec["consent_scope"] == consent[-1]
-    assert rec["status"] == ("declined" if consent[-1] == "declined" else "completed")
-    assert rec["feedback"] == (feedback[-1] if feedback and consent[-1] != "declined" else None)
-    if "consent_history" in s["expect"]:
-        assert s["expect"]["consent_history"] == consent
+    exp = s["expected"]
+    assert consent, "every scenario grants or declines consent before it ends"
+    assert exp["consent_scope"] == consent[-1]
+    assert exp["record_status"] == ("declined" if consent[-1] == "declined" else "completed")
 
 
 def test_labeled_set_covers_every_tag():
-    used = {tag for item in LABELS for tag in item["tags"]}
+    used = {tag for item in LABELS for tag in item["reference"]}
     assert used == TAGS
     for tag in TAGS:
-        assert sum(tag in item["tags"] for item in LABELS) >= 2, tag
+        assert sum(tag in item["reference"] for item in LABELS) >= 2, tag
 
 
 def test_labeled_items_are_well_formed():
+    assert len(LABELS) == 15, "the decided minimum set is fifteen accounts"
     ids = [item["id"] for item in LABELS]
     assert len(ids) == len(set(ids))
     for item in LABELS:
         assert item["language"] in {"en", "es"} and item["text"].strip()
-        assert item["tags"] and set(item["tags"]) <= TAGS
-        assert item["labeled_by"]
+        assert item["producer_id"] in PROFILES, "each account is a real sample producer"
+        assert item["reference"] and set(item["reference"]) <= TAGS
+        assert set(item["labeler_a"]) <= TAGS and set(item["labeler_b"]) <= TAGS
     assert {item["language"] for item in LABELS} == {"en", "es"}
