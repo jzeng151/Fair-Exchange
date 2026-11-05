@@ -243,11 +243,49 @@ def test_running_out_of_intake_replies_sends_the_last_reply_then_gives_up():
     assert "still in intake after 3" in result.problems[0]
 
 
-def test_a_step_that_arrives_after_the_deadline_is_a_problem():
-    ticks = iter([0, 61])  # turn 1 sets its deadline at 0 and its step arrives at 61 s
-    t = FakeTransport(step("intake", ["end"]), step("playback", ["confirm_playback", "end"]))
-    result = ScenarioRunner(t, clock=lambda: next(ticks)).run(RUN, "c-1")
-    assert "did not arrive within 60 s" in result.problems[0]
+def test_a_stream_that_stalls_is_stopped_at_the_deadline():
+    import threading
+
+    stall = threading.Event()
+
+    class Stalls(FakeTransport):
+        def send(self, producer_id, conversation_id, body):
+            self.sent.append(body)
+            if body["kind"] == "start":
+                return iter(step("intake", ["end"]))
+
+            def events():
+                yield {"type": "step", "step": "intake"}
+                stall.wait()  # a model call that never returns
+            return events()
+
+    try:
+        result = ScenarioRunner(Stalls(), step_timeout=0.3).run(RUN, "c-1")
+    finally:
+        stall.set()
+    assert result.problems == ["turn 1: message: no complete response within 0.3 s"]
+
+
+def test_extra_intake_answers_stop_once_the_deadline_has_passed():
+    now = [0.0]
+
+    class Slow(FakeTransport):
+        def send(self, producer_id, conversation_id, body):
+            now[0] += 25  # each exchange takes 25 s
+            return super().send(producer_id, conversation_id, body)
+
+    t = Slow()  # always intake
+    result = ScenarioRunner(t, clock=lambda: now[0]).run(RUN, "c-1")
+    assert "within 60 s" in result.problems[0] and len(t.sent) <= 4, "no reply is sent after the deadline"
+
+
+def test_a_transport_failure_is_a_problem_not_a_crash():
+    class Broken(FakeTransport):
+        def send(self, producer_id, conversation_id, body):
+            raise ConnectionError("refused")
+
+    result = ScenarioRunner(Broken()).run(RUN, "c-1")
+    assert result.problems == ["start: the request failed: ConnectionError: refused"]
 
 
 def test_the_agentcore_dataset_and_invoker_send_each_scenario_turn_in_order():
@@ -292,11 +330,14 @@ def test_the_reviewer_mark_decides_a_pair_and_marks_from_another_run_are_stale(s
 
 def test_the_report_scores_completed_runs_and_scores_a_declined_run_only_on_its_outcome(sessions):
     report = score(list(sessions.values()), None, "run-1", marks={"run_id": None, "marks": {}}, real_services=False)
-    scored = {r["run_id"] for r in report["results"]}
-    assert "S4" not in scored and {"S1", "L01"} <= scored, "S4 declines"
+    by_run = {}
+    for r in report["results"]:
+        by_run.setdefault(r["run_id"], []).append(r["evaluator"])
+    assert by_run["S4"] == ["scope_leak"], "S4 declines: only its outcome and the safety scan count"
+    assert {"S1", "L01"} <= set(by_run)
     assert {o["run_id"] for o in report["outcomes"]} >= {"S1", "S4"}
     assert report["failures"] == []
-    assert [r["evaluator"] for r in report["results"] if r["run_id"] == "L01"][0] == "tag_overlap"
+    assert "tag_overlap" in by_run["L01"]
     counted = {t["metric"]: t["counted"] for t in report["summary"]["targets"]}
     assert counted["Mean tone score"] is False, "an uncalibrated judge's scores are not counted"
     assert "# Eval run run-1" in markdown(report)
@@ -312,3 +353,56 @@ def test_a_judge_counts_only_after_its_calibration_met_the_threshold(tmp_path):
     path.write_text(json.dumps({"model_id": "stub-judge", "threshold": 0.8, "tone_agreement": 0.9,
                                 "support_agreement": 0.85}))
     assert judge_calibrated(judge, path) and not judge_calibrated(None, path)
+
+
+def test_failed_and_declined_sessions_are_still_scanned_for_scope_leaks(sessions):
+    s, own = sessions["S1"], ev.Ownership()
+    other = next(i for i, owner in own.owner.items() if i.startswith("PRJ-") and owner != s.run.producer_id)
+    leaked = with_claims(s, [("insights", f"About {other}.", item(s, "regional")["source"], clause(s))])
+    failed = type(s)(run=s.run, conversation_id="c", record=None, evidence=leaked.evidence, problems=["turn 3: boom"])
+    report = score([failed, sessions["S4"]], None, "run-1", marks={"run_id": None, "marks": {}}, real_services=False)
+    leaks = {r["run_id"]: r["value"] for r in report["results"] if r["evaluator"] == "scope_leak"}
+    assert leaks == {"S1": 1.0, "S4": 0.0} and report["summary"]["scope_leak_count"] == 1
+    assert [f["run_id"] for f in report["failures"]] == ["S1"]
+
+
+def test_a_declined_labeled_account_is_a_run_failure(sessions):
+    s4, account = sessions["S4"], RUNS["L02"]
+    declined = type(s4)(run=account, conversation_id="c", record=s4.record, evidence=s4.evidence)
+    report = score([declined], None, "run-1", marks={"run_id": None, "marks": {}}, real_services=False)
+    assert report["failures"][0]["run_id"] == "L02" and "declined" in report["failures"][0]["problems"][0]
+    assert not [r for r in report["results"] if r["evaluator"] == "tag_overlap"]
+
+
+def test_incomplete_evidence_leaves_the_evidence_based_scores_unscored(sessions):
+    s = sessions["S1"]
+    lost = s.evidence.model_copy(update={"respond_steps": len(s.evidence.answers) + 1})
+    partial = type(s)(run=s.run, conversation_id=s.conversation_id, record=s.record, evidence=lost)
+    assert not lost.complete
+    assert ev.citation_validity(partial, STANDARDS)["value"] is None
+    assert ev.claim_support(partial, StubJudge())["value"] is None
+    assert ev.scope_leak(partial, ev.Ownership())["breakdown"]["evidence_complete"] is False
+
+
+def test_a_saved_run_can_be_rescored_with_marks_for_that_run(sessions, tmp_path):
+    from fx_evals import offline
+
+    saved = tmp_path / "run-7.sessions.json"
+    offline.save_sessions(list(sessions.values()), saved)
+    (tmp_path / "run-7.json").write_text(json.dumps({"real_services": False}))
+    reloaded = offline.load_sessions(saved)
+    assert [s.run.run_id for s in reloaded] == list(sessions)
+    assert reloaded[0].record == sessions["S1"].record and reloaded[0].evidence == sessions["S1"].evidence
+    marks = {"run_id": "run-7", "marks": {"C4": "tailored"}}
+    report = score(reloaded, None, "run-7", marks=marks, real_services=False)
+    assert next(p for p in report["pairs"] if p["pair"] == "C4")["passes"] is True
+
+
+def test_unknown_run_ids_are_rejected(capsys):
+    from fx_evals import offline
+
+    for bad in ("S99", "S1,S99", " , "):
+        with pytest.raises(SystemExit) as exc:
+            offline.main(["--demo-models", "--runs", bad])
+        assert exc.value.code == 2
+    assert "unknown run IDs" in capsys.readouterr().err

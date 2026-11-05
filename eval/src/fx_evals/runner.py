@@ -6,6 +6,8 @@ that the next action is allowed, answers extra intake questions from `intake_rep
 whose expected step doesn't arrive within 60 seconds. A run stops at its first problem: later turns
 would only repeat it.
 """
+import queue
+import threading
 import time
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
@@ -15,6 +17,7 @@ from fx_evals.runs import LAST_REPLY, Run
 
 STEP_TIMEOUT_S = 60.0
 MAX_EXTRA_REPLIES = 6  # extra intake answers before the runner gives up waiting for a later step
+_END = object()
 
 
 class Transport(Protocol):
@@ -68,26 +71,59 @@ class ScenarioRunner:
         self.step_timeout = step_timeout
         self.max_extra_replies = max_extra_replies
 
-    def _exchange(self, run: Run, conversation_id: str, body: dict, st: RunState) -> list[dict]:
-        events = []
-        for event in self.transport.send(run.producer_id, conversation_id, body):
-            events.append(event)
-            if event.get("type") == "done":
+    def _exchange(self, run: Run, conversation_id: str, body: dict, st: RunState, deadline: float) -> list[dict]:
+        """Send one request and read its stream through `done`, never past the deadline. The stream is read
+        in a background thread, so a stalled model call or a stream that never ends can't block the run."""
+        within = f"within {self.step_timeout:g} s"
+        if self.clock() >= deadline:
+            st.problems.append(f"{body['kind']}: the expected step did not arrive {within}")
+            return []
+        items: queue.Queue = queue.Queue()
+
+        def pump() -> None:
+            try:
+                for event in self.transport.send(run.producer_id, conversation_id, body):
+                    items.put(event)
+                    if event.get("type") == "done":
+                        break
+            except Exception as exc:  # noqa: BLE001 - reported as a problem with the run
+                items.put(exc)
+            finally:
+                items.put(_END)
+
+        threading.Thread(target=pump, daemon=True).start()
+        events: list[dict] = []
+        failure = None
+        while True:
+            try:
+                item = items.get(timeout=max(0.0, deadline - self.clock()))
+            except queue.Empty:
+                failure = f"{body['kind']}: no complete response {within}"
+                break
+            if item is _END:
+                break
+            if isinstance(item, Exception):
+                failure = f"{body['kind']}: the request failed: {type(item).__name__}: {item}"
+                break
+            events.append(item)
+            if item.get("type") == "done":
                 break
         st.events += events
-        if errors := [e for e in events if e.get("type") == "error"]:
-            st.problems += [f"error event {e.get('code')}: {e.get('message')}" for e in errors]
-        if not events or events[-1].get("type") != "done":
-            st.problems.append(f"{body['kind']}: the stream ended before done")
+        if failure:
+            st.problems.append(failure)
+        else:
+            st.problems += [f"error event {e.get('code')}: {e.get('message')}" for e in events if e.get("type") == "error"]
+            if not events or events[-1].get("type") != "done":
+                st.problems.append(f"{body['kind']}: the stream ended before done")
         if actions := [e for e in events if e.get("type") == "actions"]:
             st.allowed = actions[-1]["allowed"]
         return events
 
     def start(self, run: Run, conversation_id: str, st: RunState) -> None:
-        self._exchange(run, conversation_id, {"kind": "start"}, st)
+        self._exchange(run, conversation_id, {"kind": "start"}, st, self.clock() + self.step_timeout)
 
     def play_turn(self, run: Run, conversation_id: str, number: int, st: RunState) -> None:
-        """Turn `number` (1-based) of the run, with any extra intake answers it needs."""
+        """Turn `number` (1-based) of the run, with any extra intake answers it needs, all within one deadline."""
         turn = run.turns[number - 1]
         expect = turn["expect_step"]
         if "action" in turn and turn["action"]["name"] not in st.allowed:
@@ -95,23 +131,21 @@ class ScenarioRunner:
             return
         body = ({"kind": "message", "text": turn["message"]} if "message" in turn
                 else {"kind": "action", "action": turn["action"]})
+        before = len(st.problems)
         deadline = self.clock() + self.step_timeout
-        steps = _steps(self._exchange(run, conversation_id, body, st))
+        steps = _steps(self._exchange(run, conversation_id, body, st, deadline))
         extra = 0
-        while not st.problems and expect != "intake" and steps[-1:] == ["intake"]:
+        while len(st.problems) == before and expect != "intake" and steps[-1:] == ["intake"]:
             if extra == self.max_extra_replies:
-                st.problems.append(f"turn {number}: still in intake after {extra} extra intake answers")
-                return
+                st.problems.append(f"still in intake after {extra} extra intake answers")
+                break
             text = run.intake_replies[st.replies_used] if st.replies_used < len(run.intake_replies) else LAST_REPLY
             st.replies_used += 1
             extra += 1
-            steps = _steps(self._exchange(run, conversation_id, {"kind": "message", "text": text}, st))
-        if st.problems:
-            st.problems = [f"turn {number}: {p}" if not p.startswith("turn ") else p for p in st.problems]
-        elif expect not in steps:
-            st.problems.append(f"turn {number}: expected step {expect}, got {steps}")
-        elif self.clock() > deadline:
-            st.problems.append(f"turn {number}: {expect} did not arrive within {self.step_timeout:.0f} s")
+            steps = _steps(self._exchange(run, conversation_id, {"kind": "message", "text": text}, st, deadline))
+        if len(st.problems) == before and expect not in steps:
+            st.problems.append(f"expected step {expect}, got {steps}")
+        st.problems[before:] = [f"turn {number}: {p}" for p in st.problems[before:]]
 
     def run(self, run: Run, conversation_id: str) -> RunResult:
         st = RunState()

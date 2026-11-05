@@ -53,15 +53,20 @@ def score(sessions: list[Session], judge: Judge | None, run_id: str, marks: dict
     for s in sessions:
         if s.run.kind in ("scenario", "contrast"):
             outcomes += outcome_checks(s, real_services)
+        if s.record is not None or s.evidence is not None:
+            results.append(ev.scope_leak(s, ownership))  # whatever the producer saw, however the run ended
         if s.problems or s.record is None:
             failures.append({"run_id": s.run.run_id, "problems": s.problems or ["no saved record"]})
             continue
         if isinstance(s.record, DeclinedRecord):
-            continue  # scored only on its expected outcome (spec 36)
+            if s.run.kind in ("labeled", "scope"):  # only scenarios expect a decline (spec 36)
+                failures.append({"run_id": s.run.run_id, "problems": ["the conversation was declined, so no "
+                                                                      "completed record to score"]})
+            continue  # a declined scenario is scored only on its expected outcome
         if s.run.kind == "labeled":
             results.append(ev.tag_overlap(s))
         results += [ev.citation_validity(s, standards), ev.claim_support(s, judge), ev.answer_completeness(s),
-                    ev.directive_language(s), ev.enablement_tone(s, judge), ev.scope_leak(s, ownership)]
+                    ev.directive_language(s), ev.enablement_tone(s, judge)]
     pairs = pair_rows({s.run.run_id: s for s in sessions}, run_id, marks)
     calibrated = judge_calibrated(judge)
     return {
