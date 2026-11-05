@@ -7,7 +7,7 @@ What each FEX tool takes, returns and guarantees. Code: `agent/src/fex/tools/`. 
 The contract is owned by [`docs/specs/17-standards-grounding.md`](../specs/17-standards-grounding.md). Code: `fex.tools._contract`.
 
 - **No model-settable arguments.** Every data tool is `@tool(context=True)` with no parameters. It reads everything from `tool_context.invocation_state`, which the conversation engine builds in code: `producer_id`, `step`, `entity_type` (a playback correction), `tags`, `summary_english` and `summary_original` (the confirmed playback). A value the model adds anyway is ignored. `agent/tests/test_scope_guard.py` asserts every tool in `ALL_TOOLS` has an empty input schema.
-- **Scope.** No producer in the session: the tool returns an error (`PermissionError: No producer in session`). Location and crop come from the producer's profile (`fx_data.peers.ProducerProfiles`, a stand-in until #14 and #28).
+- **Scope.** No producer in the session: the tool returns an error (`PermissionError: No producer in session`). Location and crop come from the producer's profile (`fx_data.peers.ProducerProfiles`, from the producer table the #7 generator builds).
 - **Step gating (#13).** Outside `respond`, including when no step is set, a data tool returns `{"refused": true, "reason": "Data tools run only after the producer confirms the playback."}` instead of data.
 - **Result shape.** A list of items, each `{source, kind, text, period, strength, data}`:
   - `source`: the citable label. FEX copies it unchanged into `Citation.source`.
@@ -38,7 +38,7 @@ The decision log records only the codes.
 Items with `kind: "producer_record"`, built by `fx_data.records.ProducerRecords.items`, in this order:
 
 - **Certification scope**, one item. `source` is `Your certification record [<producer_id>]`; `data` is `{"certification_scope": …}`. Certification status and audit results are never read (#21).
-- **Own Premium projects**, one item per project. `source` is `Your Premium project: <name> [<project_ref>]`; `data` is `{category, sub_category, year, amount, description}`. The sample has no amounts, so `amount` is `null`. The producer's own projects keep their real names and text; it is their own record. Placeholder rows (lorem ipsum) are left out.
+- **Own Premium projects**, one item per project. `source` is `Your Premium project: <title> [<project_id>]`; `data` is `{category, sub_category, year, amount, description}`. The sample has no amounts, so `amount` is `null`. The producer's own projects keep their real names and text; it is their own record. Placeholder rows (lorem ipsum) are left out.
 - **Survey summaries**, one item per allowlisted column with enough answers. `source` is `Your <years> survey: <column> [SV-…]`; `data` is `{column, responses}`.
 
 ```json
@@ -82,7 +82,7 @@ At most 8 items: region rows, then country, then global. It never substitutes a 
 
 ## `find_peer_examples()` (#16)
 
-Peer catalog projects (`peer_projects.json`) that share a confirmed tag, excluding the session producer's own projects:
+Peer catalog projects (the generated `peer_catalog` table, #7) that share a confirmed tag, excluding the session producer's own projects:
 
 | Matches | `strength` |
 |---|---|
@@ -124,7 +124,6 @@ Items with `kind: "standard"`: the top 5 distinct APS/FPS clauses the standards 
 |---|---|---|
 | `regional_sources.json` | `fx_data.regional fetch` (network) | when adding regions or refreshing data |
 | `regional_facts.csv` | `fx_data.regional build` (offline; validated, #8 columns) | after `fetch` |
-| `peer_projects.json`, `producer_profiles.json` | `fx_data.peers` (offline) | when the sample data changes |
-| `producer_records.json` | `fx_data.records` (offline) | when the sample data changes |
+| `generated/<table>/<table>.jsonl`: producers, Premium projects, survey responses, certifications, peer catalog | `fx_data.generator` (Comprehend for new descriptions, or `--offline`) | when the sample data or `data/generator_inputs/` change |
 
 The architecture in the [repository README](../../README.md) puts the regional table in S3 and peer search in a Knowledge Base. For the sandbox these ship as package data, like `clauses.json` (#9). Moving them to S3 or a Knowledge Base changes the loaders in `fx_data`, not the tool contracts.

@@ -2,7 +2,8 @@
 import json
 
 import pytest
-from fx_data.peers import PEERS_PATH, PUBLISHABLE, PeerProjects, ProducerProfiles
+from fx_data.peers import PUBLISHABLE, PeerProjects, ProducerProfiles
+from fx_data.tables import table_path
 
 from fex.tools import peer_examples
 from fex.tools.peer_examples import find_peer_examples
@@ -112,6 +113,6 @@ def test_the_real_catalog_returns_no_sample_account_or_project_id(monkeypatch):
     for pid in profiles.ids()[:20]:
         text = json.dumps(_call(pid, tags=["water", "climate and weather", "biodiversity and conservation"]))
         assert not any(account in text for account in raw_ids)
-    assert "account_sk" not in PEERS_PATH.read_text(encoding="utf-8")
+    assert "account_sk" not in table_path("peer_catalog").read_text(encoding="utf-8")
     assert all("owner_producer_id" not in json.dumps(i) for pid in profiles.ids()[:20]
                for i in _call(pid, tags=["water"]))

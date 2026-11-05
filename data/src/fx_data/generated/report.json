@@ -1,0 +1,531 @@
+{
+ "unmapped": {
+  "crop": {
+   "Ginger": 1,
+   "Turmeric": 1,
+   "Produce": 17,
+   "Other": 2,
+   "Peas": 1,
+   "Seafood": 8,
+   "Flowers and Plants": 1,
+   "Tea": 6,
+   "Grains": 2,
+   "Herbs and Spices": 2,
+   "Sweeteners": 7,
+   "Citrus": 1,
+   "Shrimp": 1,
+   "Nuts and Oilseeds": 5,
+   "Sugar": 2,
+   "Camellia Sinensis Tea": 2,
+   "Pineapples": 1,
+   "Dried Fruits and Vegetables": 1,
+   "Cane Sugar": 1,
+   "Beans and Grains": 1
+  },
+  "entity_type": {
+   "(blank)": 29
+  }
+ },
+ "excluded_producers": [
+  {
+   "producer_id": "043647BA42F03E2C3E862AF7F37DEAE7",
+   "reason": "crop not in scope: Seafood"
+  },
+  {
+   "producer_id": "06E573CEA2E08D37FDA6E3C683CD6BEE",
+   "reason": "crop not in scope: Ginger;Turmeric"
+  },
+  {
+   "producer_id": "074EA1F7E1D099B788D6E441E846D06E",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "0D8587ACACB3C4C65553FE0DCFF818FA",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "0F0B3837DB56741F8FE33D6009F930FB",
+   "reason": "factory"
+  },
+  {
+   "producer_id": "110CDBEE30D58283D18B76437DD0B183",
+   "reason": "crop not in scope: Nuts and Oilseeds"
+  },
+  {
+   "producer_id": "1329A4A33808CFF901CDC685E9E59809",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "14B8B231B2F921AB0A7A0007D1B61F0D",
+   "reason": "crop not in scope: Sweeteners"
+  },
+  {
+   "producer_id": "167A7F10855122A95FE66DFD9ADB2D15",
+   "reason": "factory"
+  },
+  {
+   "producer_id": "18A0E3882F9585EE1864C55838BAEC2B",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "1BF6C963F50106AA691E8136856B8DB0",
+   "reason": "crop not in scope: Tea"
+  },
+  {
+   "producer_id": "20FCDA4C423041CC2FD0097760E01AED",
+   "reason": "crop not in scope: Citrus"
+  },
+  {
+   "producer_id": "21A823D95A37B5D4A151FDBD252226E9",
+   "reason": "factory"
+  },
+  {
+   "producer_id": "24808A1AC63F325714A31BF64FCCF91D",
+   "reason": "crop not in scope: Other;Peas"
+  },
+  {
+   "producer_id": "466D149C7908B9594BB995C379E7ED92",
+   "reason": "crop not in scope: Shrimp"
+  },
+  {
+   "producer_id": "4BA662D13B595703BDB3A4BE525210FD",
+   "reason": "crop not in scope: Nuts and Oilseeds"
+  },
+  {
+   "producer_id": "4C57AA7AB3C32A7D87FE147AB5E03929",
+   "reason": "crop not in scope: Beans and Grains"
+  },
+  {
+   "producer_id": "4C7DA068FDD9CFDCD7CF4EDB90ADA370",
+   "reason": "crop not in scope: Nuts and Oilseeds"
+  },
+  {
+   "producer_id": "50E8641DDB806054951356C6B5359F5E",
+   "reason": "crop not in scope: Produce;Dried Fruits and Vegetables"
+  },
+  {
+   "producer_id": "5592C5F6CD43B0E94629224015C7A7CE",
+   "reason": "crop not in scope: Seafood"
+  },
+  {
+   "producer_id": "5DADF17F1C6CC9EFDAE51BB87834243A",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "5F57B4E57E64BBDD0164D11D7C009239",
+   "reason": "factory"
+  },
+  {
+   "producer_id": "600C50D9F2EE4B9EC7AB59169279800A",
+   "reason": "crop not in scope: Sweeteners"
+  },
+  {
+   "producer_id": "61937A02BD683D2E5E5B139CFEAC060A",
+   "reason": "crop not in scope: Camellia Sinensis Tea"
+  },
+  {
+   "producer_id": "740CB4B1A967F518A28C5F9BB3D85739",
+   "reason": "crop not in scope: Sugar"
+  },
+  {
+   "producer_id": "784AB8DEB82F8558652D37CCD3C9CB31",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "7B4DB08FC5E56A97AB3E76B8B9FFF068",
+   "reason": "crop not in scope: Seafood"
+  },
+  {
+   "producer_id": "7E2DE7EB165D2A053FF78AF4C36BBEB9",
+   "reason": "crop not in scope: Camellia Sinensis Tea"
+  },
+  {
+   "producer_id": "7EDCC4CA2D8EBDF93D67C52B6595BC65",
+   "reason": "factory"
+  },
+  {
+   "producer_id": "7FF099F42961C0F5F2D2CBB2CB55687E",
+   "reason": "factory"
+  },
+  {
+   "producer_id": "8BB3EFBDD80E664A80AD3CBC755D4160",
+   "reason": "crop not in scope: (blank)"
+  },
+  {
+   "producer_id": "9354B189238DF144436C5493CB457FC2",
+   "reason": "crop not in scope: Seafood"
+  },
+  {
+   "producer_id": "A0872E9C2DC963244D74611F69B32C36",
+   "reason": "crop not in scope: Seafood"
+  },
+  {
+   "producer_id": "A1FDDAAD8FFD94B57DB61DF1BBF2652D",
+   "reason": "crop not in scope: Tea"
+  },
+  {
+   "producer_id": "A22A10D0F5FD98910FE1C146DCD760F0",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "A2D9B2A8FEAC674B58233C626DCA7663",
+   "reason": "crop not in scope: Flowers and Plants"
+  },
+  {
+   "producer_id": "A4EDE054786BAF3B7650003FA91299F1",
+   "reason": "crop not in scope: Tea;Other;Grains;Herbs and Spices;Produce"
+  },
+  {
+   "producer_id": "ADCEAC8C58C7CDE2256335CC5569D2C1",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "AE827F2A3BF24723DD72473C26A56B56",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "C1CE6A6D0E2ACE0BC5997E4AFC119FA0",
+   "reason": "crop not in scope: Seafood"
+  },
+  {
+   "producer_id": "C3EB4200B99D3F3A345097C9B95DF073",
+   "reason": "crop not in scope: Sugar"
+  },
+  {
+   "producer_id": "C7BD0F724ECABB787F18AAF23F1E5050",
+   "reason": "crop not in scope: Tea"
+  },
+  {
+   "producer_id": "C805DEE5262A0DC9E044FB3D1FAA5983",
+   "reason": "crop not in scope: Sweeteners"
+  },
+  {
+   "producer_id": "CC46FA2DA84CA64F2985F2B269F708D1",
+   "reason": "crop not in scope: Sweeteners"
+  },
+  {
+   "producer_id": "D3F2802989D71FF0D780CFF73FBC0FE5",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "D5BFD2B1AF92C098D29B81CDFEFA2622",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "DA196BA8817CD23DEB5DD64BBDFD851A",
+   "reason": "factory"
+  },
+  {
+   "producer_id": "DBA0D4F78503C8D4F920865B3583C82E",
+   "reason": "crop not in scope: Produce;Nuts and Oilseeds"
+  },
+  {
+   "producer_id": "DEA0E9A4AB9D6CF656F294F6602C00F3",
+   "reason": "crop not in scope: Produce"
+  },
+  {
+   "producer_id": "DEC5C615E752E14478CF21FD5FE56DB8",
+   "reason": "crop not in scope: Tea"
+  },
+  {
+   "producer_id": "E01D42FB9EBA10F0278738BADFDF2BF4",
+   "reason": "crop not in scope: Pineapples"
+  },
+  {
+   "producer_id": "F2B3A728DCF0C11DFADC264C0E13576B",
+   "reason": "crop not in scope: Seafood"
+  },
+  {
+   "producer_id": "F446484E41197C5B669C7EB5F505DD75",
+   "reason": "crop not in scope: Cane Sugar;Grains;Sweeteners"
+  },
+  {
+   "producer_id": "F564B8061995450012C6F97AFE108B5A",
+   "reason": "factory"
+  },
+  {
+   "producer_id": "F5DC8573144B74D44DAE00656AEE913E",
+   "reason": "factory"
+  },
+  {
+   "producer_id": "F6F34C6C1C74E13DDC23BF4B99DAF2BA",
+   "reason": "crop not in scope: Seafood"
+  },
+  {
+   "producer_id": "F8BDE68F20D2AB38EC31C6ACC9BEAE49",
+   "reason": "factory"
+  },
+  {
+   "producer_id": "F8E015C0849709B87021F179EB5B7B11",
+   "reason": "crop not in scope: Produce"
+  }
+ ],
+ "excluded_projects": [
+  {
+   "project_id": "PRJ-503A7A79",
+   "title": "environment/ecological points",
+   "reason": "PII hit: ADDRESS"
+  },
+  {
+   "project_id": "PRJ-60BFF30A",
+   "title": "WRM LOW Project - Expocafé",
+   "reason": "PII hit: ADDRESS"
+  },
+  {
+   "project_id": "PRJ-BEDB0C46",
+   "title": "Seedbed",
+   "reason": "PII hit: ADDRESS"
+  },
+  {
+   "project_id": "PRJ-CE37A80E",
+   "title": "PROGRAM TOGETHER WE CLEAN MARCALA",
+   "reason": "PII hit: ADDRESS"
+  },
+  {
+   "project_id": "PRJ-D6385A21",
+   "title": "Amazonia Test Project",
+   "reason": "PII hit: ADDRESS"
+  },
+  {
+   "project_id": "PRJ-D9AFCF94",
+   "title": "Socio-Cultural-Environmental Impact Projects",
+   "reason": "PII hit: ADDRESS"
+  },
+  {
+   "project_id": "PRJ-FBBADAEA",
+   "title": "SMTA Honey Water Management Systems",
+   "reason": "PII hit: ADDRESS"
+  },
+  {
+   "project_id": "PRJ-6242EB64",
+   "title": "ttt",
+   "reason": "placeholder text"
+  },
+  {
+   "project_id": "PRJ-E3A826AB",
+   "title": "Test field changes 2022",
+   "reason": "placeholder text"
+  },
+  {
+   "project_id": "PRJ-02246003",
+   "title": "1.6 counterpart for the purchase and delivery of coffee and forest seedlings (SAF) for member producers (co-financed)",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-19C2C663",
+   "title": "ENVIRONMENT",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-1D1536EC",
+   "title": "Construction and implementation of nurseries for the production of coffee and forest seedlings",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-2133B673",
+   "title": "Development of coffee seedling project",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-299506F3",
+   "title": "Socio-Cultural-Environmental Impact Projects 2022",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-2FA641A1",
+   "title": "environmental plan",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-372E374B",
+   "title": "Quality Management",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-384EF733",
+   "title": "Environmental projects",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-3C969CE4",
+   "title": "ENVIRONMENT",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-4A97167B",
+   "title": "LINE OF INVESTMENT IN ENVIRONMENTAL PROGRAMS",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-50213492",
+   "title": "Program to support indigenous food security and agrobiodiversity, formulation and implementation of productive projects and environmental care",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-5EC4F7AE",
+   "title": "Renewal of Organic and Social Certificates.",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-5FF039B3",
+   "title": "Fair Trade Environmental Sanitation - Fairtrade - Fairtrade Legal Advisory Fees",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-71911FDC",
+   "title": "identification of all water sources for irrigation and processing of coffee crops under Fairtrade conditions.",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-7498D052",
+   "title": "Implementation of the environmental plan for the organization.",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-7C2ADCD5",
+   "title": "2710: Payment for Technical Assistance",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-8F0DBEC0",
+   "title": "Provide training to partners on the organic management of coffee cultivation",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-9353888F",
+   "title": "Technical Assistance",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-95B9F821",
+   "title": "Organic fertilizer, bags",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-ABD089C4",
+   "title": "2710. Payment for Technical Assistance",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-AC68CAFF",
+   "title": "VETERINARY CONFERENCES",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-BEDD1765",
+   "title": "2751. Investment Projects Strategic Plan",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-C22C4817",
+   "title": "How GSC Community Service Group works",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-C4978109",
+   "title": "phytosanitary treatment of plantations",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-C4AC1FEE",
+   "title": "Nutritional and Phytosanitary Program",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-C6BE3968",
+   "title": "26. Consultancy for Organic and Globalgap Audits",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-E46E40FA",
+   "title": "VETERINARY CONFERENCES",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-EAE887DD",
+   "title": "21. Reforestation of Green Areas",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-EB140C09",
+   "title": "Improvement or construction of a pit",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-F29FA7A8",
+   "title": "Fairtrade Fair Trade Environmental Sanitation",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-FB20CF1A",
+   "title": "Environmental projects",
+   "reason": "sub-category not mapped: (blank)"
+  },
+  {
+   "project_id": "PRJ-FF7B477F",
+   "title": "Assistance and security Fair trade - Safety and health at work",
+   "reason": "sub-category not mapped: (blank)"
+  }
+ ],
+ "projects_named_test": [
+  {
+   "project_id": "PRJ-4750460B",
+   "producer_id": "F98E96E7D2318454C40BF6BFD767D31F",
+   "title": "Test Project 7"
+  },
+  {
+   "project_id": "PRJ-D6385A21",
+   "producer_id": "F98E96E7D2318454C40BF6BFD767D31F",
+   "title": "Amazonia Test Project"
+  }
+ ],
+ "producers": {
+  "total": 98,
+  "by_origin": {
+   "sample": 88,
+   "synthetic": 10
+  },
+  "by_country": {
+   "Colombia": 31,
+   "Peru": 19,
+   "Nicaragua": 4,
+   "Costa Rica": 1,
+   "Ecuador": 4,
+   "Ethiopia": 1,
+   "Ghana": 1,
+   "Brazil": 4,
+   "Honduras": 13,
+   "Guatemala": 3,
+   "India": 1,
+   "Mexico": 5,
+   "Côte d'Ivoire": 6,
+   "Rwanda": 1,
+   "Indonesia": 2,
+   "USA": 1,
+   "Vietnam": 1
+  },
+  "by_crop": {
+   "coffee": 85,
+   "cocoa": 11,
+   "banana": 6,
+   "other": 4
+  },
+  "by_entity_type": {
+   "cooperative": 56,
+   "cooperative_union": 8,
+   "other": 29,
+   "smallholder": 3,
+   "processor": 1,
+   "hired_labor_farm": 1
+  }
+ },
+ "premium_projects": 236,
+ "peer_catalog": 197,
+ "survey_responses": 2194,
+ "certifications": 97,
+ "pii": {
+  "checked": 204,
+  "hits": 7,
+  "address_only_hits": 7
+ }
+}

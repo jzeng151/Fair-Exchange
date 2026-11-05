@@ -23,30 +23,25 @@ export const SOURCE_TABLES: Record<string, glue.CfnTable.ColumnProperty[]> = {
   producers: [
     { name: 'producer_id', type: 'string' },
     { name: 'country', type: 'string' },
-    { name: 'region', type: 'string' },
-    { name: 'crop', type: 'string' },
+    { name: 'admin1', type: 'string' },
+    { name: 'crops', type: 'array<string>' },
     { name: 'entity_type', type: 'string' },
-    { name: 'supply_chain_role', type: 'string' },
-    { name: 'source', type: 'string' },
+    { name: 'origin', type: 'string' }, // sample or synthetic (#7)
   ],
   certification: [
     { name: 'producer_id', type: 'string' },
     { name: 'certification_scope', type: 'string' },
   ],
   premium_projects: [
+    { name: 'project_id', type: 'string' },
     { name: 'producer_id', type: 'string' },
-    { name: 'project_ref', type: 'string' },
-    { name: 'source', type: 'string' },
-    { name: 'challenge_tag', type: 'string' },
+    { name: 'title', type: 'string' },
     { name: 'category', type: 'string' },
-    { name: 'subcategory', type: 'string' },
-    { name: 'name', type: 'string' },
-    { name: 'action', type: 'string' },
-    { name: 'challenge', type: 'string' },
-    { name: 'intended_outcome', type: 'string' },
-    { name: 'status', type: 'string' },
-    { name: 'start_date', type: 'string' },
-    { name: 'end_date', type: 'string' },
+    { name: 'sub_category', type: 'string' },
+    { name: 'tags', type: 'array<string>' },
+    { name: 'start_year', type: 'int' },
+    { name: 'amount', type: 'double' },
+    { name: 'description', type: 'string' },
   ],
   survey_facts: [
     { name: 'producer_id', type: 'string' },
@@ -55,7 +50,6 @@ export const SOURCE_TABLES: Record<string, glue.CfnTable.ColumnProperty[]> = {
     { name: 'source', type: 'string' },
     { name: 'period', type: 'string' },
     { name: 'responses', type: 'int' },
-    { name: 'strength', type: 'string' },
   ],
 };
 
