@@ -128,6 +128,16 @@ def action(persona: Persona, cid: str, name: str, args: dict) -> list[dict]:
     return _request(persona, "POST", f"/conversations/{cid}/actions", {"action": name, "args": args})
 
 
+def buttons(allowed: list[str], language: str) -> list[dict]:
+    """The buttons for the agent's allowed actions: {label, action, args}, main choice first."""
+    labels = _ACTION_LABELS.get(language, _ACTION_LABELS["en"])
+    return [
+        {"label": labels.get((name, key), name.replace("_", " ")), "action": name, "args": args}
+        for name in sorted((a for a in allowed if a in _BUTTON_ORDER), key=_BUTTON_ORDER.index)
+        for key, args in _ACTION_CHOICES[name]
+    ]
+
+
 def to_answer(events: list[dict], fallback_language: str) -> dict:
     """Map one turn's events onto the answer shape the chat UI renders (engine.Answer.as_dict)."""
     language, step, allowed, has_actions = fallback_language, None, [], False
@@ -180,16 +190,11 @@ def to_answer(events: list[dict], fallback_language: str) -> dict:
             seen.add(c["label"])
             unique.append(c)
 
-    labels = _ACTION_LABELS.get(language, _ACTION_LABELS["en"])
-    suggestions = [
-        {"label": labels.get((name, key), name.replace("_", " ")), "action": name, "args": args}
-        for name in sorted((a for a in allowed if a in _BUTTON_ORDER), key=_BUTTON_ORDER.index)
-        for key, args in _ACTION_CHOICES[name]
-    ]
     return {
         "text": "\n\n".join(p for p in parts if p) or "…",
         "citations": unique,
-        "suggestions": suggestions,
+        "suggestions": buttons(allowed, language),
+        "allowed": allowed,
         "pii_flagged": [],
         "in_scope": True,
         "language": language,

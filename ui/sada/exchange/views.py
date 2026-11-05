@@ -87,7 +87,8 @@ def chat(request, persona_id: str):
                 cid, first = fex_live.start(persona)
                 conversations[persona_id] = cid
                 source, opening, opening_suggestions = "live", first["text"], first["suggestions"]
-                request.session.setdefault("fex_buttons", {})[persona_id] = first["suggestions"]
+                # Only action names go in the (cookie-backed) session; buttons are rebuilt from them.
+                request.session.setdefault("fex_allowed", {})[persona_id] = first["allowed"]
                 language = first["language"] if first["language"] in engine.LANGUAGES else language
                 request.session["language"] = language
             except fex_live.LiveUnavailable as e:
@@ -192,14 +193,14 @@ def _live_turn(request, persona, message: str, action: dict | None) -> dict | No
         else:
             events = fex_live.message(persona, cid, message)
         data = fex_live.to_answer(events, request.session.get("language", persona.language))
-        buttons = request.session.setdefault("fex_buttons", {})
+        allowed = request.session.setdefault("fex_allowed", {})
         if data["closed"]:
             conversations.pop(persona.id, None)
-            buttons.pop(persona.id, None)
+            allowed.pop(persona.id, None)
         elif data["has_actions"]:
-            buttons[persona.id] = data["suggestions"]
-        else:
-            data["suggestions"] = buttons.get(persona.id, [])
+            allowed[persona.id] = data["allowed"]
+        else:  # e.g. an error: the allowed actions didn't change, so keep offering them
+            data["suggestions"] = fex_live.buttons(allowed.get(persona.id, []), data["language"])
         if data["language"] in engine.LANGUAGES:
             request.session["language"] = data["language"]
         request.session.modified = True

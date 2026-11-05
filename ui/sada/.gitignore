@@ -1,6 +1,7 @@
 # Secrets — NEVER commit. Holds live AWS credentials.
 .env
 .env.*
+!.env.example
 *.pem
 
 # Python-generated files

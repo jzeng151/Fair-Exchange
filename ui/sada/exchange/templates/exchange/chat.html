@@ -22,6 +22,13 @@
           <button class="btn-ghost" id="new-chat">＋ New chat</button>
           <a class="btn-ghost" href="{% url 'picker' %}">↺ Switch</a>
         </div>
+        <div class="source-row">
+          <span class="footnote" style="margin:0">Answers from</span>
+          <div class="source-switch" role="group" aria-label="Data source">
+            <a href="?source=mock" class="{% if requested_source == 'mock' %}active{% endif %}">Mock</a>
+            <a href="?source=live" class="{% if requested_source == 'live' %}active{% endif %}">Real API</a>
+          </div>
+        </div>
       </div>
 
       <div class="card location-card">
@@ -57,6 +64,7 @@
         </div>
         <div id="history-list" class="history-list"><div class="footnote">Your messages appear here.</div></div>
         <button class="btn-ghost full" id="report-btn">📄 Generate report</button>
+        <button class="btn-ghost full danger" id="delete-convo" title="Delete this whole conversation from this screen">🗑 Delete conversation</button>
       </div>
     </aside>
 
@@ -65,11 +73,7 @@
       <div class="chat-head">
         <span class="live" aria-hidden="true"></span>
         <span class="title">Producer Exchange</span>
-        <span class="badge-poc {% if data_source == 'live' %}live{% endif %}" title="{% if data_source == 'live' %}Answers come from the real FEX agent via its API (sample data){% else %}Answers are made up by this UI (no agent){% endif %}">{% if data_source == 'live' %}REAL API{% else %}MOCK{% endif %}</span>
-        <div class="source-switch" role="group" aria-label="Data source">
-          <a href="?source=mock" class="{% if requested_source == 'mock' %}active{% endif %}">Mock</a>
-          <a href="?source=live" class="{% if requested_source == 'live' %}active{% endif %}">Real API</a>
-        </div>
+        <span class="badge-poc {% if data_source == 'live' %}real{% endif %}" title="{% if data_source == 'live' %}Answers come from the real FEX agent via its API (sample data){% else %}Answers are made up by this UI (no agent){% endif %}">{% if data_source == 'live' %}REAL API{% else %}MOCK{% endif %}</span>
         <div class="right">
           <label class="speaker-toggle footnote"><input type="checkbox" id="speak-toggle"> 🔊 Speak</label>
           <select class="lang-select" id="lang" aria-label="Language">

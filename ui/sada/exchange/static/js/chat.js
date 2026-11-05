@@ -169,7 +169,11 @@
     if (!items.length) { box.appendChild(el("div", "footnote", "No messages in this period yet.")); return; }
     items.slice().reverse().forEach(t => {
       const row = el("div", "hist-item");
-      row.innerHTML = `<b>You:</b> ${esc(t.text.slice(0, 80))}`;
+      row.appendChild(el("span", null, `<b>You:</b> ${esc(t.text.slice(0, 80))}`));
+      const del = el("button", "hist-del", "✕");
+      del.type = "button"; del.title = "Delete this question and its answer";
+      del.addEventListener("click", () => deleteTurn(t.id));
+      row.appendChild(del);
       box.appendChild(row);
     });
   }
@@ -302,14 +306,35 @@
   });
 
   // ---- new chat ---------------------------------------------------------
-  $("new-chat").addEventListener("click", () => {
-    if (turns.length && !confirm("Start a new chat? This clears the current conversation.")) return;
+  function resetChat() {
     if (T.source === "live") { location.reload(); return; }  // the page load opens a new conversation with the agent
     turns = []; turnSeq = 0; transcript.innerHTML = "";
     if (synth) synth.cancel();
     refreshPoints(); renderHistory();
     const cw = $("candidate-wrap"); if (cw) cw.style.display = "";
     bootstrap();
+  }
+  $("new-chat").addEventListener("click", () => {
+    if (turns.length && !confirm("Start a new chat? This clears the current conversation.")) return;
+    resetChat();
+  });
+
+  // ---- delete the whole conversation (history panel) -------------------
+  $("delete-convo").addEventListener("click", async () => {
+    if (!turns.some(t => t.role === "user")) { addSystem("There's nothing to delete yet."); return; }
+    const note = T.source === "live"
+      ? "Delete this conversation? It is removed from this screen and ended with the agent. A record you already chose to save stays saved."
+      : "Delete this conversation? It is removed from this screen.";
+    if (!confirm(note)) return;
+    if (T.source === "live") {
+      try {  // end it with the agent so it doesn't stay open; the page reload then starts a fresh one
+        await fetch(T.chatUrl, {
+          method: "POST", headers: { "Content-Type": "application/json", "X-CSRFToken": T.csrftoken },
+          body: JSON.stringify({ message: "end", language, persona_id: T.personaId, action: { name: "end", args: {} } }),
+        });
+      } catch (e) {}
+    }
+    resetChat();
   });
 
   // ---- share data + points ---------------------------------------------

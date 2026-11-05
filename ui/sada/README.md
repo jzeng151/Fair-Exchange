@@ -13,8 +13,13 @@ uv run python manage.py collectstatic --noinput
 uv run python manage.py runserver 0.0.0.0:8099
 ```
 
+Or `bash run.sh`, which sets up `.venv` on first run and starts the server on http://localhost:8010.
+
+**Mock or Real API:** the chat answers from a built-in mock, or from the real FEX agent through the Fair
+Exchange chat API. See [docs/REAL-API.md](docs/REAL-API.md) to connect locally or to the deployed stack.
+
 ## Features
-- Persona picker: role -> product -> up to 3 personas from the vision doc regions
+- Persona picker: one click per persona tile (role, product, location, language)
 - Full-height chat with location map + (mocked) weather overlay
 - Candidate questions per persona; follow-up suggestions after each answer
 - Multilingual (en/es/fr/pt/sw/hi), voice input and read-aloud
