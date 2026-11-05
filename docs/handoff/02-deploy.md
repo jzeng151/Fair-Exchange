@@ -25,12 +25,12 @@ Run from the repository root (see `infra/README.md` for the current scope and th
 ```bash
 npm --prefix infra ci
 (cd infra && npx cdk synth FairExchange)   # preview only; creates nothing
-EXPECTED_AWS_ACCOUNT=<account> AWS_REGION=us-west-2 bash infra/deploy.sh
+EXPECTED_AWS_ACCOUNT=<account> AWS_REGION=us-west-2 \
+  FEX_MAX_LIFETIME_MINUTES=1440 LOG_RETENTION_DAYS=30 bash infra/deploy.sh
 ```
 
-The script refuses to run if the credentials belong to a different account, then runs eight timed steps:
-bootstrap check, website build, standards documents, infrastructure type check, the artifacts stack, the
-clause upload, the `FairExchange` stack, and publishing the website with smoke tests
+The script refuses to run if the credentials belong to a different account, then builds artifacts,
+deploys infrastructure, uploads source data, and publishes the website with smoke tests
 ([details](../../infra/README.md#stacks-and-the-deploy-order-5)). `infra/deploy-web.sh` is kept for older
 instructions and just runs `deploy.sh`. Record the elapsed time here from the #40 run.
 
@@ -113,3 +113,47 @@ Athena exposes each `ai_usage` array element as one struct. The footprint querie
 alias that struct as `u` and select `u.model_id`, `u.input_tokens`, and
 `u.output_tokens`. Assigning three aliases to the one element fails with
 `MISMATCHED_COLUMN_ALIASES` and makes the analytics endpoint return 503.
+
+## Live reviewer and producer records
+
+The application stack deploys `GET /me`, `GET /me/records`, `GET /records`,
+`GET/PATCH /records/{id}`, and `POST /records/{id}/approve`. Each handler uses the
+authorizer's identity and its own Lambda role. Producer reads can scan only the
+records table. Review reads use Scan/GetItem; corrections and approval use GetItem/PutItem.
+No record handler can delete records or invoke the agent.
+
+The sandbox has three separate credentials, generated in Secrets Manager with KMS encryption:
+
+| Role | Stack output | Request headers |
+| --- | --- | --- |
+| Producer | `DemoPasscodeSecretArn` | `x-demo-passcode` plus an allow-listed `x-demo-producer-id` |
+| Reviewer | `ReviewerPasscodeSecretArn` | `x-demo-reviewer-passcode` |
+| Admin | `AdminPasscodeSecretArn` | `x-demo-admin-passcode` |
+
+Retrieve the appropriate passcode with `aws secretsmanager get-secret-value --secret-id <output ARN>`
+using the existing operator credentials. Do not put passcodes in source, a build variable,
+or browser storage. The live views keep them only in component memory. Production identity
+remains the separate FTUSA integration described in the identity spec.
+
+`GET /me` accepts any one of these credentials and returns the user ID and roles.
+The new record routes reject authenticated callers with the wrong role with 403.
+Supplying multiple role credentials is rejected. The shared identity authorizer has
+caching disabled because its credential headers are alternatives; no cached policy
+can cross roles. Existing chat and analytics authorizers retain their scope.
+
+With `VITE_FEX_API_URL` set, the website's Your record and Fair Trade USA views use
+these APIs. The reviewer can filter, inspect, correct, resolve PII flags and approve
+closed records. Stale edits show a reload action without discarding the draft;
+approved records are read-only. Without an API URL, browser-only demos still work.
+
+When the Athena sync stack exists, deployment also validates and uploads the 200
+deterministic synthetic analytics records using `agent/scripts/load_seeded_records.py`.
+The loader replaces only the `records-seeded/` prefix in the records bucket. It
+does not write to DynamoDB, the live `records/` prefix, or the reviewer queue.
+
+The deployment runs `scripts/e2e/records_smoke.py` from the agent environment when
+the Athena sync stack exists. It verifies identity and role separation, producer
+scope, CORS, PII gating, reviewer corrections, version conflicts, approval, and the
+reviewed record in S3/Athena. It creates two synthetic records and deletes only
+those records in a cleanup block. Logs, PITR history and Athena query outputs remain
+subject to their configured retention.

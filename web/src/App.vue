@@ -12,6 +12,8 @@ import FexMark from './components/FexMark.vue'
 import LiveChatView from './components/LiveChatView.vue'
 import ReviewerView from './components/ReviewerView.vue'
 import YourRecordView from './components/YourRecordView.vue'
+import LiveYourRecordView from './components/LiveYourRecordView.vue'
+import LiveReviewerView from './components/LiveReviewerView.vue'
 import { scenarios } from './data/scenarios'
 
 type Side = 'producer' | 'live' | 'me' | 'review' | 'admin'
@@ -69,16 +71,18 @@ onBeforeUnmount(() => window.removeEventListener('hashchange', onHash))
   <div class="synthetic-banner" role="note">
     <template v-if="side === 'producer'">Demo · synthetic data · scripted replies until the chat API (#25) is connected</template>
     <template v-else-if="side === 'live'">Live · real chat API and agent · sample producer data</template>
-    <template v-else-if="side === 'me'">Your record · demo · records read from this browser until the records API (#32) is connected</template>
-    <template v-else-if="side === 'review'">Fair Trade USA side · demo · records saved in this browser until the review API (#27) is connected</template>
-    <template v-else>Admin · demo · computed in this browser until the analytics API (#29) and admin sign-in (#11) are connected</template>
+    <template v-else-if="side === 'me'">{{ apiUrl ? 'Your record · live · sign in to see your saved conversations' : 'Your record · browser demo' }}</template>
+    <template v-else-if="side === 'review'">{{ apiUrl ? 'Fair Trade USA · live reviewer access' : 'Fair Trade USA · browser demo' }}</template>
+    <template v-else>{{ apiUrl ? 'Admin · live analytics available with the admin passcode' : 'Admin · browser demo' }}</template>
   </div>
   <main class="container">
     <!-- v-show keeps the producer's conversation in place while switching sides -->
     <ChatView v-show="side === 'producer'" :producer-view="true" :subtitles="subtitles" />
     <LiveChatView v-if="apiUrl" v-show="side === 'live'" :api-url="apiUrl" />
-    <YourRecordView v-if="side === 'me'" ref="yourRecord" :producer-id="demoProducerId" />
-    <ReviewerView v-if="side === 'review'" ref="reviewer" />
+    <LiveYourRecordView v-if="side === 'me' && apiUrl" :api-url="apiUrl" />
+    <YourRecordView v-else-if="side === 'me'" ref="yourRecord" :producer-id="demoProducerId" />
+    <LiveReviewerView v-if="side === 'review' && apiUrl" :api-url="apiUrl" />
+    <ReviewerView v-else-if="side === 'review'" ref="reviewer" />
     <AdminDashboard v-if="side === 'admin'" ref="admin" :api-url="apiUrl" />
   </main>
 </template>

@@ -14,6 +14,7 @@ const props = defineProps<{
   // comes from the identity (#11), never chosen in the view.
   producerId: string
   lang?: Lang
+  liveRows?: YourRecordRow[]
 }>()
 
 const all = ref<ConversationRecord[]>(loadRecords())
@@ -24,7 +25,7 @@ defineExpose({ refresh })
 
 const lang = computed<Lang>(() => props.lang ?? 'en')
 const copy = computed(() => t[lang.value].yourRecord)
-const rows = computed<YourRecordRow[]>(() => yourRecords(all.value, props.producerId))
+const rows = computed<YourRecordRow[]>(() => props.liveRows ?? yourRecords(all.value, props.producerId))
 const selectedId = ref<string | null>(null)
 const selected = computed<YourRecordRow | null>(
   () => rows.value.find((r) => r.recordId === selectedId.value) ?? rows.value[0] ?? null,
