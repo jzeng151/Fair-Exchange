@@ -46,6 +46,9 @@ returns 409. The worker cannot invoke FEX or write consented records.
   `transcripts/` prefixes and the KMS key. The route may pass only that role to
   Transcribe. It may start only this stack's voice jobs. The worker may read only
   those jobs and translate text.
+  Service trust is restricted to this account and region, following the
+  [Transcribe trust policy](https://docs.aws.amazon.com/transcribe/latest/dg/security_iam_id-based-policy-examples.html).
+  Both the caller and data role can write the transcript prefix for start validation.
 - Deployment is part of `infra/deploy.sh`; no separate manual voice provisioning.
 
 The integration check in `scripts/e2e/voice_smoke.py` accepts a short synthetic

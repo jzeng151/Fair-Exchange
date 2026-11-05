@@ -39,7 +39,10 @@ export class FexVoice extends Construct {
     const jobs = stack.formatArn({ service: 'transcribe', resource: 'transcription-job', resourceName: `${jobPrefix}*` });
     const access = new iam.Role(this, 'TranscribeDataAccess', {
       assumedBy: new iam.ServicePrincipal('transcribe.amazonaws.com', { conditions: {
-        StringEquals: { 'aws:SourceAccount': stack.account }, ArnLike: { 'aws:SourceArn': jobs },
+        // Transcribe validates data access before the job exists. Scope trust to this
+        // account/region; job API permissions and PassRole below remain prefix-scoped.
+        StringEquals: { 'aws:SourceAccount': stack.account },
+        ArnLike: { 'aws:SourceArn': stack.formatArn({ service: 'transcribe', resource: '*' }) },
       } }),
     });
     bucket.grantRead(access, 'audio/*');
@@ -67,6 +70,7 @@ export class FexVoice extends Construct {
     route.addToRolePolicy(new iam.PolicyStatement({ actions: ['dynamodb:GetItem'], resources: [props.conversations.tableArn] }));
     bucket.grantReadWrite(route, 'audio/*'); // presigned POST, HEAD validation, cancellation
     bucket.grantDelete(route, 'transcripts/*');
+    bucket.grantPut(route, 'transcripts/*'); // StartTranscriptionJob also validates the caller's output access.
     route.addToRolePolicy(new iam.PolicyStatement({ actions: ['transcribe:StartTranscriptionJob'], resources: [jobs] }));
     route.addToRolePolicy(new iam.PolicyStatement({ actions: ['iam:PassRole'], resources: [access.roleArn],
       conditions: { StringEquals: { 'iam:PassedToService': 'transcribe.amazonaws.com' } } }));
