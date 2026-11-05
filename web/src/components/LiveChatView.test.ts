@@ -112,6 +112,42 @@ describe('LiveChatView', () => {
     expect(fake.calls.at(-1)).toEqual(['action', 'c-1', 'set_consent', { scope: 'declined' }])
   })
 
+  it('after a feedback answer the question collapses to a thank-you line, still changeable (#23)', async () => {
+    const feedbackStep = step('feedback', ['reopen_playback', 'set_consent', 'set_feedback', 'end'])
+    const saved = (version: number): StreamEvent => ({ type: 'record_saved', seq: 1, status: 'completed', consent_scope: 'internal', version })
+    const fake = fakeClient({
+      start: [{ type: 'conversation', conversationId: 'c-1' }, ...feedbackStep],
+      action: { set_feedback: [saved(2), ...feedbackStep] },
+    })
+    const w = await open(fake)
+    await w.get('[data-feedback="somewhat"]').trigger('click')
+    await flushPromises()
+    expect(fake.calls.at(-1)).toEqual(['action', 'c-1', 'set_feedback', { value: 'somewhat' }])
+    expect(w.find('[data-feedback="yes"]').exists()).toBe(false)
+    expect(w.get('.feedback-line').text()).toContain('Gracias')
+    expect(w.get('.feedback-line').text()).toContain('Algo')
+    await w.get('[data-action="change-feedback"]').trigger('click')
+    expect(w.get('[data-feedback="somewhat"]').attributes('aria-pressed')).toBe('true')
+    await w.get('[data-feedback="no"]').trigger('click')
+    await flushPromises()
+    expect(fake.calls.at(-1)).toEqual(['action', 'c-1', 'set_feedback', { value: 'no' }])
+    expect(w.find('[data-feedback="yes"]').exists()).toBe(false)
+    expect(w.get('.feedback-line').text()).toContain('No')
+  })
+
+  it('a feedback answer that fails to save keeps the question open', async () => {
+    const feedbackStep = step('feedback', ['reopen_playback', 'set_consent', 'set_feedback', 'end'])
+    const fake = fakeClient({
+      start: [{ type: 'conversation', conversationId: 'c-1' }, ...feedbackStep],
+      action: { set_feedback: [{ type: 'error', seq: 1, code: 'agent_failed', message: 'No se pudo guardar.' }, ...feedbackStep] },
+    })
+    const w = await open(fake)
+    await w.get('[data-feedback="yes"]').trigger('click')
+    await flushPromises()
+    expect(w.find('[data-feedback="yes"]').exists()).toBe(true)
+    expect(w.find('.feedback-line').exists()).toBe(false)
+  })
+
   it('asks before ending, and does nothing if the producer cancels (#13)', async () => {
     const fake = fakeClient()
     const w = await open(fake)

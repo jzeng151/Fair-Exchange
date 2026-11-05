@@ -18,6 +18,7 @@ const view = reactive<LiveView>(newView())
 const input = ref('')
 const correcting = ref(false)
 const changingConsent = ref(false) // feedback step: the consent choice collapses to one line until 'Change'
+const changingFeedback = ref(false) // once answered, the feedback question collapses to one line until 'Change'
 const scroller = ref<HTMLElement | null>(null)
 let client: LiveClient | null = null
 // Bumped whenever the producer changes: a turn started for an earlier producer stops applying events
@@ -144,7 +145,10 @@ async function act(action: ActionName, args: Record<string, unknown> = {}) {
   if (action === 'end' && !window.confirm(t.value.endConfirm)) return
   const id = view.conversationId
   if (action === 'set_consent') changingConsent.value = false
+  if (action === 'set_feedback') changingFeedback.value = false
   await turn(() => client!.action(id, action, args))
+  // The agent keeps the feedback step open so a misclick can be fixed (#23); show the answer as given.
+  if (action === 'set_feedback' && !view.error) view.feedback = args.value as LiveView['feedback']
 }
 const currentConsent = computed(() => view.consent)
 
@@ -250,12 +254,17 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
             <template v-else>{{ t.consentAsk }}</template>
             <button class="btn-text inline" data-action="change-consent" @click="changingConsent = true">{{ t.change }}</button>
           </p>
-          <div v-if="can('set_feedback')" class="choice">
+          <div v-if="can('set_feedback') && (!view.feedback || changingFeedback)" class="choice">
             <p>{{ t.feedbackAsk }}</p>
             <div class="btn-row">
-              <button v-for="f in feedbackChoices" :key="f" class="btn-default" :data-feedback="f" @click="act('set_feedback', { value: f })">{{ t.feedback[f] }}</button>
+              <button v-for="f in feedbackChoices" :key="f" class="btn-default" :data-feedback="f"
+                :aria-pressed="view.feedback === f" @click="act('set_feedback', { value: f })">{{ t.feedback[f] }}</button>
             </div>
           </div>
+          <p v-else-if="can('set_feedback') && view.feedback" class="small feedback-line">
+            {{ t.feedbackThanks }} {{ t.yourAnswer }}: {{ t.feedback[view.feedback] }}
+            <button class="btn-text inline" data-action="change-feedback" @click="changingFeedback = true">{{ t.change }}</button>
+          </p>
           <div class="btn-row secondary">
             <button v-if="can('reopen_playback')" class="btn-text" data-action="reopen_playback" @click="act('reopen_playback')">{{ t.reopen }}</button>
             <button v-if="can('end')" class="btn-text" data-action="end" @click="act('end')">
