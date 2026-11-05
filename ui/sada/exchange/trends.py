@@ -1,0 +1,128 @@
+"""Demographics and trending concerns per persona region/product (E4), plus a simple report
+builder (E3) and a shared-data points model (E7). All fictitious; shaped for later real data.
+"""
+from __future__ import annotations
+
+from .catalog import Persona
+
+# Trending concerns + light demographics, keyed by product. Aggregated, no individuals.
+_TRENDS = {
+    "coffee": {
+        "demographics": [
+            {"label": "Smallholders", "value": "72%"},
+            {"label": "Women-led farms", "value": "34%"},
+            {"label": "Avg. farm size", "value": "2.1 ha"},
+        ],
+        "trending": [
+            {"tag": "Water", "note": "Late/short rains", "trend": "▲ 18%"},
+            {"tag": "Price", "note": "Farm-gate dip vs. 5-yr median", "trend": "▲ 9%"},
+            {"tag": "Soil", "note": "Organic matter on low-cover plots", "trend": "▲ 4%"},
+        ],
+    },
+    "seafood": {
+        "demographics": [
+            {"label": "Artisanal fishers", "value": "81%"},
+            {"label": "Cooperative members", "value": "61%"},
+            {"label": "Avg. vessel size", "value": "< 12 m"},
+        ],
+        "trending": [
+            {"tag": "Climate", "note": "Warmer sea surface, shifting catch", "trend": "▲ 22%"},
+            {"tag": "Market", "note": "Export price swings", "trend": "▲ 7%"},
+            {"tag": "Labor", "note": "Crew availability", "trend": "▲ 3%"},
+        ],
+    },
+    "rice": {
+        "demographics": [
+            {"label": "Smallholders", "value": "68%"},
+            {"label": "Irrigated plots", "value": "45%"},
+            {"label": "Avg. farm size", "value": "1.6 ha"},
+        ],
+        "trending": [
+            {"tag": "Soil", "note": "Fatigue on low-cover plots", "trend": "▲ 14%"},
+            {"tag": "Water", "note": "Irrigation timing", "trend": "▲ 8%"},
+            {"tag": "Climate", "note": "Heavier storms", "trend": "▲ 6%"},
+        ],
+    },
+    "groceries": {
+        "demographics": [
+            {"label": "Repeat buyers", "value": "58%"},
+            {"label": "Label-aware", "value": "76%"},
+            {"label": "Premium interest", "value": "High"},
+        ],
+        "trending": [
+            {"tag": "Transparency", "note": "Where products come from", "trend": "▲ 19%"},
+            {"tag": "Impact", "note": "What the Premium funds", "trend": "▲ 12%"},
+            {"tag": "Price", "note": "Fair pricing questions", "trend": "▲ 5%"},
+        ],
+    },
+}
+_DEFAULT = _TRENDS["coffee"]
+
+
+def trends_for(persona: Persona) -> dict:
+    return _TRENDS.get(persona.product, _DEFAULT)
+
+
+# E7: points for contributing data. Light gamification; fictitious economy.
+POINTS_PER_SHARED_TURN = 25
+POINTS_PER_TAG = 10
+
+
+def points_summary(shared_turns: int, tags: list[str]) -> dict:
+    unique_tags = sorted(set(tags))
+    points = shared_turns * POINTS_PER_SHARED_TURN + len(unique_tags) * POINTS_PER_TAG
+    tier = "Seed" if points < 100 else "Grower" if points < 250 else "Steward"
+    return {
+        "shared_turns": shared_turns,
+        "unique_tags": unique_tags,
+        "points": points,
+        "tier": tier,
+        "next_tier_at": 100 if points < 100 else 250 if points < 250 else None,
+    }
+
+
+def build_report(persona: Persona, turns: list[dict]) -> str:
+    """A plain-text/markdown report from the current chat history (E3).
+
+    `turns` is a list of {role, text, sentiment?, tags?} dicts from the client.
+    """
+    user_turns = [t for t in turns if t.get("role") == "user"]
+    all_tags: list[str] = []
+    sentiments: list[str] = []
+    for t in turns:
+        all_tags += t.get("tags") or []
+        if t.get("sentiment"):
+            sentiments.append(t["sentiment"])
+
+    tag_counts: dict[str, int] = {}
+    for tg in all_tags:
+        tag_counts[tg] = tag_counts.get(tg, 0) + 1
+    top = sorted(tag_counts.items(), key=lambda kv: -kv[1])
+
+    sent_counts: dict[str, int] = {}
+    for s in sentiments:
+        sent_counts[s] = sent_counts.get(s, 0) + 1
+
+    lines = [
+        f"# Fair Trade Exchange — Conversation Report",
+        "",
+        f"**Persona:** {persona.name} ({persona.role}, {persona.product})",
+        f"**Region:** {persona.location.place}",
+        f"**Organization:** {persona.org}",
+        "",
+        f"## Summary",
+        f"- Messages from you: {len(user_turns)}",
+        f"- Total exchanges: {len(turns)}",
+        "",
+        f"## Top concerns (challenge tags)",
+    ]
+    lines += [f"- {tag}: {count}" for tag, count in top] or ["- (none detected yet)"]
+    lines += ["", "## Sentiment mix"]
+    lines += [f"- {s}: {c}" for s, c in sent_counts.items()] or ["- (no answers yet)"]
+    lines += ["", "## Timeline (in order)"]
+    for i, t in enumerate(turns, 1):
+        who = "You" if t.get("role") == "user" else "Exchange"
+        snippet = (t.get("text") or "").replace("\n", " ")[:120]
+        lines.append(f"{i}. {who}: {snippet}")
+    lines += ["", "_Generated by the Fair Trade Exchange PoC. All data fictitious._"]
+    return "\n".join(lines)

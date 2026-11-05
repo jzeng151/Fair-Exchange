@@ -1,0 +1,23 @@
+[project]
+name = "sada"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Workshop Participant", email = "participant@example.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "boto3>=1.34",
+    "django>=5.0",
+    "gunicorn>=22",
+    "python-dotenv>=1.0",
+    "whitenoise>=6.12.0",
+]
+
+[project.scripts]
+sada = "sada:main"
+
+[build-system]
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"

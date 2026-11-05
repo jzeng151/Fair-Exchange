@@ -1,0 +1,67 @@
+{% extends "exchange/base.html" %}
+{% block title %}Choose a persona · Fair Trade Exchange{% endblock %}
+{% block body %}
+<div class="wrap">
+  <div class="page">
+    <div class="hero" style="margin-bottom:1.6rem">
+      <h1>Who are you today?</h1>
+      <p>Pick a role, a product, and a persona. The exchange will greet you by name, know your region,
+      and show you what the data suggests. All fictitious — for the demo.</p>
+    </div>
+
+    <!-- Step 1: role -->
+    <div class="step">
+      <div class="step-label"><span class="step-num {% if role %}done{% endif %}">1</span> I am a…</div>
+      <div class="pick-row">
+        {% for r in roles %}
+          <a class="pick-tile {% if r == role %}active{% endif %}" href="?role={{ r }}">
+            <span class="pick-emoji">{% if r == 'producer' %}🌱{% else %}🛍️{% endif %}</span>
+            <b>{{ r|capfirst }}</b>
+            <small>{% if r == 'producer' %}Farmer, fisher or co-op member{% else %}Someone who buys Fair Trade{% endif %}</small>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Step 2: product -->
+    {% if role %}
+    <div class="step">
+      <div class="step-label"><span class="step-num {% if product %}done{% endif %}">2</span> Working with…</div>
+      <div class="pick-row">
+        {% for prod in products %}
+          <a class="pick-tile small {% if prod.key == product %}active{% endif %}" href="?role={{ role }}&product={{ prod.key }}">
+            <span class="pick-emoji">{{ prod.icon }}</span>
+            <b>{{ prod.label }}</b>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Step 3: persona -->
+    {% if personas %}
+    <div class="step">
+      <div class="step-label"><span class="step-num">3</span> Pick a persona</div>
+      <div class="persona-cards">
+        {% for p in personas %}
+          <a class="persona-card" href="{% url 'chat' p.id %}">
+            <div class="persona-card-top">
+              <span class="persona-card-avatar">{{ p.avatar }}</span>
+              <div>
+                <b>{{ p.name }}</b>
+                <span>{{ p.location.place }}</span>
+              </div>
+            </div>
+            <p>{{ p.blurb }}</p>
+            <div class="persona-card-org">{{ p.org }}</div>
+            <div class="persona-card-go">Start the conversation →</div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% elif product %}
+      <p class="footnote">No personas for that pick yet.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

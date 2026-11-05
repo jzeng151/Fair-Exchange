@@ -1,0 +1,22 @@
+# Secrets — NEVER commit. Holds live AWS credentials.
+.env
+.env.*
+*.pem
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Django
+staticfiles/
+db.sqlite3
+
+# uv init stub (unused)
+src/
