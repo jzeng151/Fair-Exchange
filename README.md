@@ -90,7 +90,7 @@ The original `.docx` files from Fair Trade USA are in [`docs/requirements/source
 
 ## Team 60
 
-The people behind the Fair Trade USA Producer Exchange Agent:
+The people behind the Fair Trade USA Producer Exchange Agent. Our pitch deck is here: [docs/team60-pitch.pptx](docs/team60-pitch.pptx).
 
 - Frank Yu
 - Jason Zeng
