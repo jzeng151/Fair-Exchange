@@ -4,7 +4,7 @@ A few demo conversations cannot clear the analytics rule that hides any group un
 produces a fixed set of about 200 synthetic conversation records, from a fixed random seed:
   - every one of the 11 challenge tags, in `en` and `es`;
   - producers and their entity types from the producer table. The producer-record tool (#14) is not
-    built yet, so this uses its stand-in, `ProducerProfiles` (producer_profiles.json);
+    built yet, so this uses its stand-in, `ProducerProfiles` (the #7 producer table);
   - every consent scope, including declines; every feedback value; `full` and `limited` evidence;
     reviewed and pending records; and per-model token counts (`ai_usage`).
 

@@ -10,7 +10,10 @@ import { DynamoRecordStore } from '../core/reviewStore.js';
  * function (#11). Normal (non-streaming) Lambda integration on the same REST API as the chat endpoint.
  */
 
-const HEADERS = { 'content-type': 'application/json' };
+const HEADERS = {
+  'content-type': 'application/json',
+  ...(process.env.ALLOWED_ORIGIN ? { 'access-control-allow-origin': process.env.ALLOWED_ORIGIN, vary: 'Origin' } : {}),
+};
 
 function buildReviewDeps(): ReviewDeps {
   const table = process.env.RECORDS_TABLE;

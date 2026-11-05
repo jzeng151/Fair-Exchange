@@ -1,0 +1,10 @@
+field,sample_value,value
+crop,Coffee,coffee
+crop,Bananas,banana
+crop,Cocoa,cocoa
+entity_type,1st Grade,cooperative
+entity_type,2nd Grade,cooperative_union
+entity_type,Independent Smallholder,smallholder
+entity_type,Independent Smallholder - Worker Inclusion,smallholder
+entity_type,Estate,hired_labor_farm
+entity_type,Multi-Estate,hired_labor_farm

@@ -18,7 +18,7 @@
   "expected": {
     "record_status": "completed",
     "consent_scope": "internal",
-    "evidence": "limited",
+    "evidence": "full",
     "pii_flag": false,
     "pii_entity_types": [],
     "tags": ["labor and migration"],

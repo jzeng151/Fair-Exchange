@@ -19,12 +19,13 @@ export class LiveError extends Error {
 }
 
 /**
- * LOCAL ONLY: who the caller is. The local chat API (api/src/local/server.ts) reads this header as a stand-in
- * for sign-in. How callers sign in when deployed is "Not decided" (docs/specs/11-identity.md), so this is the one
- * place to change once it is.
+ * The demo sign-in stand-in (docs/specs/11-identity.md): the chosen scenario producer plus the shared demo
+ * passcode. The deployed API's authorizer accepts the producer only with the right passcode and only from
+ * the scenario allow-list; the local chat API (api/src/local/server.ts) reads the producer and ignores the
+ * passcode. Production sign-in replaces this function.
  */
-export function demoIdentityHeaders(producerId: string): Record<string, string> {
-  return { 'x-demo-producer-id': producerId }
+export function demoIdentityHeaders(producerId: string, passcode = ''): Record<string, string> {
+  return { 'x-demo-producer-id': producerId, ...(passcode ? { 'x-demo-passcode': passcode } : {}) }
 }
 
 /** Parse a newline-delimited JSON body as it arrives, one object per line. */
@@ -49,6 +50,8 @@ export async function* readNdjson(body: ReadableStream<Uint8Array>): AsyncGenera
 export interface LiveConfig {
   baseUrl: string
   producerId: string
+  /** The shared demo passcode; required by the deployed API, ignored locally. */
+  passcode?: string
   fetch?: typeof fetch
 }
 
@@ -61,7 +64,7 @@ export function createLiveClient(cfg: LiveConfig) {
     try {
       res = await doFetch(`${base}${path}`, {
         method,
-        headers: { ...(body === undefined ? {} : { 'content-type': 'application/json' }), ...demoIdentityHeaders(cfg.producerId) },
+        headers: { ...(body === undefined ? {} : { 'content-type': 'application/json' }), ...demoIdentityHeaders(cfg.producerId, cfg.passcode) },
         body: body === undefined ? undefined : JSON.stringify(body),
       })
     } catch {

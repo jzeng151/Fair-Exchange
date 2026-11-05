@@ -51,7 +51,11 @@ function toEvent(req: IncomingMessage, body: string, id?: string): APIGatewayPro
   } as unknown as APIGatewayProxyEvent;
 }
 
-const CORS = { 'access-control-allow-origin': '*', 'access-control-allow-headers': `content-type, ${IDENTITY_HEADER}` };
+// x-demo-passcode is what the deployed stand-in also checks (core/demoAuth.ts); locally it is accepted and ignored.
+const CORS = {
+  'access-control-allow-origin': '*',
+  'access-control-allow-headers': `content-type, ${IDENTITY_HEADER}, x-demo-passcode`,
+};
 
 function sendJson(res: ServerResponse, r: JsonResult): void {
   res.writeHead(r.statusCode, { 'content-type': 'application/json', ...CORS });

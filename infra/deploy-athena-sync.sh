@@ -52,6 +52,8 @@ aws s3 cp --only-show-errors "$build/sync.zip" "s3://$code_bucket/$key"
 
 echo "3/4 Synthesizing and deploying FairExchangeAthenaSync"
 cd "$infra"
+# The app also synthesizes FairExchange, whose chat API Lambdas are bundled from api/ (needs its dependencies)
+(cd "$infra/../api" && npm ci --silent)
 npm ci --silent
 npx tsc --noEmit
 ctx=(-c recordsTableName="$RECORDS_TABLE_NAME"

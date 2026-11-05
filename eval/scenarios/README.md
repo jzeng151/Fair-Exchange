@@ -1,23 +1,23 @@
 # Scenarios
 
-One JSON file per scripted demo scenario (#35), `S1.json` to `S7.json`. Each is a real sample producer, the turns a tester sends, and what should come out. The turns use the actions from [`docs/specs/13-conversation-steps.md`](../../docs/specs/13-conversation-steps.md). They never carry a producer id; the runner sends `producer_id` as the logged-in producer.
+One JSON file per scripted demo scenario (#35), `S1.json` to `S7.json`. Each is a producer from the producer table (#7), the turns a tester sends, and what should come out. The turns use the actions from [`docs/specs/13-conversation-steps.md`](../../docs/specs/13-conversation-steps.md). They never carry a producer id; the runner sends `producer_id` as the logged-in producer.
 
 | ID | Producer | Language | Path | Expected |
 |---|---|---|---|---|
 | `S1` | Coffee smallholder, Cauca, Colombia | en | Drought; playback correction | completed, `internal`, `full` |
-| `S2` | Coffee cooperative, Chiapas, Mexico | es | Price drop | completed, `internal_and_outward`, `limited` |
-| `S3` | Furniture factory, Binh Duong, Vietnam | en | Labor shortage; the regional tool returns nothing | completed, `internal`, `limited` |
+| `S2` | Coffee cooperative, Chiapas, Mexico | es | Price drop | completed, `internal_and_outward`, `full` |
+| `S3` | Coffee processor, Dak Lak, Vietnam (synthetic, `SYN-003`) | en | Labor shortage; the regional tool returns nothing | completed, `internal`, `full` |
 | `S4` | Coffee producer, La Paz, Honduras | es | **Decline path** — consent changed before closing | declined, `full` |
 | `S5` | Cocoa producer, Goh-Djiboua, Côte d'Ivoire | en | **PII flag path** — names a person and gives a phone number (both invented) | completed, `internal`, `pii_flag: true` (`NAME`, `PHONE`), text kept |
-| `S6` | Coffee producer, Jinotega, Nicaragua | en | Asks certification status (out of scope), then a labor challenge | completed, `internal`, `limited`, `out_of_scope: true` |
+| `S6` | Coffee producer, Jinotega, Nicaragua | en | Asks certification status (out of scope), then a labor challenge | completed, `internal`, `full`, `out_of_scope: true` |
 | `S7` | Banana grower, El Oro, Ecuador | en | Same tags as S1, different crop and region — distinctness | completed, `internal`, `full` |
 
-S1 to S5 make up the minimum demo run-through (README), with S6 added once its detection is decided. S2 and S4 cover Spanish. S7 shares S1's tags to check the agent keeps distinct producers distinct.
+S1 to S5 make up the minimum demo run-through (README), with S6 added once its detection is decided. S2 and S4 cover Spanish. S7 shares S1's tags to check the agent keeps distinct producers distinct. S3 has no regional insight because the regional table does not cover Vietnam, but synthetic labor projects give it peer examples (#7), so no scenario currently expects limited evidence.
 
 ## Fields
 
 - `scenario_id`: `S1` to `S7`, the spec's required set
-- `producer_id`: a producer in `data/src/fx_data/producer_profiles.json`
+- `producer_id`: a producer in the producer table, `data/src/fx_data/generated/producers/producers.jsonl` (#7)
 - `language`: the language the producer writes in (`en` or `es`)
 - `title`: a human-readable description, shown by the web's Live FEX picker
 - `turns`: an ordered list; each entry is either `{"message": text}` or `{"action": {"name", "args"}}`, and each names the step its response stream ends in (`expect_step`: `intake`, `playback`, `respond`, `consent`, `feedback`, `closed`). The last turn is always the `end` action.

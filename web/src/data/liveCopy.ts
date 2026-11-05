@@ -14,7 +14,7 @@ export interface LiveCopy {
   insights: string; peers: string; source: string; standard: string
   strength: { exact: string; nearest: string; limited: string }
   limited: string; saved: (v: number) => string; declinedSaved: string; closed: string; working: string
-  errors: { unreachable: string; busy: string; notFound: string; other: string }
+  errors: { unreachable: string; busy: string; notFound: string; signIn: string; other: string }
 }
 
 export const liveCopy: Record<LiveLang, LiveCopy> = {
@@ -31,7 +31,7 @@ export const liveCopy: Record<LiveLang, LiveCopy> = {
     limited: 'There was only limited evidence for this situation.',
     saved: (v) => `Saved (version ${v}).`, declinedSaved: 'Noted: nothing from this conversation is kept.',
     closed: 'This conversation has ended.', working: 'FEX is working…',
-    errors: { unreachable: 'Can’t reach FEX right now. Check that the chat API is running, then try again.', busy: 'FEX is still answering your last message. Please wait a moment.', notFound: 'That conversation wasn’t found. Start a new one.', other: 'Something went wrong. Please try again.' },
+    errors: { unreachable: 'Can’t reach FEX right now. Check that the chat API is running, then try again.', busy: 'FEX is still answering your last message. Please wait a moment.', notFound: 'That conversation wasn’t found. Start a new one.', signIn: 'The demo passcode wasn’t accepted. Go back, check the passcode, and choose the scenario again.', other: 'Something went wrong. Please try again.' },
   },
   es: {
     start: 'Iniciar una conversación', send: 'Enviar', placeholder: 'Escriba un mensaje…', correctPlaceholder: 'Escriba qué debo cambiar…',
@@ -46,7 +46,7 @@ export const liveCopy: Record<LiveLang, LiveCopy> = {
     limited: 'Solo había evidencia limitada para esta situación.',
     saved: (v) => `Guardado (versión ${v}).`, declinedSaved: 'Entendido: no se guarda nada de esta conversación.',
     closed: 'Esta conversación ha terminado.', working: 'FEX está trabajando…',
-    errors: { unreachable: 'No se puede contactar a FEX ahora. Revise que la API del chat esté funcionando e intente de nuevo.', busy: 'FEX todavía está respondiendo su último mensaje. Espere un momento.', notFound: 'No se encontró esa conversación. Inicie una nueva.', other: 'Algo salió mal. Intente de nuevo.' },
+    errors: { unreachable: 'No se puede contactar a FEX ahora. Revise que la API del chat esté funcionando e intente de nuevo.', busy: 'FEX todavía está respondiendo su último mensaje. Espere un momento.', notFound: 'No se encontró esa conversación. Inicie una nueva.', signIn: 'No se aceptó el código de acceso de la demo. Vuelva atrás, revise el código y elija el escenario de nuevo.', other: 'Algo salió mal. Intente de nuevo.' },
   },
   fr: {
     start: 'Commencer une conversation', send: 'Envoyer', placeholder: 'Écrivez un message…', correctPlaceholder: 'Écrivez ce que je dois changer…',
@@ -61,7 +61,7 @@ export const liveCopy: Record<LiveLang, LiveCopy> = {
     limited: 'Il n’y avait que des preuves limitées pour cette situation.',
     saved: (v) => `Enregistré (version ${v}).`, declinedSaved: 'Noté : rien de cette conversation n’est conservé.',
     closed: 'Cette conversation est terminée.', working: 'FEX travaille…',
-    errors: { unreachable: 'Impossible de joindre FEX pour le moment. Vérifiez que l’API du chat fonctionne, puis réessayez.', busy: 'FEX répond encore à votre dernier message. Patientez un instant.', notFound: 'Cette conversation est introuvable. Commencez-en une nouvelle.', other: 'Un problème est survenu. Réessayez.' },
+    errors: { unreachable: 'Impossible de joindre FEX pour le moment. Vérifiez que l’API du chat fonctionne, puis réessayez.', busy: 'FEX répond encore à votre dernier message. Patientez un instant.', notFound: 'Cette conversation est introuvable. Commencez-en une nouvelle.', signIn: 'Le code d’accès de la démo n’a pas été accepté. Revenez en arrière, vérifiez le code et choisissez à nouveau le scénario.', other: 'Un problème est survenu. Réessayez.' },
   },
 }
 

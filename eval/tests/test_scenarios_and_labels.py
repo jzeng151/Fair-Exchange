@@ -49,7 +49,7 @@ def test_required_scenarios_exist():
 def test_scenario_is_well_formed(path):
     s = _load(path)
     assert s["scenario_id"] == path.stem
-    assert s["producer_id"] in PROFILES, "must be a sample producer, so the tools have data"
+    assert s["producer_id"] in PROFILES, "must be in the producer table (#7), so the tools have data"
     assert s["language"] in {"en", "es"}
     assert isinstance(s["intake_replies"], list)
     for reply in s["intake_replies"]:

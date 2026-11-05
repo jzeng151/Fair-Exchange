@@ -126,7 +126,7 @@ def _check_record(result, pid, _session):
         assert result == []
         return
     assert all(item["kind"] == "producer_record" for item in result)
-    own_refs = {p["project_ref"] for p in own["premium_projects"]}
+    own_refs = {p["project_id"] for p in own["premium_projects"]}
     projects = [i for i in result if i["source"].startswith("Your Premium project: ")]
     assert {_bracket_id(i["source"]) for i in projects} == own_refs
     # The producer's own ID appears only in their certification record's source

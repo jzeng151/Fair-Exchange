@@ -19,8 +19,7 @@ Details and rebuild commands are in [`data/README.md`](../../data/README.md); th
 | `clauses.json` | `fx_data.standards_loader` (from the APS/FPS workbooks, [#9](../specs/17-standards-grounding.md)) | the standards workbooks change |
 | `regional_sources.json` | `fx_data.regional fetch` (network) | adding regions or refreshing open data ([#8](../specs/08-regional-fact-table.md)) |
 | `regional_facts.json` | `fx_data.regional build` (offline) | after a `fetch` |
-| `peer_projects.json`, `producer_profiles.json` | `fx_data.peers` (offline) | the sample data changes |
-| `producer_records.json` | `fx_data.records` (offline) | the sample data changes |
+| `generated/<table>/<table>.jsonl` (producers, Premium projects, survey responses, certifications, peer catalog) | `fx_data.generator` ([#7](../specs/07-synthetic-data.md)) | the sample data or `data/generator_inputs/` change |
 | `seeded_records.py` | seeded demo records for the dashboard ([#37](../specs/37-seeded-records.md)) | demo content changes |
 
 Each rebuild has a test that fails if the committed file no longer matches its source (for example
@@ -28,17 +27,21 @@ Each rebuild has a test that fails if the committed file no longer matches its s
 
 ## The synthetic data generator
 
-The generator produces producers with deliberate profile contrasts so the demo and the eval show
-distinct, comparable cases. Its contract is spec #7 (`docs/specs/07-synthetic-data.md`, pending). FTUSA rebuilds the
-data with their own sample by running the generator against their inputs; the tool contracts
+`fx_data.generator` builds every producer table from FTUSA's sample plus synthetic `SYN-` producers that
+fill its gaps and form contrast pairs for the "distinct responses" metric ([spec #7](../specs/07-synthetic-data.md)).
+FTUSA rebuilds the data with their own sample by replacing `docs/olena_data/` and running the generator with
+AWS credentials (it checks new catalog descriptions with Comprehend). The steps are in
+[`data/README.md`](../../data/README.md#producer-data-generator-issue-7). The tool contracts
 ([Interfaces](03-interfaces.md)) do not change, so swapping the data does not change the agent.
 
 ## The vocabulary mapping
 
 FTUSA's source vocabulary (crops, entity types, regions, challenge categories) is mapped to the values
 FEX uses — the 11 challenge tags (`fex.models.ChallengeTag`), entity types, and region names that match
-the regional fact table. Keep this mapping in one place in `fx_data` so a new source vocabulary is a
-data change, not a code change.
+the regional fact table. The mapping is two reviewed tables in `data/generator_inputs/`
+(`vocabulary_map.csv` for crops and entity types, `subcategory_tags.csv` for project tags), so a new
+source vocabulary is a data change, not a code change. Values not in a table are listed in
+`generated/report.json`.
 
 ## The survey allowlist
 

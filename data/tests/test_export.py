@@ -11,10 +11,12 @@ from pathlib import Path
 import pytest
 
 from fx_data.export import TABLES, export_tables
+from fx_data.records import build_records
+from fx_data.tables import read_table
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA_BUCKET_TS = ROOT / "infra" / "lib" / "data-bucket.ts"
-RECORDS = json.loads((ROOT / "data" / "src" / "fx_data" / "producer_records.json").read_text(encoding="utf-8"))["records"]
+RECORDS = build_records()
 
 
 def rows(out: Path, table: str) -> list[dict]:
@@ -36,7 +38,7 @@ def test_writes_one_jsonl_file_per_table_under_its_own_prefix(out):
 
 def test_counts_match_the_package_data(out):
     assert len(rows(out, "producers")) == len(RECORDS)
-    assert len(rows(out, "certification")) == len(RECORDS)
+    assert len(rows(out, "certification")) == len(read_table("certifications"))
     assert len(rows(out, "premium_projects")) == sum(len(r["premium_projects"]) for r in RECORDS.values())
     assert len(rows(out, "survey_facts")) == sum(len(r["survey"]["facts"]) for r in RECORDS.values())
 
@@ -60,7 +62,7 @@ def test_never_exports_raw_survey_answers(out):
     from fx_data.records import MIN_RESPONSES
     facts = rows(out, "survey_facts")
     assert facts and all(f["responses"] >= MIN_RESPONSES for f in facts)
-    raw_markers = {"survey_response_sk", "household_sk", "respondent", "answer"}
+    raw_markers = {"survey_response_sk", "survey_response_id", "household_sk", "respondent", "answer"}
     for table in TABLES:
         for row in rows(out, table):
             assert not raw_markers & set(row), table
@@ -70,7 +72,7 @@ def test_glue_columns_in_cdk_match_the_exported_fields():
     text = DATA_BUCKET_TS.read_text(encoding="utf-8")
     block = re.search(r"export const SOURCE_TABLES[^=]*=\s*\{(.*?)\n\};", text, re.S)
     assert block, "SOURCE_TABLES not found in infra/lib/data-bucket.ts"
-    glue = {name: re.findall(r"name:\s*'([a-z_]+)'", cols)
+    glue = {name: re.findall(r"name:\s*'([a-z0-9_]+)'", cols)
             for name, cols in re.findall(r"\n  ([a-z_]+):\s*\[(.*?)\n  \]", block.group(1), re.S)}
     athena_tables = {t: f for t, f in TABLES.items() if t != "peer_catalog"}  # the peer catalog is for the tool only
     assert glue == {t: list(f) for t, f in athena_tables.items()}

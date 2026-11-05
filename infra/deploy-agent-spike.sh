@@ -22,6 +22,8 @@ cp "$src/main.py" "$build/pkg/"
 key="hello/agent-$(shasum -a 256 "$build/agent.zip" | cut -c1-12).zip"   # new key per build, so CloudFormation sees the change
 
 cd "$infra"
+# The app also synthesizes FairExchange, whose chat API Lambdas are bundled from api/ (needs its dependencies)
+(cd "$infra/../api" && npm ci --silent)
 npm ci --silent
 npx tsc --noEmit
 synth() { CDK_DEFAULT_ACCOUNT="$account" CDK_DEFAULT_REGION="$AWS_REGION" npx cdk synth --quiet "$@" >/dev/null; }

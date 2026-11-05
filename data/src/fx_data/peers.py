@@ -1,34 +1,21 @@
-"""Peer Premium projects and producer profiles, built from the FTUSA sample data (issue #16).
+"""Peer catalog and producer profiles: the runtime lookups, plus the sample-text helpers the generator uses.
 
-    PYTHONPATH=src uv run python -m fx_data.peers   # offline: writes peer_projects.json, producer_profiles.json
-
-Peer catalog (#16 spec; interim build until the #7 generator replaces it):
-  - one row per environmental Premium project (`pprojects-full-environmental-with-acct-detail.csv`),
-    with its start year from `Premium Projects Environmental.csv`
-  - only the publishable fields: fictional organization name, country, crop, entity type, category,
-    sub-category, start year and the description (organization and person names replaced), plus an
-    opaque `catalog_id` and the challenge tags
-  - one private column, `owner_producer_id` (the owning producer's ID), used only to leave a
-    producer's own projects out; never returned (#7, #16 specs)
-  - placeholder rows (lorem ipsum) are dropped
-  - not yet done (owned by #7): Comprehend PII check of each description, and the reviewed
-    vocabulary and sub-category mapping tables
-
-Producer profiles are a stand-in for the producer-record tool (#14) and the Athena tables (#28):
-producer_id -> country, region, crop and entity type, so tools can resolve the session producer's
-location without the model supplying it.
+The catalog and producer tables are built by the generator (fx_data.generator, issue #7) and read from
+`generated/` (fx_data.tables). Peer catalog rules (#7 and #16 specs):
+  - only the publishable fields, plus an opaque `catalog_id` and the challenge tags
+  - one private column, `owner_producer_id`, used only to leave a producer's own projects out; never returned
+  - organizations are fictional, and organization and person names in the text are replaced (NAME_REPLACEMENTS)
 """
 from __future__ import annotations
 
 import csv
 import hashlib
-import json
 import re
-import sys
-from collections import Counter, defaultdict
+from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
+from fx_data.tables import GENERATED_DIR, read_table
 from fx_data.text import normalize
 
 HERE = Path(__file__).parent
@@ -37,26 +24,6 @@ PROJECTS_CSV = SAMPLE_DIR / "pprojects-full-environmental-with-acct-detail.csv"
 LINKED_DIR = SAMPLE_DIR / "Producers with Linked Project & Survey Data"
 STATUS_CSV = LINKED_DIR / "Premium Projects Environmental.csv"
 ACCOUNTS_CSV = LINKED_DIR / "Producer Accounts.csv"
-PEERS_PATH = HERE / "peer_projects.json"
-PROFILES_PATH = HERE / "producer_profiles.json"
-
-# Environmental subcategory -> challenge tag. Blank subcategories fall back to keywords.
-SUBCATEGORY_TAGS = {
-    "clean water": "water",
-    "climate change mitigation/adaptation (clean energy, agroforestry etc.)": "climate and weather",
-    "pest management": "soil and land",
-    "crop diversification": "soil and land",
-    "waste disposal / recycling": "biodiversity and conservation",
-    "waste management (trash collection, recycling facilities etc.)": "biodiversity and conservation",
-    "sustainability efforts": "biodiversity and conservation",
-    "human resources and administration/ office services": "social and community",
-}
-KEYWORD_TAGS = [
-    (("water", "irrigation", "wastewater", "rainwater"), "water"),
-    (("climate", "solar", "clean energy", "carbon", "agroforestry", "reforest"), "climate and weather"),
-    (("soil", "erosion", "pest", "fertiliz", "compost", "disease"), "soil and land"),
-]
-DEFAULT_TAG = "biodiversity and conservation"
 
 # Organization and person names found in the sample text, replaced so peer examples cannot
 # identify a producer. Longest first, so "SCPP Barra de Palmitas" goes before "SCPP".
@@ -210,17 +177,6 @@ def _short(text: str, limit: int = 600) -> str:
     return text if len(text) <= limit else text[: limit - 1].rstrip() + "…"
 
 
-def tag_for(subcategory: str, *texts: str) -> str:
-    tag = SUBCATEGORY_TAGS.get(normalize(subcategory))
-    if tag:
-        return tag
-    blob = " ".join(t.lower() for t in texts if t)
-    for keywords, keyword_tag in KEYWORD_TAGS:
-        if any(k in blob for k in keywords):
-            return keyword_tag
-    return DEFAULT_TAG
-
-
 def _read(path: Path) -> list[dict]:
     with open(path, encoding="utf-8") as fh:
         return list(csv.DictReader(fh))
@@ -230,10 +186,10 @@ def _outcome(rows: list[dict]) -> set[tuple]:
     return {(r["project_status_name"], r["project_start_date"], r["project_end_date"]) for r in rows}
 
 
-def build_status_index() -> dict[tuple[str, str], list[dict]]:
+def build_status_index(path: Path = STATUS_CSV) -> dict[tuple[str, str], list[dict]]:
     """Status rows grouped by (account, description). Several projects can share a description."""
     index: dict[tuple[str, str], list[dict]] = defaultdict(list)
-    for r in _read(STATUS_CSV):
+    for r in _read(path):
         index[(r["account_sk"], r["project_description_txt"].strip())].append(r)
     return index
 
@@ -258,15 +214,6 @@ def resolve_status(index: dict, row: dict) -> dict:
     return {}
 
 
-def unique_project_ref(seen: Counter, account: str, name: str, description: str) -> str:
-    """A ref that names exactly one project. The sample repeats some projects (same account, name and
-    description), so repeats get an occurrence number. Refs of projects that appear once are unchanged."""
-    key = (account, name, description)
-    n = seen[key]
-    seen[key] += 1
-    return _ref("PROJ", *key) if n == 0 else _ref("PROJ", *key, str(n))
-
-
 # Fictional organization names (#16: "peers shown only by fictionalized organization name").
 _NAME_WORDS = ("Ceiba", "Guayacán", "Nogal", "Cedro", "Laurel", "Roble", "Sauce", "Olivo", "Almendro",
                "Ébano", "Caoba", "Pino", "Arrayán", "Encino", "Jacaranda", "Aliso", "Fresno", "Tilo",
@@ -283,66 +230,6 @@ def fictional_names(org_keys: list[str]) -> dict[str, str]:
     if len(keys) > len(FICTIONAL_NAMES):
         raise ValueError(f"{len(keys)} organizations but only {len(FICTIONAL_NAMES)} fictional names")
     return dict(zip(keys, FICTIONAL_NAMES))
-
-
-def build_peers() -> dict:
-    status_index = build_status_index()
-    seen_refs: Counter = Counter()
-    projects, dropped = [], 0
-    for row in _read(PROJECTS_CSV):
-        texts = [row[f] for f in ("translated_project_name", "translated_project_description_txt",
-                                  "translated_project_reason_txt", "translated_primary_goal_txt")]
-        if any(_PLACEHOLDER.search(t or "") for t in texts):
-            dropped += 1
-            continue
-        name, description, reason, goal = (fictionalize(t or "") for t in texts)
-        status = resolve_status(status_index, row)
-        project_ref = unique_project_ref(seen_refs, row["account_sk"], row["translated_project_name"],
-                                         row["translated_project_description_txt"])
-        start = status.get("project_start_date") or ""
-        if start.startswith("1970-01-01"):  # Unix-epoch placeholder in the sample, not a real date
-            start = ""
-        projects.append({
-            "catalog_id": project_ref,
-            "_org": _ref("ORG", row["account_sk"]),
-            "owner_producer_id": row["account_sk"],
-            "tags": [tag_for(row["subcategory"], *texts)],
-            "country": row["country"] or None,
-            "crop": row["product_category_name"] or None,
-            "entity_type": row["structure"] or None,
-            "category": row["category"] or None,
-            "sub_category": row["subcategory"] or None,
-            "start_year": int(start[:4]) if start[:4].isdigit() else None,
-            "description": _short(description or name),
-        })
-    names = fictional_names([p["_org"] for p in projects])
-    for p in projects:
-        p["organization"] = names[p.pop("_org")]
-    return {"description": "Peer catalog: publishable fields only (#16), plus the private owner_producer_id, "
-                           "used only to exclude a producer's own projects and never returned. Organizations "
-                           "are fictional.",
-            "dropped_placeholder_rows": dropped, "projects": projects}
-
-
-def build_profiles() -> dict:
-    regions: dict[str, Counter] = defaultdict(Counter)
-    for row in _read(PROJECTS_CSV):
-        if row["region"]:
-            regions[row["account_sk"]][row["region"]] += 1
-    profiles = {}
-    for row in _read(ACCOUNTS_CSV):
-        counts = regions.get(row["account_sk"])
-        # Most projects decide the region; ties go to the alphabetically first, so builds are stable.
-        region = sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[0][0] if counts else None
-        profiles[row["account_sk"]] = {
-            "country": row["country_name"] or None,
-            "region": region,
-            "crop": row["product_category_name"] or None,
-            "entity_type": row["structure_txt"] or None,
-        }
-    return {"description": "Stand-in producer profiles from the FTUSA sample accounts, until the "
-                           "producer-record tool (#14) and Athena tables (#28) exist.",
-            "profiles": profiles}
 
 
 # ---------------------------------------------------------------------------------------------
@@ -363,8 +250,12 @@ class ProducerProfiles:
         self._profiles = table["profiles"]
 
     @classmethod
-    def load(cls, path: Path = PROFILES_PATH) -> "ProducerProfiles":
-        return cls(json.loads(Path(path).read_text(encoding="utf-8")))
+    def load(cls, root: Path = GENERATED_DIR) -> "ProducerProfiles":
+        """From the producer table. Crops are joined with ";" (e.g. "cocoa;coffee"), as crop_set reads them."""
+        return cls({"profiles": {p["producer_id"]: {"country": p["country"], "region": p["admin1"],
+                                                    "crop": ";".join(p["crops"]) or None,
+                                                    "entity_type": p["entity_type"]}
+                                 for p in read_table("producers", root)}})
 
     def get(self, producer_id: str) -> ProducerProfile | None:
         row = self._profiles.get(producer_id)
@@ -375,8 +266,12 @@ class ProducerProfiles:
         return sorted(self._profiles)
 
 
+# "other" is never used for matching (#14 spec): two producers with an unknown crop or entity type are not alike.
+OTHER = "other"
+
+
 def crop_set(crop: str | None) -> set[str]:
-    return {normalize(p) for p in (crop or "").split(";") if p.strip()}
+    return {normalize(p) for p in (crop or "").split(";") if p.strip()} - {OTHER}
 
 
 PUBLISHABLE = ("organization", "country", "crop", "entity_type", "category", "sub_category", "start_year",
@@ -390,14 +285,14 @@ class PeerProjects:
         self._projects = table["projects"]
 
     @classmethod
-    def load(cls, path: Path = PEERS_PATH) -> "PeerProjects":
-        return cls(json.loads(Path(path).read_text(encoding="utf-8")))
+    def load(cls, root: Path = GENERATED_DIR) -> "PeerProjects":
+        return cls({"projects": read_table("peer_catalog", root)})
 
     @staticmethod
     def strength(project: dict, crops: set[str], entity_type: str | None) -> str:
         """#16: tag + a crop + entity type is exact; tag + one of them is nearest; tag only is limited."""
         crop = bool(crop_set(project["crop"]) & crops)
-        entity = bool(entity_type) and normalize(project["entity_type"]) == normalize(entity_type)
+        entity = normalize(entity_type) not in ("", OTHER) and normalize(project["entity_type"]) == normalize(entity_type)
         return "exact" if crop and entity else "nearest" if crop or entity else "limited"
 
     def find(self, producer_id: str, tags: set[str], crops: set[str], entity_type: str | None,
@@ -424,18 +319,3 @@ class PeerProjects:
             if len(items) >= limit:
                 break
         return items
-
-
-def main() -> None:
-    peers = build_peers()
-    PEERS_PATH.write_text(json.dumps(peers, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-    profiles = build_profiles()
-    PROFILES_PATH.write_text(json.dumps(profiles, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
-    tags = Counter(t for p in peers["projects"] for t in p["tags"])
-    print(f"wrote {PEERS_PATH}: {len(peers['projects'])} projects "
-          f"({peers['dropped_placeholder_rows']} placeholder rows dropped); {dict(tags)}", file=sys.stderr)
-    print(f"wrote {PROFILES_PATH}: {len(profiles['profiles'])} profiles", file=sys.stderr)
-
-
-if __name__ == "__main__":
-    main()

@@ -38,6 +38,11 @@ What to know before running Fair Exchange in production. Each links to its sourc
   a conversation closes after 120 minutes without a message, and the runtime session ends after
   1440 minutes (24 hours) ([#13](../specs/13-conversation-steps.md),
   [#25](../specs/25-chat-endpoint.md), [deploy](02-deploy.md)).
+- **Deployed sign-in stand-in** (decided 2026-11-04, sandbox demo only): a shared passcode plus a producer
+  from the eval scenarios' allow-list, checked by an API Gateway Lambda authorizer. Anyone with the passcode
+  can act as any of those synthetic producers. A separate admin passcode grants the `admin` role for
+  analytics only. Production sign-in replaces both
+  ([#11](../specs/11-identity.md), [#25](../specs/25-chat-endpoint.md)).
 
 ## Decisions for FTUSA
 
@@ -62,8 +67,8 @@ the current behavior below; each row stays in the open list that follows until F
 
 | Decision | Current sandbox behavior |
 |---|---|
-| Production sign-in, expected to be FTUSA's Okta ([#11](../specs/11-identity.md)) | A sandbox stand-in only |
-| Who may invoke the runtime | The deploying account's principals with invoke permission |
+| Production sign-in, expected to be FTUSA's Okta ([#11](../specs/11-identity.md)) | The demo passcode stand-in only; synthetic scenario producers |
+| Who may invoke the runtime | The chat and sweep Lambda roles are granted it; account administrators can also invoke it |
 | CDK bootstrap permissions | The default bootstrap, which grants CloudFormation `AdministratorAccess`; FTUSA may scope it down |
 
 ## Open decisions
@@ -73,12 +78,10 @@ until the owning spec decides them. The CI open-decisions check fails if a spec 
 "Not decided" item without this list and the manifest below being updated to match.
 
 <!-- open-decisions-manifest
-05-cdk-stack.md: 3
-11-identity.md: 1
+05-cdk-stack.md: 2
 13-conversation-steps.md: 1
 19-consent-and-decline.md: 3
 21-out-of-scope.md: 2
-25-chat-endpoint.md: 1
 26-write-back.md: 3
 28-athena-sync.md: 1
 40-timed-redeploy.md: 1
@@ -109,12 +112,6 @@ currently has; it is checked against the specs in CI.
 - Whether records of conversations that are still open appear in Athena; the sync currently copies every
   record, with the filter kept in one place in the sync Lambda ([#28](../specs/28-athena-sync.md)).
 
-### Identity and scope
-- How callers sign in, and the deployed stand-in for it, which the deployed smoke test and the demo need
-  before the chat endpoint runs end to end ([#11](../specs/11-identity.md),
-  [#25](../specs/25-chat-endpoint.md)). The stack will host the stand-in once it is decided
-  ([#5](../specs/05-cdk-stack.md)).
-
 ### Out of scope
 - How the out-of-scope detection function decides ([#21](../specs/21-out-of-scope.md)).
 ### Deployment and logging
@@ -123,9 +120,8 @@ currently has; it is checked against the specs in CI.
 - Whether message content may appear in AgentCore logs at all: content capture is a configuration value,
   and ADR 0002 found the Strands tracer still logs content when the documented setting is off, so whoever
   turns it off must verify the result ([#5](../specs/05-cdk-stack.md)).
-- How the timed-redeploy scenarios sign in as their producers, which depends on the sign-in stand-in and
-  blocks the scenario step until it is decided ([#40](../specs/40-timed-redeploy.md),
-  [#11](../specs/11-identity.md)).
+- How the timed-redeploy scenarios sign in as their producers ([#40](../specs/40-timed-redeploy.md)). The
+  sign-in stand-in it waited on is now decided ([#11](../specs/11-identity.md)), so this can be settled.
 
 ### This handoff
 - Any item the specs list as "Not decided" that is added after this package was assembled

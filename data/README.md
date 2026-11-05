@@ -81,23 +81,53 @@ PYTHONPATH=src uv run python -m fx_data.regional build   # offline -> regional_f
 
 Both files are committed. `tests/test_regional.py` fails if `regional_facts.csv` no longer matches `regional_sources.json`. To add a region, add it to `REGIONS` and run both steps. The Pink Sheet workbook URL changes each year; update `PINK_SHEET_URL` when it does.
 
-## Peer projects and producer profiles (issue #16)
+## Producer data generator (issue #7)
+
+One set of producer data files, shared by the data tools, the profile lookup, the test logins and Athena ([spec](../docs/specs/07-synthetic-data.md)). It combines FTUSA's sample producers, with their own IDs, and synthetic `SYN-` producers that fill the sample's gaps (Côte d'Ivoire, cocoa, the scripted scenarios) and form contrast pairs.
 
 ```bash
-PYTHONPATH=src uv run python -m fx_data.peers   # offline -> peer_projects.json, producer_profiles.json
+uv run --group generator python -m fx_data.generator   # calls Comprehend for new or edited descriptions (AWS credentials)
+uv run python -m fx_data.generator --offline           # no AWS; fails if a catalog description has no PII result
 ```
 
-- **`peer_projects.json`**: the peer catalog (#16), 347 of the 349 environmental Premium projects (2 lorem-ipsum placeholder rows dropped). Each row holds only the publishable fields (fictional organization name, country, crop, entity type, category, sub-category, start year, description), an opaque `catalog_id` and the challenge `tags`. Organizations get a fictional name (`FICTIONAL_NAMES` in `peers.py`), and organization and person names in descriptions are replaced (`NAME_REPLACEMENTS`). One private column, `owner_producer_id`, is used only to leave a producer's own projects out and is never returned (#7 spec). An interim build until the #7 generator, which adds the Comprehend PII check and the reviewed crop and entity-type vocabulary.
-- **`producer_profiles.json`**: producer id → country, region, crop, entity type. A stand-in until the producer-record tool (#14) and the Athena tables (#28) exist. Region is the region most of the producer's projects are in; 7 of the 146 sample producers have none.
+**Inputs** (`generator_inputs/`, all reviewed by hand):
 
-`tests/test_peers.py` fails if either file is stale, if an account ID appears outside `owner_producer_id`, or if a listed name appears in `peer_projects.json`.
+| File | What |
+|---|---|
+| `producer_definitions.json` | The synthetic producers: profile, Premium projects with their tags, survey responses (allowlisted columns only), certification scope. Also the scenario producers and the contrast pairs. |
+| `vocabulary_map.csv` | Sample crop and structure values to the #14 vocabulary. A value not listed becomes `other` and is listed in the report. |
+| `subcategory_tags.csv` | Sample project sub-category to challenge tags. A project whose sub-category is blank or not listed stays out of the peer catalog. |
+| `pii_checks.csv` | Comprehend's answer for each catalog description, keyed by its SHA-256. Only descriptions not in the file are sent to Comprehend. |
 
-## Producer records (issue #14)
+Plus FTUSA's sample in `docs/olena_data/`.
 
-```bash
-PYTHONPATH=src uv run python -m fx_data.records   # offline -> producer_records.json
-```
+**Rules:**
+- Only sample producers with a crop that maps to `coffee`, `banana` or `cocoa` are kept. Factories are left out.
+- A sample producer's region is the most frequent region across its Premium projects (ties go to the alphabetically first), or empty if it has none.
+- Countries use the regional table's spelling (`Cote d'Ivoire` becomes `Côte d'Ivoire`).
+- Project IDs (`PRJ-`) and catalog IDs (`CAT-`) are separate hashes, so a producer's own project can't be linked to its catalog entry.
+- A description is a PII hit when Comprehend finds a `NAME`, `PHONE`, `EMAIL` or `ADDRESS` with a score of 0.8 or more (the #20 rule). A hit leaves the project out of the catalog.
+- No randomness: the same inputs give byte-identical files.
 
-One record per sample producer: profile with certification scope (status is never read, #21), their own Premium projects (placeholder rows left out), and a survey summary. Survey answers are reduced to shares of survey responses from an allowlist of farming, water and practice questions (`YES_NO_FIELDS`, `CHOICE_FIELDS`, `MULTI_FIELDS` in `records.py`). Sensitive questions (harassment, borrowing, medical access, child schooling, committees, income) are never read. A share is only reported when at least 5 **distinct survey responses** answered (a response that picks several options counts once), and a reason is only named if at least 5 responses gave it. Each fact's period is the years of the responses behind it. They are called "survey responses", not "households": about half the sample's survey rows are not household surveys. 22 of 146 producers have survey responses; 12 have enough to summarize. `ProducerRecords.items(producer_id)` returns the record as data-tool items (#17 contract): certification scope, one item per own project, one per survey summary.
+**Outputs** (`src/fx_data/generated/`, one folder per table so each maps to an S3 prefix):
 
-`tests/test_records.py` fails if `producer_records.json` is stale or a sensitive field is added to the allowlist.
+| Table | Rows |
+|---|---|
+| `producers` | `producer_id`, `country`, `admin1`, `crops`, `entity_type`, `origin` (`sample` or `synthetic`) |
+| `premium_projects` | `project_id`, `producer_id`, `title`, `category`, `sub_category`, `tags`, `start_year`, `amount` (empty for sample rows), `description` |
+| `survey_responses` | one row per response: the #14 allowlisted columns, `response_year`, and one list per allowed multiple-choice question |
+| `certifications` | `producer_id`, `certification_scope` (status is never read, #21) |
+| `peer_catalog` | the publishable fields (#16), `catalog_id`, `tags`, and the private `owner_producer_id` |
+
+`report.json` lists counts per country, crop and entity type, unmapped values, excluded producers and projects with the reason, projects named "test", and PII hit counts.
+
+**To use FTUSA's own sample:** replace the files in `docs/olena_data/` (same columns), add any new sample values to the two mapping tables, then run the generator with AWS credentials. Check `report.json` for unmapped values and PII hits, hand-edit or accept them, and run `uv run pytest`.
+
+`tests/test_generator.py` runs the rules on a small fixture sample with Comprehend stubbed, and fails if the committed files no longer match the inputs.
+
+**Data bucket export.** `python -m fx_data.export <out_dir>` (run by `infra/deploy.sh`) writes these tables for S3 and the Glue tables in `infra/lib/data-bucket.ts`, with the same fields. The one difference is the survey: `survey_responses` is not exported, only its per-question summaries (`survey_facts`, at least 5 responses each). `certifications` is exported as `certification`. `tests/test_export.py` fails if the Glue columns and the exported fields differ.
+
+### Runtime lookups
+
+- `fx_data.peers`: `ProducerProfiles` (profile by producer ID) and `PeerProjects.find` (#16 ranking: tag, crop and entity type; `other` never counts as a match). `NAME_REPLACEMENTS` replaces organization and person names in catalog descriptions before the PII check.
+- `fx_data.records`: `ProducerRecords.items(producer_id)` (#14). Survey answers are summarized per question across the producer's responses, only when at least 5 **distinct survey responses** answered, and a multiple-choice answer is only named if at least 5 responses chose it. The allowlist is `YES_NO_FIELDS`, `CHOICE_FIELDS`, `NUMBER_FIELDS` and `MULTI_FIELDS`; sensitive questions are never copied. A missing number is recorded as 0 in the sample, so 0 is left out of medians.

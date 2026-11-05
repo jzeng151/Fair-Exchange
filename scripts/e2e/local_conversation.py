@@ -6,11 +6,13 @@ Web client's view (#25 spec): POST /conversations, /messages {text}, /actions {a
 and GET /conversations/{id}.
 Behind it run the real chat API route logic and the real agent engine (see scripts/e2e/run_local.sh).
 Exits non-zero, with the failing step, if anything is wrong. Standard library only.
+Against the deployed API, pass --api <ApiUrl> and set FEX_DEMO_PASSCODE (the sign-in stand-in, #11).
 """
 from __future__ import annotations  # run under the system python3, which may be 3.9 (PEP 604 unions in annotations)
 
 import argparse
 import json
+import os
 import sys
 import time
 import urllib.request
@@ -28,7 +30,9 @@ class Client:
         req = urllib.request.Request(f"{self.api}{path}", method=method,
                                      data=None if body is None else json.dumps(body).encode(),
                                      headers={"content-type": "application/json", "x-demo-producer-id": self.producer})
-        return urllib.request.urlopen(req, timeout=120)
+        if os.environ.get("FEX_DEMO_PASSCODE"):
+            req.add_header("x-demo-passcode", os.environ["FEX_DEMO_PASSCODE"])
+        return urllib.request.urlopen(req, timeout=300)
 
     def turn(self, path: str, body: dict) -> list[dict]:
         with self._request("POST", path, body) as res:

@@ -25,7 +25,11 @@ import type { Deps } from '../core/types.js';
  * (resolveCaller, #11), never taken from the request.
  */
 
-const HEADERS = { 'content-type': 'application/json' };
+/** CORS (#25): only the web app's origin, set by the stack as ALLOWED_ORIGIN; absent in tests. */
+const CORS: Record<string, string> = process.env.ALLOWED_ORIGIN
+  ? { 'access-control-allow-origin': process.env.ALLOWED_ORIGIN, vary: 'Origin' }
+  : {};
+const HEADERS = { 'content-type': 'application/json', ...CORS };
 
 const asProxyResult = (r: JsonResult): APIGatewayProxyResult => ({
   statusCode: r.statusCode,
@@ -69,7 +73,7 @@ export function createHandlers(
       try {
         out = awslambda.HttpResponseStream.from(responseStream, {
           statusCode: 200,
-          headers: { 'content-type': 'application/x-ndjson' },
+          headers: { 'content-type': 'application/x-ndjson', ...CORS },
         });
       } catch (err) {
         await prepared.abandon();

@@ -74,9 +74,10 @@ bash scripts/e2e/run_local.sh --web
 This runs the same checks, then keeps the chain running and opens the web app with a **⚡ Live FEX** tab at
 http://localhost:5173/#/live. Pick a sample producer and talk to the real agent. Every reply, cited claim,
 consent choice and saved record comes from the chat API. The tab appears only when `VITE_FEX_API_URL` is set
-at build time, so the published site still shows only the scripted demo. Live mode identifies the producer with
-the local server's `x-demo-producer-id` header (a local-only stand-in). How people sign in once deployed is not
-decided yet ([#11 spec](docs/specs/11-identity.md)).
+at build time. Locally, live mode identifies the producer with the `x-demo-producer-id` header. The deployed
+site's live tab talks to the deployed chat API, which also needs the shared demo passcode: a sign-in stand-in
+for the sandbox demo ([#11 spec](docs/specs/11-identity.md) "Deployed stand-in"). `infra/deploy.sh` prints the
+command that reads it.
 
 How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
 
@@ -88,3 +89,13 @@ How to contribute: [CONTRIBUTING.md](CONTRIBUTING.md).
 - [Architecture decisions](docs/adr/) and [handoff docs](docs/handoff/)
 
 The original `.docx` files from Fair Trade USA are in [`docs/requirements/source/`](docs/requirements/source/). They are the source of truth if the Markdown copies ever disagree.
+
+## Team 60
+
+The people behind the Fair Trade USA Producer Exchange Agent. Our pitch deck is here: [docs/team60-pitch.pptx](docs/team60-pitch.pptx).
+
+- Frank Yu
+- Jason Zeng
+- Sadananda Narayanappa
+- Tripat Panesar
+- Sriya Uttharkar
