@@ -1,0 +1,30 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Fair Trade Exchange{% endblock %}</title>
+  <meta name="description" content="Fair Trade USA Producer Exchange — a friendly, grounded conversation that returns evidence and peer examples to producers.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
+  <link rel="icon" type="image/png" href="{% static 'img/ftc-seal.png' %}">
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+  <header class="topbar">
+    <a class="brand" href="{% url 'picker' %}" style="color:#fff;text-decoration:none">
+      <img class="mark-seal" src="{% static 'img/ftc-seal.png' %}" alt="Fair Trade Certified" width="31" height="43">
+      <span>Fair Trade Exchange <small>Producer Intelligence · proof of concept</small></span>
+    </a>
+    <nav class="nav">
+      <a href="{% url 'picker' %}" class="{% if request.resolver_match.url_name == 'picker' or request.resolver_match.url_name == 'chat' %}active{% endif %}">Chat</a>
+      <a href="{% url 'about' %}" class="{% if request.resolver_match.url_name == 'about' %}active{% endif %}">About</a>
+      <a href="{% url 'docs' %}" class="{% if request.resolver_match.url_name == 'docs' %}active{% endif %}">Docs</a>
+      <a href="{% url 'demo' %}" class="{% if request.resolver_match.url_name == 'demo' %}active{% endif %}">Demo</a>
+    </nav>
+  </header>
+  {% block body %}{% endblock %}
+  {% block scripts %}{% endblock %}
+</body>
+</html>
