@@ -44,7 +44,7 @@ The handoff lives in `docs/handoff/` as a small set of documents. Each links to 
 
   6. **Known limitations:**
      - **Analytics over time (decided 2026-11-04).** Hidden counts can be recovered by comparing results as new records arrive. No sandbox rule prevents this. FTUSA's production version should publish on a fixed schedule, round counts, or add noise.
-     - Long-term recall is built but switched off until the decline policy is decided ([memory spec](memory.md)).
+     - Long-term recall is off until the decline policy is decided, and is not yet wired into the engine ([memory spec](memory.md)).
      - AgentCore Gateway was deferred until after the MVP. Tools stay in-process because of the scope rule (#13).
      - Peer examples use a structured query. Moving them to the Knowledge Base is a planned expansion ([#16](16-peer-example-tool.md)).
      - The verifier proves provenance, not that a claim's wording matches its source ([#17](17-standards-grounding.md)).

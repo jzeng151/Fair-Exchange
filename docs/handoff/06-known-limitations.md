@@ -12,8 +12,9 @@ What to know before running Fair Exchange in production. Each links to its sourc
   to an in-process `InMemoryStateStore` and state is lost on replacement ([memory spec](../specs/memory.md)).
   The sandbox deploy sets `FEX_MEMORY_ID`. Memory keeps conversation events and the long-term strategies
   on, and does not delete anything when a producer declines; that policy is FTUSA's to decide (see
-  "Decisions for FTUSA" below). Long-term recall of earlier conversations stays off behind one eligibility
-  function until it is decided, so declined text cannot resurface.
+  "Decisions for FTUSA" below). Long-term recall of earlier conversations is off until it is decided, so
+  declined text cannot resurface. Recall is not wired in yet: `recall_eligibility` returns nothing and the
+  engine never calls it, so turning recall on also means adding that call to intake and playback.
 - **AgentCore Gateway was deferred** until after the MVP. Tools stay in the agent process so the
   producer-ID scope rule keeps working; Gateway is the path for adding tools later, with that scope
   rule as the design constraint ([#13](../specs/13-conversation-steps.md)).
