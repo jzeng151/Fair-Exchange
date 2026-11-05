@@ -4,6 +4,9 @@ At the end of each respond step and at close, an engine with an evidence store r
 tools returned, the claims the producer was shown, the codes of claims dropped after the last retry and
 the step the conversation is in. Without a store (the main stack), nothing is captured.
 """
+import subprocess
+import sys
+
 from tests.conversation_harness import RETRIEVE, Run, answer, claim, of, playback, summary
 
 from fex.conversation import ConversationEngine
@@ -106,3 +109,8 @@ def test_a_store_failure_never_breaks_the_conversation():
     r.engine.evidence_store = Broken()
     events = r.to_consent()
     assert not of(events, "error") and of(events, "answer")
+
+
+def test_the_module_imports_on_its_own():
+    # The eval harness imports it before anything else has loaded the engine
+    subprocess.run([sys.executable, "-c", "import fex.eval_evidence"], check=True)

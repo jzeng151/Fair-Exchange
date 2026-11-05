@@ -10,7 +10,6 @@ from typing import Literal, Protocol
 
 from pydantic import BaseModel, Field
 
-from fex.conversation.contract import Step
 from fex.models import Claim
 from fex.tools._contract import EvidenceItem
 from fex.verifier import ReasonCode
@@ -36,7 +35,8 @@ class AnswerEvidence(BaseModel):
 class EvalEvidence(BaseModel):
     conversation_id: str
     producer_id: str
-    final_step: Step = Field(description="The step the conversation was in at the last write")
+    # A plain string: importing the Step type would load fex.conversation, which imports this module
+    final_step: str = Field(description="The #13 step the conversation was in at the last write")
     written_at: datetime
     answers: list[AnswerEvidence] = Field(default_factory=list, description="Every respond step, oldest first")
 
