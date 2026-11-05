@@ -259,5 +259,8 @@ export class AthenaSyncStack extends Stack {
     new CfnOutput(this, 'RecordsBucketName', { value: recordsBucket.bucketName });
     new CfnOutput(this, 'SyncFunctionName', { value: syncFunction.functionName });
     new CfnOutput(this, 'AthenaWorkGroup', { value: 'fex' });
+    // For the analytics route (#29) in the FairExchange stack: where Athena writes results, and the key
+    new CfnOutput(this, 'AthenaResultsBucketName', { value: athenaResults.bucketName });
+    new CfnOutput(this, 'SyncKeyArn', { value: key.keyArn });
   }
 }

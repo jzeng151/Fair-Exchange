@@ -12,6 +12,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
+import { RECORDS_GLUE_TABLE, RECORDS_PREFIX, SEEDED_GLUE_TABLE, SEEDED_PREFIX, SYNC_DATABASE } from './athena-sync-stack';
 
 const REPO = path.resolve(__dirname, '..', '..');
 const API_DIR = path.join(REPO, 'api');
@@ -19,6 +20,16 @@ const API_DIR = path.join(REPO, 'api');
 /** Header names; they match api/src/core/demoAuth.ts and web/src/lib/liveClient.ts. */
 const PRODUCER_HEADER = 'x-demo-producer-id';
 const PASSCODE_HEADER = 'x-demo-passcode';
+const ADMIN_PASSCODE_HEADER = 'x-demo-admin-passcode';
+
+/** The Athena side of the analytics route (#29): from the FairExchangeAthenaSync and analytics queries stacks. */
+export interface AnalyticsSource {
+  workGroup: string;
+  namedQueryIds: string;
+  recordsBucketName: string;
+  resultsBucketName: string;
+  syncKeyArn: string;
+}
 
 /**
  * The demo allow-list: the producer of every eval scenario (eval/scenarios/*.json), read at synth time so it
@@ -45,6 +56,8 @@ export interface FexChatApiProps {
   dataKey: kms.IKey;
   /** Reported by GET /health. */
   version: string;
+  /** When set, adds GET /analytics behind the admin passcode (#29, #11). Absent until the Athena stacks exist. */
+  analytics?: AnalyticsSource;
 }
 
 /**
@@ -56,6 +69,7 @@ export interface FexChatApiProps {
 export class FexChatApi extends Construct {
   readonly api: apigw.RestApi;
   readonly passcode: secretsmanager.Secret;
+  readonly adminPasscode?: secretsmanager.Secret;
 
   constructor(scope: Construct, id: string, props: FexChatApiProps) {
     super(scope, id);
@@ -160,7 +174,7 @@ export class FexChatApi extends Construct {
       defaultCorsPreflightOptions: {
         allowOrigins: [props.allowedOrigin],
         allowMethods: ['GET', 'POST', 'OPTIONS'],
-        allowHeaders: ['content-type', PRODUCER_HEADER, PASSCODE_HEADER],
+        allowHeaders: ['content-type', PRODUCER_HEADER, PASSCODE_HEADER, ADMIN_PASSCODE_HEADER],
         maxAge: Duration.hours(1),
       },
     });
@@ -187,6 +201,8 @@ export class FexChatApi extends Construct {
     one.addResource('actions').addMethod('POST', streamed(chat.action), signedIn);
     this.api.root.addResource('health').addMethod('GET', proxied(health));
 
+    if (props.analytics) this.adminPasscode = this.addAnalytics(props, fn);
+
     // #25 sweep: every 15 minutes
     new events.Rule(this, 'SweepSchedule', {
       schedule: events.Schedule.rate(Duration.minutes(15)),
@@ -195,5 +211,68 @@ export class FexChatApi extends Construct {
 
     new CfnOutput(Stack.of(this), 'ApiUrl', { value: this.api.url });
     new CfnOutput(Stack.of(this), 'DemoPasscodeSecretArn', { value: this.passcode.secretArn });
+  }
+
+  /**
+   * GET /analytics (#29) behind the admin stand-in: its own passcode, secret, header and authorizer, which grant
+   * the `admin` role only. The analytics Lambda reads the fixed named queries and runs them in the `fex` workgroup.
+   */
+  private addAnalytics(props: FexChatApiProps, fn: (name: string, file: string, handler: string, opts: {
+    timeout: Duration; environment?: Record<string, string>; description: string;
+  }) => NodejsFunction): secretsmanager.Secret {
+    const a = props.analytics!;
+    const { region, account } = Stack.of(this);
+    const secret = new secretsmanager.Secret(this, 'AdminPasscode', {
+      description: 'Fair Exchange sandbox admin passcode (analytics; sign-in stand-in, docs/specs/11-identity.md)',
+      generateSecretString: { passwordLength: 20, excludePunctuation: true, includeSpace: false },
+      encryptionKey: props.dataKey,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+    const authorizerFn = fn('AdminAuthorizer', 'authorizer.ts', 'handler', {
+      timeout: Duration.seconds(10),
+      environment: { DEMO_ROLE: 'admin', DEMO_PASSCODE_SECRET_ARN: secret.secretArn },
+      description: 'FEX analytics: admin sign-in stand-in (admin passcode only)',
+    });
+    secret.grantRead(authorizerFn);
+    const authorizer = new apigw.RequestAuthorizer(this, 'AdminAuthorizerConfig', {
+      handler: authorizerFn,
+      identitySources: [apigw.IdentitySource.header(ADMIN_PASSCODE_HEADER)],
+      resultsCacheTtl: Duration.minutes(5),
+    });
+
+    const analytics = fn('Analytics', 'analytics.ts', 'handler', {
+      timeout: Duration.seconds(29), // the queries have a 20-second limit (#29)
+      environment: {
+        ATHENA_WORKGROUP: a.workGroup,
+        ANALYTICS_NAMED_QUERY_IDS: a.namedQueryIds,
+        ALLOWED_ORIGIN: props.allowedOrigin,
+      },
+      description: 'FEX analytics: GET /analytics (admin)',
+    });
+    const allow = (sid: string, actions: string[], resources: string[]) =>
+      analytics.addToRolePolicy(new iam.PolicyStatement({ sid, actions, resources }));
+    allow('RunNamedQueries', [
+      'athena:BatchGetNamedQuery', 'athena:StartQueryExecution', 'athena:GetQueryExecution',
+      'athena:GetQueryResults', 'athena:StopQueryExecution', 'athena:GetWorkGroup',
+    ], [`arn:aws:athena:${region}:${account}:workgroup/${a.workGroup}`]);
+    allow('ReadRecordTables', ['glue:GetDatabase', 'glue:GetTable', 'glue:GetPartitions'], [
+      `arn:aws:glue:${region}:${account}:catalog`,
+      `arn:aws:glue:${region}:${account}:database/${SYNC_DATABASE}`,
+      ...[RECORDS_GLUE_TABLE, SEEDED_GLUE_TABLE].map((t) => `arn:aws:glue:${region}:${account}:table/${SYNC_DATABASE}/${t}`),
+    ]);
+    allow('ReadRecordObjects', ['s3:GetObject'],
+      [RECORDS_PREFIX, SEEDED_PREFIX].map((p) => `arn:aws:s3:::${a.recordsBucketName}/${p}*`));
+    allow('ListRecordObjects', ['s3:ListBucket', 's3:GetBucketLocation'], [`arn:aws:s3:::${a.recordsBucketName}`]);
+    allow('WriteQueryResults', [
+      's3:GetObject', 's3:PutObject', 's3:AbortMultipartUpload', 's3:ListMultipartUploadParts',
+    ], [`arn:aws:s3:::${a.resultsBucketName}/results/*`]);
+    allow('ListQueryResults', ['s3:ListBucket', 's3:GetBucketLocation'], [`arn:aws:s3:::${a.resultsBucketName}`]);
+    allow('UseSyncKey', ['kms:Decrypt', 'kms:GenerateDataKey'], [a.syncKeyArn]);
+
+    this.api.root.addResource('analytics').addMethod('GET', new apigw.LambdaIntegration(analytics), {
+      authorizer, authorizationType: apigw.AuthorizationType.CUSTOM,
+    });
+    new CfnOutput(Stack.of(this), 'AdminPasscodeSecretArn', { value: secret.secretArn });
+    return secret;
   }
 }

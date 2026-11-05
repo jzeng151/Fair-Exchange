@@ -119,12 +119,27 @@ PY
     fi
   done
 fi
+# Analytics (#29): when the Athena sync stack exists (deploy-athena-sync.sh), deploy its fixed named queries and
+# pass both stacks' outputs, which adds GET /analytics behind the admin passcode. Without it, no analytics route.
+analytics_ctx=()
+sync_key="$(output FairExchangeAthenaSync SyncKeyArn 2>/dev/null || true)"
+if [[ "$sync_key" == arn:aws:kms:* ]]; then
+  deploy FairExchangeAnalyticsQueries
+  analytics_ctx=(-c analyticsQueryIds="$(output FairExchangeAnalyticsQueries AnalyticsNamedQueryIds)"
+    -c analyticsWorkGroup="$(output FairExchangeAthenaSync AthenaWorkGroup)"
+    -c analyticsRecordsBucket="$(output FairExchangeAthenaSync RecordsBucketName)"
+    -c analyticsResultsBucket="$(output FairExchangeAthenaSync AthenaResultsBucketName)"
+    -c analyticsKeyArn="$sync_key")
+  echo "Analytics route: on (Athena workgroup $(output FairExchangeAthenaSync AthenaWorkGroup))"
+else
+  echo "Analytics route: off (deploy the Athena sync with infra/deploy-athena-sync.sh, then re-run)"
+fi
 # cdk deploy (not aws cloudformation deploy): it publishes the stack's CDK assets through the bootstrap roles
 (cd "$infra" && CDK_DEFAULT_ACCOUNT="$account" CDK_DEFAULT_REGION="$AWS_REGION" npx cdk deploy FairExchange \
   --require-approval never --progress events -c standardsDocsTtlDays="$ttl_days" \
   -c artifactsBucket="$bucket" -c artifactsKeyArn="$key_arn" -c standardsDocsHash="$hash" \
   -c agentCodeKey="$agent_key" -c maxLifetimeMinutes="$FEX_MAX_LIFETIME_MINUTES" -c logRetentionDays="$LOG_RETENTION_DAYS" \
-  -c version="$(git -C "$repo" rev-parse --short HEAD 2>/dev/null || echo unknown)")
+  -c version="$(git -C "$repo" rev-parse --short HEAD 2>/dev/null || echo unknown)" ${analytics_ctx[@]+"${analytics_ctx[@]}"})
 
 step "9/9 Building and publishing the website (live mode uses the chat API), then smoke tests"
 api_url="$(output FairExchange ApiUrl)"
@@ -142,3 +157,8 @@ echo "Standards Knowledge Base: $kb_id"
 echo "Chat API: $api_url"
 echo "Demo passcode (sign-in stand-in, docs/specs/11-identity.md):"
 echo "  aws secretsmanager get-secret-value --secret-id $(output FairExchange DemoPasscodeSecretArn) --query SecretString --output text"
+admin_secret="$(output FairExchange AdminPasscodeSecretArn)"
+if [[ "$admin_secret" == arn:* ]]; then
+  echo "Admin passcode (analytics):"
+  echo "  aws secretsmanager get-secret-value --secret-id $admin_secret --query SecretString --output text"
+fi

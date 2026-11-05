@@ -40,7 +40,8 @@ What to know before running Fair Exchange in production. Each links to its sourc
   [#25](../specs/25-chat-endpoint.md), [deploy](02-deploy.md)).
 - **Deployed sign-in stand-in** (decided 2026-11-04, sandbox demo only): a shared passcode plus a producer
   from the eval scenarios' allow-list, checked by an API Gateway Lambda authorizer. Anyone with the passcode
-  can act as any of those synthetic producers; production sign-in replaces it
+  can act as any of those synthetic producers. A separate admin passcode grants the `admin` role for
+  analytics only. Production sign-in replaces both
   ([#11](../specs/11-identity.md), [#25](../specs/25-chat-endpoint.md)).
 
 ## Decisions for FTUSA

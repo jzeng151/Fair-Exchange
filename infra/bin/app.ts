@@ -33,6 +33,14 @@ new FairExchangeStack(app, 'FairExchange', {
     logRetention: Number(ctx('logRetentionDays', '1')),
   },
   version: ctx('version', 'unset'),
+  // deploy.sh passes these once FairExchangeAthenaSync and FairExchangeAnalyticsQueries exist
+  analytics: app.node.tryGetContext('analyticsQueryIds') ? {
+    workGroup: ctx('analyticsWorkGroup', 'fex'),
+    namedQueryIds: ctx('analyticsQueryIds', ''),
+    recordsBucketName: ctx('analyticsRecordsBucket', 'unset-records-bucket'),
+    resultsBucketName: ctx('analyticsResultsBucket', 'unset-results-bucket'),
+    syncKeyArn: ctx('analyticsKeyArn', 'arn:aws:kms:us-west-2:000000000000:key/unset'),
+  } : undefined,
 });
 
 // Issue #4 spike (deploy-agent-spike.sh passes the code location as context; placeholders keep `cdk synth` working)

@@ -48,6 +48,8 @@ The stack provides these to the application; each is a value FTUSA sets for thei
 | `AGENT_RUNTIME_ARN` | chat + sweep Lambdas | the AgentCore Runtime to invoke | [#25](../specs/25-chat-endpoint.md) |
 | `ALLOWED_ORIGIN` | chat + health Lambdas | the website's origin, the only CORS origin (`WebUrl`) | [#25](../specs/25-chat-endpoint.md) |
 | `DEMO_PASSCODE_SECRET_ARN`, `DEMO_PRODUCER_IDS` | authorizer Lambda | the sign-in stand-in: the passcode secret and the scenario producer allow-list (from `eval/scenarios/`) | [#11](../specs/11-identity.md) |
+| `DEMO_ROLE=admin`, `DEMO_PASSCODE_SECRET_ARN` | admin authorizer Lambda | the admin passcode stand-in for analytics | [#11](../specs/11-identity.md) |
+| `ATHENA_WORKGROUP`, `ANALYTICS_NAMED_QUERY_IDS` | analytics Lambda | the `fex` workgroup and the `AnalyticsNamedQueryIds` output; `deploy.sh` adds the route only when `FairExchangeAthenaSync` exists | [#29](../specs/29-analytics-api.md) |
 | `INACTIVITY_MINUTES` | sweep Lambda | idle period before a conversation is auto-closed: 120 (decided 2026-11-04, [#13](../specs/13-conversation-steps.md)) | [#25](../specs/25-chat-endpoint.md) |
 | `RECORDS_TABLE` | write-back, review, "your record" Lambdas | DynamoDB records table | [#26](../specs/26-write-back.md) |
 | `FEX_SMALL_MODEL`, `FEX_LARGE_MODEL` | agent runtime | the Claude inference profiles (default to `us.` profiles) | [#13](../specs/13-conversation-steps.md) |
@@ -71,9 +73,12 @@ The `FairExchange` stack emits (see `infra/lib/`): `WebUrl`, `WebBucketName`, `W
 `FEX_STANDARDS_KB_ID`); `MemoryId`, `MemoryArn` ([memory](../specs/memory.md)); `AgentRuntimeArn`,
 `AgentRuntimeId`, `AgentRuntimeLogGroup` (the agent); `ApiUrl` (the chat API, [#25](../specs/25-chat-endpoint.md))
 and `DemoPasscodeSecretArn` (the demo passcode, [#11](../specs/11-identity.md); read it with
-`aws secretsmanager get-secret-value --secret-id <arn> --query SecretString --output text`). The Athena sync (`SyncFunctionName`, `RecordsBucketName`,
+`aws secretsmanager get-secret-value --secret-id <arn> --query SecretString --output text`); with analytics
+on, `AdminPasscodeSecretArn` (the admin passcode, read the same way). The Athena sync (`SyncFunctionName`, `RecordsBucketName`,
 `AthenaWorkGroup`; deployed with `infra/deploy-athena-sync.sh`, [#28](../specs/28-athena-sync.md)) and the
-analytics queries (`AnalyticsNamedQueryIds`, [#29](../specs/29-analytics-api.md)) are separate stacks today.
+analytics queries (`AnalyticsNamedQueryIds`, [#29](../specs/29-analytics-api.md)) are separate stacks. The Athena
+sync stack also emits `AthenaResultsBucketName` and `SyncKeyArn`. When it exists, `deploy.sh` deploys the
+analytics queries stack and adds `GET /analytics` to the chat API.
 
 ## Teardown
 

@@ -6,7 +6,7 @@ import type * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import type { Construct } from 'constructs';
 import { FexRuntime } from './agent-runtime';
-import { FexChatApi } from './chat-api';
+import { type AnalyticsSource, FexChatApi } from './chat-api';
 import { FexGuardrail } from './guardrail';
 import { FexMemory } from './memory';
 import { FexTables } from './tables';
@@ -25,6 +25,8 @@ export interface FairExchangeStackProps extends StackProps {
   };
   /** Reported by GET /health; deploy.sh passes the git commit. */
   version: string;
+  /** The Athena stacks' outputs, when they are deployed: adds GET /analytics (#29) behind the admin passcode. */
+  analytics?: AnalyticsSource;
 }
 
 /**
@@ -140,6 +142,7 @@ export class FairExchangeStack extends Stack {
       logRetention: props.agent.logRetention,
       dataKey,
       version: props.version,
+      analytics: props.analytics,
     });
   }
 }

@@ -79,6 +79,6 @@ onBeforeUnmount(() => window.removeEventListener('hashchange', onHash))
     <LiveChatView v-if="apiUrl" v-show="side === 'live'" :api-url="apiUrl" />
     <YourRecordView v-if="side === 'me'" ref="yourRecord" :producer-id="demoProducerId" />
     <ReviewerView v-if="side === 'review'" ref="reviewer" />
-    <AdminDashboard v-if="side === 'admin'" ref="admin" />
+    <AdminDashboard v-if="side === 'admin'" ref="admin" :api-url="apiUrl" />
   </main>
 </template>

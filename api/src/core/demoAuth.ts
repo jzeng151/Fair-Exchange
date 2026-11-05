@@ -9,11 +9,12 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 
 export const PRODUCER_HEADER = 'x-demo-producer-id';
 export const PASSCODE_HEADER = 'x-demo-passcode';
+/** The admin passcode has its own header, secret and authorizer: it never acts as a producer, and vice versa. */
+export const ADMIN_PASSCODE_HEADER = 'x-demo-admin-passcode';
 
 /** What the authorizer hands API Gateway as context; flat strings, as the REST API requires. */
 export interface DemoContext {
   [key: string]: string;
-  producerId: string;
   userId: string;
   roles: string;
 }
@@ -51,4 +52,14 @@ export function authorizeDemo(
   const producerId = header(headers, PRODUCER_HEADER)?.trim();
   if (!producerId || !allowed.has(producerId)) return null;
   return { producerId, userId: `demo:${producerId}`, roles: 'producer' };
+}
+
+/** The admin stand-in: the admin passcode alone grants the `admin` role (analytics), with no producer. */
+export function authorizeDemoAdmin(
+  headers: Record<string, string | undefined> | null | undefined,
+  passcode: string,
+): DemoContext | null {
+  const given = header(headers, ADMIN_PASSCODE_HEADER);
+  if (given === undefined || !passcodeMatches(given, passcode)) return null;
+  return { userId: 'demo:admin', roles: 'admin' };
 }

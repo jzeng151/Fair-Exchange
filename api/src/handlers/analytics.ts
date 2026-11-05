@@ -24,7 +24,11 @@ import { json, toErrorResult, type JsonResult } from '../core/routes.js';
 export type AnalyticsDeps = AthenaDeps;
 
 const ROUTE = 'GET /analytics';
-const HEADERS = { 'content-type': 'application/json' };
+/** CORS (#25): only the web app's origin, set by the stack as ALLOWED_ORIGIN; absent in tests. */
+const HEADERS = {
+  'content-type': 'application/json',
+  ...(process.env.ALLOWED_ORIGIN ? { 'access-control-allow-origin': process.env.ALLOWED_ORIGIN, vary: 'Origin' } : {}),
+};
 const RETRY = json(503, { message: 'Analytics are temporarily unavailable. Please retry in a moment.' });
 
 const asProxyResult = (r: JsonResult): APIGatewayProxyResult => ({
