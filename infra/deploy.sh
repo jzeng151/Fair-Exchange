@@ -156,6 +156,12 @@ kb_id="$(output FairExchange StandardsKnowledgeBaseId)"
 (cd "$repo/agent" && FEX_STANDARDS_KB_ID="$kb_id" uv run --quiet pytest -q -p no:cacheprovider \
   ../eval/tests/test_standards_kb_smoke.py)
 
+# Health alone cannot detect broken Athena SQL or analytics authorization.
+if [[ "$sync_key" == arn:aws:kms:* ]]; then
+  admin_secret="$(output FairExchange AdminPasscodeSecretArn)"
+  python3 "$repo/scripts/e2e/analytics_smoke.py" --api "$api_url" --admin-secret-arn "$admin_secret"
+fi
+
 echo
 echo "Deployed in $((SECONDS - start))s."
 echo "Website: $(output FairExchange WebUrl)"

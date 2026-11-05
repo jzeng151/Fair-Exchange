@@ -84,7 +84,7 @@ export function footprintQuery(table: string, closedOnly: boolean): string {
   const where = closedOnly ? 'WHERE closed_at IS NOT NULL' : '';
   return `SELECT u.model_id, SUM(u.input_tokens) AS input_tokens, SUM(u.output_tokens) AS output_tokens
 FROM ${SYNC_DATABASE}.${table}
-CROSS JOIN UNNEST(ai_usage) AS u (model_id, input_tokens, output_tokens)
+CROSS JOIN UNNEST(ai_usage) AS usage_rows (u)
 ${where}
 GROUP BY u.model_id`;
 }
