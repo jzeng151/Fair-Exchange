@@ -1,3 +1,4 @@
+import VoiceInput from './VoiceInput.vue'
 // @vitest-environment jsdom
 import { flushPromises, mount } from '@vue/test-utils'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -271,4 +272,17 @@ describe('LiveChatView', () => {
     await open(fake)
     expect(fake.calls).toEqual([['resume', 'c-gone'], ['start']])
   })
+})
+
+it('places the voice transcript in the editable composer without sending it', async () => {
+  const fake = fakeClient()
+  const w = await open(fake)
+  await w.get('#live-msg').setValue('Existing draft.')
+  w.getComponent(VoiceInput).vm.$emit('transcript', 'Lluvia irregular.', 'Irregular rain.')
+  await flushPromises()
+  expect((w.get('#live-msg').element as HTMLTextAreaElement).value).toBe('Existing draft.\nLluvia irregular.')
+  expect(fake.calls).toEqual([['start']])
+  await w.get('form').trigger('submit'); await flushPromises()
+  expect(fake.calls.at(-1)).toEqual(['message', 'c-1', 'Existing draft.\nLluvia irregular.'])
+  w.unmount()
 })

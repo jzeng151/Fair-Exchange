@@ -4,6 +4,7 @@
 // words and button choices. The scripted demo (ChatView.vue) is untouched and stays the default.
 import { computed, nextTick, reactive, ref } from 'vue'
 import FexMark from './FexMark.vue'
+import VoiceInput from './VoiceInput.vue'
 import { copyFor } from '../data/liveCopy'
 import { languageName, liveProducers } from '../data/liveProducers'
 import { createLiveClient, LiveError } from '../lib/liveClient'
@@ -11,11 +12,16 @@ import { apply, beginTurn, fromResume, newView, said } from '../lib/liveView'
 import type { ActionName, LiveClient, StreamEvent } from '../lib/liveClient'
 import type { Item, LiveView } from '../lib/liveView'
 
-const props = defineProps<{ apiUrl: string; makeClient?: (producerId: string) => LiveClient }>()
+const props = defineProps<{ apiUrl: string; active?: boolean; makeClient?: (producerId: string) => LiveClient }>()
 
 const producerId = ref<string | null>(null)
 const view = reactive<LiveView>(newView())
 const input = ref('')
+const voiceEnglish = ref('')
+function receiveTranscript(text: string, english?: string) {
+  input.value = [input.value.trim(), text].filter(Boolean).join('\n')
+  voiceEnglish.value = english ?? ''
+}
 const correcting = ref(false)
 const changingConsent = ref(false) // feedback step: the consent choice collapses to one line until 'Change'
 const changingFeedback = ref(false) // once answered, the feedback question collapses to one line until 'Change'
@@ -52,7 +58,7 @@ function recall(id: string): string | null {
   try { return sessionStorage.getItem(KEY(id)) } catch { return null }
 }
 
-function reset(next = newView()) { Object.assign(view, next) }
+function reset(next = newView()) { Object.assign(view, next); input.value = ''; voiceEnglish.value = '' }
 async function scrollDown() {
   await nextTick()
   if (scroller.value) scroller.value.scrollTop = scroller.value.scrollHeight
@@ -137,6 +143,7 @@ async function send() {
   const text = input.value.trim()
   if (!text || !canType.value || !client || !view.conversationId) return
   input.value = ''
+  voiceEnglish.value = ''
   correcting.value = false
   said(view, text)
   const id = view.conversationId
@@ -277,9 +284,13 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
           </div>
         </div>
 
+        <VoiceInput v-if="view.conversationId && producerId" :key="view.conversationId"
+          :api-url="apiUrl" :conversation-id="view.conversationId" :producer-id="producerId" :passcode="passcode.trim()"
+          :language="view.language" :disabled="!canType || active === false" @transcript="receiveTranscript" />
+        <p v-if="voiceEnglish" class="small" lang="en">English translation of the recording: {{ voiceEnglish }}</p>
         <form class="composer" @submit.prevent="send">
           <label class="sr-only" for="live-msg">Message</label>
-          <input id="live-msg" v-model="input" :placeholder="correcting ? t.correctPlaceholder : t.placeholder" :disabled="!canType" autocomplete="off" />
+          <textarea rows="2" id="live-msg" v-model="input" :placeholder="correcting ? t.correctPlaceholder : t.placeholder" :disabled="!canType" autocomplete="off"></textarea>
           <button class="btn-primary" :disabled="!canType || !input.trim()">{{ t.send }}</button>
         </form>
       </section>

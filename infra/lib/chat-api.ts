@@ -12,6 +12,7 @@ import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as logs from 'aws-cdk-lib/aws-logs';
 import * as secretsmanager from 'aws-cdk-lib/aws-secretsmanager';
 import { Construct } from 'constructs';
+import { FexVoice } from './voice';
 import { RECORDS_GLUE_TABLE, RECORDS_PREFIX, SEEDED_GLUE_TABLE, SEEDED_PREFIX, SYNC_DATABASE } from './athena-sync-stack';
 
 const REPO = path.resolve(__dirname, '..', '..');
@@ -175,7 +176,7 @@ export class FexChatApi extends Construct {
       },
       defaultCorsPreflightOptions: {
         allowOrigins: [props.allowedOrigin],
-        allowMethods: ['GET', 'POST', 'PATCH', 'OPTIONS'],
+        allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
         allowHeaders: ['content-type', PRODUCER_HEADER, PASSCODE_HEADER, ADMIN_PASSCODE_HEADER, REVIEWER_PASSCODE_HEADER],
         maxAge: Duration.hours(1),
       },
@@ -227,6 +228,7 @@ export class FexChatApi extends Construct {
       identitySources: [], resultsCacheTtl: Duration.seconds(0),
     });
     const session = { authorizer: sessionAuthorizer, authorizationType: apigw.AuthorizationType.CUSTOM };
+    new FexVoice(this, 'Voice', { ...props, conversationResource: one, authorization: session });
     const recordEnv = { RECORDS_TABLE: props.records.tableName, ALLOWED_ORIGIN: props.allowedOrigin };
     const identity = fn('Identity', 'me.ts', 'identity', {
       timeout: Duration.seconds(10), environment: { ALLOWED_ORIGIN: props.allowedOrigin }, description: 'FEX: GET /me',
