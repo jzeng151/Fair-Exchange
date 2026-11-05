@@ -29,6 +29,7 @@ from fex.guardrail import CONVERSATION_KEY, OutputAssessor, narrative_texts
 from fex.conversation.state import (
     ConversationState, DecisionLogEntry, Playback, Profile, ShownClaims, StateConflict, StateStore,
 )
+from fex.eval_evidence import AnswerEvidence, EvalEvidence, EvidenceStore, ShownClaim
 from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer, decision_refs
 from fex.tools import ALL_TOOLS, DATA_TOOLS
 from fex.tools._contract import EVIDENCE_KEY, ITEMS_KEY, LOG_KEY, TOOLS_RUN_KEY, run_data_tool
@@ -219,7 +220,8 @@ class ConversationEngine:
                  clock: Callable[[], datetime] | None = None, max_retries: int = 2,
                  records: Any = None, scope_check: ScopeCheck | None = None,
                  pii_scanner: Callable[[str, str], list[dict]] | None = None,
-                 output_assessor: OutputAssessor | None = None, translator: Any = None) -> None:
+                 output_assessor: OutputAssessor | None = None, translator: Any = None,
+                 evidence_store: EvidenceStore | None = None) -> None:
         self.store = store
         self.small_model, self.large_model = small_model, large_model
         self.standards = standards or Standards.load()
@@ -234,6 +236,8 @@ class ConversationEngine:
         self.scope_check = scope_check or always_in_scope  # how it decides is "Not decided" (#21)
         # Assesses structured-output text, which the Converse guardrail skips (#12). No-op when unconfigured.
         self.output_assessor = output_assessor or OutputAssessor()
+        # Eval stacks only (#34, #36): None in the main stack, so nothing is captured there.
+        self.evidence_store = evidence_store
 
     # ------------------------------------------------------------------ entrypoint
 
@@ -347,6 +351,7 @@ class ConversationEngine:
     def _close(self, state: ConversationState, turn: _Turn, reason: str):
         state.step, state.closed_reason, state.closed_at = "closed", reason, self.clock()
         self._save_record(state, turn)
+        self._keep_eval_evidence(state, None)
         return self._finish(state, turn, step_changed=True)
 
     def _save_record(self, state: ConversationState, turn: _Turn) -> None:
@@ -456,10 +461,14 @@ class ConversationEngine:
         state.step, state.answer, state.answer_failed = "respond", None, False
         state.partial, state.partial_started_at = ShownClaims(), self.clock()
         lang = state.language
+        # For eval evidence (#34): filled as the answer is built, so a failed answer still records what it had
+        items: list[dict] = []
+        shown_in_order: list[ShownClaim] = []
+        dropped: list[str] = []
         try:
             turn.say(copy.text(lang, "respond_opening"))
             evidence = state.session_evidence()
-            items = self._retrieve(state, evidence)  # every data tool has run before any claim is written
+            self._retrieve(state, evidence, items)  # every data tool has run before any claim is written
             draft = self._write(state, self._answer_prompt(state, items))
             pending = [("insights", c) for c in draft.insights] + [("peer_examples", c) for c in draft.peer_examples]
             for attempt in range(self.max_retries + 1):
@@ -470,6 +479,7 @@ class ConversationEngine:
                         failed.append((section, claim, problems))
                         continue
                     getattr(state.partial, section).append(claim)
+                    shown_in_order.append(ShownClaim(section=section, claim=claim))
                     turn.emit("claim", section=section, claim=claim.model_dump())
                 if not failed:
                     break
@@ -479,6 +489,7 @@ class ConversationEngine:
                         log.warning("dropped unverified claim (%s): %s", section, ", ".join(codes))
                         for code in codes:
                             self._log(state, "verifier", code, _claim_refs(claim))
+                        dropped.extend(codes)
                     break
                 draft = self._write(state, self._rewrite_prompt(state, items, failed))
                 pending = [("insights", c) for c in draft.insights] + [("peer_examples", c) for c in draft.peer_examples]
@@ -487,6 +498,9 @@ class ConversationEngine:
             state.answer_failed = True
             turn.say(copy.text(lang, "failed"))
             turn.emit("error", code="agent_failed", message=copy.text(lang, "failed"))
+            self._keep_eval_evidence(state, AnswerEvidence(
+                started_at=state.partial_started_at, tool_results=items, claims=shown_in_order, dropped=dropped,
+                failed=True))
             return
 
         shown = state.partial
@@ -502,6 +516,24 @@ class ConversationEngine:
         turn.emit("answer", insights=[c.model_dump() for c in shown.insights],
                   peer_examples=[c.model_dump() for c in shown.peer_examples], evidence=evidence_level)
         state.step = "consent"
+        self._keep_eval_evidence(state, AnswerEvidence(
+            started_at=state.answer_given_at, tool_results=items, claims=shown_in_order, dropped=dropped))
+
+    def _keep_eval_evidence(self, state: ConversationState, answer: AnswerEvidence | None) -> None:
+        """Eval stacks only (#34): add this answer, if any, and record the step the conversation is in.
+        A store failure is logged, never shown to the producer: eval capture must not break a conversation."""
+        if self.evidence_store is None:
+            return
+        try:
+            ev = self.evidence_store.get(state.conversation_id) or EvalEvidence(
+                conversation_id=state.conversation_id, producer_id=state.producer_id, final_step=state.step,
+                written_at=self.clock())
+            if answer is not None:
+                ev.answers.append(answer)
+            ev.final_step, ev.written_at = state.step, self.clock()
+            self.evidence_store.put(ev)
+        except Exception:  # noqa: BLE001 - logged with the conversation ID only; the evaluator reports it unscored
+            log.exception("eval evidence not written for %s", state.conversation_id)
 
     def _check(self, section: str, claim: Claim, evidence: SessionEvidence) -> list[Problem]:
         return check_claim(section, claim, evidence, self.standards)
@@ -509,12 +541,12 @@ class ConversationEngine:
     def _log(self, state: ConversationState, kind: str, code: str, refs: list[str]) -> None:
         state.decision_log.append(DecisionLogEntry(at=self.clock(), kind=kind, code=code, refs=refs))
 
-    def _retrieve(self, state: ConversationState, evidence: SessionEvidence) -> list[dict]:
-        """The model calls the data tools; code then calls any it skipped (#17). Returns every item returned
-        in this respond step. Tools add their items to `evidence`, which is kept in the conversation state."""
+    def _retrieve(self, state: ConversationState, evidence: SessionEvidence, items: list[dict]) -> list[dict]:
+        """The model calls the data tools; code then calls any it skipped (#17). Every item returned in this
+        respond step is added to `items` as it arrives (so a failure keeps what came before), and returned.
+        Tools add their source labels to `evidence`, which is kept in the conversation state."""
         pb = state.playback
         tools_run: set[str] = set()
-        items: list[dict] = []
         invocation_state = {
             "producer_id": state.producer_id, "step": "respond", "entity_type": state.effective_entity_type,
             "tags": list(pb.tags) if pb else [], "summary_english": pb.summary_english if pb else None,
