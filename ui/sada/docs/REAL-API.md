@@ -101,21 +101,42 @@ The deployed API accepts only the scenario producers on its allow-list (`DEMO_PR
 above use exactly those. The calls go from the Django server, not the browser, so CORS doesn't apply and the
 passcode never reaches the page.
 
-## Deploy this UI
+## Deploy this UI to AWS
 
-There's no deploy script for this UI yet. It's a plain Django app, so it runs anywhere Python 3.12 runs:
+`deploy/deploy.sh` deploys it as one Lambda behind a public function URL (`deploy/template.yaml`). It has no
+database and nothing runs while idle. Lambda was chosen over API Gateway (29-second limit) and App Runner
+(120-second limit) because a Real API answer turn can take minutes.
+
+```bash
+EXPECTED_AWS_ACCOUNT=<account> bash ui/sada/deploy/deploy.sh                      # Mock answers only
+EXPECTED_AWS_ACCOUNT=<account> CONNECT_FEX_API=1 bash ui/sada/deploy/deploy.sh    # also Real API mode
+```
+
+The script:
+
+1. Packages the app with Linux wheels and collects static files.
+2. Uploads the zip to a code bucket (`fair-exchange-sample-ui-code-<account>-<region>`).
+3. Deploys the `FairExchangeSampleUi` stack.
+4. Smoke-tests the URL and prints it.
+
+With `CONNECT_FEX_API=1` it reads `ApiUrl` and `DemoPasscodeSecretArn` from the deployed `FairExchange` stack.
+The Lambda reads the passcode from Secrets Manager, so the page never sees it. The Django secret key is
+generated into Secrets Manager too.
+
+**This UI has no sign-in.** With Real API on, anyone who has the URL can talk to the agent as the demo producers,
+and each answer uses Bedrock. Share the URL only with people who should have that.
+
+Remove it with `EXPECTED_AWS_ACCOUNT=<account> bash ui/sada/deploy/destroy.sh`. The code bucket is kept.
+
+To run it on your own server instead:
 
 ```bash
 cd ui/sada
-.venv/bin/python -m pip install -r requirements.txt
 DJANGO_DEBUG=0 .venv/bin/python manage.py collectstatic --noinput
 DJANGO_DEBUG=0 DJANGO_SECRET_KEY=<random> CSRF_TRUSTED_ORIGINS=https://<your host> \
   FEX_API_URL=<ApiUrl> FEX_DEMO_PASSCODE=<passcode> \
-  .venv/bin/gunicorn config.wsgi --bind 0.0.0.0:8010 --timeout 300
+  .venv/bin/gunicorn config.wsgi --bind 0.0.0.0:8010 --timeout 330
 ```
-
-Keep `--timeout` at least `FEX_API_TIMEOUT` (300 seconds by default): an answer turn with real Claude can take a
-while, and the request waits for the whole turn.
 
 ## Settings
 

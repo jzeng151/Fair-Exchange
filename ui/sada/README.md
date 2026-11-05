@@ -18,6 +18,9 @@ Or `bash run.sh`, which sets up `.venv` on first run and starts the server on ht
 **Mock or Real API:** the chat answers from a built-in mock, or from the real FEX agent through the Fair
 Exchange chat API. See [docs/REAL-API.md](docs/REAL-API.md) to connect locally or to the deployed stack.
 
+**Deploy to AWS:** `EXPECTED_AWS_ACCOUNT=<account> bash deploy/deploy.sh` (one Lambda with a public URL; see
+[docs/REAL-API.md](docs/REAL-API.md#deploy-this-ui-to-aws)).
+
 ## Features
 - Persona picker: one click per persona tile (role, product, location, language)
 - Full-height chat with location map + (mocked) weather overlay

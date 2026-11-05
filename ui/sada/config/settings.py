@@ -37,14 +37,31 @@ def _load_env(path: Path) -> None:
 # .env holds AWS credentials and app config. Loaded but never logged.
 _load_env(BASE_DIR / ".env")
 
-SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "poc-insecure-key-swap-before-production")
+def _secret(arn_var: str) -> str:
+    """A Secrets Manager value named by the env var `arn_var` (set by deploy/template.yaml on Lambda), else ""."""
+    arn = os.environ.get(arn_var, "")
+    if not arn:
+        return ""
+    import boto3
+    return boto3.client("secretsmanager").get_secret_value(SecretId=arn)["SecretString"].strip()
+
+
+ON_LAMBDA = bool(os.environ.get("AWS_LAMBDA_FUNCTION_NAME"))  # deployed by deploy/deploy.sh
+
+SECRET_KEY = (_secret("DJANGO_SECRET_KEY_SECRET_ARN") or os.environ.get("DJANGO_SECRET_KEY")
+              or "poc-insecure-key-swap-before-production")
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 
 # Demo PoC: allow any host so it runs behind whatever AWS gives us. Tighten for production.
 ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
     o for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if o
-] or ["https://*.amazonaws.com", "https://*.elb.amazonaws.com"]
+] or ["https://*.amazonaws.com", "https://*.elb.amazonaws.com", "https://*.on.aws"]  # *.on.aws: Lambda function URLs
+
+if ON_LAMBDA:
+    # The function URL terminates HTTPS and forwards the scheme in X-Forwarded-Proto.
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+    SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = True
 
 INSTALLED_APPS = [
     "django.contrib.staticfiles",
@@ -115,5 +132,6 @@ USE_LIVE_WEATHER = os.environ.get("USE_LIVE_WEATHER", "1") == "1"
 DATA_SOURCE = os.environ.get("DATA_SOURCE", "mock")
 DATA_SOURCE = DATA_SOURCE if DATA_SOURCE in ("mock", "live") else "mock"
 FEX_API_URL = os.environ.get("FEX_API_URL", "")            # local chain: http://127.0.0.1:3000; deployed: ApiUrl output
-FEX_DEMO_PASSCODE = os.environ.get("FEX_DEMO_PASSCODE", "")  # deployed API only (DemoPasscodeSecretArn)
+FEX_DEMO_PASSCODE = (os.environ.get("FEX_DEMO_PASSCODE", "")  # deployed API only (DemoPasscodeSecretArn)
+                     or _secret("FEX_DEMO_PASSCODE_SECRET_ARN"))
 FEX_API_TIMEOUT = int(os.environ.get("FEX_API_TIMEOUT", "300"))  # seconds; a real answer turn can take a while
