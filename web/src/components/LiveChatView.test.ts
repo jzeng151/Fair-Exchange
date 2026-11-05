@@ -300,3 +300,85 @@ it('places the voice transcript in the editable composer without sending it', as
   expect(fake.calls.at(-1)).toEqual(['message', 'c-1', 'Existing draft.\nLluvia irregular.'])
   w.unmount()
 })
+
+describe('LiveChatView: clearer answers (#169)', () => {
+  const answer = (sources: string[]): StreamEvent[] => [
+    { type: 'text', seq: 1, text: 'Esto es lo que encontré.' },
+    ...sources.map((s, i): StreamEvent => ({ type: 'claim', seq: 2 + i, section: i === 0 ? 'insights' : 'peer_examples', claim: { text: `Dato ${i + 1}.`, citation: cite(s) } })),
+    { type: 'answer', seq: 9, insights: [], peer_examples: [], evidence: 'full' },
+    ...step('consent', ['reopen_playback', 'set_consent', 'end']),
+  ]
+
+  it('numbers answer cards across both sections and restarts the numbers for a new answer', async () => {
+    const fake = fakeClient({
+      start: [{ type: 'conversation', conversationId: 'c-1' }, ...step('playback', ['confirm_playback', 'end'])],
+      action: { confirm_playback: answer(['WRI Aqueduct 4.0 water stress', 'FTUSA Premium project']) },
+      message: [answer(['World Bank Pink Sheet'])],
+    })
+    const w = await open(fake)
+    await w.get('[data-action="confirm_playback"]').trigger('click')
+    await flushPromises()
+    await w.get('#live-msg').setValue('Otra pregunta')
+    await w.get('form').trigger('submit')
+    await flushPromises()
+    expect(w.findAll('.claim .cite').map((c) => c.text().slice(0, 3))).toEqual(['[1]', '[2]', '[1]'])
+  })
+
+  it('marks WRI Aqueduct sources as listed in the TNFD Tools Catalogue, in the conversation language', async () => {
+    const fake = fakeClient({
+      start: [{ type: 'conversation', conversationId: 'c-1' }, ...step('playback', ['confirm_playback', 'end'])],
+      action: { confirm_playback: answer(['WRI Aqueduct 4.0 water stress', 'FTUSA Premium project']) },
+    })
+    const w = await open(fake)
+    await w.get('[data-action="confirm_playback"]').trigger('click')
+    await flushPromises()
+    const cites = w.findAll('.claim .cite').map((c) => c.text())
+    expect(cites[0]).toContain('Incluido en el catálogo de herramientas de la TNFD')
+    expect(cites[1]).not.toContain('TNFD')
+  })
+
+  it('explains who can see each consent choice, in the conversation language', async () => {
+    const fake = fakeClient({ start: [{ type: 'conversation', conversationId: 'c-1' }, ...step('consent', ['reopen_playback', 'set_consent', 'end'])] })
+    const w = await open(fake)
+    const lines = w.findAll('.consent-explainer li').map((l) => l.text())
+    expect(lines).toHaveLength(3)
+    expect(lines[0]).toContain('equipo de Fair Trade USA')
+    expect(lines[1]).toContain('nunca con su nombre')
+    expect(lines[2]).toContain('no se guarda nada')
+  })
+})
+
+describe('LiveChatView: Listen and attachments (#169)', () => {
+  it("reads a FEX reply aloud through the speech route for this producer's conversation", async () => {
+    const fake = fakeClient()
+    const speak = vi.fn(async () => new Blob(['mp3'], { type: 'audio/mpeg' }))
+    const made: [string, string][] = []
+    const w = mount(LiveChatView, { props: { apiUrl: 'http://api.test', makeClient: () => fake.client,
+      makeSpeech: (producerId: string, conversationId: string) => { made.push([producerId, conversationId]); return { speak } } } })
+    await w.get('[data-scenario="S1"]').trigger('click')
+    await flushPromises()
+    const listen = w.get('.msg.agent + [data-action="listen"]')
+    expect(listen.text()).toContain('Escuchar')
+    await listen.trigger('click')
+    await flushPromises()
+    expect(speak).toHaveBeenCalledWith('¿Qué ha sido lo más difícil?')
+    expect(made[0]![1]).toBe('c-1')
+    await w.get('#live-msg').setValue('La lluvia bajó')
+    await w.get('form').trigger('submit')
+    await flushPromises()
+    expect(bubbles(w)).toEqual(['¿Qué ha sido lo más difícil?', 'La lluvia bajó'])
+    expect(w.findAll('[data-action="listen"]')).toHaveLength(1) // FEX's words only, not the producer's
+  })
+
+  it("puts an attachment's description in the message box without sending it", async () => {
+    const fake = fakeClient()
+    const w = mount(LiveChatView, { props: { apiUrl: 'http://api.test', makeClient: () => fake.client } })
+    await w.get('[data-scenario="S1"]').trigger('click')
+    await flushPromises()
+    await w.get('#live-msg').setValue('Mire esto')
+    w.findComponent({ name: 'AttachInput' }).vm.$emit('description', '[Foto: Hojas secas.]')
+    await flushPromises()
+    expect((w.get('#live-msg').element as HTMLTextAreaElement).value).toBe('Mire esto\n[Foto: Hojas secas.]')
+    expect(fake.calls).toEqual([['start']])
+  })
+})

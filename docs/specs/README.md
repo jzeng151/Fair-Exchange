@@ -38,6 +38,7 @@ One spec per outline issue. The issue stays a short outline; the spec is the imp
 | #39 | [Handoff package](39-handoff.md) | docs |
 | #40 | [Timed clean redeploy and demo run-through](40-timed-redeploy.md) | infra |
 | #41 | [Voice notes via Amazon Transcribe](41-voice-notes.md) | agent, web |
+| #169 | [Listen, photo and document notes, and clearer answers in the live chat](42-producer-chat-extras.md) | api, infra, web |
 | — | [Conversation memory (shared contract)](memory.md) | agent, infra |
 
 ## Rules

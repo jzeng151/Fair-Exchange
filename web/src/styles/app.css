@@ -1,24 +1,4 @@
-/* Tokens from FTUSA_Producer_Exchange_UI_UX_Specification v1.1, section 12 */
-:root {
-  --ft-brand-green: #93D73B;
-  --ft-brand-indigo: #313D7F;
-  --ft-ui-primary: #2C6EA1;
-  --ft-ui-primary-hover: #245982;
-  --ft-ui-primary-tint: rgba(44, 110, 161, 0.12);
-  --ft-ui-text: #343637;
-  --ft-ui-text-secondary: rgba(0, 0, 0, 0.54);
-  --ft-ui-border: #EEEEEE;
-  --ft-ui-canvas: #FAFAFA;
-  --ft-ui-surface: #FFFFFF;
-  --ft-ui-error: #AB2300;
-  --ft-ui-error-bg: #FFE8DF;
-  --ft-ui-success: #2E8540;
-  --ft-ui-success-bg: #E7F4E4;
-  --ft-ui-warning: #FDB81E;
-  --ft-ui-warning-bg: #FFF1D2;
-  --ft-font-ui: "Rubik", Arial, sans-serif;
-  --ft-font-brand-heading: "Source Serif 4", Georgia, serif;
-}
+/* Colours and fonts come from tokens.css (#169). */
 
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--ft-ui-canvas); color: var(--ft-ui-text); font: 16px/1.5 var(--ft-font-ui); }

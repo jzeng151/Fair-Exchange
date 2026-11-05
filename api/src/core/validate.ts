@@ -69,3 +69,27 @@ export function parseStartBody(body: string | null | undefined): void {
   if (body === null || body === undefined || body.trim() === '') return;
   rejectUnknown(parseObject(body), []);
 }
+
+/** Listen (#169): text read aloud, counted in UTF-16 units like messages. */
+export const MAX_SPEECH_CHARS = 1500;
+
+export function parseSpeechBody(body: string | null | undefined): { text: string } {
+  const obj = parseObject(body);
+  rejectUnknown(obj, ['text']);
+  const { text } = obj;
+  if (typeof text !== 'string' || text.length < 1 || text.length > MAX_SPEECH_CHARS) {
+    throw new BadRequest(`text must be 1 to ${MAX_SPEECH_CHARS} characters`);
+  }
+  return { text };
+}
+
+/** Photo and document notes (#169): the body names only the file type. */
+export function parseAttachmentBody<T extends string>(body: string | null | undefined, types: readonly T[]): { content_type: T } {
+  const obj = parseObject(body);
+  rejectUnknown(obj, ['content_type']);
+  const { content_type } = obj;
+  if (typeof content_type !== 'string' || !types.includes(content_type as T)) {
+    throw new BadRequest(`content_type must be one of ${types.join(', ')}`);
+  }
+  return { content_type: content_type as T };
+}

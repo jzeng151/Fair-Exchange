@@ -52,7 +52,7 @@ onBeforeUnmount(() => window.removeEventListener('hashchange', onHash))
     <div class="brand">
       <FexMark :size="36" />
       <span class="brand-name">Fair Exchange</span>
-      <span class="brand-product">by Fair Trade USA</span>
+      <span class="brand-product">for Fair Trade USA</span>
     </div>
     <div class="top-right">
       <nav class="side-switch" aria-label="Which side of Fair Exchange to show">

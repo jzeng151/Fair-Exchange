@@ -2,17 +2,21 @@
 // Live mode (#116): the producer chat against the REAL chat API (routes and stream: #25 spec).
 // Everything FEX says comes from the agent; this view only renders events and sends the producer's
 // words and button choices. The scripted demo (ChatView.vue) is untouched and stays the default.
-import { computed, nextTick, reactive, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, reactive, ref } from 'vue'
+import AttachInput from './AttachInput.vue'
 import FexMark from './FexMark.vue'
 import VoiceInput from './VoiceInput.vue'
 import { copyFor } from '../data/liveCopy'
 import { languageName, liveProducers } from '../data/liveProducers'
+import { createListenPlayer } from '../lib/listenPlayer'
 import { createLiveClient, LiveError } from '../lib/liveClient'
 import { apply, beginTurn, fromResume, newView, said } from '../lib/liveView'
+import { createSpeechClient, type SpeechClient } from '../lib/speechClient'
 import type { ActionName, LiveClient, StreamEvent } from '../lib/liveClient'
 import type { Item, LiveView } from '../lib/liveView'
 
-const props = defineProps<{ apiUrl: string; active?: boolean; makeClient?: (producerId: string) => LiveClient }>()
+const props = defineProps<{ apiUrl: string; active?: boolean; makeClient?: (producerId: string) => LiveClient
+  makeSpeech?: (producerId: string, conversationId: string) => SpeechClient }>()
 
 const producerId = ref<string | null>(null)
 // The picked card. Two scenarios can share a producer (S5 and S7, #35), so the card, not the producer, is the key.
@@ -24,6 +28,23 @@ function receiveTranscript(text: string, english?: string) {
   input.value = [input.value.trim(), text].filter(Boolean).join('\n')
   voiceEnglish.value = english ?? ''
 }
+// A photo or document's description, for the producer to review before sending (#169).
+function receiveDescription(text: string) {
+  input.value = [input.value.trim(), text].filter(Boolean).join('\n')
+}
+
+// Listen (#169): one player for the chat; Amazon Polly through the speech route, browser voice as fallback.
+const player = createListenPlayer({
+  fetchAudio: (text) => {
+    if (!producerId.value || !view.conversationId) return Promise.reject(new Error('No conversation'))
+    const speech = props.makeSpeech?.(producerId.value, view.conversationId)
+      ?? createSpeechClient({ baseUrl: props.apiUrl, producerId: producerId.value, passcode: passcode.value.trim() }, view.conversationId)
+    return speech.speak(text)
+  },
+})
+const listenKey = (i: number) => `${view.conversationId}:${i}`
+function listen(i: number, text: string) { player.toggle(listenKey(i), text, view.language) }
+onBeforeUnmount(() => player.stop())
 const correcting = ref(false)
 const changingConsent = ref(false) // feedback step: the consent choice collapses to one line until 'Change'
 const changingFeedback = ref(false) // once answered, the feedback question collapses to one line until 'Change'
@@ -60,7 +81,7 @@ function recall(id: string): string | null {
   try { return sessionStorage.getItem(KEY(id)) } catch { return null }
 }
 
-function reset(next = newView()) { Object.assign(view, next); input.value = ''; voiceEnglish.value = '' }
+function reset(next = newView()) { player.stop(); Object.assign(view, next); input.value = ''; voiceEnglish.value = '' }
 async function scrollDown() {
   await nextTick()
   if (scroller.value) scroller.value.scrollTop = scroller.value.scrollHeight
@@ -185,6 +206,15 @@ function headingBefore(i: number): string | null {
   if (prev?.kind === 'claim' && prev.section === item.section) return null
   return item.section === 'insights' ? t.value.insights : t.value.peers
 }
+// Answer cards are numbered across both sections; an answer's cards arrive together, so a new answer
+// (after any FEX or producer text) starts again at 1 (#169).
+function claimNumber(i: number): number {
+  let n = 1
+  while (view.items[i - n]?.kind === 'claim') n++
+  return n
+}
+// WRI Aqueduct is listed in the TNFD Tools Catalogue ("listed", not endorsed: the catalogue says so itself).
+const isTnfdListed = (source: string) => /WRI Aqueduct/i.test(source)
 const consentChoices = ['internal', 'internal_and_outward', 'declined'] as const
 const feedbackChoices = ['yes', 'somewhat', 'no'] as const
 </script>
@@ -227,12 +257,19 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
           <template v-for="(m, i) in view.items" :key="i">
             <h4 v-if="headingBefore(i)" class="claim-heading">{{ headingBefore(i) }}</h4>
             <div v-if="m.kind === 'text'" :class="['msg', m.role === 'fex' ? 'agent' : 'producer']">{{ m.text }}</div>
+            <button v-if="m.kind === 'text' && m.role === 'fex' && !(view.busy && i === view.items.length - 1)" type="button"
+              class="btn-text listen" data-action="listen" :aria-pressed="player.state.playing === listenKey(i)"
+              @click="listen(i, m.text)">{{ player.state.playing === listenKey(i) ? t.stopListening : t.listen }}</button>
             <div v-else-if="m.kind === 'claim'" class="msg agent card claim" :data-section="m.section">
               <p>{{ m.claim.text }}</p>
+              <button type="button" class="btn-text listen" data-action="listen" :aria-pressed="player.state.playing === listenKey(i)"
+                @click="listen(i, m.claim.text)">{{ player.state.playing === listenKey(i) ? t.stopListening : t.listen }}</button>
               <p class="small cite">
+                <span class="cite-num">[{{ claimNumber(i) }}]</span>
                 {{ t.source }}: {{ m.claim.citation.source }}<span v-if="m.claim.citation.period"> ({{ m.claim.citation.period }})</span>
                 · {{ t.standard }}: {{ m.claim.citation.standard_clause }}
                 <span v-if="m.claim.citation.strength"> · {{ t.strength[m.claim.citation.strength] }}</span>
+                <span v-if="isTnfdListed(m.claim.citation.source)" class="tnfd"> · {{ t.tnfd }}</span>
               </p>
             </div>
             <div v-else-if="m.kind === 'notice'" class="alert warning" role="status">⚑ {{ m.text }}</div>
@@ -261,6 +298,9 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
           </div>
           <div v-if="can('set_consent') && (view.step === 'consent' || changingConsent)" class="choice">
             <p>{{ t.consentAsk }}</p>
+            <ul class="consent-explainer small">
+              <li v-for="c in consentChoices" :key="c">{{ t.consentExplain[c] }}</li>
+            </ul>
             <div class="btn-row">
               <button v-for="c in consentChoices" :key="c" class="btn-default" :data-consent="c"
                 :aria-pressed="currentConsent === c" @click="act('set_consent', { scope: c })">{{ t.consent[c] }}</button>
@@ -294,6 +334,10 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
         <VoiceInput v-if="view.conversationId && producerId" :key="view.conversationId"
           :api-url="apiUrl" :conversation-id="view.conversationId" :producer-id="producerId" :passcode="passcode.trim()"
           :language="view.language" :disabled="!canType || active === false" @transcript="receiveTranscript" />
+        <AttachInput v-if="view.conversationId && producerId" :key="`attach-${view.conversationId}`"
+          :api-url="apiUrl" :conversation-id="view.conversationId" :producer-id="producerId" :passcode="passcode.trim()"
+          :language="view.language" :disabled="!canType || active === false" @description="receiveDescription" />
+        <p v-if="player.state.unavailable" class="small" role="status">{{ t.listenUnavailable }}</p>
         <p v-if="voiceEnglish" class="small" lang="en">English translation of the recording: {{ voiceEnglish }}</p>
         <form class="composer" @submit.prevent="send">
           <label class="sr-only" for="live-msg">Message</label>
@@ -308,6 +352,11 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
 <style scoped>
 .claim-heading { margin: 12px 0 4px; font-size: 0.95rem; }
 .claim .cite { margin-top: 6px; font-size: 13px; }
+.cite-num { font-weight: 600; color: var(--ft-ui-primary); }
+.listen { display: block; min-height: 32px; margin-top: 4px; padding: 2px 0; font-size: 13px; }
+.listen[aria-pressed='true'] { font-weight: 600; }
+.consent-explainer { margin: 4px 0 2px; padding-left: 18px; }
+.consent-explainer li { margin: 2px 0; }
 .live-actions { display: flex; flex-direction: column; gap: 6px; padding: 6px 0 2px; border-top: 1px solid var(--ft-ui-border, #dadce0); }
 .live-actions .btn-row { margin-top: 4px; gap: 6px; }
 .live-actions .btn-default, .live-actions .btn-primary { min-height: 40px; padding: 6px 12px; font-size: 14px; }
