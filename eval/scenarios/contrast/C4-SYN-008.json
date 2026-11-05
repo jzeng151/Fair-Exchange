@@ -1,0 +1,27 @@
+{
+  "scenario_id": "C4-SYN-008",
+  "title": "Colombian coffee cooperative, two dry seasons (English), contrast partner of S1",
+  "producer_id": "SYN-008",
+  "language": "en",
+  "profile_note": "Synthetic producer (#7): coffee cooperative, Cauca, Colombia, with weather station and cover crop projects. Same challenge, crop and region as S1; only the entity type differs (cooperative vs smallholder). The SYN-008 run for contrast pair C4, which is judged on the reviewer mark alone because the two share regional facts.",
+  "turns": [
+    {"message": "It hasn't rained like it used to. Our members have had two seasons of very irregular rain and last year's coffee harvest dropped a lot across the cooperative.", "expect_step": "intake"},
+    {"message": "It started at the end of 2024. Members lost about a third of the crop. We put weather stations on member farms and planted cover crops, but it wasn't enough.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
+    {"action": {"name": "set_feedback", "args": {"value": "yes"}}, "expect_step": "feedback"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
+  ],
+  "intake_replies": [
+    "Some members also saved water in tanks, but the rain just did not come."
+  ],
+  "expected": {
+    "record_status": "completed",
+    "consent_scope": "internal",
+    "evidence": "full",
+    "pii_flag": false,
+    "pii_entity_types": [],
+    "tags": ["climate and weather", "water"],
+    "out_of_scope": false
+  }
+}

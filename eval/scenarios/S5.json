@@ -1,9 +1,9 @@
 {
   "scenario_id": "S5",
-  "title": "Côte d'Ivoire cocoa producer, irregular rainfall, names a person and a phone number (English)",
-  "producer_id": "9D79CF4ED3FBE4CFBD3640576B74642A",
+  "title": "Côte d'Ivoire cocoa cooperative, irregular rainfall, names a person and a phone number (English)",
+  "producer_id": "SYN-005",
   "language": "en",
-  "profile_note": "Sample producer: cocoa, Goh-Djiboua, Côte d'Ivoire. The PII path: the producer names a person and gives a phone number (both invented). The record is flagged, never redacted.",
+  "profile_note": "Synthetic producer (#7): cocoa cooperative, Bas-Sassandra, Côte d'Ivoire (the same producer as S7). The PII path: the producer names a person and gives a phone number (both invented). The record is flagged, never redacted.",
   "turns": [
     {"message": "The rain has become irregular and this year's cocoa harvest dropped a lot.", "expect_step": "intake"},
     {"message": "It got worse over the last two seasons. The technician Kouame Konan came to help us check the trees, and you can reach him at +225 07 00 00 00 00. We water by hand when we can, but it is not enough.", "expect_step": "playback"},
