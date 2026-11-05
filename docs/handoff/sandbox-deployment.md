@@ -104,10 +104,6 @@ The deployed routes are `/#/live`, `/#/me`, `/#/review`, and `/#/admin`.
 The root producer route remains the scripted demonstration. Credentials stay in
 Secrets Manager; see [role-specific access](02-deploy.md) for the stack outputs.
 
-The PR needs review and merge. Until it merges, a later website publish from
-`main` can replace these frontend changes with the previous version. Infrastructure
-remains deployed independently of website publishing.
-
 ## Remaining work for issue #5
 
 The current sandbox is deployed, but [issue #5](https://github.com/jzeng151/Fair-Exchange/issues/5)
