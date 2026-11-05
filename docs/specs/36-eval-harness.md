@@ -101,6 +101,7 @@ Amazon Bedrock AgentCore Evaluations (decided 2026-11-04) runs the scripted scen
 ### Spike check
 
 - The code-based evaluator payload carries the runtime session ID, so evaluators can look up the record and eval evidence.
+- **Result (2026-11-05).** A throwaway code-based evaluator ran on a real FEX session (101 spans) and was deleted afterward. The Lambda event has no top-level session ID. The ID is on every span as `attributes["session.id"]`, one value across the session, and in `evaluationReferenceInputs[].context.spanContext.sessionId` when reference inputs are sent. It equals the runtime session ID, which the chat API sets to the conversation ID. Evaluators read the reference-input context first, then the spans' single `session.id`, and fail on zero or several (`fx_evals.session.session_id_from_payload`). This needs the runtime's spans in CloudWatch; they carry `session.id` even with content capture off.
 
 ## Out of Scope
 
