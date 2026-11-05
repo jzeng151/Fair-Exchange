@@ -46,7 +46,7 @@ DEFINITIONS = {"producers": [{
 
 # Comprehend answers for the stub, by description
 PII = {"Maria Lopez dug a well.": [{"Type": "NAME", "Score": 0.95}],
-       "Started in March 2021.": [{"Type": "DATE_TIME", "Score": 0.99}, {"Type": "NAME", "Score": 0.5}]}
+       "Started in March 2021.": [{"Type": "DATE_TIME", "Score": 0.99}, {"Type": "NAME", "Score": 0.79999}]}  # just under the threshold
 
 
 def _write_csv(path: Path, header: list[str], rows: list[dict]) -> None:

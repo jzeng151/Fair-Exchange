@@ -89,7 +89,7 @@ def pii_hit_types(entities: list[dict]) -> list[str]:
 
 
 def _encode_entities(entities: list[dict]) -> str:
-    return ";".join(sorted(f"{e['Type']}:{e['Score']:.4f}" for e in entities))
+    return ";".join(sorted(f"{e['Type']}:{e['Score']!r}" for e in entities))
 
 
 def _decode_entities(text: str) -> list[dict]:
