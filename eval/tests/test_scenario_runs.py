@@ -42,3 +42,13 @@ def test_the_fake_scanner_finds_only_the_invented_person_and_phone():
     found = fake_pii_scanner(text, "en")
     assert [(e["Type"], text[e["BeginOffset"]:e["EndOffset"]]) for e in found] == [
         ("NAME", "Kouame Konan"), ("PHONE", "+225 07 00 00 00 00")]
+
+
+def test_a_run_that_never_leaves_intake_fails_instead_of_looping(tmp_path, monkeypatch):
+    # An intake that never reaches playback must end the run with a problem, not send replies forever
+    import fex.conversation.engine as engine_module
+
+    monkeypatch.setattr(engine_module.ConversationEngine, "_intake",
+                        lambda self, state, turn: turn.say("Tell me more."))
+    [session] = run_all([RUNS[0]], tmp_path, demo=True)
+    assert session.problems and "still in intake" in session.problems[0]

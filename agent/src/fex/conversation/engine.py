@@ -188,6 +188,9 @@ class _Turn:
         self.spoken: list[str] = []
         self.excluded = False  # an out-of-scope exchange (#21): kept in history, hidden from models
         self.loaded_revision: int | None = None  # the state revision this request started from
+        # Eval evidence to write once this turn's state is saved (#34), so a rejected stale turn writes none
+        self.eval_write = False
+        self.eval_answer: AnswerEvidence | None = None
 
     def emit(self, type_: str, **fields) -> None:
         event = _EVENT.validate_python({"type": type_, "seq": len(self.events) + 1, **fields})
@@ -351,7 +354,7 @@ class ConversationEngine:
     def _close(self, state: ConversationState, turn: _Turn, reason: str):
         state.step, state.closed_reason, state.closed_at = "closed", reason, self.clock()
         self._save_record(state, turn)
-        self._keep_eval_evidence(state, None)
+        turn.eval_write = True
         return self._finish(state, turn, step_changed=True)
 
     def _save_record(self, state: ConversationState, turn: _Turn) -> None:
@@ -498,9 +501,9 @@ class ConversationEngine:
             state.answer_failed = True
             turn.say(copy.text(lang, "failed"))
             turn.emit("error", code="agent_failed", message=copy.text(lang, "failed"))
-            self._keep_eval_evidence(state, AnswerEvidence(
+            turn.eval_write, turn.eval_answer = True, AnswerEvidence(
                 started_at=state.partial_started_at, tool_results=items, claims=shown_in_order, dropped=dropped,
-                failed=True))
+                failed=True)
             return
 
         shown = state.partial
@@ -516,8 +519,8 @@ class ConversationEngine:
         turn.emit("answer", insights=[c.model_dump() for c in shown.insights],
                   peer_examples=[c.model_dump() for c in shown.peer_examples], evidence=evidence_level)
         state.step = "consent"
-        self._keep_eval_evidence(state, AnswerEvidence(
-            started_at=state.answer_given_at, tool_results=items, claims=shown_in_order, dropped=dropped))
+        turn.eval_write, turn.eval_answer = True, AnswerEvidence(
+            started_at=state.answer_given_at, tool_results=items, claims=shown_in_order, dropped=dropped)
 
     def _keep_eval_evidence(self, state: ConversationState, answer: AnswerEvidence | None) -> None:
         """Eval stacks only (#34): add this answer, if any, and record the step the conversation is in.
@@ -679,6 +682,9 @@ class ConversationEngine:
                 log.error("stale turn not saved: %s", exc)
                 turn.emit("error", code="agent_failed",
                           message="This conversation changed while I was answering. Please reload it.")
+            else:
+                if turn.eval_write:  # only a saved turn updates the eval evidence
+                    self._keep_eval_evidence(state, turn.eval_answer)
         return self._events(turn, state)
 
     @staticmethod
