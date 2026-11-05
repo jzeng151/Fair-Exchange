@@ -21,7 +21,7 @@ from pydantic import BaseModel, Field, TypeAdapter
 from strands import Agent
 
 from fex.conversation import copy
-from fex.conversation.scope import ScopeCheck, always_in_scope
+from fex.conversation.scope import ScopeCheck, ScopeUnavailable, always_in_scope
 from fex.conversation.contract import (
     ActionEntry, ActionName, Answer, Event, Request, ResumeResponse, SpokenEntry,
 )
@@ -236,7 +236,7 @@ class ConversationEngine:
         self.clock = clock or (lambda: datetime.now(UTC))
         self.max_retries = max_retries
         self.records = records  # a fex.records.RecordStore; None = records are not saved (#26)
-        self.scope_check = scope_check or always_in_scope  # how it decides is "Not decided" (#21)
+        self.scope_check = scope_check or always_in_scope  # live runtime supplies BedrockScopeCheck
         # Assesses structured-output text, which the Converse guardrail skips (#12). No-op when unconfigured.
         self.output_assessor = output_assessor or OutputAssessor()
         # Eval stacks only (#34, #36): None in the main stack, so nothing is captured there.
@@ -333,14 +333,22 @@ class ConversationEngine:
 
     def _declined(self, state: ConversationState, turn: _Turn, text: str) -> bool:
         """The one scope check for producer text (#21). Out of scope: fixed decline in the producer's language,
-        no model, no data tool, step unchanged; the exchange stays in history but is hidden from models."""
-        verdict = self.scope_check(text, state.step)
+        no answering model or data tool, step unchanged; hidden from subsequent model prompts."""
+        try:
+            verdict = self.scope_check(text, state.step)
+        except ScopeUnavailable:
+            state.excluded_history.append(len(state.history) - 1)
+            turn.excluded = True
+            turn.say(copy.text(state.language, "scope_unavailable"))
+            self._log(state, "step", "scope_check_failed", [])
+            return True
         if verdict.in_scope:
             return False
         if verdict.language:
             state.language = verdict.language
         state.excluded_history.append(len(state.history) - 1)
         turn.excluded = True
+        self._log(state, "step", f"scope_declined_{verdict.reason or 'other_producer_data'}", [])
         turn.say(copy.text(state.language, f"out_of_scope_{verdict.reason or 'other_producer_data'}"))
         turn.say(copy.text(state.language, "back_to_open"))
         return True

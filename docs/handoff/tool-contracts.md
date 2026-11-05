@@ -129,3 +129,16 @@ Items with `kind: "standard"`: the top 5 distinct APS/FPS clauses the standards 
 | `generated/<table>/<table>.jsonl`: producers, Premium projects, survey responses, certifications, peer catalog | `fx_data.generator` (Comprehend for new descriptions, or `--offline`) | when the sample data or `data/generator_inputs/` change |
 
 The architecture in the [repository README](../../README.md) puts the regional table in S3 and peer search in a Knowledge Base. For the sandbox these ship as package data, like `clauses.json` (#9). Moving them to S3 or a Knowledge Base changes the loaders in `fx_data`, not the tool contracts.
+
+## Scope classification before conversation processing
+
+The live runtime calls `BedrockScopeCheck` before intake, follow-up messages or playback corrections.
+It uses `FEX_SMALL_MODEL` through the existing guarded Bedrock model factory, with no data tools.
+Only a validated category and language leave the classifier. Code chooses the fixed refusal text.
+A service or validation failure preserves the step and asks the producer to retry; the rejected
+exchange is excluded from later prompts and PII scans. Decision logs carry fixed scope codes only.
+The no-AWS demo remains a scripted stand-in. Retention and disabled recall are unchanged.
+
+Run `cd agent && uv run pytest tests/test_scope_classifier.py tests/test_out_of_scope.py` for
+local checks. `scripts/e2e/scope_classifier_smoke.py` exercises synthetic messages against the
+configured real Bedrock small model without reading or writing producer records.
