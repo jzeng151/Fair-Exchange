@@ -114,3 +114,23 @@ def test_a_store_failure_never_breaks_the_conversation():
 def test_the_module_imports_on_its_own():
     # The eval harness imports it before anything else has loaded the engine
     subprocess.run([sys.executable, "-c", "import fex.eval_evidence"], check=True)
+
+
+def test_a_stale_answer_turn_cannot_overwrite_the_evidence_of_a_stop_that_arrived_meanwhile():
+    # Mirrors test_an_in_flight_answer_cannot_undo_a_stop_that_arrived_meanwhile: the stale turn's state
+    # save is rejected, so its evidence write must not happen either.
+    r = Run()
+    store = capturing(r)
+    r.to_playback()
+    r.small.add(summary())
+    stopped = []
+
+    def stop_meanwhile():
+        if not stopped:
+            stopped.append(r.action("end"))
+    r.large.watch = stop_meanwhile
+    r.large.add(*RETRIEVE, r.good_answer())
+    events = r.action("confirm_playback")
+    assert of(events, "error")[0].code == "agent_failed"
+    ev = store.get(r.conversation_id)
+    assert ev.final_step == "closed" and ev.answers == [], "evidence matches the saved, closed conversation"
