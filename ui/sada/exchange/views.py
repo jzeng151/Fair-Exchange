@@ -1,6 +1,6 @@
 """Views: persona picker, the chat page, about, docs, demo, and the mock chat API.
 
-No sign-on (SDD.md). The visitor picks role → product → persona, then chats as that persona. Location
+No sign-on (SDD.md). The visitor clicks a persona tile, then chats as that persona. Location
 and a (made-up) weather overlay come from the chosen persona; the chat engine mocks the Fair Exchange
 API and is shaped so the real runtime can replace it.
 """
@@ -16,21 +16,30 @@ from . import engine, catalog, trends, weather, uploads
 
 
 def picker(request):
-    """Landing step: choose role, then product, then one of up to three personas."""
-    role = request.GET.get("role")
-    product = request.GET.get("product")
-    products = [
-        {"key": k, "label": catalog.PRODUCT_LABEL.get(k, k.title()), "icon": catalog.PRODUCT_ICON.get(k, "•")}
-        for k in (catalog.products_for(role) if role else [])
-    ]
-    context = {
-        "roles": catalog.ROLES,
-        "role": role,
-        "product": product,
-        "products": products,
-        "personas": [p.as_dict() for p in catalog.personas_for(role, product)] if role and product else [],
-    }
-    return render(request, "exchange/picker.html", context)
+    """Landing page: one click on a persona tile starts the chat in that persona's language."""
+    groups = []
+    for role in catalog.ROLES:
+        tiles = []
+        for p in (catalog.get_persona(pid) for pid in catalog.PICKER_IDS):
+            if not p or p.role != role:
+                continue
+            chat_lang = p.language if p.language in engine.LANGUAGES else "en"
+            tiles.append({
+                **p.as_dict(),
+                "role_icon": catalog.ROLE_ICON.get(role, "•"),
+                "role_label": catalog.ROLE_LABEL.get(role, role.title()),
+                "product_icon": catalog.PRODUCT_ICON.get(p.product, "•"),
+                "product_label": catalog.PRODUCT_LABEL.get(p.product, p.product.title()),
+                "chat_lang": chat_lang,
+                "lang_label": engine.LANGUAGES[chat_lang],
+            })
+        groups.append({
+            "role": role,
+            "label": catalog.ROLE_LABEL.get(role, role.title()) + "s",
+            "icon": catalog.ROLE_ICON.get(role, "•"),
+            "personas": tiles,
+        })
+    return render(request, "exchange/picker.html", {"groups": groups})
 
 
 def chat(request, persona_id: str):
@@ -38,7 +47,11 @@ def chat(request, persona_id: str):
     if not persona:
         return redirect("picker")
     request.session["persona_id"] = persona_id
-    language = request.session.get("language", "en")
+    # The tile's ?lang=, else the persona's own language; the chat's selector can still change it.
+    language = request.GET.get("lang")
+    if language not in engine.LANGUAGES:
+        language = persona.language if persona.language in engine.LANGUAGES else "en"
+    request.session["language"] = language
     # Real weather (Open-Meteo) for this persona's location; falls back to the mocked overlay.
     live = weather.weather_for(persona)
     pdata = persona.as_dict()

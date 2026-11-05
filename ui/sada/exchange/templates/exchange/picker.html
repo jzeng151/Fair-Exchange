@@ -2,66 +2,38 @@
 {% block title %}Choose a persona · Fair Trade Exchange{% endblock %}
 {% block body %}
 <div class="wrap">
-  <div class="page">
-    <div class="hero" style="margin-bottom:1.6rem">
-      <h1>Who are you today?</h1>
-      <p>Pick a role, a product, and a persona. The exchange will greet you by name, know your region,
-      and show you what the data suggests. All fictitious — for the demo.</p>
+  <div class="page page-wide">
+    <div class="hero hero-compact">
+      <h1>Pick a persona to chat</h1>
+      <p>Each comes with a role, a product, a location and a language. All fictitious, for the demo.</p>
     </div>
 
-    <!-- Step 1: role -->
-    <div class="step">
-      <div class="step-label"><span class="step-num {% if role %}done{% endif %}">1</span> I am a…</div>
-      <div class="pick-row">
-        {% for r in roles %}
-          <a class="pick-tile {% if r == role %}active{% endif %}" href="?role={{ r }}">
-            <span class="pick-emoji">{% if r == 'producer' %}🌱{% else %}🛍️{% endif %}</span>
-            <b>{{ r|capfirst }}</b>
-            <small>{% if r == 'producer' %}Farmer, fisher or co-op member{% else %}Someone who buys Fair Trade{% endif %}</small>
-          </a>
-        {% endfor %}
-      </div>
-    </div>
-
-    <!-- Step 2: product -->
-    {% if role %}
-    <div class="step">
-      <div class="step-label"><span class="step-num {% if product %}done{% endif %}">2</span> Working with…</div>
-      <div class="pick-row">
-        {% for prod in products %}
-          <a class="pick-tile small {% if prod.key == product %}active{% endif %}" href="?role={{ role }}&product={{ prod.key }}">
-            <span class="pick-emoji">{{ prod.icon }}</span>
-            <b>{{ prod.label }}</b>
-          </a>
-        {% endfor %}
-      </div>
-    </div>
-    {% endif %}
-
-    <!-- Step 3: persona -->
-    {% if personas %}
-    <div class="step">
-      <div class="step-label"><span class="step-num">3</span> Pick a persona</div>
+    {% for g in groups %}
+    <div class="step picker-group">
+      <div class="step-label"><span class="pick-emoji" style="font-size:1.3rem">{{ g.icon }}</span> {{ g.label }}</div>
       <div class="persona-cards">
-        {% for p in personas %}
-          <a class="persona-card" href="{% url 'chat' p.id %}">
+        {% for p in g.personas %}
+          <a class="persona-card" href="{% url 'chat' p.id %}?lang={{ p.chat_lang }}">
             <div class="persona-card-top">
               <span class="persona-card-avatar">{{ p.avatar }}</span>
               <div>
                 <b>{{ p.name }}</b>
-                <span>{{ p.location.place }}</span>
+                <span>{{ p.org }}</span>
               </div>
             </div>
+            <div class="persona-chips">
+              <span class="persona-chip" title="Role">{{ p.role_icon }} {{ p.role_label }}</span>
+              <span class="persona-chip" title="Product">{{ p.product_icon }} {{ p.product_label }}</span>
+              <span class="persona-chip" title="Location">{{ p.flag|default:"📍" }} {{ p.location.place }}</span>
+              <span class="persona-chip persona-chip-lang" title="Chat language">🗣️ {{ p.lang_label }}</span>
+            </div>
             <p>{{ p.blurb }}</p>
-            <div class="persona-card-org">{{ p.org }}</div>
             <div class="persona-card-go">Start the conversation →</div>
           </a>
         {% endfor %}
       </div>
     </div>
-    {% elif product %}
-      <p class="footnote">No personas for that pick yet.</p>
-    {% endif %}
+    {% endfor %}
   </div>
 </div>
 {% endblock %}
