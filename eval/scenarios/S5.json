@@ -6,11 +6,11 @@
   "profile_note": "Sample producer: cocoa, Goh-Djiboua, Côte d'Ivoire. The PII path: the producer names a person and gives a phone number (both invented). The record is flagged, never redacted.",
   "turns": [
     {"message": "The rain has become irregular and this year's cocoa harvest dropped a lot.", "expect_step": "intake"},
-    {"message": "It got worse over the last two seasons. The technician Kouame Konan came to help us check the trees, and you can reach him at +225 07 00 00 00 00. We water by hand when we can, but it is not enough.", "expect_step": "intake"},
-    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "playback"},
-    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "consent"},
+    {"message": "It got worse over the last two seasons. The technician Kouame Konan came to help us check the trees, and you can reach him at +225 07 00 00 00 00. We water by hand when we can, but it is not enough.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
     {"action": {"name": "set_feedback", "args": {"value": "yes"}}, "expect_step": "feedback"},
-    {"action": {"name": "end", "args": {}}, "expect_step": "feedback"}
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
   ],
   "intake_replies": [
     "We also dug small channels to catch what little rain does fall."

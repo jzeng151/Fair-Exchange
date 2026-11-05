@@ -6,12 +6,12 @@
   "profile_note": "Sample producer: coffee, 1st Grade, La Paz, Honduras. Has regional data, survey facts and peer examples, so the answer has full evidence before the producer declines.",
   "turns": [
     {"message": "Con las lluvias fuertes se nos está lavando la tierra de las parcelas en ladera. Cada año hay menos suelo bueno.", "expect_step": "intake"},
-    {"message": "Lo notamos desde hace unos tres años. En algunas parcelas ya se ven las raíces. Hicimos unas barreras con piedras, pero no en todas.", "expect_step": "intake"},
-    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "playback"},
-    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "consent"},
+    {"message": "Lo notamos desde hace unos tres años. En algunas parcelas ya se ven las raíces. Hicimos unas barreras con piedras, pero no en todas.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal"}}, "expect_step": "feedback"},
     {"message": "¿Qué quiere decir exactamente que guarden mi resumen?", "expect_step": "feedback"},
-    {"action": {"name": "set_consent", "args": {"scope": "declined"}}, "expect_step": "feedback"},
-    {"action": {"name": "end", "args": {}}, "expect_step": "consent"}
+    {"action": {"name": "set_consent", "args": {"scope": "declined"}}, "expect_step": "consent"},
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
   ],
   "intake_replies": [
     "En la parte más alta del cerro ya casi no queda tierra para sembrar."

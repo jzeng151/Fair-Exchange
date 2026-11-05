@@ -6,11 +6,11 @@
   "profile_note": "Sample producer: coffee, 2nd Grade cooperative, Chiapas, Mexico. Regional facts and coffee price benchmarks exist, but the sample has no market-and-price peer projects, so the answer has limited evidence.",
   "turns": [
     {"message": "El precio que nos pagan los compradores por el café ha bajado mucho este año, y a nuestros socios les preocupa no cubrir sus costos.", "expect_step": "intake"},
-    {"message": "Empezó después de la cosecha pasada. Algunos socios recibieron casi una quinta parte menos por kilo. Intentamos vender más por la cooperativa en vez de a los intermediarios locales.", "expect_step": "intake"},
-    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "playback"},
-    {"action": {"name": "set_consent", "args": {"scope": "internal_and_outward"}}, "expect_step": "consent"},
+    {"message": "Empezó después de la cosecha pasada. Algunos socios recibieron casi una quinta parte menos por kilo. Intentamos vender más por la cooperativa en vez de a los intermediarios locales.", "expect_step": "playback"},
+    {"action": {"name": "confirm_playback", "args": {}}, "expect_step": "consent"},
+    {"action": {"name": "set_consent", "args": {"scope": "internal_and_outward"}}, "expect_step": "feedback"},
     {"action": {"name": "set_feedback", "args": {"value": "somewhat"}}, "expect_step": "feedback"},
-    {"action": {"name": "end", "args": {}}, "expect_step": "feedback"}
+    {"action": {"name": "end", "args": {}}, "expect_step": "closed"}
   ],
   "intake_replies": [
     "También guardamos parte de la cosecha para venderla más adelante, cuando el precio suba."

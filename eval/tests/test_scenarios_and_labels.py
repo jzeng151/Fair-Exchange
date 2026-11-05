@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 from fx_data.peers import ProducerProfiles
 
+from fex.conversation.engine import ALLOWED
 from fex.models import ChallengeTag
 
 EVAL = Path(__file__).parents[1]
@@ -78,6 +79,18 @@ def test_scenario_is_well_formed(path):
     if exp["pii_flag"]:
         assert exp["pii_entity_types"], "a flagged record names the entity types it was flagged for"
     assert isinstance(exp["out_of_scope"], bool)
+
+
+@pytest.mark.parametrize("path", SCENARIOS, ids=[p.stem for p in SCENARIOS])
+def test_each_turn_expects_the_step_it_lands_in(path):
+    """The runner checks expect_step against the turn's response stream, so it is the step the turn ends in:
+    each action must be allowed in the step the previous turn ended in, and the closing `end` ends in closed."""
+    step = "intake"
+    for t in _load(path)["turns"]:
+        if "action" in t:
+            assert t["action"]["name"] in ALLOWED[step], (step, t["action"]["name"])
+        step = t["expect_step"]
+    assert step == "closed"
 
 
 @pytest.mark.parametrize("path", SCENARIOS, ids=[p.stem for p in SCENARIOS])
