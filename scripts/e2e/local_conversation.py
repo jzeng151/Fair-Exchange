@@ -59,7 +59,7 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--api", default="http://127.0.0.1:3000")
     ap.add_argument("--records", default=None, help="FEX_LOCAL_RECORDS_DIR the agent writes to")
-    ap.add_argument("--producer", default="CFC19603C1B7B29C017954FD1DB2D620", help="a Cauca coffee producer")
+    ap.add_argument("--producer", default="SYN-001", help="a Cauca coffee producer")
     args = ap.parse_args()
     c = Client(args.api, args.producer)
     started = time.time()

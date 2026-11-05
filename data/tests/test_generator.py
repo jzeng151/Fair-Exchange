@@ -290,7 +290,7 @@ def _profile(committed, pid) -> dict:
     ("SYN-003", "Vietnam", "Dak Lak", ["coffee"], "processor"),        # S3 labor shortage
     ("SYN-004", "Honduras", "Copan", ["coffee"], "cooperative"),       # S4 Spanish-language producer
     ("SYN-005", "Côte d'Ivoire", "Bas-Sassandra", ["cocoa"], "cooperative"),  # S5
-    ("SYN-006", "Côte d'Ivoire", "Goh-Djiboua", ["cocoa"], "smallholder"),
+    ("SYN-006", "Côte d'Ivoire", "Goh-Djiboua", ["cocoa"], "smallholder"),  # S6 labor shortage
 ])
 def test_scenario_producers_exist_with_their_profiles(committed, pid, country, admin1, crops, entity_type):
     assert _profile(committed, pid) == {"producer_id": pid, "country": country, "admin1": admin1, "crops": crops,

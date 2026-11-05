@@ -14,6 +14,10 @@ from fex.models import ChallengeTag
 
 EVAL = Path(__file__).parents[1]
 SCENARIOS = sorted((EVAL / "scenarios").glob("S*.json"))
+# #7's contrast pairs need one run per producer; producers not already in S1 to S7 have their own file (#35)
+CONTRAST = sorted((EVAL / "scenarios" / "contrast").glob("*.json"))
+RUNS = SCENARIOS + CONTRAST
+DEFINITIONS = json.loads((EVAL.parent / "data" / "generator_inputs" / "producer_definitions.json").read_text(encoding="utf-8"))
 LABELS = [json.loads(line) for line in (EVAL / "labeled" / "challenge-tags.jsonl").read_text(encoding="utf-8").splitlines() if line.strip()]
 TAGS = set(ChallengeTag.__args__)
 PROFILES = ProducerProfiles.load()._profiles
@@ -43,9 +47,26 @@ def test_required_scenarios_exist():
     assert any(x["expected"]["pii_flag"] for x in s), "PII flag path"
     countries = {PROFILES[x["producer_id"]]["country"] for x in s}
     assert {"Colombia", "Mexico", "Vietnam"} <= countries, "the vision doc's three scenarios"
+    # The web picker and the demo sign-in allow-list read the top level, so only S1 to S7 live there
+    assert sorted((EVAL / "scenarios").glob("*.json")) == SCENARIOS
 
 
-@pytest.mark.parametrize("path", SCENARIOS, ids=[p.stem for p in SCENARIOS])
+def test_scenario_producers_match_the_producer_definitions():
+    # #7 lists each scenario's producer once; the scenario files must agree with it
+    assert {_load(p)["scenario_id"]: _load(p)["producer_id"] for p in SCENARIOS} == DEFINITIONS["scenario_producers"]
+
+
+def test_every_contrast_pair_producer_has_a_scenario_run():
+    run_producers = {_load(p)["producer_id"] for p in RUNS}
+    for pair in DEFINITIONS["contrast_pairs"]:
+        assert set(pair["producers"]) <= run_producers, pair["pair_id"]
+    for path in CONTRAST:
+        pair_id = path.stem.split("-", 1)[0]
+        pair = next(p for p in DEFINITIONS["contrast_pairs"] if p["pair_id"] == pair_id)
+        assert _load(path)["producer_id"] in pair["producers"], path.name
+
+
+@pytest.mark.parametrize("path", RUNS, ids=[p.stem for p in RUNS])
 def test_scenario_is_well_formed(path):
     s = _load(path)
     assert s["scenario_id"] == path.stem
@@ -81,7 +102,7 @@ def test_scenario_is_well_formed(path):
     assert isinstance(exp["out_of_scope"], bool)
 
 
-@pytest.mark.parametrize("path", SCENARIOS, ids=[p.stem for p in SCENARIOS])
+@pytest.mark.parametrize("path", RUNS, ids=[p.stem for p in RUNS])
 def test_each_turn_expects_the_step_it_lands_in(path):
     """The runner checks expect_step against the turn's response stream, so it is the step the turn ends in:
     each action must be allowed in the step the previous turn ended in, and the closing `end` ends in closed."""
@@ -93,7 +114,7 @@ def test_each_turn_expects_the_step_it_lands_in(path):
     assert step == "closed"
 
 
-@pytest.mark.parametrize("path", SCENARIOS, ids=[p.stem for p in SCENARIOS])
+@pytest.mark.parametrize("path", RUNS, ids=[p.stem for p in RUNS])
 def test_expected_record_matches_the_last_choices(path):
     s = _load(path)
     actions = [t["action"] for t in s["turns"] if "action" in t]

@@ -1,9 +1,10 @@
 // Live mode (#116, #124): the producers the live chat can act as, one card per official demo scenario.
 // Built from the scenario files themselves (eval/scenarios/S1..S7.json, #35), so the picker can never drift
-// from them: same sample producer, same language, same title. The presenter follows the scenario's turns
-// (see eval/scenarios/README.md). Local only: choosing a producer here stands in for sign-in (#11).
+// from them: same producer, same language, same title. S5 and S7 share a producer, so cards are keyed by
+// scenario. The presenter follows the scenario's turns (see eval/scenarios/README.md). Local only: choosing
+// a producer here stands in for sign-in (#11).
 export interface LiveProducer {
-  id: string // the sample producer ID the scenario uses
+  id: string // the producer ID the scenario uses (#7's synthetic producers)
   scenarioId: string
   title: string
   language: string
@@ -17,7 +18,7 @@ const files = import.meta.glob<ScenarioFile>('../../../eval/scenarios/S*.json', 
 // The vision document's three required scenarios first (S1–S3), then the decline, PII, out-of-scope and
 // contrast paths (S4–S7).
 const ORDER = ['S1', 'S2', 'S3', 'S4', 'S5', 'S6', 'S7']
-const FLAGS: Record<string, string> = { S1: '🇨🇴', S2: '🇲🇽', S3: '🇻🇳', S4: '🇭🇳', S5: '🇨🇮', S6: '🇳🇮', S7: '🇪🇨' }
+const FLAGS: Record<string, string> = { S1: '🇨🇴', S2: '🇲🇽', S3: '🇻🇳', S4: '🇭🇳', S5: '🇨🇮', S6: '🇨🇮', S7: '🇨🇮' }
 const rank = (id: string) => (ORDER.includes(id) ? ORDER.indexOf(id) : ORDER.length)
 
 export const liveProducers: LiveProducer[] = Object.values(files)

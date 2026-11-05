@@ -32,7 +32,7 @@ function fakeClient(script: { start?: StreamEvent[]; message?: StreamEvent[][]; 
 
 async function open(fake: ReturnType<typeof fakeClient>) {
   const w = mount(LiveChatView, { props: { apiUrl: 'http://api.test', makeClient: () => fake.client } })
-  await w.get('[data-producer="CFC19603C1B7B29C017954FD1DB2D620"]').trigger('click')
+  await w.get('[data-scenario="S1"]').trigger('click')
   await flushPromises()
   return w
 }
@@ -164,18 +164,18 @@ describe('LiveChatView', () => {
     const gate = new Promise<void>((r) => { release = r })
     const feedbackStart = (id: string) => [{ type: 'conversation', conversationId: id } as StreamEvent, ...step('feedback', ['set_feedback', 'end'])]
     const clients: Record<string, LiveClient> = {
-      CFC19603C1B7B29C017954FD1DB2D620: { ...fakeClient({ start: feedbackStart('c-A') }).client, action: async function* () {
+      'SYN-001': { ...fakeClient({ start: feedbackStart('c-A') }).client, action: async function* () {
         await gate
         for (const e of step('feedback', ['set_feedback', 'end'])) yield e
       } },
-      '95A4A8BC3F2E3F38F8D6A81B57BA5E4A': fakeClient({ start: feedbackStart('c-B') }).client,
+      'SYN-002': fakeClient({ start: feedbackStart('c-B') }).client,
     }
     const w = mount(LiveChatView, { props: { apiUrl: 'http://api.test', makeClient: (id: string) => clients[id]! } })
-    await w.get('[data-producer="CFC19603C1B7B29C017954FD1DB2D620"]').trigger('click')
+    await w.get('[data-scenario="S1"]').trigger('click')
     await flushPromises()
     await w.get('[data-feedback="yes"]').trigger('click')
     await w.get('.back-link').trigger('click')
-    await w.get('[data-producer="95A4A8BC3F2E3F38F8D6A81B57BA5E4A"]').trigger('click')
+    await w.get('[data-scenario="S2"]').trigger('click')
     await flushPromises()
     release() // A's feedback request finishes after B's conversation has loaded
     await flushPromises()
@@ -203,8 +203,22 @@ describe('LiveChatView', () => {
     expect((w.get('#live-msg').element as HTMLInputElement).disabled).toBe(false)
   })
 
+  it('keeps two scenarios that share a producer apart (S5 and S7, #35)', async () => {
+    const fake = fakeClient()
+    const made: string[] = []
+    const w = mount(LiveChatView, { props: { apiUrl: 'http://api.test', makeClient: (id: string) => { made.push(id); return fake.client } } })
+    const s5 = w.get('[data-scenario="S5"]'), s7 = w.get('[data-scenario="S7"]')
+    expect(s5.attributes('data-producer')).toBe(s7.attributes('data-producer'))
+    await s7.trigger('click')
+    await flushPromises()
+    expect(made).toEqual([s7.attributes('data-producer')])
+    expect(w.text()).toContain('contrast partner of S1')
+    expect(sessionStorage.getItem('fex.live.S7')).toBe('c-1')
+    expect(sessionStorage.getItem('fex.live.S5')).toBeNull()
+  })
+
   it('resumes the saved conversation for this producer after a reload instead of starting a new one', async () => {
-    sessionStorage.setItem('fex.live.CFC19603C1B7B29C017954FD1DB2D620', 'c-old')
+    sessionStorage.setItem('fex.live.S1', 'c-old')
     const fake = fakeClient({ resume: { step: 'feedback', language: 'es', allowed: ['set_feedback', 'end'], answer: null, history: [{ role: 'fex', text: 'Hola de nuevo', at: '2026-11-04T10:00:00Z' }] } })
     const w = await open(fake)
     expect(fake.calls).toEqual([['resume', 'c-old']])
@@ -212,7 +226,7 @@ describe('LiveChatView', () => {
   })
 
   it('after a reload in the feedback step, consent can still be changed even though the choice is not known (#19)', async () => {
-    sessionStorage.setItem('fex.live.CFC19603C1B7B29C017954FD1DB2D620', 'c-old')
+    sessionStorage.setItem('fex.live.S1', 'c-old')
     const fake = fakeClient({ resume: { step: 'feedback', language: 'es', allowed: ['reopen_playback', 'set_consent', 'set_feedback', 'end'], answer: null, history: [] } })
     const w = await open(fake)
     await w.get('[data-action="change-consent"]').trigger('click')
@@ -220,11 +234,11 @@ describe('LiveChatView', () => {
   })
 
   it('keeps the saved conversation and offers a retry when resuming fails for a temporary reason', async () => {
-    sessionStorage.setItem('fex.live.CFC19603C1B7B29C017954FD1DB2D620', 'c-old')
+    sessionStorage.setItem('fex.live.S1', 'c-old')
     const fake = fakeClient({ resume: new LiveError(0, 'unreachable') })
     const w = await open(fake)
     expect(fake.calls).toEqual([['resume', 'c-old']]) // no new conversation started
-    expect(sessionStorage.getItem('fex.live.CFC19603C1B7B29C017954FD1DB2D620')).toBe('c-old')
+    expect(sessionStorage.getItem('fex.live.S1')).toBe('c-old')
     // Nothing from the conversation has loaded yet, so its language is unknown: the notice is in English
     expect(w.get('.alert').text()).toContain('Can’t reach FEX')
     fake.client.resume = async (id) => { fake.calls.push(['resume', id]); return { step: 'intake', language: 'es', allowed: ['end'], answer: null, history: [{ role: 'fex', text: 'Hola otra vez', at: '2026-11-04T10:00:00Z' }] } }
@@ -239,22 +253,22 @@ describe('LiveChatView', () => {
     const gate = new Promise<void>((r) => { release = r })
     const gateB = new Promise<void>((r) => { releaseB = r })
     const clients: Record<string, LiveClient> = {
-      CFC19603C1B7B29C017954FD1DB2D620: { ...fakeClient().client, start: async function* () {
+      'SYN-001': { ...fakeClient().client, start: async function* () {
         yield { type: 'conversation', conversationId: 'c-A' } as StreamEvent
         await gate
         yield { type: 'text', seq: 1, text: 'late reply for A' } as StreamEvent
         yield { type: 'done', seq: 2 } as StreamEvent
       } },
-      '95A4A8BC3F2E3F38F8D6A81B57BA5E4A': { ...fakeClient().client, start: async function* () {
+      'SYN-002': { ...fakeClient().client, start: async function* () {
         await gateB
         for (const e of [{ type: 'conversation', conversationId: 'c-B' }, { type: 'text', seq: 1, text: 'hello B' }, ...step('intake', ['end'])]) yield e as StreamEvent
       } },
     }
     const w = mount(LiveChatView, { props: { apiUrl: 'http://api.test', makeClient: (id: string) => clients[id]! } })
-    await w.get('[data-producer="CFC19603C1B7B29C017954FD1DB2D620"]').trigger('click')
+    await w.get('[data-scenario="S1"]').trigger('click')
     await flushPromises()
     await w.get('.back-link').trigger('click')
-    await w.get('[data-producer="95A4A8BC3F2E3F38F8D6A81B57BA5E4A"]').trigger('click')
+    await w.get('[data-scenario="S2"]').trigger('click')
     await flushPromises()
     release() // A's late reply finishes while B's first reply is still loading
     await flushPromises()
@@ -263,11 +277,11 @@ describe('LiveChatView', () => {
     releaseB()
     await flushPromises()
     expect(bubbles(w)).toEqual(['hello B'])
-    expect(sessionStorage.getItem('fex.live.95A4A8BC3F2E3F38F8D6A81B57BA5E4A')).toBe('c-B')
+    expect(sessionStorage.getItem('fex.live.S2')).toBe('c-B')
   })
 
   it('starts fresh when the saved conversation is gone (404)', async () => {
-    sessionStorage.setItem('fex.live.CFC19603C1B7B29C017954FD1DB2D620', 'c-gone')
+    sessionStorage.setItem('fex.live.S1', 'c-gone')
     const fake = fakeClient({ resume: new LiveError(404, 'Not found') })
     await open(fake)
     expect(fake.calls).toEqual([['resume', 'c-gone'], ['start']])

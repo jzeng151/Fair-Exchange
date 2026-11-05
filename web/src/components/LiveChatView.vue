@@ -15,6 +15,8 @@ import type { Item, LiveView } from '../lib/liveView'
 const props = defineProps<{ apiUrl: string; active?: boolean; makeClient?: (producerId: string) => LiveClient }>()
 
 const producerId = ref<string | null>(null)
+// The picked card. Two scenarios can share a producer (S5 and S7, #35), so the card, not the producer, is the key.
+const scenarioId = ref<string | null>(null)
 const view = reactive<LiveView>(newView())
 const input = ref('')
 const voiceEnglish = ref('')
@@ -47,9 +49,9 @@ const t = computed(() => copyFor(view.language))
 const can = (a: ActionName) => view.allowed.includes(a)
 const closed = computed(() => view.step === 'closed')
 const canType = computed(() => !!view.conversationId && !closed.value && !view.busy)
-const producer = computed(() => liveProducers.find((p) => p.id === producerId.value))
+const producer = computed(() => liveProducers.find((p) => p.scenarioId === scenarioId.value))
 
-// Remember the last conversation per producer in this tab, so a reload resumes it (per-viewer convenience only).
+// Remember the last conversation per scenario card in this tab, so a reload resumes it (per-viewer convenience only).
 const KEY = (id: string) => `fex.live.${id}`
 function remember(id: string, conversationId: string | null) {
   try { conversationId ? sessionStorage.setItem(KEY(id), conversationId) : sessionStorage.removeItem(KEY(id)) } catch { /* storage unavailable */ }
@@ -78,7 +80,7 @@ function errorText(err: unknown): string {
  *  Returns true only if the turn finished without an error and the producer did not change. */
 async function turn(events: () => AsyncGenerator<StreamEvent>): Promise<boolean> {
   const mine = session
-  const owner = producerId.value
+  const owner = scenarioId.value
   beginTurn(view)
   try {
     for await (const e of events()) {
@@ -101,15 +103,19 @@ async function turn(events: () => AsyncGenerator<StreamEvent>): Promise<boolean>
   }
 }
 
-async function pick(id: string) {
+async function pick(scenario: string) {
+  const card = liveProducers.find((p) => p.scenarioId === scenario)
+  if (!card) return
+  const id = card.id
   const mine = ++session
   producerId.value = id
+  scenarioId.value = scenario
   resumeFailed.value = null
   savePasscode()
   client = props.makeClient
     ? props.makeClient(id)
     : createLiveClient({ baseUrl: props.apiUrl, producerId: id, passcode: passcode.value.trim() })
-  const saved = recall(id)
+  const saved = recall(scenario)
   if (saved) {
     try {
       const resumed = await client.resume(saved)
@@ -125,7 +131,7 @@ async function pick(id: string) {
         view.items.push({ kind: 'notice', tone: 'error', text: errorText(err) })
         return
       }
-      remember(id, null) // the server says it is gone
+      remember(scenario, null) // the server says it is gone
     }
   }
   await startNew()
@@ -166,6 +172,7 @@ function back() {
   session++
   resumeFailed.value = null
   producerId.value = null
+  scenarioId.value = null
   client = null
   reset()
 }
@@ -201,7 +208,7 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
       <h1>Choose a demo scenario</h1>
       <p class="small">Each card is an official demo scenario (<code>eval/scenarios/</code>): a sample producer and the messages to send.</p>
       <div class="picker-cards">
-        <button v-for="p in liveProducers" :key="p.scenarioId" class="picker-card" :data-producer="p.id" :data-scenario="p.scenarioId" @click="pick(p.id)">
+        <button v-for="p in liveProducers" :key="p.scenarioId" class="picker-card" :data-producer="p.id" :data-scenario="p.scenarioId" @click="pick(p.scenarioId)">
           <span class="flag" aria-hidden="true">{{ p.flag }}</span>
           <strong>{{ p.title }}</strong>
           <span class="label neutral">{{ languageName[p.language] ?? p.language }}</span>
@@ -240,7 +247,7 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
 
         <div v-if="resumeFailed" class="live-actions">
           <div class="btn-row">
-            <button class="btn-primary" data-action="retry-resume" @click="pick(producerId!)">{{ t.retry }}</button>
+            <button class="btn-primary" data-action="retry-resume" @click="pick(scenarioId!)">{{ t.retry }}</button>
             <button class="btn-text" @click="startNew">{{ t.start }}</button>
           </div>
         </div>
