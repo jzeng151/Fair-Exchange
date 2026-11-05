@@ -92,3 +92,24 @@ steps for the full stack here once #5 lands and #40 exercises them.
 
 The current sandbox deployment, the GitHub OIDC publishing role, and the full-stack deployment
 checklist for #5 are in [sandbox deployment](sandbox-deployment.md).
+
+## Analytics deployment smoke check
+
+When the Athena sync stack exists, `infra/deploy.sh` also runs
+`scripts/e2e/analytics_smoke.py` before reporting success. It checks that
+anonymous analytics access returns 401 and that both authenticated views return
+200 with JSON. This exercises all four named Athena queries, including the live
+and seeded AI-usage aggregations. The script reads the admin passcode from Secrets
+Manager in memory and never prints it. The deployment caller needs read access to
+that existing secret. The GitHub website-only publishing role is unchanged.
+
+Run the check separately with Python 3 and the AWS CLI:
+
+```bash
+python3 scripts/e2e/analytics_smoke.py --api <ApiUrl> --admin-secret-arn <AdminPasscodeSecretArn>
+```
+
+Athena exposes each `ai_usage` array element as one struct. The footprint queries
+alias that struct as `u` and select `u.model_id`, `u.input_tokens`, and
+`u.output_tokens`. Assigning three aliases to the one element fails with
+`MISMATCHED_COLUMN_ALIASES` and makes the analytics endpoint return 503.
