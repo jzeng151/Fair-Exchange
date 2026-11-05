@@ -31,7 +31,7 @@ from fex.conversation.state import (
 )
 from fex.models import ChallengeTag, Claim, ConsentChoice, EarlierAnswer, decision_refs
 from fex.tools import ALL_TOOLS, DATA_TOOLS
-from fex.tools._contract import EVIDENCE_KEY, ITEMS_KEY, TOOLS_RUN_KEY, run_data_tool
+from fex.tools._contract import EVIDENCE_KEY, ITEMS_KEY, LOG_KEY, TOOLS_RUN_KEY, run_data_tool
 from fex.tools.standards import RETRIEVER_KEY, ClauseRetriever, default_retriever
 from fex.verifier import Problem, SessionEvidence, check_claim
 
@@ -158,6 +158,11 @@ def _tool_errors(messages: list[dict]) -> list[str]:
 
 
 _BRACKET_ID = re.compile(r"\[([^\[\]]+)\]\s*$")
+
+
+def _source_refs(items: list[dict]) -> list[str]:
+    """Opaque IDs of the items a data tool returned: the bracketed item ID, or the clause ID for standards."""
+    return decision_refs([m.group(1) if (m := _BRACKET_ID.search(i["source"])) else i["source"] for i in items])
 
 
 def _claim_refs(claim: Claim) -> list[str]:
@@ -349,6 +354,7 @@ class ConversationEngine:
         A conflict or invalid record is logged and surfaced as an error, never retried."""
         if self.records is None:
             return
+        self._log_step(state)
         from fex.records import RecordConflict, save_record  # local: records imports conversation state
 
         try:
@@ -515,6 +521,8 @@ class ConversationEngine:
             "summary_original": pb.summary_original if pb else None,
             CONVERSATION_KEY: state.conversation_id,  # for Guardrail findings (#12)
             RETRIEVER_KEY: self.retriever, EVIDENCE_KEY: evidence, TOOLS_RUN_KEY: tools_run, ITEMS_KEY: items,
+            LOG_KEY: lambda name, returned: self._log(state, "tool", "tool_called",
+                                                      [name, *dict.fromkeys(_source_refs(returned))]),
         }
         try:
             try:
@@ -613,6 +621,14 @@ class ConversationEngine:
 
     def _emit_step(self, state: ConversationState, turn: _Turn) -> None:
         turn.emit("step", step=state.step, language=state.language)
+        self._log_step(state)
+
+    def _log_step(self, state: ConversationState) -> None:
+        """Log the step change since the last `step_changed` entry, if any (#26). Called when a step is emitted
+        and before a record save, which can come first in a turn, so the record holds the change too."""
+        last = next((e.refs[-1] for e in reversed(state.decision_log) if e.code == "step_changed"), None)
+        if state.step != last:
+            self._log(state, "step", "step_changed", ([last] if last else []) + [state.step])
 
     def _finish(self, state: ConversationState, turn: _Turn, *, step_changed: bool, save: bool = True):
         if turn.spoken:

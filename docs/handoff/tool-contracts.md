@@ -15,6 +15,7 @@ The contract is owned by [`docs/specs/17-standards-grounding.md`](../specs/17-st
   - `strength`: `exact`, `nearest` or `limited`. `data`: tool-specific fields.
   - Nothing found: an empty list, which leads to the limited-evidence path.
 - **Session evidence.** `run_data_tool` adds each item's `source` and `kind` (and, for standards, the clause ID) to the conversation's `SessionEvidence` as it returns them. The verifier accepts only those sources and clauses.
+- **Decision log.** Every data tool run, by the model or the backstop, logs `{kind: "tool", code: "tool_called", refs: [tool name, item IDs...]}`. The item IDs are the bracketed IDs from each `source` (the clause ID for standards), so a reviewer sees which sources the answer could cite.
 - **Backstop.** After the model's retrieval call, the engine calls any data tool the model skipped through the same `run_data_tool`, and logs `{kind: "tool", code: "tool_backstopped", refs: [tool name]}` in the decision log. Claims are written only after that, from every item returned.
 - Tests that call a tool directly get `step: "respond"` from `tests/tool_harness.call_tool` unless they pass another step (or `step=None` for none).
 
