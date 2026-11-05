@@ -10,7 +10,7 @@ export interface LiveCopy {
   stop: string; end: string; endConfirm: string
   consentAsk: string; consent: { internal: string; internal_and_outward: string; declined: string }
   yourChoice: string; change: string
-  feedbackAsk: string; feedback: { yes: string; somewhat: string; no: string }
+  feedbackAsk: string; feedbackThanks: string; yourAnswer: string; feedback: { yes: string; somewhat: string; no: string }
   insights: string; peers: string; source: string; standard: string
   strength: { exact: string; nearest: string; limited: string }
   limited: string; saved: (v: number) => string; declinedSaved: string; closed: string; working: string
@@ -25,7 +25,7 @@ export const liveCopy: Record<LiveLang, LiveCopy> = {
     consentAsk: 'May Fair Trade USA keep a summary of this conversation?',
     consent: { internal: 'Yes, for Fair Trade USA only', internal_and_outward: 'Yes, and it may be shared (combined with others)', declined: 'No, don’t keep it' },
     yourChoice: 'Your choice', change: 'Change',
-    feedbackAsk: 'Was this helpful?', feedback: { yes: 'Yes', somewhat: 'Somewhat', no: 'No' },
+    feedbackAsk: 'Was this helpful?', feedbackThanks: 'Thank you.', yourAnswer: 'Your answer', feedback: { yes: 'Yes', somewhat: 'Somewhat', no: 'No' },
     insights: 'What the data shows', peers: 'What others have tried', source: 'Source', standard: 'Standard',
     strength: { exact: 'exact match', nearest: 'nearest match', limited: 'limited evidence' },
     limited: 'There was only limited evidence for this situation.',
@@ -40,7 +40,7 @@ export const liveCopy: Record<LiveLang, LiveCopy> = {
     consentAsk: '¿Puede Fair Trade USA guardar un resumen de esta conversación?',
     consent: { internal: 'Sí, solo para Fair Trade USA', internal_and_outward: 'Sí, y se puede compartir (junto con otros)', declined: 'No, no guardarlo' },
     yourChoice: 'Su elección', change: 'Cambiar',
-    feedbackAsk: '¿Le fue útil?', feedback: { yes: 'Sí', somewhat: 'Algo', no: 'No' },
+    feedbackAsk: '¿Le fue útil?', feedbackThanks: 'Gracias.', yourAnswer: 'Su respuesta', feedback: { yes: 'Sí', somewhat: 'Algo', no: 'No' },
     insights: 'Lo que muestran los datos', peers: 'Lo que otros han probado', source: 'Fuente', standard: 'Estándar',
     strength: { exact: 'coincidencia exacta', nearest: 'coincidencia cercana', limited: 'evidencia limitada' },
     limited: 'Solo había evidencia limitada para esta situación.',
@@ -55,7 +55,7 @@ export const liveCopy: Record<LiveLang, LiveCopy> = {
     consentAsk: 'Fair Trade USA peut-il conserver un résumé de cette conversation ?',
     consent: { internal: 'Oui, pour Fair Trade USA seulement', internal_and_outward: 'Oui, et il peut être partagé (avec d’autres)', declined: 'Non, ne pas le conserver' },
     yourChoice: 'Votre choix', change: 'Modifier',
-    feedbackAsk: 'Cela vous a-t-il été utile ?', feedback: { yes: 'Oui', somewhat: 'Un peu', no: 'Non' },
+    feedbackAsk: 'Cela vous a-t-il été utile ?', feedbackThanks: 'Merci.', yourAnswer: 'Votre réponse', feedback: { yes: 'Oui', somewhat: 'Un peu', no: 'Non' },
     insights: 'Ce que montrent les données', peers: 'Ce que d’autres ont essayé', source: 'Source', standard: 'Norme',
     strength: { exact: 'correspondance exacte', nearest: 'correspondance proche', limited: 'preuves limitées' },
     limited: 'Il n’y avait que des preuves limitées pour cette situation.',

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import events from '../../../api/src/core/fixtures/agent-stream.events.json'
 import { apply, beginTurn, fromResume, newView, said } from './liveView'
 import type { StreamEvent } from './liveClient'
+import type { LiveView } from './liveView'
 
 const claim = (text: string) => ({ text, citation: { source: 'S', standard_clause: 'APS 1.1.1', period: null, strength: 'exact' as const } })
 
@@ -82,6 +83,15 @@ describe('live view', () => {
     run(v, [{ type: 'step', seq: 2, step: 'playback', language: 'es' }])
     expect(v.consent).toBeNull()
     expect(v.record?.version).toBe(2) // the saved-record history is kept
+  })
+
+  it('clears the shown feedback answer on a decline or a reopened description, as the agent does (#23)', () => {
+    const v: LiveView = { ...newView(), feedback: 'yes' }
+    run(v, [{ type: 'record_saved', seq: 1, status: 'declined', consent_scope: 'declined', version: 2 }])
+    expect(v.feedback).toBeNull()
+    v.feedback = 'no'
+    run(v, [{ type: 'step', seq: 2, step: 'playback', language: 'es' }])
+    expect(v.feedback).toBeNull()
   })
 
   it('rebuilds the view from a resume response: history, then the answer, step and allowed actions', () => {

@@ -23,6 +23,8 @@ export interface LiveView {
   /** The consent choice in force now. Null until chosen, and again after the description is reopened
    *  (the agent clears consent and feedback then, without a record_saved event). Unknown after a resume. */
   consent: 'internal' | 'internal_and_outward' | 'declined' | null
+  /** The feedback answer saved in this tab (#23). Cleared with consent; unknown after a resume. */
+  feedback: 'yes' | 'somewhat' | 'no' | null
   error: { code: string; message: string } | null
   busy: boolean
   /** Streamed text joins the last FEX bubble only while this is true. */
@@ -30,7 +32,7 @@ export interface LiveView {
 }
 
 export function newView(): LiveView {
-  return { conversationId: null, step: null, language: 'en', allowed: [], items: [], evidence: null, record: null, consent: null, error: null, busy: false, open: false }
+  return { conversationId: null, step: null, language: 'en', allowed: [], items: [], evidence: null, record: null, consent: null, feedback: null, error: null, busy: false, open: false }
 }
 
 /** A request is about to be sent: new FEX text goes in a new bubble. */
@@ -68,7 +70,7 @@ export function apply(view: LiveView, event: StreamEvent): void {
     case 'step':
       view.step = event.step
       view.language = event.language
-      if (event.step === 'intake' || event.step === 'playback') view.consent = null
+      if (event.step === 'intake' || event.step === 'playback') view.consent = view.feedback = null
       return
     case 'actions':
       view.allowed = event.allowed
@@ -78,6 +80,7 @@ export function apply(view: LiveView, event: StreamEvent): void {
       const record = { status: event.status, consent_scope: event.consent_scope, version: event.version }
       view.record = record
       view.consent = event.status === 'declined' ? 'declined' : event.consent_scope
+      if (event.status === 'declined') view.feedback = null
       view.items.push({ kind: 'record', ...record })
       view.open = false
       return
