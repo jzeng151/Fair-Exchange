@@ -117,7 +117,8 @@ describe('createLiveClient', () => {
 })
 
 describe('demoIdentityHeaders', () => {
-  it('is the local-only stand-in for sign-in (#11: deployed sign-in not decided)', () => {
+  it('sends the chosen producer, and the demo passcode when one is entered (#11 stand-in)', () => {
     expect(demoIdentityHeaders('P1')).toEqual({ 'x-demo-producer-id': 'P1' })
+    expect(demoIdentityHeaders('P1', 'pass')).toEqual({ 'x-demo-producer-id': 'P1', 'x-demo-passcode': 'pass' })
   })
 })

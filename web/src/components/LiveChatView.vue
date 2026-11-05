@@ -25,6 +25,17 @@ let client: LiveClient | null = null
 let session = 0
 const resumeFailed = ref<string | null>(null) // saved conversation we could not reopen for a temporary reason
 
+// The shared demo passcode (#11 stand-in): the deployed API requires it, the local one ignores it.
+// Kept for this tab only, never in the build.
+const PASSCODE_KEY = 'fex.live.passcode'
+const passcode = ref(readPasscode())
+function readPasscode(): string {
+  try { return sessionStorage.getItem(PASSCODE_KEY) ?? '' } catch { return '' }
+}
+function savePasscode() {
+  try { sessionStorage.setItem(PASSCODE_KEY, passcode.value.trim()) } catch { /* storage unavailable */ }
+}
+
 const t = computed(() => copyFor(view.language))
 const can = (a: ActionName) => view.allowed.includes(a)
 const closed = computed(() => view.step === 'closed')
@@ -51,6 +62,7 @@ function errorText(err: unknown): string {
     if (err.status === 0) return t.value.errors.unreachable
     if (err.status === 409) return closed.value ? t.value.closed : t.value.errors.busy
     if (err.status === 404) return t.value.errors.notFound
+    if (err.status === 401 || err.status === 403) return t.value.errors.signIn
   }
   return t.value.errors.other
 }
@@ -83,7 +95,10 @@ async function pick(id: string) {
   const mine = ++session
   producerId.value = id
   resumeFailed.value = null
-  client = props.makeClient ? props.makeClient(id) : createLiveClient({ baseUrl: props.apiUrl, producerId: id })
+  savePasscode()
+  client = props.makeClient
+    ? props.makeClient(id)
+    : createLiveClient({ baseUrl: props.apiUrl, producerId: id, passcode: passcode.value.trim() })
   const saved = recall(id)
   if (saved) {
     try {
@@ -164,6 +179,11 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
           <p class="small">Chat API: <code>{{ apiUrl }}</code></p>
         </div>
       </section>
+      <label class="passcode">
+        <span>Demo passcode</span>
+        <input v-model="passcode" type="password" autocomplete="off" data-field="passcode" />
+        <span class="small">Ask the Fair Exchange team for it. Not needed for a local chat API.</span>
+      </label>
       <h1>Choose a demo scenario</h1>
       <p class="small">Each card is an official demo scenario (<code>eval/scenarios/</code>): a sample producer and the messages to send.</p>
       <div class="picker-cards">
@@ -267,4 +287,6 @@ const feedbackChoices = ['yes', 'somewhat', 'no'] as const
 .choice p, .consent-line { margin: 0; }
 .btn-text.inline { min-height: 0; padding: 0 4px; text-decoration: underline; }
 code { overflow-wrap: anywhere; }
+.passcode { display: flex; flex-direction: column; gap: 4px; max-width: 320px; margin: 12px 0; }
+.passcode input { min-height: 40px; padding: 6px 10px; font-size: 15px; }
 </style>

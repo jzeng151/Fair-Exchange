@@ -6,6 +6,7 @@ import type * as logs from 'aws-cdk-lib/aws-logs';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import type { Construct } from 'constructs';
 import { FexRuntime } from './agent-runtime';
+import { type AnalyticsSource, FexChatApi } from './chat-api';
 import { FexDataBucket } from './data-bucket';
 import { FexGuardrail } from './guardrail';
 import { FexMemory } from './memory';
@@ -23,14 +24,20 @@ export interface FairExchangeStackProps extends StackProps {
     /** Runtime log retention (spec 05: required deploy-time value, no default). */
     logRetention: logs.RetentionDays;
   };
+  /** Reported by GET /health; deploy.sh passes the git commit. */
+  version: string;
+  /** The Athena stacks' outputs, when they are deployed: adds GET /analytics (#29) behind the admin passcode. */
+  analytics?: AnalyticsSource;
 }
 
 /**
  * Short-term event retention (days). Configuration, per the memory spec, and must be longer than the
- * maximum conversation lifetime. The lifetime (#13) is still "Not decided"; 7 days comfortably exceeds
- * any plausible lifetime. The agent re-checks this rule at startup from its own env configuration.
+ * maximum conversation lifetime (#13: 1,440 minutes for the sandbox and pilot, passed by deploy.sh). The agent re-checks this rule at startup from its own env configuration.
  */
 const MEMORY_EVENT_EXPIRY_DAYS = 7;
+
+/** Idle period before the sweep auto-closes a conversation (#13, decided 2026-11-04 for the sandbox and pilot). */
+const INACTIVITY_MINUTES = 120;
 
 /**
  * The whole Fair Exchange stack, deployable with one command (issue #5).
@@ -39,7 +46,7 @@ const MEMORY_EVENT_EXPIRY_DAYS = 7;
  *   - Agent: AgentCore Runtime for FEX + execution role (bedrock:InvokeModel on us. profiles only) (#4: done)
  *   - Guardrail in detect mode (FexGuardrail; the FEX runtime takes runtimeEnvironment + grantApply) (#12)
  *   - Knowledge Bases (S3 Vectors, NOT OpenSearch Serverless: it has an always-on cost)    (#16, #17: standards done)
- *   - API: API Gateway + Lambdas (chat, write-back, review, analytics), Powertools          (#25–#29)
+ *   - API: API Gateway + Lambdas (chat: done, with the #11 demo sign-in stand-in; review, analytics) (#25–#29)
  *   - Records: DynamoDB table (encrypted), Comprehend permissions                          (#26)
  *   - Memory: AgentCore Memory for conversation resume + per-producer long-term memory      (#59)
  *   - Web: S3 + CloudFront for the Vue app                                                 (#30–#33)
@@ -116,7 +123,7 @@ export class FairExchangeStack extends Stack {
     new FexDataBucket(this, 'Data', { encryptionKey: dataKey });
 
     // The FEX agent (#5, #13): AgentCore Runtime with the role limited to the #13 permission list
-    new FexRuntime(this, 'Agent', {
+    const agent = new FexRuntime(this, 'Agent', {
       codeBucketName: props.standards.artifactsBucketName,
       codeKey: props.agent.codeKey,
       artifactsKeyArn: props.standards.artifactsKeyArn,
@@ -129,6 +136,18 @@ export class FairExchangeStack extends Stack {
       knowledgeBaseArn: standards.knowledgeBaseArn,
       maxLifetimeMinutes: props.agent.maxLifetimeMinutes,
       logRetention: props.agent.logRetention,
+    });
+
+    // The chat API (#25) with the sandbox sign-in stand-in (#11). CORS allows only the website.
+    new FexChatApi(this, 'ChatApi', {
+      conversations: tables.conversations,
+      runtimeArn: agent.runtime.attrAgentRuntimeArn,
+      allowedOrigin: `https://${distribution.distributionDomainName}`,
+      inactivityMinutes: INACTIVITY_MINUTES,
+      logRetention: props.agent.logRetention,
+      dataKey,
+      version: props.version,
+      analytics: props.analytics,
     });
   }
 }

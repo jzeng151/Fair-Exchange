@@ -139,7 +139,6 @@ Script checks, run once in the sandbox: a re-run with no changes succeeds, a mis
 
 - Retention period for each log group. It is a required deploy-time configuration value with no default, so every deployer chooses it explicitly.
 - Whether message content may appear in AgentCore logs at all (ADR 0002). Turning content capture off is a configuration value. ADR 0002 found the Strands tracer still logs content when the documented setting is off, so whoever turns it off must verify the result the same way the spike did.
-- The sign-in stand-in ([#11](11-identity.md)), which the stack will host once decided
 
 ### Spike checks
 

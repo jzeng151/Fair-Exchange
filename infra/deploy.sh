@@ -57,8 +57,8 @@ if [[ "$destination" != CloudWatchLogs ]]; then
 fi
 echo "Transaction Search: on."
 
-step "2/10 Building the website"
-(cd "$repo/web" && npm ci --silent && npm run build)
+step "2/10 Installing the chat API's dependencies (bundled into its Lambdas by the stack)"
+(cd "$repo/api" && npm ci --silent)
 
 step "3/10 Building one standards document per clause"
 hash="$(cd "$repo/data" && uv run --quiet python -m fx_data.standards_kb "$build/docs")"
@@ -96,7 +96,7 @@ agent_key="agent/fex-$(sha256 "$build/agent.zip" | cut -c1-12).zip"  # new key p
 aws s3 cp --only-show-errors "$build/agent.zip" "s3://$bucket/$agent_key"
 echo "Agent code: s3://$bucket/$agent_key ($(du -h "$build/agent.zip" | cut -f1))"
 
-step "8/10 Main stack (website hosting, standards Knowledge Base; ingestion runs when the clauses change)"
+step "8/10 Main stack (website hosting, standards Knowledge Base, data bucket, agent runtime, chat API)"
 # Migration for stacks deployed before the data source used RETAIN: switch the existing data source first.
 # A change that replaces the vector store also replaces the data source, and the old one is deleted after the
 # Knowledge Base role's vector permission has moved to the new index. With DELETE, that cleanup fails and leaves
@@ -119,11 +119,27 @@ PY
     fi
   done
 fi
+# Analytics (#29): when the Athena sync stack exists (deploy-athena-sync.sh), deploy its fixed named queries and
+# pass both stacks' outputs, which adds GET /analytics behind the admin passcode. Without it, no analytics route.
+analytics_ctx=()
+sync_key="$(output FairExchangeAthenaSync SyncKeyArn 2>/dev/null || true)"
+if [[ "$sync_key" == arn:aws:kms:* ]]; then
+  deploy FairExchangeAnalyticsQueries
+  analytics_ctx=(-c analyticsQueryIds="$(output FairExchangeAnalyticsQueries AnalyticsNamedQueryIds)"
+    -c analyticsWorkGroup="$(output FairExchangeAthenaSync AthenaWorkGroup)"
+    -c analyticsRecordsBucket="$(output FairExchangeAthenaSync RecordsBucketName)"
+    -c analyticsResultsBucket="$(output FairExchangeAthenaSync AthenaResultsBucketName)"
+    -c analyticsKeyArn="$sync_key")
+  echo "Analytics route: on (Athena workgroup $(output FairExchangeAthenaSync AthenaWorkGroup))"
+else
+  echo "Analytics route: off (deploy the Athena sync with infra/deploy-athena-sync.sh, then re-run)"
+fi
 # cdk deploy (not aws cloudformation deploy): it publishes the stack's CDK assets through the bootstrap roles
 (cd "$infra" && CDK_DEFAULT_ACCOUNT="$account" CDK_DEFAULT_REGION="$AWS_REGION" npx cdk deploy FairExchange \
   --require-approval never --progress events -c standardsDocsTtlDays="$ttl_days" \
   -c artifactsBucket="$bucket" -c artifactsKeyArn="$key_arn" -c standardsDocsHash="$hash" \
-  -c agentCodeKey="$agent_key" -c maxLifetimeMinutes="$FEX_MAX_LIFETIME_MINUTES" -c logRetentionDays="$LOG_RETENTION_DAYS")
+  -c agentCodeKey="$agent_key" -c maxLifetimeMinutes="$FEX_MAX_LIFETIME_MINUTES" -c logRetentionDays="$LOG_RETENTION_DAYS" \
+  -c version="$(git -C "$repo" rev-parse --short HEAD 2>/dev/null || echo unknown)" ${analytics_ctx[@]+"${analytics_ctx[@]}"})
 
 step "9/10 Uploading the producer data to the data bucket (#7, #14; Glue tables over it for Athena)"
 # Only allowlisted data: profiles, Premium projects, survey summary facts, certification scope, the peer catalog
@@ -131,8 +147,11 @@ data_bucket="$(output FairExchange DataBucketName)"
 (cd "$repo/data" && uv run --quiet python -m fx_data.export "$build/data")
 aws s3 sync --only-show-errors --delete "$build/data/" "s3://$data_bucket/"
 
-step "10/10 Publishing the website and running smoke tests"
+step "10/10 Building and publishing the website (live mode uses the chat API), then smoke tests"
+api_url="$(output FairExchange ApiUrl)"
+(cd "$repo/web" && npm ci --silent && VITE_FEX_API_URL="$api_url" npm run build)
 bash "$infra/publish-web.sh"
+curl --fail --silent --show-error --retry 5 --retry-all-errors "${api_url%/}/health"; echo
 kb_id="$(output FairExchange StandardsKnowledgeBaseId)"
 (cd "$repo/agent" && FEX_STANDARDS_KB_ID="$kb_id" uv run --quiet pytest -q -p no:cacheprovider \
   ../eval/tests/test_standards_kb_smoke.py)
@@ -140,4 +159,12 @@ kb_id="$(output FairExchange StandardsKnowledgeBaseId)"
 echo
 echo "Deployed in $((SECONDS - start))s."
 echo "Website: $(output FairExchange WebUrl)"
-echo "Standards Knowledge Base: $kb_id (set FEX_STANDARDS_KB_ID on the agent runtime)"
+echo "Standards Knowledge Base: $kb_id"
+echo "Chat API: $api_url"
+echo "Demo passcode (sign-in stand-in, docs/specs/11-identity.md):"
+echo "  aws secretsmanager get-secret-value --secret-id $(output FairExchange DemoPasscodeSecretArn) --query SecretString --output text"
+admin_secret="$(output FairExchange AdminPasscodeSecretArn)"
+if [[ "$admin_secret" == arn:* ]]; then
+  echo "Admin passcode (analytics):"
+  echo "  aws secretsmanager get-secret-value --secret-id $admin_secret --query SecretString --output text"
+fi

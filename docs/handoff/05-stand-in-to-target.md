@@ -19,8 +19,9 @@ Notes on the swaps that touch a contract-owning seam:
 
 - **Sign-in.** The identity-resolution function ([#11](../specs/11-identity.md)) is the only place that
   reads identity. Replacing the test stand-in with Okta changes that one function; no handler changes.
-  The deployed sign-in stand-in is itself still "Not decided" (see
-  [open decisions](06-known-limitations.md#open-decisions)).
+  The deployed stand-in is an API Gateway Lambda authorizer that accepts a shared demo passcode plus a
+  producer from the eval scenarios' allow-list ([#11](../specs/11-identity.md) "Deployed stand-in").
+  Replace the authorizer with the Okta one; the identity it hands the handlers keeps the same fields.
 - **Records store.** The record schema ([#26](../specs/26-write-back.md)) is the contract; moving from
   DynamoDB to the production store keeps the schema and the review/"your record" routes.
 - **Producer and regional data.** Swap the loaders in `fx_data` (see [Data](04-data.md)); the data-tool
