@@ -11,7 +11,7 @@ import type { FexMemory } from './memory';
 /** The models FEX calls (ADR 0001): US cross-region inference profiles, so processing stays in US regions. */
 export const SMALL_MODEL = 'anthropic.claude-haiku-5-5';
 export const LARGE_MODEL = 'anthropic.claude-sonnet-5-5';
-const US_REGIONS = ['us-east-1', 'us-east-2', 'us-west-2'];
+export const US_REGIONS = ['us-east-1', 'us-east-2', 'us-west-2'];
 
 export interface FexRuntimeProps {
   /** Artifacts bucket and the agent code zip's key (a new key per build, so CloudFormation sees a change). */

@@ -9,7 +9,10 @@ export interface Conversation {
   createdAt: number;
   status: ConversationStatus;
   closedAt?: number;
+  /** Language the agent identified from what the producer wrote. Voice transcription trusts only this. */
   language?: string;
+  /** Language the agent opened in, from the producer's profile (#22). Not identified from the producer. */
+  openingLanguage?: string;
   lastActivityAt: number;
   /** Epoch ms. A turn is in progress while this is in the future. */
   lockExpiresAt?: number;
@@ -77,6 +80,8 @@ export interface ConversationStore {
   markClosed(conversationId: string, now: number): Promise<void>;
   /** Cache only agent-identified language for voice transcription. No conversation content. */
   setLanguage?(conversationId: string, token: string, language: string): Promise<void>;
+  /** Cache the start turn's profile language, for read-aloud and attachments only (#169). */
+  setOpeningLanguage?(conversationId: string, token: string, language: string): Promise<void>;
   /** All open conversations. Used only by the sweep. */
   listOpen(): Promise<Conversation[]>;
 }

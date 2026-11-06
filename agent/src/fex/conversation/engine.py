@@ -94,7 +94,9 @@ _RULES = (
 INTAKE_SYSTEM = _RULES + (
     " You are in intake. Open with an open question about what has been difficult. Then ask, one at a time, when it "
     "started, how severe it is and what they have tried. Confirm their location and entity type from the profile "
-    "instead of asking them to type it. Set ready_for_playback when you know all four."
+    "instead of asking them to type it. Set ready_for_playback when you know all four. Never mention internal steps "
+    "or words like 'intake', 'playback' or 'step'. If they ask for data or advice now, say warmly that you will look "
+    "up the data for their area as soon as you understand their situation, then ask the next question."
 )
 PLAYBACK_SYSTEM = _RULES + (
     " Restate what you understood: the challenge, timing, severity and what was tried. If the producer corrected "

@@ -24,6 +24,7 @@ const toConversation = (item: Item): Conversation => ({
   lockExpiresAt: item.lock_expires_at ? Number(item.lock_expires_at.N) : undefined,
   lockToken: item.lock_token?.S,
   language: item.language?.S,
+  openingLanguage: item.opening_language?.S,
 });
 
 const num = (n: number): AttributeValue => ({ N: String(n) });
@@ -138,9 +139,17 @@ export class DynamoConversationStore implements ConversationStore {
   }
 
   async setLanguage(conversationId: string, token: string, language: string): Promise<void> {
+    await this.setLanguageAttribute(conversationId, token, 'language', language);
+  }
+
+  async setOpeningLanguage(conversationId: string, token: string, language: string): Promise<void> {
+    await this.setLanguageAttribute(conversationId, token, 'opening_language', language);
+  }
+
+  private async setLanguageAttribute(conversationId: string, token: string, attribute: string, language: string): Promise<void> {
     await this.client.send(new UpdateItemCommand({ TableName: this.table,
       Key: { conversation_id: { S: conversationId } }, UpdateExpression: 'SET #lang = :lang',
-      ConditionExpression: 'lock_token = :token', ExpressionAttributeNames: { '#lang': 'language' },
+      ConditionExpression: 'lock_token = :token', ExpressionAttributeNames: { '#lang': attribute },
       ExpressionAttributeValues: { ':lang': { S: language }, ':token': { S: token } } }));
   }
 

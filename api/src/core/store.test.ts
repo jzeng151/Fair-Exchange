@@ -50,3 +50,15 @@ describe('DynamoConversationStore turn lock', () => {
     await expect(store.releaseLock('c1', 'stale')).resolves.toBeUndefined();
   });
 });
+
+describe('DynamoConversationStore language', () => {
+  it.each([['setLanguage', 'language'], ['setOpeningLanguage', 'opening_language']] as const)(
+    '%s writes %s only while the turn holds the lock', async (method, attribute) => {
+      ddb.on(UpdateItemCommand).resolves({});
+      await store[method]('c1', 'tok-1', 'es');
+      const input = ddb.commandCalls(UpdateItemCommand)[0]!.args[0].input;
+      expect(input.ConditionExpression).toBe('lock_token = :token');
+      expect(input.ExpressionAttributeNames).toEqual({ '#lang': attribute });
+      expect(input.ExpressionAttributeValues).toEqual({ ':lang': { S: 'es' }, ':token': { S: 'tok-1' } });
+    });
+});

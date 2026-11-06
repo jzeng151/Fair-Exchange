@@ -1,15 +1,20 @@
-/* Design tokens from the FTUSA UI/UX specification v1.1 (Partner Portal palette, Rubik). */
+/* Design tokens: the only place colours and fonts are defined (#169). */
 :root {
-  --ft-brand-green: #93D73B;
+  /* Fair Trade USA brand palette (design.fairtradecertified.org), decided 2026-11-05 (#169) */
   --ft-brand-indigo: #313D7F;
-  --ft-ui-primary: #2C6EA1;
-  --ft-ui-primary-hover: #245982;
-  --ft-ui-primary-tint: rgba(44, 110, 161, 0.12);
-  --ft-ui-text: #343637;
-  --ft-ui-text-secondary: rgba(0, 0, 0, 0.54);
-  --ft-ui-border: #EEEEEE;
-  --ft-ui-canvas: #FAFAFA;
+  --ft-brand-cyan: #44AEC8;
+  --ft-brand-green: #93D73B;
+  --ft-brand-amber: #ECCA52;
+  --ft-brand-dark-grey: #39373A;
+  --ft-ui-primary: #313D7F;
+  --ft-ui-primary-hover: #262F63;
+  --ft-ui-primary-tint: rgba(49, 61, 127, 0.12);
+  --ft-ui-text: #39373A;
+  --ft-ui-text-secondary: rgba(0, 0, 0, 0.6);
+  --ft-ui-border: #E6DFD1;
+  --ft-ui-canvas: #F7F2E8;
   --ft-ui-surface: #FFFFFF;
+  /* Status colours: unchanged from the FTUSA UI/UX specification v1.1 */
   --ft-ui-error: #AB2300;
   --ft-ui-error-bg: #FFE8DF;
   --ft-ui-success: #2E8540;

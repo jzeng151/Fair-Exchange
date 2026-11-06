@@ -142,10 +142,19 @@ export async function streamTurn(
   let doneSent = false;
   try {
     for await (const event of boundedStream(deps, request)) {
-      if (request.kind !== 'start' && event.type === 'step' && typeof event.language === 'string'
-        && ['en', 'es', 'fr'].includes(event.language) && event.language !== conversation.language) {
-        await deps.store.setLanguage?.(conversation.conversationId, lease.token, event.language);
-        conversation.language = event.language;
+      if (event.type === 'step' && typeof event.language === 'string' && ['en', 'es', 'fr'].includes(event.language)) {
+        if (request.kind === 'start') {
+          // The start turn's language comes from the profile, not from anything the producer said, so it is
+          // kept apart from `language`: voice still lets Transcribe identify it, while Listen and attachments
+          // can use it before the first message (#169).
+          if (event.language !== conversation.openingLanguage) {
+            await deps.store.setOpeningLanguage?.(conversation.conversationId, lease.token, event.language);
+            conversation.openingLanguage = event.language;
+          }
+        } else if (event.language !== conversation.language) {
+          await deps.store.setLanguage?.(conversation.conversationId, lease.token, event.language);
+          conversation.language = event.language;
+        }
       }
       writeEvent(sink, event);
       if (event.type === 'done') doneSent = true;
