@@ -1,7 +1,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { PollyClient, SynthesizeSpeechCommand, type LanguageCode, type VoiceId } from '@aws-sdk/client-polly';
 import type { APIGatewayProxyEvent } from 'aws-lambda';
-import { loadOwnedConversation } from '../core/ownedConversation.js';
+import { loadOwnedConversation, replyLanguage } from '../core/ownedConversation.js';
 import { MAX_SPEECH_CHARS, parseSpeechBody } from '../core/validate.js';
 import { json } from '../core/routes.js';
 import type { Log } from '../core/types.js';
@@ -14,7 +14,7 @@ export function speechDeps(log: Log): SpeechDeps {
   return { db: new DynamoDBClient({}), polly: new PollyClient({}), conversations, log, clock: () => Date.now() };
 }
 
-/** Chosen from the stored conversation language only, never from the request. */
+/** Chosen from the stored conversation language (or, before the first message, the opening language), never from the request. */
 const VOICES: Record<string, { voice: VoiceId; code: LanguageCode }> = {
   en: { voice: 'Joanna', code: 'en-US' }, es: { voice: 'Lupe', code: 'es-US' }, fr: { voice: 'Lea', code: 'fr-FR' },
 };
@@ -24,7 +24,7 @@ export async function speechRoute(d: SpeechDeps, event: APIGatewayProxyEvent) {
   const started = d.clock();
   const conversation = await loadOwnedConversation(d.db, d.conversations, event);
   const { text } = parseSpeechBody(event.body);
-  const { voice, code } = VOICES[conversation.language ?? ''] ?? VOICES.en!;
+  const { voice, code } = VOICES[replyLanguage(conversation) ?? ''] ?? VOICES.en!;
   const result = await d.polly.send(new SynthesizeSpeechCommand({ Text: text, TextType: 'text', VoiceId: voice,
     LanguageCode: code, Engine: 'neural', OutputFormat: 'mp3' }));
   if (!result.AudioStream) throw new Error('Polly returned no audio');

@@ -157,6 +157,34 @@ describe('ownership', () => {
   });
 });
 
+describe('conversation language', () => {
+  it('keeps the start turn\'s profile language apart from the identified language', async () => {
+    const t = makeDeps();
+    t.agent.script.push([{ type: 'step', seq: 1, step: 'intake', language: 'es' }, { type: 'done', seq: 2 }]);
+    const { id } = await startConversation(t);
+    const stored = t.store.items.get(id)!;
+    expect(stored.openingLanguage).toBe('es');
+    // Voice transcription trusts only `language`, so it still identifies the first voice note itself.
+    expect(stored.language).toBeUndefined();
+  });
+
+  it('stores the language identified on a later turn as the conversation language', async () => {
+    const t = makeDeps();
+    t.agent.script.push([{ type: 'step', seq: 1, step: 'intake', language: 'es' }, { type: 'done', seq: 2 }]);
+    const { id } = await startConversation(t);
+    t.agent.script.push([{ type: 'step', seq: 1, step: 'playback', language: 'fr' }, { type: 'done', seq: 2 }]);
+    await call(t, () => planMessage(t.deps, resolve, makeEvent({ id, body: { text: 'Mes parcelles sont inondées' } })));
+    expect(t.store.items.get(id)).toMatchObject({ openingLanguage: 'es', language: 'fr' });
+  });
+
+  it('ignores a start-turn language outside en, es and fr', async () => {
+    const t = makeDeps();
+    t.agent.script.push([{ type: 'step', seq: 1, step: 'intake', language: 'de' }, { type: 'done', seq: 2 }]);
+    const { id } = await startConversation(t);
+    expect(t.store.items.get(id)!.openingLanguage).toBeUndefined();
+  });
+});
+
 describe('streaming turns', () => {
   it('passes agent events through in order, unchanged', async () => {
     const t = makeDeps();

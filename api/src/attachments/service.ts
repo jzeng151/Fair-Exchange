@@ -4,7 +4,7 @@ import { S3Client, DeleteObjectCommand, GetObjectCommand, HeadObjectCommand } fr
 import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 import { BedrockRuntimeClient, ConverseCommand, type ContentBlock } from '@aws-sdk/client-bedrock-runtime';
 import type { APIGatewayProxyEvent } from 'aws-lambda';
-import { loadOwnedConversation } from '../core/ownedConversation.js';
+import { loadOwnedConversation, replyLanguage } from '../core/ownedConversation.js';
 import { BadRequest, isConversationId, parseAttachmentBody } from '../core/validate.js';
 import { Conflict, NotFound } from '../core/turn.js';
 import { json } from '../core/routes.js';
@@ -80,7 +80,7 @@ export async function attachmentsRoute(d: AttachmentDeps, event: APIGatewayProxy
       ? { document: { format: 'pdf', name: 'attachment', source: { bytes } } }
       : { image: { format: IMAGE_FORMATS[contentType], source: { bytes } } };
     const result = await d.bedrock.send(new ConverseCommand({ modelId: d.modelId,
-      messages: [{ role: 'user', content: [file, { text: prompt(LANGUAGES[conversation.language ?? ''] ?? 'English') }] }],
+      messages: [{ role: 'user', content: [file, { text: prompt(LANGUAGES[replyLanguage(conversation) ?? ''] ?? 'English') }] }],
       inferenceConfig: { maxTokens: 200 } }));
     const description = (result.output?.message?.content ?? []).map(block => block.text ?? '').join('').trim();
     if (!description) throw new Error('Empty description');

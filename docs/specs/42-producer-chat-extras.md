@@ -49,6 +49,7 @@ This changes [#41](41-voice-notes.md)'s "Out of Scope: voice replies from FEX" (
   - `text` is 1 to 1,500 characters, counted in UTF-16 units like the chat API.
   - Anything else returns 400.
 - **Voice.** Chosen by the server from the conversation's stored language, never from the request: `en` Joanna (en-US), `es` Lupe (es-US), `fr` Léa (fr-FR). All use the neural engine. Any other language uses `en`.
+- **Conversation language.** The language the agent identified from what the producer wrote. Before the first message there is none, so the server uses the language the conversation opened in, which the start turn stores separately as `opening_language` (the profile's language, [#22](22-spanish-exchange.md)). Voice notes ([#41](41-voice-notes.md)) don't use `opening_language`, so Transcribe still identifies the first voice note's language itself. Attachments use the same rule.
 - **Response.** `200 { "content_type": "audio/mpeg", "audio": "<base64 MP3>" }`. The audio is not stored anywhere.
 - **Abuse limit.** The route only reads text aloud; it doesn't check that the text came from FEX. The 1,500-character cap, the producer sign-in and the API's existing throttling bound the cost. Neural Polly is about $16 per million characters.
 - **Client.**

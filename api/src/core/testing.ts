@@ -41,6 +41,14 @@ export class MemoryStore implements ConversationStore {
       delete c.lockToken;
     }
   }
+  async setLanguage(id: string, token: string, language: string) {
+    const c = this.items.get(id);
+    if (c && c.lockToken === token) c.language = language;
+  }
+  async setOpeningLanguage(id: string, token: string, language: string) {
+    const c = this.items.get(id);
+    if (c && c.lockToken === token) c.openingLanguage = language;
+  }
   async markClosed(id: string, now: number) {
     const c = this.items.get(id);
     if (c) {

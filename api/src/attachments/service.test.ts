@@ -100,6 +100,11 @@ describe('reading an attachment', () => {
     await attachmentsRoute(d, event('read'));
     expect(bedrock.commandCalls(ConverseCommand)[0]!.args[0].input.messages![0]!.content![1]!.text).toMatch(new RegExp(`Reply in ${name}\\.$`));
   });
+  it('describes in the opening language before the producer has written anything', async () => {
+    db.on(GetItemCommand, { TableName: 'chat' }).resolves({ Item: marshall({ producer_id: 'p', status: 'open', opening_language: 'fr' }) });
+    await attachmentsRoute(d, event('read'));
+    expect(bedrock.commandCalls(ConverseCommand)[0]!.args[0].input.messages![0]!.content![1]!.text).toMatch(/Reply in French\.$/);
+  });
   it('uses the full spec prompt', async () => {
     await attachmentsRoute(d, event('read'));
     expect(bedrock.commandCalls(ConverseCommand)[0]!.args[0].input.messages![0]!.content![1]!.text).toBe(

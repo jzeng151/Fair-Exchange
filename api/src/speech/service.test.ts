@@ -47,6 +47,13 @@ describe('speech route', () => {
       expect(polly.commandCalls(SynthesizeSpeechCommand)[0]!.args[0].input).toEqual({
         Text: secret, VoiceId: voice, LanguageCode: code, Engine: 'neural', OutputFormat: 'mp3', TextType: 'text' });
     });
+  it.each([[undefined, 'es', 'Lupe'], ['fr', 'es', 'Lea'], [undefined, undefined, 'Joanna']])(
+    'with language %s and opening language %s, reads with %s', async (language, openingLanguage, voice) => {
+      db.on(GetItemCommand, { TableName: 'chat' }).resolves({ Item: marshall({ producer_id: 'p', status: 'open',
+        ...(language ? { language } : {}), ...(openingLanguage ? { opening_language: openingLanguage } : {}) }) });
+      await speechRoute(d, event());
+      expect(polly.commandCalls(SynthesizeSpeechCommand)[0]!.args[0].input.VoiceId).toBe(voice);
+    });
   it('never takes the language from the request', async () => {
     conversation('p', 'open', 'fr');
     await expect(speechRoute(d, event({ text: 'hi', language: 'es' }))).rejects.toThrow('Unknown field: language');

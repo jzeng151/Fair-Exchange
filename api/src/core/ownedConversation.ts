@@ -5,7 +5,17 @@ import { resolveIdentity, requireRole } from './identity.js';
 import { isConversationId } from './validate.js';
 import { NotFound } from './turn.js';
 
-export interface OwnedConversation { id: string; status: string; language?: string }
+export interface OwnedConversation {
+  id: string;
+  status: string;
+  /** Identified from the producer's own words. */
+  language?: string;
+  /** The profile language the conversation opened in, set before the producer writes anything. */
+  openingLanguage?: string;
+}
+
+/** The language to reply in: the identified one, else the one the conversation opened in. */
+export const replyLanguage = (c: OwnedConversation): string | undefined => c.language ?? c.openingLanguage;
 
 /**
  * The ownership check the voice routes use (#25, #41): producer role, a UUID conversation ID from the path,
@@ -19,5 +29,6 @@ export async function loadOwnedConversation(db: DynamoDBClient, table: string, e
   const conversation = result.Item && unmarshall(result.Item);
   if (!conversation || conversation.producer_id !== identity.producerId) throw new NotFound();
   return { id, status: String(conversation.status),
-    ...(typeof conversation.language === 'string' ? { language: conversation.language } : {}) };
+    ...(typeof conversation.language === 'string' ? { language: conversation.language } : {}),
+    ...(typeof conversation.opening_language === 'string' ? { openingLanguage: conversation.opening_language } : {}) };
 }
